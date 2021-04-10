@@ -63,6 +63,10 @@ public class LinkedList<E>
      */
     transient FingerStack<E> fingerStack = new FingerStack<>();
     
+    public LinkedList() {
+        
+    }
+    
     public LinkedList(Collection<? extends E> c) {
         addAll(c);
     }
@@ -121,6 +125,18 @@ public class LinkedList<E>
     private void addFinger(Node<E> node, int index) {
         final Finger<E> finger = new Finger<>(node, index);
         fingerStack.push(finger);
+    }
+    
+    public void clear() {
+        fingerStack.clear();
+        
+        for (Node<E> node = first; node != null; node = node) {
+            node.prev = null;
+            node.item = null;
+            Node<E> next = node.next;
+            node.next = null;
+            node = next;
+        }
     }
     
     private void removeFinger() {
@@ -220,6 +236,19 @@ public class LinkedList<E>
     public boolean add(E e) {
         linkLast(e);
         return true;
+    }
+    
+    public E get(int index) {
+        final Finger<E> closestFinger = fingerStack.get(index);
+        final int distance = closestFinger.index - index;
+        
+        if (distance > 0) {
+            closestFinger.rewindLeft(distance);
+        } else {
+            closestFinger.rewindRight(-distance);
+        }
+        
+        return closestFinger.node.item;
     }
     
     public boolean remove(Object o) {
@@ -509,6 +538,15 @@ public class LinkedList<E>
         
         Finger<E> get(int index) {
             return fingerArray[index];
+        }
+        
+        void clear() {
+            for (int i = 0; i < size; i++) {
+                fingerArray[i].node = null; // help GC
+                fingerArray[i] = null;
+            }
+            
+            size = 0;
         }
         
         private void enlargeFingerArrayIfNeeded() {

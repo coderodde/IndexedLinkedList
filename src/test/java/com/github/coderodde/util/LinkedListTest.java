@@ -1,7 +1,13 @@
 package com.github.coderodde.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class LinkedListTest {
 
+    private final LinkedList<Integer> list = new LinkedList<>();
+    
     @org.junit.jupiter.api.BeforeAll
     public static void setUpClass() throws Exception {
         
@@ -14,7 +20,7 @@ public class LinkedListTest {
 
     @org.junit.jupiter.api.BeforeEach
     public void setUp() throws Exception {
-        
+        list.clear();
     }
 
     @org.junit.jupiter.api.AfterEach
@@ -34,6 +40,32 @@ public class LinkedListTest {
     
     @org.junit.jupiter.api.Test
     public void testAdd() {
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+        
+        list.add(1);
+        
+        assertEquals(1, list.size());
+        assertFalse(list.isEmpty());
+        
+        assertEquals(Integer.valueOf(1), list.get(0));
+        
+        list.add(2);
+        
+        assertEquals(2, list.size());
+        assertFalse(list.isEmpty());
+        
+        assertEquals(Integer.valueOf(2), list.get(1));
+    }
+    
+    @org.junit.jupiter.api.Test(expected = IndexOutOfBoundsException.class)
+    public void testAddThrowsOnMinusOneIndex() {
+        list.add(1);
+        
+    }
+    
+    @org.junit.jupiter.api.Test
+    public void testAddThrowsOnTooLargeIndex() {
         
     }
     
