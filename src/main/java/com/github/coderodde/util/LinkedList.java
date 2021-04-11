@@ -86,7 +86,7 @@ public class LinkedList<E>
         
         size++;
         modCount++;
-        shiftFingersLeft(1);
+        shiftFingersRight(1);
         
         if (mustAddFinger())
             addFinger(newNode, 0);
@@ -110,10 +110,36 @@ public class LinkedList<E>
             addFinger(newNode, size - 1);
     }
     
+//    private void linkBefore(E e, Node<E> succ, int index) {
+//        final Node<E> pred = succ.prev;
+//        final Node<E> newNode = new Node<>();
+//        newNode.item = e;
+//        newNode.next = succ;
+//        
+//        if (pred == null) 
+//            first = newNode;
+//        else {
+//            pred.next = newNode;
+//            newNode.prev = pred;
+//        }
+//        
+//        size++;
+//        modCount++;
+//        
+//        if (mustAddFinger()) {
+//            addFinger(newNode, index);
+//            
+//        }
+//    }
+    
     private boolean mustAddFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerStack.size() != getRecommendedFingerCount();
+    }
+    
+    private boolean mustAddFinger(int size) {
+        return fingerStack.size() != getRecommendedFingerCount(size);
     }
     
     private boolean mustRemoveFinger() {
@@ -203,26 +229,98 @@ public class LinkedList<E>
         final Node<E> pred = succ.prev;
         final Node<E> newNode = new Node<>();
         
-        newNode.prev = pred;
         newNode.item = e;
         newNode.next = succ;
         succ.prev = newNode;
         
-        if (pred == null) 
+        if (pred == null) {
             first = newNode;
-        else
+        } else {
             pred.next = newNode;
+            newNode.prev = pred;
+        }
         
         size++;
         modCount++;
+        shiftFingersRight(index);
         
         if (mustAddFinger()) 
             addFinger(newNode, index);
+    }
+    
+    private E unlinkFirst(Node<E> f) {
+        final E element = f.item;
+        final Node<E> next = f.next;
+        f.item = null;
+        f.next = null; // help GC
+        first = next;
         
-        //! or index + 1?
-        shiftFingersRight(index);
+        if (next == null) 
+            last = null;
+        else
+            next.prev = null;
+        
+        size--;
+        modCount++;
+        
+        if (mustRemoveFinger()) 
+            fingerStack.pop();
+        
+        fingerStack.rewindLeft(1);
+        return element;
+    }
+    
+    private E unlinkLast(Node<E> l) {
+        final E element = l.item;
+        final Node<E> prev = l.prev;
+        l.item = null;
+        l.prev = null; // help GC
+        last = prev;
+        
+        if (prev == null) 
+            first = null;
+        else 
+            prev.next = null;
+        
+        size--;
+        modCount++;
+        
+        if (mustRemoveFinger()) 
+            fingerStack.pop();
+        
+        return element;
     }
 
+    E unlink(Node<E> x, int index) {
+        final E element = x.item;
+        final Node<E> next = x.next;
+        final Node<E> prev = x.prev;
+        
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+            x.prev = null;
+        }
+        
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+            x.next = null;
+        }
+        
+        x.item = null;
+        size--;
+        modCount++;
+        
+        if (mustRemoveFinger())
+            removeFinger();
+        
+        fingerStack.rewindLeft(index + 1);
+        return element;
+    }
+    
     @Override
     public ListIterator<E> listIterator(int index) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -239,16 +337,8 @@ public class LinkedList<E>
     }
     
     public E get(int index) {
-        final Finger<E> closestFinger = fingerStack.get(index);
-        final int distance = closestFinger.index - index;
-        
-        if (distance > 0) {
-            closestFinger.rewindLeft(distance);
-        } else {
-            closestFinger.rewindRight(-distance);
-        }
-        
-        return closestFinger.node.item;
+        checkElementIndex(index);
+        return node(index).item;
     }
     
     public boolean remove(Object o) {
@@ -270,10 +360,6 @@ public class LinkedList<E>
             }
         }
         return false;
-    }
-    
-    private void unlink(Node<E> node, int index) {
-        
     }
     
     public boolean addAll(Collection<? extends E> c) {
@@ -540,6 +626,30 @@ public class LinkedList<E>
             return fingerArray[index];
         }
         
+        private void rewind(int startingIndex, int steps) {
+            for (int i = 0; i < size; i++) {
+                Finger<E> finger = fingerArray[i];
+                if (finger.index >= startingIndex) 
+                    finger.index += steps;
+            }
+        }
+        
+        void rewindLeft(int startingIndex) {
+            rewind(startingIndex, -1);
+        }
+        
+        void rewindRight(int startingIndex) {
+            rewind(startingIndex, 1);
+        }
+        
+        void rewindLeft(int startingIndex, int steps) {
+            rewind(startingIndex, -steps);
+        }
+        
+        void rewindRight(int startingIndex, int steps) {
+            rewind(startingIndex, steps);
+        }
+        
         void clear() {
             for (int i = 0; i < size; i++) {
                 fingerArray[i].node = null; // help GC
@@ -558,6 +668,10 @@ public class LinkedList<E>
     }
     
     private int getRecommendedFingerCount() {
+        return (int) Math.ceil(Math.sqrt(size / 2.0));
+    }
+    
+    private static int getRecommendedFingerCount(int size) {
         return (int) Math.ceil(Math.sqrt(size / 2.0));
     }
     
@@ -581,5 +695,17 @@ public class LinkedList<E>
      */
     private String outOfBoundsMsg(int index) {
         return "Index: "+index+", Size: "+size;
+    }
+    
+    private void checkElementIndex(int index) {
+        if (!isElementIndex(index))
+            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
+    }
+    
+    /**
+     * Tells if the argument is the index of an existing element.
+     */
+    private boolean isElementIndex(int index) {
+        return index >= 0 && index < size;
     }
 }
