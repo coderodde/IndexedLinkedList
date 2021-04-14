@@ -72,9 +72,10 @@ public class LinkedList<E>
     }
     
     private void linkFirst(E e) {
+        shiftFingersRight(0);
+        
         final Node<E> f = first;
         final Node<E> newNode = new Node<>();
-        
         newNode.item = e;
         newNode.next = f;
         first = newNode;
@@ -86,7 +87,6 @@ public class LinkedList<E>
         
         size++;
         modCount++;
-        shiftFingersRight(1);
         
         if (mustAddFinger())
             addFinger(newNode, 0);
@@ -97,6 +97,7 @@ public class LinkedList<E>
         final Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.prev = l;
+        last = newNode;
         
         if (l == null) 
             first = newNode;
@@ -109,28 +110,6 @@ public class LinkedList<E>
         if (mustAddFinger()) 
             addFinger(newNode, size - 1);
     }
-    
-//    private void linkBefore(E e, Node<E> succ, int index) {
-//        final Node<E> pred = succ.prev;
-//        final Node<E> newNode = new Node<>();
-//        newNode.item = e;
-//        newNode.next = succ;
-//        
-//        if (pred == null) 
-//            first = newNode;
-//        else {
-//            pred.next = newNode;
-//            newNode.prev = pred;
-//        }
-//        
-//        size++;
-//        modCount++;
-//        
-//        if (mustAddFinger()) {
-//            addFinger(newNode, index);
-//            
-//        }
-//    }
     
     private boolean mustAddFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or,
@@ -334,6 +313,24 @@ public class LinkedList<E>
     public boolean add(E e) {
         linkLast(e);
         return true;
+    }
+    
+    /**
+     * Inserts the specified element at the specified position in this list.
+     * Shifts the element currently at that position (if any) and any
+     * subsequent elements to the right (adds one to their indices).
+     *
+     * @param index index at which the specified element is to be inserted
+     * @param element element to be inserted
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    public void add(int index, E element) {
+        checkPositionIndex(index);
+
+        if (index == size)
+            linkLast(element);
+        else
+            linkBefore(element, node(index), index);
     }
     
     public E get(int index) {
