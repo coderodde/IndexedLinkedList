@@ -135,7 +135,7 @@ public class LinkedList<E>
     public void clear() {
         fingerStack.clear();
         
-        for (Node<E> node = first; node != null; node = node) {
+        for (Node<E> node = first; node != null;) {
             node.prev = null;
             node.item = null;
             Node<E> next = node.next;
@@ -152,7 +152,7 @@ public class LinkedList<E>
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             if (finger.index >= startIndex) 
-                finger.index += steps;
+                finger.rewindRight(steps);
         }
     }
     
@@ -160,7 +160,7 @@ public class LinkedList<E>
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             if (finger.index >= startIndex)
-                finger.index -= steps;
+                finger.rewindLeft(steps);
         }
     }
     
@@ -205,9 +205,10 @@ public class LinkedList<E>
     }
     
     private void linkBefore(E e, Node<E> succ, int index) {
+        shiftFingersRight(index);
+        
         final Node<E> pred = succ.prev;
         final Node<E> newNode = new Node<>();
-        
         newNode.item = e;
         newNode.next = succ;
         succ.prev = newNode;
@@ -221,13 +222,14 @@ public class LinkedList<E>
         
         size++;
         modCount++;
-        shiftFingersRight(index);
         
         if (mustAddFinger()) 
             addFinger(newNode, index);
     }
     
     private E unlinkFirst(Node<E> f) {
+        shiftFingersLeft(1);
+        
         final E element = f.item;
         final Node<E> next = f.next;
         f.item = null;
@@ -245,7 +247,6 @@ public class LinkedList<E>
         if (mustRemoveFinger()) 
             fingerStack.pop();
         
-        fingerStack.rewindLeft(1);
         return element;
     }
     
@@ -271,6 +272,8 @@ public class LinkedList<E>
     }
 
     E unlink(Node<E> x, int index) {
+        shiftFingersLeft(index + 1);
+        
         final E element = x.item;
         final Node<E> next = x.next;
         final Node<E> prev = x.prev;
@@ -296,7 +299,6 @@ public class LinkedList<E>
         if (mustRemoveFinger())
             removeFinger();
         
-        fingerStack.rewindLeft(index + 1);
         return element;
     }
     
@@ -360,8 +362,10 @@ public class LinkedList<E>
     }
     
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        return addAll(size, c);
     }
+    
+    
     
     private void prependall(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
@@ -392,45 +396,94 @@ public class LinkedList<E>
         addFingers(newFirst, c.size());
     }
     
-    private void appendAll(Collection<? extends E> c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
+        checkPositionIndex(index);
+        if (c.isEmpty()) 
+            return false;
         
+        if (size == 0) 
+            setAll(c);
+        else if (index == 0) 
+            prependAll(c);
+        else if (index == size) 
+            appendAll(c);
+        else 
+            insertAll(c, node(index));
+        
+        return true;
     }
     
-    public boolean addAll(int index, Collection<? extends E> c) {
-//        checkPositionIndex(index);
-//        if (c.isEmpty()) 
-//            return false;
-//        
-//        if (index == 0) 
-//            prependall(c);
-//        else if (index == size) 
-//            appendAll(c);
-//            addAllImpl(index, c);
-//        shiftFingersRight(index, c.size());
-//        Finger<E> finger = getClosestFinger(index);
-//        int distance = finger.index - index;
-//        
-//        if (distance > 0) 
-//            finger.rewindLeft(distance);
-//        else if (distance < 0) 
-//            finger.rewindRight(-distance);
-//        
-//        Node<E> pred;
-//        Node<E> succ;
-//        
-//        if (index == 0) {
-//            pred = null;
-//            succ = first;
-//        } else {
-//            pred
-//        }
-//        
-//        for (E e : c) {
-//            Node<E> newNode = new Node<>();
-//            newNode.item = e;
-//            
-//        }
-        return true;
+    private void setAll(Collection<? extends E> c) {
+        Iterator<? extends E> iterator = c.iterator();
+        
+        first = new Node<>();
+        first.item = iterator.next();
+        
+        Node<E> prevNode = first;
+        
+        for (int i = 1, sz = c.size(); i < sz - 1; i++) {
+            Node<E> newNode = new Node<>();
+            newNode.item = iterator.next();
+            newNode.prev = prevNode;
+            prevNode = newNode;
+        }
+        
+        last = prevNode;
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        addFingers(first, sz);
+    }
+    
+    private void prependAll(Collection<? extends E> c) {
+        Iterator<? extends E> iterator = c.iterator();
+        final Node<E> oldFirst = first;
+        first = new Node<>();
+        first.item = iterator.next();
+        
+        Node<E> prevNode = first;
+        
+        for (int i = 1, sz = c.size(); i < sz - 1; i++) {
+            Node<E> newNode = new Node<>();
+            newNode.item = iterator.next();
+            newNode.prev = newNode;
+            prevNode = newNode;
+        }
+        
+        prevNode.next = oldFirst;
+        oldFirst.prev = prevNode;
+        
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        addFingers(first, sz);
+    }
+    
+    private void appendAll(Collection<? extends E> c) {
+        Node<E> prev = last;
+        final Node<E> oldLast = last;
+        
+        for (E item : c) {
+            Node<E> newNode = new Node<>();
+            newNode.item = item;
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+        
+        last = prev;
+        
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        addFingers(oldLast.next, sz);
+    }
+    
+    private void insertAll(Collection<? extends E> c, Node<E> succ) {
+        
     }
     
     private void addFingers(Node<E> first, int collectionSize) {

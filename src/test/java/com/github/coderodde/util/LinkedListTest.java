@@ -80,4 +80,27 @@ public class LinkedListTest {
         list.addLast(20);
         list.get(2);
     }
+    
+    @Test
+    public void testAddIndexAndElement() {
+        list.add(0, 1);
+        assertEquals(Integer.valueOf(1), list.get(0));
+        
+        list.add(0, 2);
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        
+        list.add(2, 10);
+        
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(10), list.get(2));
+        
+        list.add(2, 100);
+        
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(100), list.get(2));
+        assertEquals(Integer.valueOf(10), list.get(3));
+    }
 }
