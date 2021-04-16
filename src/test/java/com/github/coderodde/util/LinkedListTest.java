@@ -1,5 +1,8 @@
 package com.github.coderodde.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -102,5 +105,33 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(1));
         assertEquals(Integer.valueOf(100), list.get(2));
         assertEquals(Integer.valueOf(10), list.get(3));
+    }
+    
+    @Test
+    public void testAddCollectionOneElementToEmptyList() {
+        List<Integer> c = new ArrayList<>();
+        c.add(100);
+        
+        list.addAll(c);
+        
+        assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(100), list.get(0));
+    }
+    
+    @Test
+    public void testAddCollectionThreeElementsToEmptyList() {
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+        
+        List<Integer> c = Arrays.asList(1, 2, 3);
+        
+        list.addAll(c);
+        assertFalse(list.isEmpty());
+        assertEquals(3, list.size());
+        
+        for (int i = 0; i < list.size(); i++) {
+            assertEquals(Integer.valueOf(i + 1), list.get(i));
+        }
     }
 }

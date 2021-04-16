@@ -72,7 +72,7 @@ public class LinkedList<E>
     }
     
     private void linkFirst(E e) {
-        shiftFingersRight(0);
+        shiftIndicesToRightOnce(0);
         
         final Node<E> f = first;
         final Node<E> newNode = new Node<>();
@@ -148,11 +148,11 @@ public class LinkedList<E>
         fingerStack.pop();
     }
     
-    private void shiftFingersRight(int startIndex, int steps) {
+    private void shiftFingersToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startIndex) 
-                finger.rewindRight(steps);
+            if (finger.index >= startIndex)
+                finger.index += steps;
         }
     }
     
@@ -164,13 +164,6 @@ public class LinkedList<E>
         }
     }
     
-    private void shiftFingersRight(int startIndex) {
-        shiftFingersRight(startIndex, 1);
-    }
-    
-    private void shiftFingersLeft(int startIndex) {
-        shiftFingersLeft(startIndex, 1);
-    }
     
     private Finger<E> getClosestFinger(int index) {
         int bestDistance = Integer.MAX_VALUE;
@@ -205,7 +198,7 @@ public class LinkedList<E>
     }
     
     private void linkBefore(E e, Node<E> succ, int index) {
-        shiftFingersRight(index);
+        shiftIndicesToRightOnce(index);
         
         final Node<E> pred = succ.prev;
         final Node<E> newNode = new Node<>();
@@ -228,7 +221,7 @@ public class LinkedList<E>
     }
     
     private E unlinkFirst(Node<E> f) {
-        shiftFingersLeft(1);
+        shiftIndicesToLeftOnce(1);
         
         final E element = f.item;
         final Node<E> next = f.next;
@@ -272,7 +265,7 @@ public class LinkedList<E>
     }
 
     E unlink(Node<E> x, int index) {
-        shiftFingersLeft(index + 1);
+        shiftIndicesToLeftOnce(index + 1);
         
         final E element = x.item;
         final Node<E> next = x.next;
@@ -421,10 +414,11 @@ public class LinkedList<E>
         
         Node<E> prevNode = first;
         
-        for (int i = 1, sz = c.size(); i < sz - 1; i++) {
+        for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>();
             newNode.item = iterator.next();
             newNode.prev = prevNode;
+            prevNode.next = newNode;
             prevNode = newNode;
         }
         
@@ -474,7 +468,6 @@ public class LinkedList<E>
         }
         
         last = prev;
-        
         int sz = c.size();
         modCount++;
         size += sz;
@@ -483,12 +476,29 @@ public class LinkedList<E>
     }
     
     private void insertAll(Collection<? extends E> c, Node<E> succ) {
+        final Node<E> pred = succ.prev;
+        Node<E> prev = pred;
         
+        for (E item : c) {
+            final Node<E> newNode = new Node<>();
+            newNode.item = item;
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+        
+        prev.next = succ;
+        succ.prev = prev;
+        
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        addFingers(pred, sz);
     }
     
     private void addFingers(Node<E> first, int collectionSize) {
-        final int requestedFingers = getRecommendedFingerCount();
-        final int newFingers = requestedFingers - fingerStack.size();
+        final int newFingers = getRecommendedFingerCount() - fingerStack.size();
         final int distance = collectionSize / newFingers;
         final int startOffset = distance / 2;
         int index = startOffset;
@@ -757,5 +767,45 @@ public class LinkedList<E>
      */
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
+    }
+    
+    private void shiftIndicesLeft(int startingIndex) {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            if (finger.index >= startingIndex) 
+                finger.index--;
+        }
+    }
+    
+    private void shiftIndicesToLeft(int startingIndex, int steps) {
+        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            if (finger.index >= startingIndex) 
+                finger.index -= steps; // substract the index
+        }
+    }
+    
+    private void shiftIndicesToRight(int startingIndex, int steps) {
+        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            if (finger.index >= startingIndex) 
+                finger.index += steps; // add to index
+        }
+    }
+    
+    /***************************************************************************
+    * Shifts all the indices at least 'startingIndex' one position towards     *
+    * smaller index values.                                                    *
+    ***************************************************************************/
+    private void shiftIndicesToLeftOnce(int startingIndex) {
+        shiftIndicesToLeft(startingIndex, 1);
+    }
+    
+    /***************************************************************************
+    * Shifts all the indices at least 'startingIndex' one position towards     *
+    * larger index values.                                                     *
+    ***************************************************************************/
+    private void shiftIndicesToRightOnce(int startingIndex) {
+        shiftFingersToRight(startingIndex, 1);
     }
 }
