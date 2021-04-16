@@ -417,8 +417,8 @@ public class LinkedList<E>
         for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>();
             newNode.item = iterator.next();
-            newNode.prev = prevNode;
             prevNode.next = newNode;
+            newNode.prev = prevNode;
             prevNode = newNode;
         }
         
@@ -438,10 +438,11 @@ public class LinkedList<E>
         
         Node<E> prevNode = first;
         
-        for (int i = 1, sz = c.size(); i < sz - 1; i++) {
+        for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>();
             newNode.item = iterator.next();
-            newNode.prev = newNode;
+            newNode.prev = prevNode;
+            prevNode.next = newNode;
             prevNode = newNode;
         }
         
@@ -498,8 +499,13 @@ public class LinkedList<E>
     }
     
     private void addFingers(Node<E> first, int collectionSize) {
-        final int newFingers = getRecommendedFingerCount() - fingerStack.size();
-        final int distance = collectionSize / newFingers;
+        final int numberOfNewFingers =
+                getRecommendedFingerCount() - fingerStack.size();
+        
+        if (numberOfNewFingers == 0) 
+            return;
+        
+        final int distance = collectionSize / numberOfNewFingers;
         final int startOffset = distance / 2;
         int index = startOffset;
         Node<E> node = first;
@@ -507,13 +513,14 @@ public class LinkedList<E>
         for (int i = 0; i < startOffset; i++) 
             node = node.next;
         
-        for (int i = 0; i < newFingers; i++) {
+        for (int i = 0; i < numberOfNewFingers; i++) {
             Finger<E> finger = new Finger<>(node, index);
             fingerStack.push(finger);
             index += distance;
             
             for (int j = 0; j < distance; j++) 
-                node = node.next;
+                if (node.next != null)
+                    node = node.next;
         }
     }
 
@@ -631,6 +638,11 @@ public class LinkedList<E>
         E item;
         Node<E> prev;
         Node<E> next;
+        
+        @Override
+        public String toString() {
+            return "[Node; item = " + item + "]";
+        }
     }
     
     private static class Finger<E> {
@@ -640,6 +652,11 @@ public class LinkedList<E>
         Finger(Node<E> node, int index) {
             this.node = node;
             this.index = index;
+        }
+        
+        @Override
+        public String toString() {
+            return "[Finger; index = " + index + ", item = " + node.item + "]";
         }
         
         void rewindLeft(int steps) {

@@ -134,4 +134,16 @@ public class LinkedListTest {
             assertEquals(Integer.valueOf(i + 1), list.get(i));
         }
     }
+    
+    @Test
+    public void testAddCollectionAtIndex() {
+        list.addAll(0, Arrays.asList(2, 3)); // setAll
+        list.addAll(0, Arrays.asList(0, 1)); // prependAll
+        list.addAll(4, Arrays.asList(5, 6)); // appendAll
+        list.addAll(4, Arrays.asList(3, 4)); // insertAll
+        
+        for (int i = 0; i < 8; i++) {
+            assertEquals(Integer.valueOf(i), list.get(i));
+        }
+    }
 }
