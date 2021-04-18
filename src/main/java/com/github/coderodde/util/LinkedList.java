@@ -386,7 +386,7 @@ public class LinkedList<E>
         }
         
         size += c.size();
-        addFingers(newFirst, c.size());
+        addFingers(newFirst, 0, c.size());
     }
     
     public boolean addAll(int index, Collection<? extends E> c) {
@@ -401,7 +401,7 @@ public class LinkedList<E>
         else if (index == size) 
             appendAll(c);
         else 
-            insertAll(c, node(index));
+            insertAll(c, node(index), index - c.size());
         
         return true;
     }
@@ -427,7 +427,7 @@ public class LinkedList<E>
         modCount++;
         size += sz;
         
-        addFingers(first, sz);
+        addFingers(first, 0, sz);
     }
     
     private void prependAll(Collection<? extends E> c) {
@@ -453,7 +453,7 @@ public class LinkedList<E>
         modCount++;
         size += sz;
         
-        addFingers(first, sz);
+        addFingersAfterPrependAll(first, sz);
     }
     
     private void appendAll(Collection<? extends E> c) {
@@ -471,12 +471,15 @@ public class LinkedList<E>
         last = prev;
         int sz = c.size();
         modCount++;
+        addFingers(oldLast.next, size, sz);
         size += sz;
-        
-        addFingers(oldLast.next, sz);
     }
     
-    private void insertAll(Collection<? extends E> c, Node<E> succ) {
+    private void insertAll(
+            Collection<? extends E> c, 
+            Node<E> succ, 
+            int succIndex) {
+        
         final Node<E> pred = succ.prev;
         Node<E> prev = pred;
         
@@ -495,10 +498,12 @@ public class LinkedList<E>
         modCount++;
         size += sz;
         
-        addFingers(pred, sz);
+        addFingers(pred.next, succIndex - sz, sz);
     }
     
-    private void addFingers(Node<E> first, int collectionSize) {
+    private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
+        fingerStack.rewindRight(0, collectionSize);
+        
         final int numberOfNewFingers =
                 getRecommendedFingerCount() - fingerStack.size();
         
@@ -513,14 +518,46 @@ public class LinkedList<E>
         for (int i = 0; i < startOffset; i++) 
             node = node.next;
         
-        for (int i = 0; i < numberOfNewFingers; i++) {
-            Finger<E> finger = new Finger<>(node, index);
-            fingerStack.push(finger);
+        addFinger(node, index);
+        
+        for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
             
             for (int j = 0; j < distance; j++) 
                 if (node.next != null)
                     node = node.next;
+            
+            addFinger(node, index);
+        }
+    }
+    
+    private void addFingers(Node<E> first, int firstIndex, int collectionSize) {
+        fingerStack.rewindRight(firstIndex + collectionSize, collectionSize);
+        
+        final int numberOfNewFingers =
+                getRecommendedFingerCount() - fingerStack.size();
+        
+        if (numberOfNewFingers == 0) 
+            return;
+        
+        final int distance = collectionSize / numberOfNewFingers;
+        final int startOffset = firstIndex + distance / 2;
+        int index = firstIndex + startOffset;
+        Node<E> node = first;
+        
+        for (int i = 0; i < startOffset; i++) 
+            node = node.next;
+        
+        addFinger(node, index);
+        
+        for (int i = 1; i < numberOfNewFingers; i++) {
+            index += distance;
+            
+            for (int j = 0; j < distance; j++) 
+                if (node.next != null)
+                    node = node.next;
+            
+            addFinger(node, index);
         }
     }
 
@@ -676,6 +713,11 @@ public class LinkedList<E>
         }
     }
     
+    /**
+     * Implements a simple, array-based stack for storing the node fingers.
+     * 
+     * @param <E> the list element type
+     */
     private static class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
         
@@ -752,15 +794,19 @@ public class LinkedList<E>
         return (int) Math.ceil(Math.sqrt(size / 2.0));
     }
     
+    /***************************************************************************
+    * Checks that the input index is a valid position index for add operation  *
+    * or iterator position.                                                    *
+    ***************************************************************************/
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index))
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
     
-    /**
-     * Tells if the argument is the index of a valid position for an
-     * iterator or an add operation.
-     */
+    /***************************************************************************
+    * Tells if the argument is the index of a valid position for an iterator   *
+    * or an add operation.                                                     *
+    ***************************************************************************/
     private boolean isPositionIndex(int index) {
         return index >= 0 && index <= size;
     }
@@ -779,29 +825,27 @@ public class LinkedList<E>
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
     
-    /**
-     * Tells if the argument is the index of an existing element.
-     */
+    /***************************************************************************
+    * Tells if the argument is the index of an existing element.               *
+    ***************************************************************************/
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
     }
-    
-    private void shiftIndicesLeft(int startingIndex) {
-        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startingIndex) 
-                finger.index--;
-        }
-    }
-    
+  
+    /***************************************************************************
+     * Subtracts 'steps' positions from each index at least 'startingIndex'.   *
+     **************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             if (finger.index >= startingIndex) 
-                finger.index -= steps; // substract the index
+                finger.index -= steps; // substract from index
         }
     }
     
+    /***************************************************************************
+     * Adds 'steps' positions to each index at least 'startingIndex'.          *
+     **************************************************************************/
     private void shiftIndicesToRight(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
