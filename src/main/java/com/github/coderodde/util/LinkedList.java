@@ -32,6 +32,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 /**
  *
@@ -69,6 +70,92 @@ public class LinkedList<E>
     
     public LinkedList(Collection<? extends E> c) {
         addAll(c);
+    }
+    
+    /**
+     * Inserts the specified element at the beginning of this list.
+     *
+     * @param e the element to add
+     */
+    public void addFirst(E e) {
+        linkFirst(e);
+    }
+
+    /**
+     * Appends the specified element to the end of this list.
+     *
+     * <p>This method is equivalent to {@link #add}.
+     *
+     * @param e the element to add
+     */
+    public void addLast(E e) {
+        linkLast(e);
+    }
+    
+    /**
+     * Returns the first element in this list.
+     *
+     * @return the first element in this list
+     * @throws NoSuchElementException if this list is empty
+     */
+    public E getFirst() {
+        final Node<E> f = first;
+        if (f == null) 
+            throw new NoSuchElementException();
+        
+        return f.item;
+    }
+    
+    /**
+     * Returns {@code true} if this list contains the specified element.
+     * More formally, returns {@code true} if and only if this list contains
+     * at least one element {@code e} such that
+     * {@code Objects.equals(o, e)}.
+     *
+     * @param o element whose presence in this list is to be tested
+     * @return {@code true} if this list contains the specified element
+     */
+    public boolean contains(Object o) {
+        return indexOf(o) >= 0;
+    }
+    
+    /**
+     * Returns the last element in this list.
+     *
+     * @return the last element in this list
+     * @throws NoSuchElementException if this list is empty
+     */
+    public E getLast() {
+        final Node<E> l = last;
+        if (l == null)
+            throw new NoSuchElementException();
+        return l.item;
+    }
+    
+    /**
+     * Removes and returns the first element from this list.
+     *
+     * @return the first element from this list
+     * @throws NoSuchElementException if this list is empty
+     */
+    public E removeFirst() {
+        final Node<E> f = first;
+        if (f == null)
+            throw new NoSuchElementException();
+        return unlinkFirst(f);
+    }
+    
+    /**
+     * Removes and returns the last element from this list.
+     *
+     * @return the last element from this list
+     * @throws NoSuchElementException if this list is empty
+     */
+    public E removeLast() {
+        final Node<E> l = last;
+        if (l == null)
+            throw new NoSuchElementException();
+        return unlinkLast(l);
     }
     
     private void linkFirst(E e) {
@@ -502,7 +589,7 @@ public class LinkedList<E>
     }
     
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
-        fingerStack.rewindRight(0, collectionSize);
+        shiftIndicesToRight(0, collectionSize);
         
         final int numberOfNewFingers =
                 getRecommendedFingerCount() - fingerStack.size();
@@ -532,8 +619,7 @@ public class LinkedList<E>
     }
     
     private void addFingers(Node<E> first, int firstIndex, int collectionSize) {
-        fingerStack.rewindRight(firstIndex + collectionSize, collectionSize);
-        
+        shiftIndicesToRight(firstIndex + collectionSize, collectionSize);
         final int numberOfNewFingers =
                 getRecommendedFingerCount() - fingerStack.size();
         
@@ -562,16 +648,6 @@ public class LinkedList<E>
     }
 
     @Override
-    public void addFirst(E e) {
-        linkFirst(e);
-    }
-
-    @Override
-    public void addLast(E e) {
-        linkLast(e);
-    }
-
-    @Override
     public boolean offerFirst(E e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -582,32 +658,12 @@ public class LinkedList<E>
     }
 
     @Override
-    public E removeFirst() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public E removeLast() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public E pollFirst() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public E pollLast() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public E getFirst() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public E getLast() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
