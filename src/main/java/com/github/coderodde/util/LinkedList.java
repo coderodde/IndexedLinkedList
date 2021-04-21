@@ -221,6 +221,7 @@ public class LinkedList<E>
     
     public void clear() {
         fingerStack.clear();
+        size = 0;
         
         for (Node<E> node = first; node != null;) {
             node.prev = null;
@@ -273,6 +274,7 @@ public class LinkedList<E>
     }
     
     private Node<E> node(int index) {
+//        System.out.println("index = " + index + ", size = " + size);
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
         
