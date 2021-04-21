@@ -274,7 +274,6 @@ public class LinkedList<E>
     }
     
     private Node<E> node(int index) {
-//        System.out.println("index = " + index + ", size = " + size);
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
         

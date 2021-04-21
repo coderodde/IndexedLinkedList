@@ -168,15 +168,10 @@ public class LinkedListBenchmark {
                 List<Integer> list, 
                 int operations, 
                 Random random) {
-//            boolean count = list.getClass().equals(com.github.coderodde.util.LinkedList.class);
-//            int c = 0;
+            
             long startMillis = System.currentTimeMillis();
             
             for (int i = 0; i < operations; i++) {
-//                if (count) {
-////                    System.out.println(c);
-//                    c++;
-//                }
                 int index = random.nextInt(list.size());
                 Integer value = random.nextInt();
                 list.add(index, value);
