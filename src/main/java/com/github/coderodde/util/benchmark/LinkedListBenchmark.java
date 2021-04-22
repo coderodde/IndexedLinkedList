@@ -360,7 +360,7 @@ public class LinkedListBenchmark {
         }
         
         private void profileAppendCollectionLinkedList() {
-            totalMillisRoddeList +=
+            totalMillisLinkedList +=
                     profileAppendCollection(
                             linkedList, 
                             ADD_LAST_COLLECTION_OPERATIONS, 
@@ -368,7 +368,7 @@ public class LinkedListBenchmark {
         }
         
         private void profileAppendCollectionArrayList() {
-            totalMillisRoddeList +=
+            totalMillisArrayList +=
                     profileAppendCollection(
                             arrayList, 
                             ADD_LAST_COLLECTION_OPERATIONS, 
