@@ -12,6 +12,10 @@ public class LinkedListBenchmark {
 
         private static final int ADD_FIRST_OPERATIONS = 100_000;
         private static final int ADD_AT_OPERATIONS = 10_000;
+        private static final int ADD_COLLECTION_AT_OPERATIONS = 5_000;
+        private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
+        
+        private static final int MAXIMUM_COLLECTION_SIZE = 2_000;
         
         private final Random randomJavaUtilLinkedList;
         private final Random randomJavaUtilArrayList;
@@ -31,6 +35,18 @@ public class LinkedListBenchmark {
             this.randomJavaUtilLinkedList = new Random(seed);
             this.randomJavaUtilArrayList = new Random(seed);
             this.randomMyList = new Random(seed);
+        }
+    
+        private static List<Integer> createRandomCollection(Random random) {
+            int size = 1 + random.nextInt(MAXIMUM_COLLECTION_SIZE);
+
+            List<Integer> list = new ArrayList<>(size);
+
+            for (int i = 0; i < size; i++) {
+                list.add(random.nextInt());
+            }
+
+            return list;
         }
         
         private enum BenchmarkChoice { WARMUP, BENCHMARK }
@@ -94,6 +110,18 @@ public class LinkedListBenchmark {
             profileAddIndexRoddeList();
             profileAddIndexLinkedList();
             profileAddIndexArrayList();
+            
+            System.out.println();
+            
+            profileAddCollectionRoddeList();
+            profileAddCollectionLinkedList();
+            profileAddCollectionArrayList();
+            
+            System.out.println();
+            
+            profileAppendCollectionRoddeList();
+            profileAppendCollectionLinkedList();
+            profileAppendCollectionArrayList();
             
             System.out.println();
             
@@ -188,6 +216,53 @@ public class LinkedListBenchmark {
             return durationMillis;
         }
         
+        private long profileAddCollection(
+                List<Integer> list, 
+                int operations, 
+                Random random) {
+            
+            long startMillis = System.currentTimeMillis();
+            
+            for (int i = 0; i < operations; i++) {
+                List<Integer> collection = createRandomCollection(random);
+                int index = random.nextInt(list.size());
+                list.addAll(index, collection);
+            }
+            
+            long endMillis = System.currentTimeMillis();
+            long durationMillis = endMillis - startMillis;
+            
+            System.out.println(
+                    list.getClass().getName() + 
+                            ".addAll(int, Collection) in (ms): " +
+                            durationMillis);
+            
+            return durationMillis;
+        }
+        
+        private long profileAppendCollection(
+                List<Integer> list, 
+                int operations, 
+                Random random) {
+            
+            long startMillis = System.currentTimeMillis();
+            
+            for (int i = 0; i < operations; i++) {
+                List<Integer> collection = createRandomCollection(random);
+                list.addAll(collection);
+            }
+            
+            long endMillis = System.currentTimeMillis();
+            long durationMillis = endMillis - startMillis;
+            
+            System.out.println(
+                    list.getClass().getName() + 
+                            ".addAll(Collection) in (ms): " +
+                            durationMillis);
+            
+            return durationMillis;
+        }
+        
         private void profileAddFirstRoddeList() {
             totalMillisRoddeList += 
                     profileAddFirst(
@@ -248,6 +323,55 @@ public class LinkedListBenchmark {
                     profileAddIndex(
                             arrayList, 
                             ADD_AT_OPERATIONS, 
+                            randomJavaUtilArrayList);
+        }
+        
+        private void profileAddCollectionRoddeList() {
+            totalMillisRoddeList +=
+                    profileAddCollection(
+                            roddeList, 
+                            ADD_COLLECTION_AT_OPERATIONS, 
+                            randomMyList);
+        }
+       
+        private void profileAddCollectionLinkedList() {
+            totalMillisLinkedList += 
+                    profileAddCollection(
+                            linkedList,
+                            ADD_COLLECTION_AT_OPERATIONS,
+                            randomJavaUtilLinkedList);
+        }
+           
+        private void profileAddCollectionArrayList() {
+            totalMillisArrayList +=
+                    profileAddCollection(
+                            arrayList,
+                            ADD_COLLECTION_AT_OPERATIONS,
+                            randomJavaUtilArrayList);
+        }
+        
+            
+        private void profileAppendCollectionRoddeList() {
+            totalMillisRoddeList +=
+                    profileAppendCollection(
+                            roddeList, 
+                            ADD_LAST_COLLECTION_OPERATIONS, 
+                            randomMyList);
+        }
+        
+        private void profileAppendCollectionLinkedList() {
+            totalMillisRoddeList +=
+                    profileAppendCollection(
+                            linkedList, 
+                            ADD_LAST_COLLECTION_OPERATIONS, 
+                            randomJavaUtilLinkedList);
+        }
+        
+        private void profileAppendCollectionArrayList() {
+            totalMillisRoddeList +=
+                    profileAppendCollection(
+                            arrayList, 
+                            ADD_LAST_COLLECTION_OPERATIONS, 
                             randomJavaUtilArrayList);
         }
         

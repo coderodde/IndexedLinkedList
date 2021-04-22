@@ -428,6 +428,7 @@ public class LinkedList<E>
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
                     unlink(x, index);
+                    shiftIndicesToLeftOnce(index);
                     return true;
                 }
             }
@@ -435,18 +436,26 @@ public class LinkedList<E>
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
                     unlink(x, index);
+                    shiftIndicesToLeftOnce(index);
                     return true;
                 }
             }
         }
+        
         return false;
+    }
+    
+    public E remove(int index) {
+        Finger<E> finger = getClosestFinger(index);
+        Node<E> node = finger.node;
+        unlink(node, index);
+        shiftIndicesToLeftOnce(index);
+        return node.item;
     }
     
     public boolean addAll(Collection<? extends E> c) {
         return addAll(size, c);
     }
-    
-    
     
     private void prependall(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
@@ -632,8 +641,12 @@ public class LinkedList<E>
         int index = firstIndex + startOffset;
         Node<E> node = first;
         
-        for (int i = 0; i < startOffset; i++) 
+        for (int i = 0; i < startOffset; i++) {
+            if (node.next == null) 
+                break;
+        
             node = node.next;
+        }
         
         addFinger(node, index);
         
@@ -763,10 +776,12 @@ public class LinkedList<E>
         
         void rewindRight(int steps) {
             for (int i = 0; i < steps; i++) {
+                if (node.next == null) 
+                    return;
+                
                 node = node.next;
+                index++;
             }
-            
-            index += steps;
         }
     }
     
