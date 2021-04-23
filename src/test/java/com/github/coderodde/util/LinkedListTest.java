@@ -146,4 +146,13 @@ public class LinkedListTest {
             assertEquals(Integer.valueOf(i), list.get(i));
         }
     }
+    
+    @Test
+    public void testRemoveInt() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        
+        assertEquals(Integer.valueOf(0), list.remove(0));
+        assertEquals(Integer.valueOf(4), list.remove(3));
+        assertEquals(Integer.valueOf(2), list.remove(1));
+    }
 }

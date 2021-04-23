@@ -352,9 +352,7 @@ public class LinkedList<E>
         return element;
     }
 
-    E unlink(Node<E> x, int index) {
-        shiftIndicesToLeftOnce(index + 1);
-        
+    private E unlink(Node<E> x, int index) {
         final E element = x.item;
         final Node<E> next = x.next;
         final Node<E> prev = x.prev;
@@ -380,6 +378,7 @@ public class LinkedList<E>
         if (mustRemoveFinger())
             removeFinger();
         
+        shiftIndicesToLeftOnce(index + 1);
         return element;
     }
     
@@ -427,16 +426,16 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
+                    shiftIndicesToLeftOnce(index + 1);
                     unlink(x, index);
-                    shiftIndicesToLeftOnce(index);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
+                    shiftIndicesToLeftOnce(index + 1);
                     unlink(x, index);
-                    shiftIndicesToLeftOnce(index);
                     return true;
                 }
             }
@@ -445,12 +444,52 @@ public class LinkedList<E>
         return false;
     }
     
+    private final class RemoveData<E> {
+        Node<E> node;
+        Finger<E> finger;
+    }
+    
+    private final RemoveData<E> removeData = new RemoveData<>();
+    
+    /*
+    
+    1. Find the node N to remove
+    2. If N is fingered by F, move F left/right
+    3. unlink(N)
+    
+    */
     public E remove(int index) {
+        checkElementIndex(index);
+        
+        // Loads the removeData!
+        findNodeToRemove(index);
+        
+        // Make sure that no finger is on our way pointing to the node to remove
+        if (removeData.finger.index == index) 
+            moveFingerOutOfRemovalLocation(removeData.finger);
+        
+        // Once here, the list is not empty and has at least one finger!
+        return unlink(removeData.node, index);
+    }
+    
+    private void findNodeToRemove(int index) {
         Finger<E> finger = getClosestFinger(index);
         Node<E> node = finger.node;
-        unlink(node, index);
-        shiftIndicesToLeftOnce(index);
-        return node.item;
+        
+        if (index < finger.index) {
+            int distance = finger.index - index;
+            
+            for (int i = 0; i < distance; i++) 
+                node = node.next;
+        } else {
+            int distance = index - finger.index;
+            
+            for (int i = 0; i < distance; i++) 
+                node = node.prev;
+        }
+        
+        removeData.finger = finger;
+        removeData.node = node;
     }
     
     public boolean addAll(Collection<? extends E> c) {
@@ -856,6 +895,35 @@ public class LinkedList<E>
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
+    }
+    
+    /***************************************************************************
+    * Returns a finger that does not point to the element to remove. We need   *
+    * this in order to make sure that after removal, all the fingers point to  *
+    * valid nodes.                                                             *
+    ***************************************************************************/
+    private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
+        if (size == 1) {
+            System.out.println("yeahhhh");
+            fingerStack.pop();
+            return;
+        }
+        
+        if (finger.node.prev != null) {
+            // Move the finger one position to the left:
+            finger.node = finger.node.prev;
+            finger.index--;
+            return;
+        }
+        
+        if (finger.node.next != null) {
+            // Move the finger one position to the right:
+            finger.node = finger.node.next;
+            finger.index++;
+            return;
+        }
+        
+        throw new IllegalStateException("Removing from an empty list.");
     }
     
     private int getRecommendedFingerCount() {
