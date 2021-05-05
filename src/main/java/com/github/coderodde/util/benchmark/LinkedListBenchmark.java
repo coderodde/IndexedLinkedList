@@ -1,10 +1,12 @@
 package com.github.coderodde.util.benchmark;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import javax.swing.text.StyleConstants;
 
 public class LinkedListBenchmark {
 
@@ -14,18 +16,19 @@ public class LinkedListBenchmark {
         private static final int ADD_AT_OPERATIONS = 10_000;
         private static final int ADD_COLLECTION_AT_OPERATIONS = 5_000;
         private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
+        private static final int REMOVE_VIA_INDEX_OPERATIONS = 1_000;
         
         private static final int MAXIMUM_COLLECTION_SIZE = 2_000;
         
         private final Random randomJavaUtilLinkedList;
         private final Random randomJavaUtilArrayList;
-        private final Random randomMyList;
+        private final Random randomRoddeList;
         
-        private final com.github.coderodde.util.LinkedList<Integer> roddeList = 
+        private com.github.coderodde.util.LinkedList<Integer> roddeList = 
                 new com.github.coderodde.util.LinkedList<>();
         
-        private final LinkedList<Integer> linkedList = new LinkedList<>();
-        private final ArrayList<Integer> arrayList = new ArrayList<>();
+        private LinkedList<Integer> linkedList = new LinkedList<>();
+        private ArrayList<Integer> arrayList = new ArrayList<>();
         
         private long totalMillisRoddeList  = 0L;
         private long totalMillisLinkedList = 0L;
@@ -34,7 +37,7 @@ public class LinkedListBenchmark {
         private Benchmark(long seed) {
             this.randomJavaUtilLinkedList = new Random(seed);
             this.randomJavaUtilArrayList = new Random(seed);
-            this.randomMyList = new Random(seed);
+            this.randomRoddeList = new Random(seed);
         }
     
         private static List<Integer> createRandomCollection(Random random) {
@@ -64,11 +67,20 @@ public class LinkedListBenchmark {
                 if (lists[i].size() != lists[i + 1].size())  {
                     throw new IllegalStateException("Different size");
                 }
-
-                for (int j = 0; j < lists[0].size(); j++) {
-                    if (!Objects.equals(lists[0].get(j), lists[i + 1].get(j))) {
-                        throw new IllegalStateException("Different data");
+                
+                Iterator<Integer> leftIterator = lists[i].iterator();
+                Iterator<Integer> rightIterator = 
+                        lists[lists.length - 1].iterator();
+                
+                while (leftIterator.hasNext()) {
+                    if (!Objects.equals(leftIterator.next(),
+                                        rightIterator.next())) {
+                        throw new IllegalArgumentException("Data mismatch");
                     }
+                }
+                
+                if (leftIterator.hasNext() || rightIterator.hasNext()) {
+                    throw new IllegalStateException("Bad iterators");
                 }
             }
         }
@@ -81,53 +93,91 @@ public class LinkedListBenchmark {
             profile(BenchmarkChoice.BENCHMARK);
         }
         
-        private void clearAllLists() {
-            roddeList.clear();
-            linkedList.clear();
-            arrayList.clear();
-        }
-        
         private void profile(BenchmarkChoice benchmarkChoice) {
             
             printTitle(benchmarkChoice);
             
-            profileAddFirstRoddeList();
-            profileAddFirstLinkedList();
-            profileAddFirstArrayList();
+            profileAddFirst();
             
             listsEqual();
             
             System.out.println();
             
-            profileAddLastRoddeList();
-            profileAddLastLinkedList();
-            profileAddLastArrayList();
+            profileAddLast();
             
             listsEqual();
             
             System.out.println();
             
-            profileAddIndexRoddeList();
-            profileAddIndexLinkedList();
-            profileAddIndexArrayList();
+            profileAddViaIndex();
+            
+            listsEqual();
             
             System.out.println();
             
-            profileAddCollectionRoddeList();
-            profileAddCollectionLinkedList();
-            profileAddCollectionArrayList();
+            profileAppendCollection();
+            
+            listsEqual();
             
             System.out.println();
             
-            profileAppendCollectionRoddeList();
-            profileAppendCollectionLinkedList();
-            profileAppendCollectionArrayList();
+            profileAddCollection();
+            
+            listsEqual();
+            
+            System.out.println();
+            
+            profileRemoveViaIndex();
+            
+            listsEqual();
             
             System.out.println();
             
             printTotalDurations();
             
-            clearAllLists();
+            resetLists();
+        }
+        
+        private void resetLists() {
+            roddeList = new com.github.coderodde.util.LinkedList<>();
+            linkedList = new java.util.LinkedList<>();
+            arrayList = new ArrayList<>();
+        }
+        
+        private void profileAddFirst() {
+            profileAddFirstRoddeList();
+            profileAddFirstLinkedList();
+            profileAddFirstArrayList();
+        }
+        
+        private void profileAddLast() {
+            profileAddLastRoddeList();
+            profileAddLastLinkedList();
+            profileAddLastArrayList();
+        }
+        
+        private void profileAddViaIndex() {
+            profileAddIndexRoddeList();
+            profileAddIndexLinkedList();
+            profileAddIndexArrayList();
+        }
+        
+        private void profileAddCollection() {
+            profileAddCollectionRoddeList();
+            profileAddCollectionLinkedList();
+            profileAddCollectionArrayList();
+        }
+        
+        private void profileAppendCollection() {
+            profileAppendCollectionRoddeList();
+            profileAppendCollectionLinkedList();
+            profileAppendCollectionArrayList();
+        }
+        
+        private void profileRemoveViaIndex() {
+            profileRemoveViaIndexRoddeList();
+            profileRemoveViaIndexLinkedList();
+            profileRemoveViaIndexArrayList();
         }
         
         private void printTotalDurations() {
@@ -263,12 +313,34 @@ public class LinkedListBenchmark {
             return durationMillis;
         }
         
+        private long profileRemoveViaIndex(
+                List<Integer> list, 
+                int operations, 
+                Random random) {
+            
+            long startMillis = System.currentTimeMillis();
+            
+            for (int i = 0; i < operations; i++) {
+                list.remove(random.nextInt(list.size()));
+            }
+            
+            long endMillis = System.currentTimeMillis();
+            long durationMillis = endMillis - startMillis;
+            
+            System.out.println(
+                    list.getClass().getName() +
+                            ".remove(int) in (ms): " +
+                            durationMillis);
+            
+            return durationMillis;
+        }
+        
         private void profileAddFirstRoddeList() {
             totalMillisRoddeList += 
                     profileAddFirst(
                             roddeList, 
                             ADD_FIRST_OPERATIONS, 
-                            randomMyList);
+                            randomRoddeList);
         }
         
         private void profileAddFirstLinkedList() {
@@ -287,7 +359,7 @@ public class LinkedListBenchmark {
         
         private void profileAddLastRoddeList() {
             totalMillisRoddeList += 
-                profileAddLast(roddeList, ADD_FIRST_OPERATIONS, randomMyList);
+                profileAddLast(roddeList, ADD_FIRST_OPERATIONS, randomRoddeList);
         }
         
         private void profileAddLastLinkedList() {
@@ -307,7 +379,7 @@ public class LinkedListBenchmark {
         
         private void profileAddIndexRoddeList() {
             totalMillisRoddeList += 
-                    profileAddIndex(roddeList, ADD_AT_OPERATIONS, randomMyList);
+                    profileAddIndex(roddeList, ADD_AT_OPERATIONS, randomRoddeList);
         }
         
         private void profileAddIndexLinkedList() {
@@ -331,7 +403,7 @@ public class LinkedListBenchmark {
                     profileAddCollection(
                             roddeList, 
                             ADD_COLLECTION_AT_OPERATIONS, 
-                            randomMyList);
+                            randomRoddeList);
         }
        
         private void profileAddCollectionLinkedList() {
@@ -356,7 +428,7 @@ public class LinkedListBenchmark {
                     profileAppendCollection(
                             roddeList, 
                             ADD_LAST_COLLECTION_OPERATIONS, 
-                            randomMyList);
+                            randomRoddeList);
         }
         
         private void profileAppendCollectionLinkedList() {
@@ -372,6 +444,31 @@ public class LinkedListBenchmark {
                     profileAppendCollection(
                             arrayList, 
                             ADD_LAST_COLLECTION_OPERATIONS, 
+                            randomJavaUtilArrayList);
+        }
+        
+        
+        private void profileRemoveViaIndexRoddeList() {
+            totalMillisRoddeList += 
+                    profileRemoveViaIndex(
+                            roddeList, 
+                            REMOVE_VIA_INDEX_OPERATIONS, 
+                            randomRoddeList);
+        }
+        
+        private void profileRemoveViaIndexLinkedList() {    
+            totalMillisLinkedList += 
+                    profileRemoveViaIndex(
+                            linkedList, 
+                            REMOVE_VIA_INDEX_OPERATIONS, 
+                            randomJavaUtilLinkedList);
+        }
+        
+        private void profileRemoveViaIndexArrayList() {
+            totalMillisArrayList += 
+                    profileRemoveViaIndex(
+                            arrayList, 
+                            REMOVE_VIA_INDEX_OPERATIONS, 
                             randomJavaUtilArrayList);
         }
         

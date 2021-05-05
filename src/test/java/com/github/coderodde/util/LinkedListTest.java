@@ -154,5 +154,7 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(0), list.remove(0));
         assertEquals(Integer.valueOf(4), list.remove(3));
         assertEquals(Integer.valueOf(2), list.remove(1));
+        assertEquals(Integer.valueOf(1), list.remove(0));
+        assertEquals(Integer.valueOf(3), list.remove(0));
     }
 }

@@ -28,11 +28,13 @@ package com.github.coderodde.util;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  *
@@ -480,12 +482,12 @@ public class LinkedList<E>
             int distance = finger.index - index;
             
             for (int i = 0; i < distance; i++) 
-                node = node.next;
+                node = node.prev;
         } else {
             int distance = index - finger.index;
             
             for (int i = 0; i < distance; i++) 
-                node = node.prev;
+                node = node.next;
         }
         
         removeData.finger = finger;
@@ -774,6 +776,11 @@ public class LinkedList<E>
     public E pop() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    @Override
+    public Iterator<E> iterator() {
+        return new BasicIterator();
+    }
 
     @Override
     public Iterator<E> descendingIterator() {
@@ -897,6 +904,47 @@ public class LinkedList<E>
         }
     }
     
+    private final class BasicIterator implements Iterator<E> {
+
+        private Node<E> lastReturned;
+        private Node<E> next = first;
+        private int nextIndex;
+        private final int expectedModCount = modCount;
+        
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+
+        @Override
+        public E next() {
+            checkForComodification();
+            if (!hasNext()) 
+                throw new NoSuchElementException();
+            
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.item;
+        }
+
+        @Override
+        public void remove() {
+            
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            while (hasNext()) 
+                action.accept(next());
+        }
+        
+        private final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
+    }
+    
     /***************************************************************************
     * Returns a finger that does not point to the element to remove. We need   *
     * this in order to make sure that after removal, all the fingers point to  *
@@ -904,7 +952,6 @@ public class LinkedList<E>
     ***************************************************************************/
     private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
         if (size == 1) {
-            System.out.println("yeahhhh");
             fingerStack.pop();
             return;
         }
