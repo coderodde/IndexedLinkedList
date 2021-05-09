@@ -3,6 +3,8 @@ package com.github.coderodde.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -156,5 +158,32 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(2), list.remove(1));
         assertEquals(Integer.valueOf(1), list.remove(0));
         assertEquals(Integer.valueOf(3), list.remove(0));
+    }
+    
+    @Test
+    public void testBruteForceAddCollectionAtIndex() {
+        long seed = System.currentTimeMillis();
+        System.out.println("seed = " + seed);
+        Random random = new Random(seed);
+        
+        list.addAll(getIntegerList());
+        
+        for (int op = 0; op < 100; op++) {
+            list.addAll(random.nextInt(list.size()), getIntegerList(10));
+        }
+    }
+    
+    private static List<Integer> getIntegerList() {
+        return getIntegerList(100);
+    }
+
+    private static List<Integer> getIntegerList(int length) {
+        List<Integer> list = new ArrayList<>(length);
+        
+        for (int i = 0; i < length; i++) {
+            list.add(i);
+        }
+        
+        return list;
     }
 }

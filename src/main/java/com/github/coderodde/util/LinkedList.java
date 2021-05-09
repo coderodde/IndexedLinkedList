@@ -539,7 +539,7 @@ public class LinkedList<E>
         else if (index == size) 
             appendAll(c);
         else 
-            insertAll(c, node(index), index - c.size());
+            insertAll(c, node(index), index);
         
         return true;
     }
@@ -822,12 +822,10 @@ public class LinkedList<E>
         
         void rewindRight(int steps) {
             for (int i = 0; i < steps; i++) {
-                if (node.next == null) 
-                    return;
-                
                 node = node.next;
-                index++;
             }
+            
+            index += steps;
         }
     }
     
