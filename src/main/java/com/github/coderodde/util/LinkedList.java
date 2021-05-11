@@ -640,8 +640,12 @@ public class LinkedList<E>
         int sz = c.size();
         modCount++;
         size += sz;
-        //    v = 2
-//        1 2 3 -> 1 2 x y 3
+        
+        // Shift all the fingers positions past the 'succ' on the right 'sz' 
+        // positions to the right:
+        shiftIndicesToRight(succIndex, sz);
+        //                                   0 1 |10 11 12| 3 4 5 6 7 8 9
+        // Add fingers:
         addFingersAfterInsertAll(pred.next, succIndex, sz);
     }
     
@@ -707,7 +711,31 @@ public class LinkedList<E>
     private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
                                           int indexOfInsertedRangeHead,
                                           int collectionSize) {
+        final int numberOfNewFingers =
+                getRecommendedNumberOfFingers() - fingerStack.size();
         
+        if (numberOfNewFingers == 0) 
+            return;
+        
+        final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
+        final int startOffset = distanceBetweenFingers / 2;
+        
+        int index = indexOfInsertedRangeHead + startOffset;
+        Node<E> node = headNodeOfInsertedRange;
+        
+        for (int i = 0; i < startOffset; i++) 
+           node = node.next;
+        
+        addFinger(node, index);
+        
+        for (int i = 1; i < numberOfNewFingers; i++) {
+            index += distanceBetweenFingers;
+            
+            for (int j = 0; j < distanceBetweenFingers; j++) 
+                node = node.next;
+            
+            addFinger(node, index);
+        }
     }
     
     private void addFingersAfterAppendAll(
