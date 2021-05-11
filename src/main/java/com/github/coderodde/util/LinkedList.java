@@ -203,7 +203,7 @@ public class LinkedList<E>
     private boolean mustAddFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
-        return fingerStack.size() != getRecommendedFingerCount();
+        return fingerStack.size() != getRecommendedNumberOfFingers();
     }
     
     private boolean mustAddFinger(int size) {
@@ -213,7 +213,7 @@ public class LinkedList<E>
     private boolean mustRemoveFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or, 
         // fingerStack.size() == getRecommendedFingerCount() + 1
-        return fingerStack.size() != getRecommendedFingerCount();
+        return fingerStack.size() != getRecommendedNumberOfFingers();
     }
     
     private void addFinger(Node<E> node, int index) {
@@ -565,7 +565,7 @@ public class LinkedList<E>
         modCount++;
         size += sz;
         
-        addFingers(first, 0, sz);
+        addFingersAfterSetAll();
     }
     
     private void prependAll(Collection<? extends E> c) {
@@ -591,6 +591,11 @@ public class LinkedList<E>
         modCount++;
         size += sz;
         
+        // Prior to adding new (possible) fingers, we need to shift all the 
+        // current fingers 'c.size()' nodes to the larger index values:
+        shiftFingersToRight(0, sz);
+        
+        // Now, add the missing fingers:
         addFingersAfterPrependAll(first, sz);
     }
     
@@ -608,9 +613,9 @@ public class LinkedList<E>
         
         last = prev;
         int sz = c.size();
-        modCount++;
-        addFingers(oldLast.next, size, sz);
         size += sz;
+        modCount++;
+        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
     
     private void insertAll(
@@ -635,25 +640,56 @@ public class LinkedList<E>
         int sz = c.size();
         modCount++;
         size += sz;
-        
-        addFingers(pred.next, succIndex - sz, sz);
+        //    v = 2
+//        1 2 3 -> 1 2 x y 3
+        addFingersAfterInsertAll(pred.next, succIndex, sz);
     }
     
-    private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
-        shiftIndicesToRight(0, collectionSize);
+    private void addFingersAfterSetAll() {
+        final int numberOfNewFingers = getRecommendedNumberOfFingers();
         
+        if (numberOfNewFingers == 0) 
+            return;
+        
+        final int distance = size / numberOfNewFingers;
+        final int startIndex = distance / 2;
+        int index = startIndex;
+        Node<E> node = first;
+        
+        for (int i = 0; i < startIndex; i++)
+            node = node.next;
+        
+        addFinger(node, startIndex);
+        
+        for (int i = 1; i < numberOfNewFingers; i++) {
+            index += distance;
+            
+            for (int j = 0; j < distance; j++)
+                node = node.next;
+            
+            addFinger(node, index);
+        }
+    }
+    
+    /**
+     * Adds fingers after prepending a collection to this list.
+     * 
+     * @param first 
+     * @param collectionSize 
+     */
+    private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
         final int numberOfNewFingers =
-                getRecommendedFingerCount() - fingerStack.size();
+                getRecommendedNumberOfFingers() - fingerStack.size();
         
         if (numberOfNewFingers == 0) 
             return;
         
         final int distance = collectionSize / numberOfNewFingers;
-        final int startOffset = distance / 2;
-        int index = startOffset;
+        final int startIndex = distance / 2;
+        int index = startIndex;
         Node<E> node = first;
         
-        for (int i = 0; i < startOffset; i++) 
+        for (int i = 0; i < startIndex; i++) 
             node = node.next;
         
         addFinger(node, index);
@@ -662,17 +698,55 @@ public class LinkedList<E>
             index += distance;
             
             for (int j = 0; j < distance; j++) 
-                if (node.next != null)
-                    node = node.next;
+                node = node.next;
             
             addFinger(node, index);
         }
     }
     
+    private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
+                                          int indexOfInsertedRangeHead,
+                                          int collectionSize) {
+        
+    }
+    
+    private void addFingersAfterAppendAll(
+            Node<E> first, 
+            int firstIndex, 
+            int collectionSize) {
+        final int numberOfNewFingers = 
+                getRecommendedNumberOfFingers() - fingerStack.size();
+        
+        if (numberOfNewFingers == 0) 
+            return;
+        
+        final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
+        final int startOffset = firstIndex + distanceBetweenFingers / 2;
+        int index = firstIndex + startOffset;
+        Node<E> node = first;
+        
+        for (int i = 0; i < startOffset; i++) 
+            node = node.next;
+        
+        addFinger(node, index);
+        
+        for (int i = 1; i < numberOfNewFingers; i++) {
+            index += distanceBetweenFingers;
+            
+            for  (int j = 0; j < distanceBetweenFingers; j++) 
+                node = node.next;
+            
+            addFinger(node, index);
+        }
+    }
+    
+    // first - the leftmost node of the inserted range,
+    // firstIndex - the index of the leftmost node,
+    // collectionSize - the size of the inserted range.
     private void addFingers(Node<E> first, int firstIndex, int collectionSize) {
-        shiftIndicesToRight(firstIndex + collectionSize, collectionSize);
+        shiftIndicesToRight(firstIndex, collectionSize);
         final int numberOfNewFingers =
-                getRecommendedFingerCount() - fingerStack.size();
+                getRecommendedNumberOfFingers() - fingerStack.size();
         
         if (numberOfNewFingers == 0) 
             return;
@@ -699,6 +773,14 @@ public class LinkedList<E>
                     node = node.next;
             
             addFinger(node, index);
+        }
+        
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.index >= this.size) {
+                throw new IllegalStateException();
+            }
         }
     }
 
@@ -971,7 +1053,7 @@ public class LinkedList<E>
         throw new IllegalStateException("Removing from an empty list.");
     }
     
-    private int getRecommendedFingerCount() {
+    private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size / 2.0));
     }
     

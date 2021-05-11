@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import javax.swing.text.StyleConstants;
 
 public class LinkedListBenchmark {
 
@@ -97,42 +96,12 @@ public class LinkedListBenchmark {
             
             printTitle(benchmarkChoice);
             
-            profileAddFirst();
-            
-            listsEqual();
-            
-            System.out.println();
-            
-            profileAddLast();
-            
-            listsEqual();
-            
-            System.out.println();
-            
-            profileAddViaIndex();
-            
-            listsEqual();
-            
-            System.out.println();
-            
+//            profileAddFirst();
+//            profileAddLast();
+//            profileAddViaIndex();
             profileAppendCollection();
-            
-            listsEqual();
-            
-            System.out.println();
-            
             profileAddCollection();
-            
-            listsEqual();
-            
-            System.out.println();
-            
             profileRemoveViaIndex();
-            
-            listsEqual();
-            
-            System.out.println();
-            
             printTotalDurations();
             
             resetLists();
@@ -148,36 +117,54 @@ public class LinkedListBenchmark {
             profileAddFirstRoddeList();
             profileAddFirstLinkedList();
             profileAddFirstArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void profileAddLast() {
             profileAddLastRoddeList();
             profileAddLastLinkedList();
             profileAddLastArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void profileAddViaIndex() {
             profileAddIndexRoddeList();
             profileAddIndexLinkedList();
             profileAddIndexArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void profileAddCollection() {
             profileAddCollectionRoddeList();
             profileAddCollectionLinkedList();
             profileAddCollectionArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void profileAppendCollection() {
             profileAppendCollectionRoddeList();
             profileAppendCollectionLinkedList();
             profileAppendCollectionArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void profileRemoveViaIndex() {
             profileRemoveViaIndexRoddeList();
             profileRemoveViaIndexLinkedList();
             profileRemoveViaIndexArrayList();
+            
+            listsEqual();
+            System.out.println();
         }
         
         private void printTotalDurations() {

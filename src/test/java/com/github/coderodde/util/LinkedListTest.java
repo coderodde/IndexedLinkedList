@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -144,7 +143,7 @@ public class LinkedListTest {
         list.addAll(4, Arrays.asList(6, 7)); // appendAll
         list.addAll(4, Arrays.asList(4, 5)); // insertAll
         
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < list.size(); i++) {
             assertEquals(Integer.valueOf(i), list.get(i));
         }
     }
@@ -162,14 +161,16 @@ public class LinkedListTest {
     
     @Test
     public void testBruteForceAddCollectionAtIndex() {
-        long seed = System.currentTimeMillis();
+        long seed = 1620649955365L;
+//        seed = System.currentTimeMillis();
         System.out.println("seed = " + seed);
         Random random = new Random(seed);
         
         list.addAll(getIntegerList());
         
         for (int op = 0; op < 100; op++) {
-            list.addAll(random.nextInt(list.size()), getIntegerList(10));
+            System.out.println(op);
+            list.addAll(random.nextInt(list.size()), getIntegerList(random.nextInt(100)));
         }
     }
     
