@@ -753,16 +753,24 @@ public class LinkedList<E>
         int index = firstIndex + startOffset;
         Node<E> node = first;
         
-        for (int i = 0; i < startOffset; i++) 
+        for (int i = 0; i < startOffset; i++) {
+            if (node.next == null) 
+                break;
+            
             node = node.next;
+        }
         
         addFinger(node, index);
         
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
             
-            for  (int j = 0; j < distanceBetweenFingers; j++) 
+            for  (int j = 0; j < distanceBetweenFingers; j++) {
+                if (node.next == null) 
+                    break;
+                
                 node = node.next;
+            }
             
             addFinger(node, index);
         }
