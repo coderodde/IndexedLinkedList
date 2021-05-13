@@ -13,7 +13,7 @@ public class LinkedListBenchmark {
 
         private static final int ADD_FIRST_OPERATIONS = 100_000;
         private static final int ADD_AT_OPERATIONS = 10_000;
-        private static final int ADD_COLLECTION_AT_OPERATIONS = 5_000;
+        private static final int ADD_COLLECTION_AT_OPERATIONS = 1_000;
         private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
         private static final int REMOVE_VIA_INDEX_OPERATIONS = 1_000;
         
@@ -72,9 +72,13 @@ public class LinkedListBenchmark {
                         lists[lists.length - 1].iterator();
                 
                 while (leftIterator.hasNext()) {
-                    if (!Objects.equals(leftIterator.next(),
-                                        rightIterator.next())) {
-                        throw new IllegalArgumentException("Data mismatch");
+                    Integer i1 = leftIterator.next();
+                    Integer i2 = rightIterator.next();
+                    
+                    if (!i1.equals(i2)) {
+                        throw new IllegalArgumentException(
+                                "Data mismatch: " + i1 + " vs. " + i2 +
+                                " at list " + i);
                     }
                 }
                 

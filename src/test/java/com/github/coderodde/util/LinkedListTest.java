@@ -2,6 +2,8 @@ package com.github.coderodde.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import static org.junit.Assert.assertEquals;
@@ -162,16 +164,52 @@ public class LinkedListTest {
     @Test
     public void testBruteForceAddCollectionAtIndex() {
         long seed = 1620649955365L;
-//        seed = System.currentTimeMillis();
+        seed = System.currentTimeMillis();
         System.out.println("seed = " + seed);
         Random random = new Random(seed);
         
         list.addAll(getIntegerList());
         
-        for (int op = 0; op < 100; op++) {
-            System.out.println(op);
-            list.addAll(random.nextInt(list.size()), getIntegerList(random.nextInt(100)));
+        List<Integer> referenceList = new java.util.LinkedList<>(list);
+        
+        for (int op = 0; op < 1000; op++) {
+            int index = random.nextInt(list.size());
+            Collection<Integer> coll = getIntegerList(random.nextInt(100));
+            
+            referenceList.addAll(index, coll);
+            list.addAll(index, coll);
+            
+            if (!listsEqual(referenceList, list)) {
+                System.out.println("yeah!");
+                return;
+            }
         }
+    }
+    
+    private static boolean listsEqual(
+            List<Integer> list1, List<Integer> list2) {
+        
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+        
+        Iterator<Integer> iter1 = list1.iterator();
+        Iterator<Integer> iter2 = list2.iterator();
+        
+        while (iter1.hasNext() && iter2.hasNext()) {
+            Integer int1 = iter1.next();
+            Integer int2 = iter2.next();
+            
+            if (!int1.equals(int2)) {
+                return false;
+            }
+        }
+        
+        if (iter1.hasNext() || iter2.hasNext()) {
+            throw new IllegalStateException();
+        }
+        
+        return true;
     }
     
     private static List<Integer> getIntegerList() {
