@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 public class LinkedListBenchmark {
@@ -13,15 +12,17 @@ public class LinkedListBenchmark {
 
         private static final int ADD_FIRST_OPERATIONS = 100_000;
         private static final int ADD_AT_OPERATIONS = 10_000;
-        private static final int ADD_COLLECTION_AT_OPERATIONS = 1_000;
-        private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
+        private static final int ADD_COLLECTION_AT_OPERATIONS = 10;
+        private static final int ADD_LAST_COLLECTION_OPERATIONS = 10;
         private static final int REMOVE_VIA_INDEX_OPERATIONS = 1_000;
         
-        private static final int MAXIMUM_COLLECTION_SIZE = 2_000;
+        private static final int MAXIMUM_COLLECTION_SIZE = 20;
         
-        private final Random randomJavaUtilLinkedList;
-        private final Random randomJavaUtilArrayList;
-        private final Random randomRoddeList;
+        private final long seed;
+        
+        private Random randomJavaUtilLinkedList;
+        private Random randomJavaUtilArrayList;
+        private Random randomRoddeList;
         
         private com.github.coderodde.util.LinkedList<Integer> roddeList = 
                 new com.github.coderodde.util.LinkedList<>();
@@ -34,9 +35,7 @@ public class LinkedListBenchmark {
         private long totalMillisArrayList  = 0L;
         
         private Benchmark(long seed) {
-            this.randomJavaUtilLinkedList = new Random(seed);
-            this.randomJavaUtilArrayList = new Random(seed);
-            this.randomRoddeList = new Random(seed);
+            this.seed = seed;
         }
     
         private static List<Integer> createRandomCollection(Random random) {
@@ -52,6 +51,12 @@ public class LinkedListBenchmark {
         }
         
         private enum BenchmarkChoice { WARMUP, BENCHMARK }
+        
+        private void initRandomGenerators() {
+            randomJavaUtilLinkedList = new Random(seed);
+            randomJavaUtilArrayList  = new Random(seed);
+            randomRoddeList          = new Random(seed);
+        }
         
         private void listsEqual() {
             listsEqual(roddeList, linkedList, arrayList);
@@ -71,15 +76,20 @@ public class LinkedListBenchmark {
                 Iterator<Integer> rightIterator = 
                         lists[lists.length - 1].iterator();
                 
-                while (leftIterator.hasNext()) {
-                    Integer i1 = leftIterator.next();
-                    Integer i2 = rightIterator.next();
+                int elementIndex = 0;
+                
+                while (leftIterator.hasNext() && rightIterator.hasNext()) {
+                    Integer integer1 = leftIterator.next();
+                    Integer integer2 = rightIterator.next();
                     
-                    if (!i1.equals(i2)) {
+                    if (!integer1.equals(integer2)) {
                         throw new IllegalArgumentException(
-                                "Data mismatch: " + i1 + " vs. " + i2 +
-                                " at list " + i);
+                                "Data mismatch: " + integer1 + " vs. " + 
+                                integer2 + " at list " + i + 
+                                ", element index: " + elementIndex);
                     }
+                    
+                    elementIndex++;
                 }
                 
                 if (leftIterator.hasNext() || rightIterator.hasNext()) {
@@ -99,6 +109,7 @@ public class LinkedListBenchmark {
         private void profile(BenchmarkChoice benchmarkChoice) {
             
             printTitle(benchmarkChoice);
+            initRandomGenerators();
             
 //            profileAddFirst();
 //            profileAddLast();
@@ -109,6 +120,13 @@ public class LinkedListBenchmark {
             printTotalDurations();
             
             resetLists();
+            zeroTimeDurationCounters();
+        }
+        
+        private void zeroTimeDurationCounters() {
+            totalMillisArrayList  = 0;
+            totalMillisLinkedList = 0;
+            totalMillisRoddeList  = 0;
         }
         
         private void resetLists() {
