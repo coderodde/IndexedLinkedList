@@ -41,6 +41,7 @@ import java.util.function.Consumer;
  * @author  Rodion Efremov
  * @see     List
  * @see     ArrayList
+ * @see     java.util.LinkedList
  * @since 17
  * @param <E> the type of elements held in this collection
  */
@@ -72,6 +73,45 @@ public class LinkedList<E>
     
     public LinkedList(Collection<? extends E> c) {
         addAll(c);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) 
+            return false;
+        
+        if (o == this) 
+            return true;
+        
+        if (!o.getClass().equals(o.getClass())) 
+            return false;
+        
+        List<?> otherList = (List<?>) o;
+        
+        if (size != otherList.size())
+            return false;
+        
+        Iterator<?> iterator1 = iterator();
+        Iterator<?> iterator2 = otherList.iterator();
+        
+        while (iterator1.hasNext() && iterator2.hasNext()) {
+            Object object1 = iterator1.next();
+            Object object2 = iterator2.next();
+            
+            if (!java.util.Objects.equals(object1, object2)) 
+                return false;
+        }
+        
+        boolean iterator1HasMore = iterator1.hasNext();
+        boolean iterator2HasMore = iterator2.hasNext();
+        
+        if (iterator1HasMore || iterator2HasMore)
+            throw new IllegalStateException(
+                    iterator1HasMore ? 
+                            "This list has more elements to offer" : 
+                            "Argument list has more elements to offer");
+        
+        return true;
     }
     
     /**
