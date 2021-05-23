@@ -33,8 +33,8 @@ public final class LinkedListDebugger {
             int index = random.nextInt(roddeList.size());
             System.out.println("INDEX: " + index);
             
-            roddeList.addAll(index, randomList);
             arrayList.addAll(index, randomList);
+            roddeList.addAll(index, randomList);
             
             checkEqualLists(roddeList, arrayList);
             op++;
