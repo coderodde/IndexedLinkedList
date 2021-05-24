@@ -8,12 +8,12 @@ import java.util.Random;
 
 final class LinkedListBenchmark {
 
-    private static final int ADD_FIRST_OPERATIONS = 100_000;
-    private static final int ADD_LAST_OPERATIONS = 100_000;
-    private static final int ADD_AT_OPERATIONS = 10_000;
-    private static final int ADD_COLLECTION_AT_OPERATIONS = 10;
-    private static final int ADD_LAST_COLLECTION_OPERATIONS = 10;
-    private static final int REMOVE_VIA_INDEX_OPERATIONS = 1_000;
+    private static final int ADD_FIRST_OPERATIONS           = 100_000;
+    private static final int ADD_LAST_OPERATIONS            = 100_000;
+    private static final int ADD_AT_OPERATIONS              = 10_000;
+    private static final int ADD_COLLECTION_AT_OPERATIONS   = 4_000;
+    private static final int ADD_LAST_COLLECTION_OPERATIONS = 4_000;
+    private static final int REMOVE_VIA_INDEX_OPERATIONS    = 1_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 
@@ -109,9 +109,9 @@ final class LinkedListBenchmark {
         printTitle(benchmarkChoice);
         initRandomGenerators();
 
-//            profileAddFirst();
-//            profileAddLast();
-//            profileAddViaIndex();
+        profileAddFirst();
+        profileAddLast();
+        profileAddViaIndex();
         profileAppendCollection();
         profileAddCollection();
 //        profileRemoveViaIndex();
@@ -161,43 +161,43 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddCollection() {
-        long seed = System.currentTimeMillis();
-        seed = 1621688256515L;
+//        long seed = System.currentTimeMillis();
+//        seed = 1621688256515L;
+//        
+//        System.out.println("---> seed = " + seed);
+//        Random random = new Random(seed);
+//        
+//        try {
+//            listsEqual();
+//        } catch (IllegalStateException ex) {
+//            System.out.println("SHIT HAPPENED");
+//            System.exit(-1);
+//        }
+//        
+//        for (int op = 0; op < ADD_COLLECTION_AT_OPERATIONS; op++) {
+//            List<Integer> coll = createRandomCollection(random);
+//            int index = random.nextInt(roddeList.size());
+//            
+//            linkedList.addAll(index, coll);
+//            roddeList.addAll(index, coll);
+//            arrayList.addAll(index, coll);
+//            
+////            System.out.println("(" + index + ", op = " + op + ", [" + coll + "])");
+//            
+//            try {
+//                listsEqual();
+//            } catch (IllegalStateException ex) {
+//                ex.printStackTrace();
+//                System.exit(-1);
+//            }
+//        }
         
-        System.out.println("---> seed = " + seed);
-        Random random = new Random(seed);
-        
-        try {
-            listsEqual();
-        } catch (IllegalStateException ex) {
-            System.out.println("SHIT HAPPENED");
-            System.exit(-1);
-        }
-        
-        for (int op = 0; op < ADD_COLLECTION_AT_OPERATIONS; op++) {
-            List<Integer> coll = createRandomCollection(random);
-            int index = random.nextInt(roddeList.size());
-            
-            linkedList.addAll(index, coll);
-            roddeList.addAll(index, coll);
-            arrayList.addAll(index, coll);
-            
-            System.out.println("(" + index + ", op = " + op + ", [" + coll + "])");
-            
-            try {
-                listsEqual();
-            } catch (IllegalStateException ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            }
-        }
-        
-//        profileAddCollectionRoddeList();
-//        profileAddCollectionLinkedList();
-//        profileAddCollectionArrayList();
-//
-//        listsEqual();
-//        System.out.println();
+        profileAddCollectionRoddeList();
+        profileAddCollectionLinkedList();
+        profileAddCollectionArrayList();
+
+        listsEqual();
+        System.out.println();
     }
 
     private void profileAppendCollection() {
@@ -397,21 +397,21 @@ final class LinkedListBenchmark {
 
     private void profileAddLastRoddeList() {
         totalMillisRoddeList += 
-            profileAddLast(roddeList, ADD_FIRST_OPERATIONS, randomRoddeList);
+            profileAddLast(roddeList, ADD_LAST_OPERATIONS, randomRoddeList);
     }
 
     private void profileAddLastLinkedList() {
         totalMillisLinkedList += 
                 profileAddLast(
                         linkedList, 
-                        ADD_FIRST_OPERATIONS, 
+                        ADD_LAST_OPERATIONS, 
                         randomJavaUtilLinkedList);
     }
 
     private void profileAddLastArrayList() {
         totalMillisArrayList += 
                 profileAddLast(arrayList, 
-                               ADD_FIRST_OPERATIONS, 
+                               ADD_LAST_OPERATIONS, 
                                randomJavaUtilArrayList);
     }
 

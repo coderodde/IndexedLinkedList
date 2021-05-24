@@ -571,7 +571,7 @@ public class LinkedList<E>
     
     public boolean addAll(int index, Collection<? extends E> c) {
 //        System.out.println("op = " + (op++));
-        op = 0;
+//        op = 0;
         checkPositionIndex(index);
         if (c.isEmpty()) 
             return false;
@@ -585,7 +585,7 @@ public class LinkedList<E>
         else 
             insertAll(c, node(index), index);
         
-        checkInvariant();
+//        checkInvariant();
         return true;
     }
     
