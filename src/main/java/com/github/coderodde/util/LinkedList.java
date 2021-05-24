@@ -75,6 +75,8 @@ public class LinkedList<E>
         addAll(c);
     }
     
+    int op = 0;
+    
     @Override
     public boolean equals(Object o) {
         if (o == null) 
@@ -568,6 +570,8 @@ public class LinkedList<E>
     }
     
     public boolean addAll(int index, Collection<? extends E> c) {
+//        System.out.println("op = " + (op++));
+        op = 0;
         checkPositionIndex(index);
         if (c.isEmpty()) 
             return false;
@@ -790,16 +794,12 @@ public class LinkedList<E>
             return;
         
         final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
-        final int startOffset = firstIndex + distanceBetweenFingers / 2;
-        int index = startOffset;
+        final int nodesToSkip = distanceBetweenFingers / 2;
+        int index = firstIndex + nodesToSkip;
         Node<E> node = first;
         
-        for (int i = 0; i < startOffset; i++) {
-            if (node.next == null) 
-                break;
-            
+        for (int i = 0; i < nodesToSkip; i++) 
             node = node.next;
-        }
         
         addFinger(node, index);
         
