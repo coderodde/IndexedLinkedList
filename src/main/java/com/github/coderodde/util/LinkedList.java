@@ -581,6 +581,7 @@ public class LinkedList<E>
         else 
             insertAll(c, node(index), index);
         
+        checkInvariant();
         return true;
     }
     
@@ -790,7 +791,7 @@ public class LinkedList<E>
         
         final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
         final int startOffset = firstIndex + distanceBetweenFingers / 2;
-        int index = firstIndex + startOffset;
+        int index = startOffset;
         Node<E> node = first;
         
         for (int i = 0; i < startOffset; i++) {
@@ -1211,5 +1212,27 @@ public class LinkedList<E>
     ***************************************************************************/
     private void shiftIndicesToRightOnce(int startingIndex) {
         shiftFingersToRight(startingIndex, 1);
+    }
+    
+    private void checkInvariant() {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            Node<E> node = getNodeRaw(finger.index);
+            
+            if (finger.node != node) 
+                throw new AssertionError(
+                        "checkInvariant() failed at finger index (" +
+                                finger.index + "), expected node = " + 
+                                finger.node + ", actual node = " + node);
+        }
+    }
+    
+    private Node<E> getNodeRaw(int index) {
+        Node<E> node = first;
+        
+        for (int i = 0; i < index; i++) 
+            node = node.next;
+        
+        return node;
     }
 }

@@ -24,9 +24,7 @@ public final class LinkedListDebugger {
         populate(roddeList, arrayList);
         checkEqualLists(roddeList, arrayList);
         
-        int op = 0;
-        
-        while (true) {
+        for (int op = 0; op < TEST_LOOP_ITERATIONS; op++) {
             System.out.println("Operation " + op);
             
             List<Integer> randomList = getRandomList();
@@ -37,7 +35,6 @@ public final class LinkedListDebugger {
             roddeList.addAll(index, randomList);
             
             checkEqualLists(roddeList, arrayList);
-            op++;
         }
     }
     
@@ -78,9 +75,10 @@ public final class LinkedListDebugger {
     
     private void populate(List<Integer> roddeList, List<Integer> arrayList) {
         for (int op = 0; op < 5; op++) {
+            System.out.println("op = " + op);
             List<Integer> coll = getRandomList();
-            roddeList.addAll(coll);
             arrayList.addAll(coll);
+            roddeList.addAll(coll);
             
             if (!roddeList.equals(arrayList)) {
                 throw new IllegalStateException("op = " + op);
