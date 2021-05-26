@@ -6,6 +6,7 @@ public class LinkedListBenchmarkRunner {
 //        new LinkedListDebugger().run();
 //        System.exit(0);
         long seed = 1619010671495L; //System.currentTimeMillis();
+        seed = System.currentTimeMillis();
         
         System.out.println("--- Seed = " + seed + " ---");
         System.out.println();

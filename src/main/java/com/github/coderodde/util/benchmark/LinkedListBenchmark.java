@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import org.apache.commons.collections4.list.TreeList;
 
 final class LinkedListBenchmark {
 
@@ -22,16 +23,19 @@ final class LinkedListBenchmark {
     private Random randomJavaUtilLinkedList;
     private Random randomJavaUtilArrayList;
     private Random randomRoddeList;
-
+    private Random randomTreeList;
+    
     private com.github.coderodde.util.LinkedList<Integer> roddeList = 
             new com.github.coderodde.util.LinkedList<>();
 
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
+    private TreeList<Integer> treeList = new TreeList<>();
 
     private long totalMillisRoddeList  = 0L;
     private long totalMillisLinkedList = 0L;
     private long totalMillisArrayList  = 0L;
+    private long totalMillisTreeList   = 0L;
 
     LinkedListBenchmark(long seed) {
         this.seed = seed;
@@ -63,10 +67,11 @@ final class LinkedListBenchmark {
         randomJavaUtilLinkedList = new Random(seed);
         randomJavaUtilArrayList  = new Random(seed);
         randomRoddeList          = new Random(seed);
+        randomTreeList           = new Random(seed);
     }
 
     private void listsEqual() {
-        listsEqual(roddeList, linkedList, arrayList);
+        listsEqual(roddeList, linkedList, arrayList, treeList);
     }
 
     private static void listsEqual(List<Integer>... lists) {
@@ -115,7 +120,7 @@ final class LinkedListBenchmark {
         profileAppendCollection();
         profileAddCollection();
 //        profileRemoveViaIndex();
-//        printTotalDurations();
+        printTotalDurations();
 
         resetLists();
         zeroTimeDurationCounters();
@@ -125,18 +130,21 @@ final class LinkedListBenchmark {
         totalMillisArrayList  = 0;
         totalMillisLinkedList = 0;
         totalMillisRoddeList  = 0;
+        totalMillisTreeList   = 0;
     }
 
     private void resetLists() {
         roddeList = new com.github.coderodde.util.LinkedList<>();
         linkedList = new java.util.LinkedList<>();
         arrayList = new ArrayList<>();
+        treeList = new TreeList<>();
     }
 
     private void profileAddFirst() {
         profileAddFirstRoddeList();
         profileAddFirstLinkedList();
         profileAddFirstArrayList();
+        profileAddFirstTreeList();
 
         listsEqual();
         System.out.println();
@@ -146,6 +154,7 @@ final class LinkedListBenchmark {
         profileAddLastRoddeList();
         profileAddLastLinkedList();
         profileAddLastArrayList();
+        profileAddLastTreeList();
 
         listsEqual();
         System.out.println();
@@ -155,6 +164,7 @@ final class LinkedListBenchmark {
         profileAddIndexRoddeList();
         profileAddIndexLinkedList();
         profileAddIndexArrayList();
+        profileAddIndexTreeList();
 
         listsEqual();
         System.out.println();
@@ -195,6 +205,7 @@ final class LinkedListBenchmark {
         profileAddCollectionRoddeList();
         profileAddCollectionLinkedList();
         profileAddCollectionArrayList();
+        profileAddCollectionTreeList();
 
         listsEqual();
         System.out.println();
@@ -204,6 +215,7 @@ final class LinkedListBenchmark {
         profileAppendCollectionRoddeList();
         profileAppendCollectionLinkedList();
         profileAppendCollectionArrayList();
+        profileAppendCollectionTreeList();
 
         listsEqual();
         System.out.println();
@@ -234,6 +246,11 @@ final class LinkedListBenchmark {
                 arrayList.getClass().getName() + 
                         " in (ms): " + 
                         totalMillisArrayList);
+
+        System.out.println(
+                treeList.getClass().getName() + 
+                        " in (ms): " + 
+                        totalMillisTreeList);
     }
 
     private long profileAddFirst(
@@ -394,6 +411,13 @@ final class LinkedListBenchmark {
                                 ADD_FIRST_OPERATIONS, 
                                 randomJavaUtilArrayList);
     }
+    
+    private void profileAddFirstTreeList() {
+        totalMillisTreeList += 
+                profileAddFirst(treeList,
+                                ADD_FIRST_OPERATIONS,
+                                randomTreeList);
+    }
 
     private void profileAddLastRoddeList() {
         totalMillisRoddeList += 
@@ -415,6 +439,13 @@ final class LinkedListBenchmark {
                                randomJavaUtilArrayList);
     }
 
+    private void profileAddLastTreeList() {
+        totalMillisTreeList += 
+                profileAddLast(treeList, 
+                               ADD_LAST_OPERATIONS, 
+                               randomTreeList);
+    }
+
     private void profileAddIndexRoddeList() {
         totalMillisRoddeList += 
                 profileAddIndex(roddeList, ADD_AT_OPERATIONS, randomRoddeList);
@@ -434,6 +465,14 @@ final class LinkedListBenchmark {
                         arrayList, 
                         ADD_AT_OPERATIONS, 
                         randomJavaUtilArrayList);
+    }
+
+    private void profileAddIndexTreeList() {
+        totalMillisTreeList +=
+                profileAddIndex(
+                        treeList, 
+                        ADD_AT_OPERATIONS, 
+                        randomTreeList);
     }
 
     private void profileAddCollectionRoddeList() {
@@ -460,6 +499,13 @@ final class LinkedListBenchmark {
                         randomJavaUtilArrayList);
     }
 
+    private void profileAddCollectionTreeList() {
+        totalMillisTreeList +=
+                profileAddCollection(
+                        treeList,
+                        ADD_COLLECTION_AT_OPERATIONS,
+                        randomTreeList);
+    }
 
     private void profileAppendCollectionRoddeList() {
         totalMillisRoddeList +=
@@ -485,6 +531,13 @@ final class LinkedListBenchmark {
                         randomJavaUtilArrayList);
     }
 
+    private void profileAppendCollectionTreeList() {
+        totalMillisTreeList +=
+                profileAppendCollection(
+                        treeList, 
+                        ADD_LAST_COLLECTION_OPERATIONS, 
+                        randomTreeList);
+    }
 
     private void profileRemoveViaIndexRoddeList() {
         totalMillisRoddeList += 
