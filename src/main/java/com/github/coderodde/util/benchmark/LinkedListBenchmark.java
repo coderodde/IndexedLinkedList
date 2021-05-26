@@ -171,37 +171,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddCollection() {
-//        long seed = System.currentTimeMillis();
-//        seed = 1621688256515L;
-//        
-//        System.out.println("---> seed = " + seed);
-//        Random random = new Random(seed);
-//        
-//        try {
-//            listsEqual();
-//        } catch (IllegalStateException ex) {
-//            System.out.println("SHIT HAPPENED");
-//            System.exit(-1);
-//        }
-//        
-//        for (int op = 0; op < ADD_COLLECTION_AT_OPERATIONS; op++) {
-//            List<Integer> coll = createRandomCollection(random);
-//            int index = random.nextInt(roddeList.size());
-//            
-//            linkedList.addAll(index, coll);
-//            roddeList.addAll(index, coll);
-//            arrayList.addAll(index, coll);
-//            
-////            System.out.println("(" + index + ", op = " + op + ", [" + coll + "])");
-//            
-//            try {
-//                listsEqual();
-//            } catch (IllegalStateException ex) {
-//                ex.printStackTrace();
-//                System.exit(-1);
-//            }
-//        }
-        
         profileAddCollectionRoddeList();
         profileAddCollectionLinkedList();
         profileAddCollectionArrayList();
