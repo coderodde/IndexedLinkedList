@@ -15,6 +15,7 @@ final class LinkedListBenchmark {
     private static final int ADD_COLLECTION_AT_OPERATIONS   = 4_000;
     private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
     private static final int REMOVE_VIA_INDEX_OPERATIONS    = 10_000;
+    private static final int REMOVE_OBJECT_OPERATIONS       = 500;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 
@@ -120,6 +121,8 @@ final class LinkedListBenchmark {
         profileAppendCollection();
         profileAddCollection();
         profileRemoveViaIndex();
+        profileRemoveObject();
+        
         printTotalDurations();
 
         resetLists();
@@ -195,6 +198,16 @@ final class LinkedListBenchmark {
         profileRemoveViaIndexLinkedList();
         profileRemoveViaIndexArrayList();
         profileRemoveViaIndexTreeList();
+
+        listsEqual();
+        System.out.println();
+    }
+
+    private void profileRemoveObject() {
+        profileRemoveObjectRoddeList();
+        profileRemoveObjectLinkedList();
+        profileRemoveObjectArrayList();
+        profileRemoveObjectTreeList();
 
         listsEqual();
         System.out.println();
@@ -355,6 +368,28 @@ final class LinkedListBenchmark {
         System.out.println(
                 list.getClass().getName() +
                         ".remove(int) in (ms): " +
+                        durationMillis);
+
+        return durationMillis;
+    }
+
+    private long profileRemoveObject(
+            List<Integer> list, 
+            int operations, 
+            Random random) {
+
+        long startMillis = System.currentTimeMillis();
+
+        for (int i = 0; i < operations; i++) {
+            list.remove(Integer.valueOf(random.nextInt(list.size())));
+        }
+
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+
+        System.out.println(
+                list.getClass().getName() +
+                        ".remove(Object) in (ms): " +
                         durationMillis);
 
         return durationMillis;
@@ -538,6 +573,38 @@ final class LinkedListBenchmark {
                 profileRemoveViaIndex(
                         treeList, 
                         REMOVE_VIA_INDEX_OPERATIONS, 
+                        randomTreeList);
+    }
+
+    private void profileRemoveObjectRoddeList() {
+        totalMillisRoddeList += 
+                profileRemoveObject(
+                        roddeList, 
+                        REMOVE_OBJECT_OPERATIONS, 
+                        randomRoddeList);
+    }
+
+    private void profileRemoveObjectLinkedList() {    
+        totalMillisLinkedList += 
+                profileRemoveObject(
+                        linkedList, 
+                        REMOVE_OBJECT_OPERATIONS, 
+                        randomJavaUtilLinkedList);
+    }
+
+    private void profileRemoveObjectArrayList() {
+        totalMillisArrayList += 
+                profileRemoveObject(
+                        arrayList, 
+                        REMOVE_OBJECT_OPERATIONS, 
+                        randomJavaUtilArrayList);
+    }
+
+    private void profileRemoveObjectTreeList() {
+        totalMillisTreeList += 
+                profileRemoveObject(
+                        treeList,
+                        REMOVE_OBJECT_OPERATIONS, 
                         randomTreeList);
     }
 
