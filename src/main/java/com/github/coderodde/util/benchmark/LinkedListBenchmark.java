@@ -13,8 +13,8 @@ final class LinkedListBenchmark {
     private static final int ADD_LAST_OPERATIONS            = 100_000;
     private static final int ADD_AT_OPERATIONS              = 10_000;
     private static final int ADD_COLLECTION_AT_OPERATIONS   = 4_000;
-    private static final int ADD_LAST_COLLECTION_OPERATIONS = 4_000;
-    private static final int REMOVE_VIA_INDEX_OPERATIONS    = 1_000;
+    private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
+    private static final int REMOVE_VIA_INDEX_OPERATIONS    = 10_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 
@@ -119,7 +119,7 @@ final class LinkedListBenchmark {
         profileAddViaIndex();
         profileAppendCollection();
         profileAddCollection();
-//        profileRemoveViaIndex();
+        profileRemoveViaIndex();
         printTotalDurations();
 
         resetLists();
@@ -194,6 +194,7 @@ final class LinkedListBenchmark {
         profileRemoveViaIndexRoddeList();
         profileRemoveViaIndexLinkedList();
         profileRemoveViaIndexArrayList();
+        profileRemoveViaIndexTreeList();
 
         listsEqual();
         System.out.println();
@@ -530,6 +531,14 @@ final class LinkedListBenchmark {
                         arrayList, 
                         REMOVE_VIA_INDEX_OPERATIONS, 
                         randomJavaUtilArrayList);
+    }
+
+    private void profileRemoveViaIndexTreeList() {
+        totalMillisTreeList += 
+                profileRemoveViaIndex(
+                        treeList, 
+                        REMOVE_VIA_INDEX_OPERATIONS, 
+                        randomTreeList);
     }
 
     private void printTitle(BenchmarkChoice benchmarkChoice) {

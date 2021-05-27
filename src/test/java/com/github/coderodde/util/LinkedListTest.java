@@ -9,6 +9,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -178,10 +179,9 @@ public class LinkedListTest {
     }
     
     @Test
-    public void testBruteForceAddCollectionAtIndex() {
-        long seed = 1620649955365L;
-        seed = System.currentTimeMillis();
-        System.out.println("seed = " + seed);
+    public void bruteForceAddCollectionAtIndex() {
+        long seed = System.currentTimeMillis();
+        System.out.println("bruteForceAddCollectionAtIndex.seed = " + seed);
         Random random = new Random(seed);
         
         list.addAll(getIntegerList());
@@ -197,10 +197,35 @@ public class LinkedListTest {
             list.addAll(index, coll);
             
             if (!listsEqual(list, referenceList)) {
-                System.out.println("yeah!");
-                throw new IllegalStateException();
+                fail("Lists not equal!");
             }
         }
+    }
+    
+    @Test
+    public void removeAtIndex() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        
+        assertEquals(Integer.valueOf(2), list.remove(2));
+        assertEquals(Integer.valueOf(0), list.remove(0));
+        assertEquals(Integer.valueOf(4), list.remove(2));
+    }
+    
+    @Test
+    public void removeObject() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        
+        assertFalse(list.remove(Integer.valueOf(10)));
+        assertFalse(list.remove(null));
+        
+        list.add(3, null);
+        
+        assertTrue(list.remove(null));
+        
+        assertTrue(list.remove(Integer.valueOf(4)));
+        assertTrue(list.remove(Integer.valueOf(0)));
+        assertTrue(list.remove(Integer.valueOf(2)));
+        assertFalse(list.remove(Integer.valueOf(2)));
     }
     
     private static boolean listsEqual(
