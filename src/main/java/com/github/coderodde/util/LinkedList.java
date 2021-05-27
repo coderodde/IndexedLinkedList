@@ -68,14 +68,13 @@ public class LinkedList<E>
     transient FingerStack<E> fingerStack = new FingerStack<>();
     
     public LinkedList() {
-        
+        super();
     }
     
     public LinkedList(Collection<? extends E> c) {
+        super();
         addAll(c);
     }
-    
-    int op = 0;
     
     @Override
     public boolean equals(Object o) {
@@ -202,6 +201,7 @@ public class LinkedList<E>
         return unlinkLast(l);
     }
     
+    // Prepends the input element to the head of this list.
     private void linkFirst(E e) {
         shiftIndicesToRightOnce(0);
         
@@ -223,6 +223,7 @@ public class LinkedList<E>
             addFinger(newNode, 0);
     }
     
+    // Appends the input element to the tail of this list.
     private void linkLast(E e) {
         final Node<E> l = last;
         final Node<E> newNode = new Node<>();
@@ -242,16 +243,14 @@ public class LinkedList<E>
             addFinger(newNode, size - 1);
     }
     
+    // Returns true only if this list requires more fingers.
     private boolean mustAddFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
     
-    private boolean mustAddFinger(int size) {
-        return fingerStack.size() != getRecommendedFingerCount(size);
-    }
-    
+    // Returns true only if this list requires less fingers.
     private boolean mustRemoveFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or, 
         // fingerStack.size() == getRecommendedFingerCount() + 1
@@ -470,16 +469,24 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
-                    shiftIndicesToLeftOnce(index + 1);
                     unlink(x, index);
+                    
+                    if (mustRemoveFinger())
+                        removeFinger();
+                    
+                    shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
-                    shiftIndicesToLeftOnce(index + 1);
                     unlink(x, index);
+                    
+                    if (mustRemoveFinger())
+                        removeFinger();
+                    
+                    shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
