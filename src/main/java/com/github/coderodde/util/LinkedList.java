@@ -201,67 +201,6 @@ public class LinkedList<E>
         return unlinkLast(l);
     }
     
-    // Prepends the input element to the head of this list.
-    private void linkFirst(E e) {
-        shiftIndicesToRightOnce(0);
-        
-        final Node<E> f = first;
-        final Node<E> newNode = new Node<>();
-        newNode.item = e;
-        newNode.next = f;
-        first = newNode;
-        
-        if (f == null) 
-            last = newNode;
-        else
-            f.prev = newNode;
-        
-        size++;
-        modCount++;
-        
-        if (mustAddFinger())
-            addFinger(newNode, 0);
-    }
-    
-    // Appends the input element to the tail of this list.
-    private void linkLast(E e) {
-        final Node<E> l = last;
-        final Node<E> newNode = new Node<>();
-        newNode.item = e;
-        newNode.prev = l;
-        last = newNode;
-        
-        if (l == null) 
-            first = newNode;
-        else
-            l.next = newNode;
-        
-        size++;
-        modCount++;
-        
-        if (mustAddFinger()) 
-            addFinger(newNode, size - 1);
-    }
-    
-    // Returns true only if this list requires more fingers.
-    private boolean mustAddFinger() {
-        // here, fingerStack.size() == getRecommendedFingerCount(), or,
-        // fingerStack.size() == getRecommendedFingerCount() - 1
-        return fingerStack.size() != getRecommendedNumberOfFingers();
-    }
-    
-    // Returns true only if this list requires less fingers.
-    private boolean mustRemoveFinger() {
-        // here, fingerStack.size() == getRecommendedFingerCount(), or, 
-        // fingerStack.size() == getRecommendedFingerCount() + 1
-        return fingerStack.size() != getRecommendedNumberOfFingers();
-    }
-    
-    private void addFinger(Node<E> node, int index) {
-        final Finger<E> finger = new Finger<>(node, index);
-        fingerStack.push(finger);
-    }
-    
     public void clear() {
         fingerStack.clear();
         size = 0;
@@ -1107,6 +1046,73 @@ public class LinkedList<E>
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
         }
+    }
+    
+    /***************************************************************************
+    * Prepends the input element to the head of this list.                     *
+    ***************************************************************************/
+    private void linkFirst(E e) {
+        shiftIndicesToRightOnce(0);
+        
+        final Node<E> f = first;
+        final Node<E> newNode = new Node<>();
+        newNode.item = e;
+        newNode.next = f;
+        first = newNode;
+        
+        if (f == null) 
+            last = newNode;
+        else
+            f.prev = newNode;
+        
+        size++;
+        modCount++;
+        
+        if (mustAddFinger())
+            addFinger(newNode, 0);
+    }
+    
+    /***************************************************************************
+    * Appends the input element to the head of this list.                      *
+    ***************************************************************************/
+    private void linkLast(E e) {
+        final Node<E> l = last;
+        final Node<E> newNode = new Node<>();
+        newNode.item = e;
+        newNode.prev = l;
+        last = newNode;
+        
+        if (l == null) 
+            first = newNode;
+        else
+            l.next = newNode;
+        
+        size++;
+        modCount++;
+        
+        if (mustAddFinger()) 
+            addFinger(newNode, size - 1);
+    }
+    
+    
+    // Returns true only if this list requires more fingers.
+    private boolean mustAddFinger() {
+        // here, fingerStack.size() == getRecommendedFingerCount(), or,
+        // fingerStack.size() == getRecommendedFingerCount() - 1
+        return fingerStack.size() != getRecommendedNumberOfFingers();
+    }
+    
+    // Returns true only if this list requires less fingers.
+    private boolean mustRemoveFinger() {
+        // here, fingerStack.size() == getRecommendedFingerCount(), or, 
+        // fingerStack.size() == getRecommendedFingerCount() + 1
+        return fingerStack.size() != getRecommendedNumberOfFingers();
+    }
+    
+    // Adds a finger pointing to the input node at the input index.
+    private void addFinger(Node<E> node, int index) {
+        final Finger<E> finger = new Finger<>(node, index);
+        fingerStack.push(finger);
     }
     
     /***************************************************************************
