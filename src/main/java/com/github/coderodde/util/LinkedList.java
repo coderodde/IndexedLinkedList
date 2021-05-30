@@ -37,7 +37,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 /**
- * 
+ *
  * @author  Rodion Efremov
  * @see     List
  * @see     ArrayList
@@ -46,41 +46,41 @@ import java.util.function.Consumer;
  * @param <E> the type of elements held in this collection
  */
 
-public class LinkedList<E> 
+public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
-    
+
 //    @java.io.Serial
     private static final long serialVersionUID = 876323262645176354L;
-    
+
     /**
      * Number of elements in the list.
      */
     private int size = 0;
-    
+
     /**
      * Pointer to first node.
      */
     private transient Node<E> first;
-    
+
     /**
      * Pointer to last node.
      */
     private transient Node<E> last;
-    
+
     /**
      * Stack of fingers.
      */
     private transient FingerStack<E> fingerStack = new FingerStack<>();
-    
+
     /**
      * Constructs an empty list.
      */
     public LinkedList() {
-    
+
     }
-    
+
     /**
      * Constructs a list containing the elements of the specified
      * collection, in the order they are returned by the collection's
@@ -93,7 +93,7 @@ public class LinkedList<E>
         this();
         addAll(c);
     }
-    
+
     /**
      * Appends the specified element to the end of this list.
      *
@@ -106,7 +106,7 @@ public class LinkedList<E>
         linkLast(e);
         return true;
     }
-    
+
     /**
      * Inserts the specified element at the specified position in this list.
      * Shifts the element currently at that position (if any) and any
@@ -124,7 +124,7 @@ public class LinkedList<E>
         else
             linkBefore(element, node(index), index);
     }
-    
+
     /**
      * Appends all of the elements in the specified collection to the end of
      * this list, in the order that they are returned by the specified
@@ -140,7 +140,7 @@ public class LinkedList<E>
     public boolean addAll(Collection<? extends E> c) {
         return addAll(size, c);
     }
-    
+
     /**
      * Inserts all of the elements in the specified collection into this
      * list, starting at the specified position.  Shifts the element
@@ -158,22 +158,22 @@ public class LinkedList<E>
      */
     public boolean addAll(int index, Collection<? extends E> c) {
         checkPositionIndex(index);
-        if (c.isEmpty()) 
+        if (c.isEmpty())
             return false;
-        
-        if (size == 0) 
+
+        if (size == 0)
             setAll(c);
-        else if (index == 0) 
+        else if (index == 0)
             prependAll(c);
-        else if (index == size) 
+        else if (index == size)
             appendAll(c);
-        else 
+        else
             insertAll(c, node(index), index);
-        
+
 //        checkInvariant();
         return true;
     }
-    
+
     /**
      * Inserts the specified element at the beginning of this list.
      *
@@ -193,7 +193,7 @@ public class LinkedList<E>
     public void addLast(E e) {
         linkLast(e);
     }
-    
+
     /**
      * Removes all of the elements from this list.
      * The list will be empty after this call returns.
@@ -201,7 +201,7 @@ public class LinkedList<E>
     public void clear() {
         fingerStack.clear();
         size = 0;
-        
+
         // Clearing all of the links between nodes is "unnecessary", but:
         // - helps a generational GC if the discarded nodes inhabit
         //   more than one generation
@@ -213,11 +213,11 @@ public class LinkedList<E>
             node.next = null;
             node = next;
         }
-        
+
         first = last = null;
         modCount++;
     }
-    
+
     /**
      * Returns {@code true} if this list contains the specified element.
      * More formally, returns {@code true} if and only if this list contains
@@ -230,7 +230,7 @@ public class LinkedList<E>
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
     }
-    
+
     /**
      * @since 1.6
      */
@@ -238,7 +238,7 @@ public class LinkedList<E>
     public Iterator<E> descendingIterator() {
         throw new UnsupportedOperationException();
     }
-    
+
     /**
      * Retrieves, but does not remove, the head (first element) of this list.
      *
@@ -250,55 +250,55 @@ public class LinkedList<E>
     public E element() {
         return getFirst();
     }
-    
+
     /**
      * Returns {@code true} only if the input object is a {@link List}, has the
      * same size, and whose iterator returns the elements in the same order as
      * this list.
-     * 
+     *
      * @param o the query object.
      * @return {@code true} only if this list and the input list represent the
      * same element sequence.
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) 
+        if (o == null)
             return false;
-        
-        if (o == this) 
+
+        if (o == this)
             return true;
-        
-        if (!o.getClass().equals(o.getClass())) 
+
+        if (!o.getClass().equals(o.getClass()))
             return false;
-        
+
         List<?> otherList = (List<?>) o;
-        
+
         if (size != otherList.size())
             return false;
-        
+
         Iterator<?> iterator1 = iterator();
         Iterator<?> iterator2 = otherList.iterator();
-        
+
         while (iterator1.hasNext() && iterator2.hasNext()) {
             Object object1 = iterator1.next();
             Object object2 = iterator2.next();
-            
-            if (!java.util.Objects.equals(object1, object2)) 
+
+            if (!java.util.Objects.equals(object1, object2))
                 return false;
         }
-        
+
         boolean iterator1HasMore = iterator1.hasNext();
         boolean iterator2HasMore = iterator2.hasNext();
-        
+
         if (iterator1HasMore || iterator2HasMore)
             throw new IllegalStateException(
-                    iterator1HasMore ? 
-                            "This list has more elements to offer" : 
+                    iterator1HasMore ?
+                            "This list has more elements to offer" :
                             "Argument list has more elements to offer");
-        
+
         return true;
     }
-    
+
     /**
      * Returns the element at the specified position in this list.
      *
@@ -310,7 +310,7 @@ public class LinkedList<E>
         checkElementIndex(index);
         return node(index).item;
     }
-    
+
     /**
      * Returns the first element in this list.
      *
@@ -319,12 +319,12 @@ public class LinkedList<E>
      */
     public E getFirst() {
         final Node<E> f = first;
-        if (f == null) 
+        if (f == null)
             throw new NoSuchElementException();
-        
+
         return f.item;
     }
-    
+
     /**
      * Returns the last element in this list.
      *
@@ -337,18 +337,18 @@ public class LinkedList<E>
             throw new NoSuchElementException();
         return l.item;
     }
-    
+
     /**
      * Returns the basic iterator over this list supporting only traversal and
      * removal.
-     * 
+     *
      * @return the basic iterator.
      */
     @Override
     public Iterator<E> iterator() {
         return new BasicIterator();
     }
-    
+
     /**
      * Returns a list-iterator of the elements in this list (in proper
      * sequence), starting at the specified position in the list.
@@ -372,9 +372,9 @@ public class LinkedList<E>
      */
     @Override
     public ListIterator<E> listIterator(int index) {
-        throw new UnsupportedOperationException(); 
+        throw new UnsupportedOperationException();
     }
-    
+
     /**
      * Adds the specified element as the tail (last element) of this list.
      *
@@ -386,7 +386,7 @@ public class LinkedList<E>
     public boolean offer(E e) {
         return add(e);
     }
-    
+
     /**
      * Inserts the specified element at the front of this list.
      *
@@ -424,7 +424,7 @@ public class LinkedList<E>
         final Node<E> f = first;
         return (f == null) ? null : f.item;
     }
-    
+
     /**
      * Retrieves, but does not remove, the first element of this list,
      * or returns {@code null} if this list is empty.
@@ -452,7 +452,7 @@ public class LinkedList<E>
         final Node<E> l = last;
         return (l == null) ? null : l.item;
     }
-    
+
     /**
      * Retrieves and removes the head (first element) of this list.
      *
@@ -492,7 +492,7 @@ public class LinkedList<E>
         final Node<E> l = last;
         return (l == null) ? null : unlinkLast();
     }
-    
+
     /**
      * Pops an element from the stack represented by this list.  In other
      * words, removes and returns the first element of this list.
@@ -508,7 +508,7 @@ public class LinkedList<E>
     public E pop() {
         return removeFirst();
     }
-    
+
     /**
      * Pushes an element onto the stack represented by this list.  In other
      * words, inserts the element at the front of this list.
@@ -522,7 +522,7 @@ public class LinkedList<E>
     public void push(E e) {
         addFirst(e);
     }
-    
+
     /**
      * Retrieves and removes the head (first element) of this list.
      *
@@ -550,15 +550,15 @@ public class LinkedList<E>
      */
     public boolean remove(Object o) {
         int index = 0;
-        
+
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
                     unlink(x, index);
-                    
+
                     if (mustRemoveFinger())
                         removeFinger();
-                    
+
                     shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
@@ -567,19 +567,19 @@ public class LinkedList<E>
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
                     unlink(x, index);
-                    
+
                     if (mustRemoveFinger())
                         removeFinger();
-                    
+
                     shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Removes the element residing at the given index.
      * The procedure:
@@ -589,18 +589,18 @@ public class LinkedList<E>
     */
     public E remove(int index) {
         checkElementIndex(index);
-        
+
         // Loads the removeData!
         loadRemoveData(index);
-        
+
         // Make sure that no finger is on our way pointing to the node to remove
-        if (removeData.finger.index == index) 
+        if (removeData.finger.index == index)
             moveFingerOutOfRemovalLocation(removeData.finger);
-        
+
         // Once here, the list is not empty and has at least one finger!
         return unlink(removeData.node, index);
     }
-    
+
     /**
      * Removes and returns the first element from this list.
      *
@@ -613,7 +613,7 @@ public class LinkedList<E>
             throw new NoSuchElementException();
         return unlinkFirst();
     }
-    
+
     /**
      * Removes the first occurrence of the specified element in this
      * list (when traversing the list from head to tail).  If the list
@@ -627,7 +627,7 @@ public class LinkedList<E>
     public boolean removeFirstOccurrence(Object o) {
         return remove(o);
     }
-    
+
     /**
      * Removes and returns the last element from this list.
      *
@@ -653,15 +653,15 @@ public class LinkedList<E>
     @Override
     public boolean removeLastOccurrence(Object o) {
         int index = size - 1;
-        
+
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (x.item == null) {
                     unlink(x, index);
-                    
+
                     if (mustRemoveFinger())
                         removeFinger();
-                    
+
                     shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
@@ -670,19 +670,19 @@ public class LinkedList<E>
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (o.equals(x.item)) {
                     unlink(x, index);
-                    
+
                     if (mustRemoveFinger())
                         removeFinger();
-                    
+
                     shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns the number of elements in this list.
      *
@@ -691,84 +691,84 @@ public class LinkedList<E>
     public int size() {
         return size;
     }
-    
+
     // Internal methods begin:
-    
+
     /***************************************************************************
-    * Returns the closest finger to the node with index 'index'.               *
+    Returns the closest finger to the node with index 'index'.
     ***************************************************************************/
     private Finger<E> getClosestFinger(int index) {
         int bestDistance = Integer.MAX_VALUE;
         Finger<E> bestFinger = null;
-        
+
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             int distance = Math.abs(finger.index - index);
-            
-            if (distance == 0) 
+
+            if (distance == 0)
                 return finger;
-            
+
             if (bestDistance > distance) {
                 bestDistance = distance;
                 bestFinger = finger;
             }
         }
-        
+
         return bestFinger;
     }
-    
+
     /***************************************************************************
-    * Links the input element right before the node 'succ'.                    * 
+    Links the input element right before the node 'succ'.
     ***************************************************************************/
     private void linkBefore(E e, Node<E> succ, int index) {
         shiftIndicesToRightOnce(index);
-        
+
         final Node<E> pred = succ.prev;
         final Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.next = succ;
         succ.prev = newNode;
-        
+
         if (pred == null) {
             first = newNode;
         } else {
             pred.next = newNode;
             newNode.prev = pred;
         }
-        
+
         size++;
         modCount++;
-        
-        if (mustAddFinger()) 
+
+        if (mustAddFinger())
             addFinger(newNode, index);
     }
-    
+
     /***************************************************************************
-    * Prepends the input element to the head of this list.                     *
+    Prepends the input element to the head of this list.
     ***************************************************************************/
     private void linkFirst(E e) {
         shiftIndicesToRightOnce(0);
-        
+
         final Node<E> f = first;
         final Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.next = f;
         first = newNode;
-        
-        if (f == null) 
+
+        if (f == null)
             last = newNode;
         else
             f.prev = newNode;
-        
+
         size++;
         modCount++;
-        
+
         if (mustAddFinger())
             addFinger(newNode, 0);
     }
-    
+
     /***************************************************************************
-    * Appends the input element to the head of this list.                      *
+    Appends the input element to the head of this list.                     
     ***************************************************************************/
     private void linkLast(E e) {
         final Node<E> l = last;
@@ -776,67 +776,67 @@ public class LinkedList<E>
         newNode.item = e;
         newNode.prev = l;
         last = newNode;
-        
-        if (l == null) 
+
+        if (l == null)
             first = newNode;
         else
             l.next = newNode;
-        
+
         size++;
         modCount++;
-        
-        if (mustAddFinger()) 
+
+        if (mustAddFinger())
             addFinger(newNode, size - 1);
     }
-    
+
     /***************************************************************************
-    * Loads the removal operation related data.                                *
+    Loads the removal operation related data.                                
     ***************************************************************************/
     private void loadRemoveData(int index) {
         Finger<E> finger = getClosestFinger(index);
         Node<E> node = finger.node;
-        
+
         if (index < finger.index) {
             int distance = finger.index - index;
-            
-            for (int i = 0; i < distance; i++) 
+
+            for (int i = 0; i < distance; i++)
                 node = node.prev;
         } else {
             int distance = index - finger.index;
-            
-            for (int i = 0; i < distance; i++) 
+
+            for (int i = 0; i < distance; i++)
                 node = node.next;
         }
-        
+
         removeData.finger = finger;
         removeData.node = node;
     }
-    
+
     /***************************************************************************
-    * Returns the node at index 'index'. Moves the closest finger to the node. *  
+    Returns the node at index 'index'. Moves the closest finger to the node.
     ***************************************************************************/
     private Node<E> node(int index) {
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
-        
-        if (distance > 0) 
+
+        if (distance > 0)
             finger.rewindLeft(distance);
-        else 
+        else
             finger.rewindRight(-distance);
-        
+
         return finger.node;
     }
-    
+
     /***************************************************************************
-    * Removes a finger from the finger stack.                                  *  
+    Removes a finger from the finger stack.                                  
     ***************************************************************************/
     private void removeFinger() {
         fingerStack.pop();
     }
-    
+
     /***************************************************************************
-    * For each finger with the index at least 'startIndex', add 'steps' to the *
-    * index.                                                                   * 
+    For each finger with the index at least 'startIndex', add 'steps' to the 
+    index.                                                                   
     ***************************************************************************/
     private void shiftFingersToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
@@ -845,68 +845,68 @@ public class LinkedList<E>
                 finger.index += steps;
         }
     }
-    
+
     /***************************************************************************
-    * Unlinks the input node.                                                  * 
+    Unlinks the input node.                                                  
     ***************************************************************************/
     private E unlink(Node<E> x, int index) {
         final E element = x.item;
         final Node<E> next = x.next;
         final Node<E> prev = x.prev;
-        
+
         if (prev == null) {
             first = next;
         } else {
             prev.next = next;
             x.prev = null;
         }
-        
+
         if (next == null) {
             last = prev;
         } else {
             next.prev = prev;
             x.next = null;
         }
-        
+
         x.item = null;
         size--;
         modCount++;
-        
+
         if (mustRemoveFinger())
             removeFinger();
-        
+
         shiftIndicesToLeftOnce(index + 1);
         return element;
     }
-    
+
     /***************************************************************************
-    * Unlinks the head node from this list.                                    *
+    Unlinks the head node from this list.                                   
     ***************************************************************************/
     private E unlinkFirst() {
         shiftIndicesToLeftOnce(1);
-        
+
         final E element = first.item;
         final Node<E> next = first.next;
         first.item = null;
         first.next = null; // help GC
         first = next;
-        
-        if (next == null) 
+
+        if (next == null)
             last = null;
         else
             next.prev = null;
-        
+
         size--;
         modCount++;
-        
-        if (mustRemoveFinger()) 
+
+        if (mustRemoveFinger())
             fingerStack.pop();
-        
+
         return element;
     }
-    
+
     /***************************************************************************
-    * Unlinks the tail node from this list.                                    *
+    Unlinks the tail node from this list.                                   
     ***************************************************************************/
     private E unlinkLast() {
         final E element = last.item;
@@ -914,40 +914,41 @@ public class LinkedList<E>
         last.item = null;
         last.prev = null; // help GC
         last = prev;
-        
-        if (prev == null) 
+
+        if (prev == null)
             first = null;
-        else 
+        else
             prev.next = null;
-        
+
         size--;
         modCount++;
-        
-        if (mustRemoveFinger()) 
+
+        if (mustRemoveFinger())
             fingerStack.pop();
-        
+
         return element;
     }
-    
+
+    // Implements a type for holding information describing a removal operation.
     private static final class RemoveData<E> {
         Node<E> node;
         Finger<E> finger;
     }
-    
+
     // Caches the removal data:
     private transient final RemoveData<E> removeData = new RemoveData<>();
-    
+
     /***************************************************************************
-    Sets the input collection as a list.                                     
+    Sets the input collection as a list.
     ***************************************************************************/
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
-        
+
         first = new Node<>();
         first.item = iterator.next();
-        
+
         Node<E> prevNode = first;
-        
+
         for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>();
             newNode.item = iterator.next();
@@ -955,15 +956,15 @@ public class LinkedList<E>
             newNode.prev = prevNode;
             prevNode = newNode;
         }
-        
+
         last = prevNode;
         int sz = c.size();
         modCount++;
         size += sz;
-        
+
         addFingersAfterSetAll();
     }
-    
+
     /***************************************************************************
     Prepends the input collection to the head of this list.
     ***************************************************************************/
@@ -972,9 +973,9 @@ public class LinkedList<E>
         final Node<E> oldFirst = first;
         first = new Node<>();
         first.item = iterator.next();
-        
+
         Node<E> prevNode = first;
-        
+
         for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>();
             newNode.item = iterator.next();
@@ -982,29 +983,29 @@ public class LinkedList<E>
             prevNode.next = newNode;
             prevNode = newNode;
         }
-        
+
         prevNode.next = oldFirst;
         oldFirst.prev = prevNode;
-        
+
         int sz = c.size();
         modCount++;
         size += sz;
-        
-        // Prior to adding new (possible) fingers, we need to shift all the 
+
+        // Prior to adding new (possible) fingers, we need to shift all the
         // current fingers 'c.size()' nodes to the larger index values:
         shiftFingersToRight(0, sz);
-        
+
         // Now, add the missing fingers:
         addFingersAfterPrependAll(first, sz);
     }
-    
+
     /***************************************************************************
     Appends the input collection to the tail of this list.
     ***************************************************************************/
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         final Node<E> oldLast = last;
-        
+
         for (E item : c) {
             Node<E> newNode = new Node<>();
             newNode.item = item;
@@ -1012,25 +1013,25 @@ public class LinkedList<E>
             prev.next = newNode;
             prev = newNode;
         }
-        
+
         last = prev;
         int sz = c.size();
         size += sz;
         modCount++;
         addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
-    
+
     /***************************************************************************
     Inserts the input collection right before the node 'succ'.
     ***************************************************************************/
     private void insertAll(
-            Collection<? extends E> c, 
-            Node<E> succ, 
+            Collection<? extends E> c,
+            Node<E> succ,
             int succIndex) {
-        
+
         final Node<E> pred = succ.prev;
         Node<E> prev = pred;
-        
+
         for (E item : c) {
             final Node<E> newNode = new Node<>();
             newNode.item = item;
@@ -1038,192 +1039,192 @@ public class LinkedList<E>
             prev.next = newNode;
             prev = newNode;
         }
-        
+
         prev.next = succ;
         succ.prev = prev;
-        
+
         int sz = c.size();
         modCount++;
         size += sz;
-        
-        // Shift all the fingers positions past the 'succ' on the right 'sz' 
+
+        // Shift all the fingers positions past the 'succ' on the right 'sz'
         // positions to the right:
         shiftIndicesToRight(succIndex, sz);
         //                                   0 1 |10 11 12| 3 4 5 6 7 8 9
         // Add fingers:
         addFingersAfterInsertAll(pred.next, succIndex, sz);
     }
-    
+
     /***************************************************************************
-    Adds fingers after setting a collection as a list.                       
+    Adds fingers after setting a collection as a list.
     ***************************************************************************/
     private void addFingersAfterSetAll() {
         final int numberOfNewFingers = getRecommendedNumberOfFingers();
-        
-        if (numberOfNewFingers == 0) 
+
+        if (numberOfNewFingers == 0)
             return;
-        
+
         final int distance = size / numberOfNewFingers;
         final int startIndex = distance / 2;
         int index = startIndex;
         Node<E> node = first;
-        
+
         for (int i = 0; i < startIndex; i++)
             node = node.next;
-        
+
         addFinger(node, startIndex);
-        
+
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
-            
+
             for (int j = 0; j < distance; j++)
                 node = node.next;
-            
+
             addFinger(node, index);
         }
     }
-    
+
     /***************************************************************************
-    * Adds fingers after prepending a collection to this list.                 *
+    Adds fingers after prepending a collection to this list.                 
     ***************************************************************************/
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
         final int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
-        
-        if (numberOfNewFingers == 0) 
+
+        if (numberOfNewFingers == 0)
             return;
-        
+
         final int distance = collectionSize / numberOfNewFingers;
         final int startIndex = distance / 2;
         int index = startIndex;
         Node<E> node = first;
-        
-        for (int i = 0; i < startIndex; i++) 
+
+        for (int i = 0; i < startIndex; i++)
             node = node.next;
-        
+
         addFinger(node, index);
-        
+
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
-            
-            for (int j = 0; j < distance; j++) 
+
+            for (int j = 0; j < distance; j++)
                 node = node.next;
-            
+
             addFinger(node, index);
         }
     }
-    
+
     /***************************************************************************
-    * Adds fingers after inserting a collection in this list.                  *
+    Adds fingers after inserting a collection in this list.                 
     ***************************************************************************/
     private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
                                           int indexOfInsertedRangeHead,
                                           int collectionSize) {
         final int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
-        
-        if (numberOfNewFingers == 0) 
+
+        if (numberOfNewFingers == 0)
             return;
-        
+
         final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
         final int startOffset = distanceBetweenFingers / 2;
-        
+
         int index = indexOfInsertedRangeHead + startOffset;
         Node<E> node = headNodeOfInsertedRange;
-        
-        for (int i = 0; i < startOffset; i++) 
+
+        for (int i = 0; i < startOffset; i++)
            node = node.next;
-        
+
         addFinger(node, index);
-        
+
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
-            
-            for (int j = 0; j < distanceBetweenFingers; j++) 
+
+            for (int j = 0; j < distanceBetweenFingers; j++)
                 node = node.next;
-            
+
             addFinger(node, index);
         }
     }
-    
+
     /***************************************************************************
-    * Adds fingers after appending a collection to this list.                  *
+    Adds fingers after appending a collection to this list.                  
     ***************************************************************************/
     private void addFingersAfterAppendAll(
-            Node<E> first, 
-            int firstIndex, 
+            Node<E> first,
+            int firstIndex,
             int collectionSize) {
-        final int numberOfNewFingers = 
+        final int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
-        
-        if (numberOfNewFingers == 0) 
+
+        if (numberOfNewFingers == 0)
             return;
-        
+
         final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
         final int nodesToSkip = distanceBetweenFingers / 2;
         int index = firstIndex + nodesToSkip;
         Node<E> node = first;
-        
-        for (int i = 0; i < nodesToSkip; i++) 
+
+        for (int i = 0; i < nodesToSkip; i++)
             node = node.next;
-        
+
         addFinger(node, index);
-        
+
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
-            
+
             for  (int j = 0; j < distanceBetweenFingers; j++) {
-                if (node.next == null) 
+                if (node.next == null)
                     break;
-                
+
                 node = node.next;
             }
-            
+
             addFinger(node, index);
         }
     }
-    
+
     /***************************************************************************
-    * Adds fingers.....                                                        * 
-    * first - the leftmost node of the inserted range,                         *
-      firstIndex - the index of the leftmost node,                             *
-    * collectionSize - the size of the inserted range.                         *
-    ***************************************************************************/ 
+    Adds fingers.....                                                        
+    first - the leftmost node of the inserted range,                         
+    firstIndex - the index of the leftmost node,                             
+    collectionSize - the size of the inserted range.                         
+    ***************************************************************************/
     private void addFingers(Node<E> first, int firstIndex, int collectionSize) {
         shiftIndicesToRight(firstIndex, collectionSize);
         final int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
-        
-        if (numberOfNewFingers == 0) 
+
+        if (numberOfNewFingers == 0)
             return;
-        
+
         final int distance = collectionSize / numberOfNewFingers;
         final int startOffset = firstIndex + distance / 2;
         int index = firstIndex + startOffset;
         Node<E> node = first;
-        
+
         for (int i = 0; i < startOffset; i++) {
-            if (node.next == null) 
+            if (node.next == null)
                 break;
-        
+
             node = node.next;
         }
-        
+
         addFinger(node, index);
-        
+
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
-            
-            for (int j = 0; j < distance; j++) 
+
+            for (int j = 0; j < distance; j++)
                 if (node.next != null)
                     node = node.next;
-            
+
             addFinger(node, index);
         }
-        
+
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
-            
+
             if (finger.index >= this.size) {
                 throw new IllegalStateException();
             }
@@ -1231,133 +1232,133 @@ public class LinkedList<E>
     }
 
     /***************************************************************************
-    * Implements the doubly-linked list node.                                  *
+    Implements the doubly-linked list node.                                  
     ***************************************************************************/
     private static class Node<E> {
         E item;
         Node<E> prev;
         Node<E> next;
-        
+
         @Override
         public String toString() {
             return "[Node; item = " + item + "]";
         }
     }
-    
+
     /***************************************************************************
-    * Implements the list node finger.                                         *
+    Implements the list node finger.                                         
     ***************************************************************************/
     private static final class Finger<E> {
         Node<E> node;
         int index; // Index at which 'node' is located.
-        
+
         Finger(Node<E> node, int index) {
             this.node = node;
             this.index = index;
         }
-        
+
         @Override
         public String toString() {
             return "[Finger; index = " + index + ", item = " + node.item + "]";
         }
-        
+
         // Moves this finger 'steps' position to the left
         void rewindLeft(int steps) {
             for (int i = 0; i < steps; i++) {
                 node = node.prev;
             }
-            
+
             index -= steps;
         }
-        
+
         // Moves this finger 'steps' position to the right
         void rewindRight(int steps) {
             for (int i = 0; i < steps; i++) {
                 node = node.next;
             }
-            
+
             index += steps;
         }
     }
-    
+
     /**
      * Implements a simple, array-based stack for storing the node fingers.
-     * 
+     *
      * @param <E> the list element type
      */
     private static final class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
-        
+
         private Finger<E>[] fingerArray;
         private int size = 0;
-        
+
         FingerStack() {
             this.fingerArray = new Finger[INITIAL_CAPACITY];
         }
-        
+
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();
             fingerArray[size++] = finger;
         }
-        
+
         void pop() {
             fingerArray[--size] = null;
         }
-        
+
         int size() {
             return size;
         }
-        
+
         Finger<E> get(int index) {
             return fingerArray[index];
         }
-        
-        // Rewinds all fingers with index at least 'startingIndex' 'steps' 
+
+        // Rewinds all fingers with index at least 'startingIndex' 'steps'
         // positions to left or right depending whether 'steps' is negative or
         // positive:
         private void rewind(int startingIndex, int steps) {
             for (int i = 0; i < size; i++) {
                 Finger<E> finger = fingerArray[i];
-                if (finger.index >= startingIndex) 
+                if (finger.index >= startingIndex)
                     finger.index += steps;
             }
         }
-        
+
         // Rewinds all fingers with index at least 'startingIndex' one position
         // to the left:
         void rewindLeft(int startingIndex) {
             rewind(startingIndex, -1);
         }
-        
-        
+
+
         // Rewinds all fingers with index at least 'startingIndex' one position
         // to the right:
         void rewindRight(int startingIndex) {
             rewind(startingIndex, 1);
         }
-        
+
         // Rewinds all fingers with index at least 'startingIndex' 'steps'
         // positions to the left:
         void rewindLeft(int startingIndex, int steps) {
             rewind(startingIndex, -steps);
         }
-        
+
         // Rewinds all fingers with index at least 'startingIndex' 'steps'
         // positions to the right:
         void rewindRight(int startingIndex, int steps) {
             rewind(startingIndex, steps);
         }
-        
+
         // Clears this finger stack:
         void clear() {
             for (int i = 0; i < size; i++) {
                 fingerArray[i].node = null; // help GC
                 fingerArray[i] = null;
             }
-            
+
             size = 0;
         }
-        
+
         // Makes sure that the next finger fits in this finger stack:
         private void enlargeFingerArrayIfNeeded() {
             if (size == fingerArray.length) {
@@ -1366,17 +1367,19 @@ public class LinkedList<E>
             }
         }
     }
-    
+
     /***************************************************************************
-    * This class implements a basic iterator over this list.                   *
+    This class implements a basic iterator over this list.                   
+    
+    @param E the element type.
     ***************************************************************************/
     private final class BasicIterator implements Iterator<E> {
 
         private Node<E> lastReturned;
         private Node<E> next = first;
         private int nextIndex;
-        private final int expectedModCount = modCount;
-        
+        private int expectedModCount = modCount;
+
         @Override
         public boolean hasNext() {
             return nextIndex < size;
@@ -1385,9 +1388,9 @@ public class LinkedList<E>
         @Override
         public E next() {
             checkForComodification();
-            if (!hasNext()) 
+            if (!hasNext())
                 throw new NoSuchElementException();
-            
+
             lastReturned = next;
             next = next.next;
             nextIndex++;
@@ -1396,168 +1399,179 @@ public class LinkedList<E>
 
         @Override
         public void remove() {
-            
+
         }
 
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
-            while (hasNext()) 
+            while (hasNext())
                 action.accept(next());
         }
-        
+
         private final void checkForComodification() {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
         }
     }
-    
+
     // Returns true only if this list requires more fingers.
     private boolean mustAddFinger() {
         // here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
-    
+
     // Returns true only if this list requires less fingers.
     private boolean mustRemoveFinger() {
-        // here, fingerStack.size() == getRecommendedFingerCount(), or, 
+        // here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() + 1
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
-    
+
     // Adds a finger pointing to the input node at the input index.
     private void addFinger(Node<E> node, int index) {
         final Finger<E> finger = new Finger<>(node, index);
         fingerStack.push(finger);
     }
-    
+
     /***************************************************************************
-    * Returns a finger that does not point to the element to remove. We need   *
-    * this in order to make sure that after removal, all the fingers point to  *
-    * valid nodes.                                                             *
+    Returns a finger that does not point to the element to remove. We need this 
+    in order to make sure that after removal, all the fingers point to valid 
+    nodes.                                                            
     ***************************************************************************/
     private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
         if (size == 1) {
             fingerStack.pop();
             return;
         }
-        
+
         if (finger.node.prev != null) {
             // Move the finger one position to the left:
             finger.node = finger.node.prev;
             finger.index--;
             return;
         }
-        
+
         if (finger.node.next != null) {
             // Move the finger one position to the right:
             finger.node = finger.node.next;
             finger.index++;
             return;
         }
-        
+
         throw new IllegalStateException("Removing from an empty list.");
     }
-    
+
+    /***************************************************************************
+    Computes the recommended number of fingers.
+    ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size / 2.0));
     }
-    
+
     /***************************************************************************
-    * Checks that the input index is a valid position index for add operation  *
-    * or iterator position.                                                    *
+    Checks that the input index is a valid position index for add operation or 
+    iterator position.                                                    
     ***************************************************************************/
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index))
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
-    
+
     /***************************************************************************
-    * Tells if the argument is the index of a valid position for an iterator   *
-    * or an add operation.                                                     *
+    Tells if the argument is the index of a valid position for an iterator or an 
+    add operation.                                                     
     ***************************************************************************/
     private boolean isPositionIndex(int index) {
         return index >= 0 && index <= size;
     }
-    
-    /**
-     * Constructs an IndexOutOfBoundsException detail message.
-     * Of the many possible refactorings of the error handling code,
-     * this "outlining" performs best with both server and client VMs.
-     */
+
+    /***************************************************************************
+    Constructs an IndexOutOfBoundsException detail message.
+    ***************************************************************************/
     private String outOfBoundsMsg(int index) {
-        return "Index: "+index+", Size: "+size;
+        return "Index: " + index + ", Size: " + size;
     }
-    
+
+    /***************************************************************************
+    Checks the element index. In the case of non-empty list, valid indices are
+    {@code 0, 1, ..., size - 1}.
+    ***************************************************************************/
     private void checkElementIndex(int index) {
         if (!isElementIndex(index))
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
-    
+
     /***************************************************************************
-    * Tells if the argument is the index of an existing element.               *
+    Tells if the argument is the index of an existing element.               
     ***************************************************************************/
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
     }
-  
+
     /***************************************************************************
-     * Subtracts 'steps' positions from each index at least 'startingIndex'.   *
-     **************************************************************************/
+    Subtracts 'steps' positions from each index at least 'startingIndex'.   
+    ***************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startingIndex) 
+            if (finger.index >= startingIndex)
                 finger.index -= steps; // substract from index
         }
     }
-    
+
     /***************************************************************************
-     * Adds 'steps' positions to each index at least 'startingIndex'.          *
-     **************************************************************************/
+    Adds 'steps' positions to each index at least 'startingIndex'.          
+    ***************************************************************************/
     private void shiftIndicesToRight(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startingIndex) 
+            if (finger.index >= startingIndex)
                 finger.index += steps; // add to index
         }
     }
-    
+
     /***************************************************************************
-    * Shifts all the indices at least 'startingIndex' one position towards     *
-    * smaller index values.                                                    *
+    Shifts all the indices at least 'startingIndex' one position towards smaller 
+    index values.                                                    
     ***************************************************************************/
     private void shiftIndicesToLeftOnce(int startingIndex) {
         shiftIndicesToLeft(startingIndex, 1);
     }
-    
+
     /***************************************************************************
-    * Shifts all the indices at least 'startingIndex' one position towards     *
-    * larger index values.                                                     *
+    Shifts all the indices at least 'startingIndex' one position towards larger 
+    index values.                                                     
     ***************************************************************************/
     private void shiftIndicesToRightOnce(int startingIndex) {
         shiftFingersToRight(startingIndex, 1);
     }
-    
+
+    /***************************************************************************
+    Used previously for debugging. Ignore.
+    ***************************************************************************/
     private void checkInvariant() {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             Node<E> node = getNodeRaw(finger.index);
-            
-            if (finger.node != node) 
+
+            if (finger.node != node)
                 throw new AssertionError(
                         "checkInvariant() failed at finger index (" +
-                                finger.index + "), expected node = " + 
+                                finger.index + "), expected node = " +
                                 finger.node + ", actual node = " + node);
         }
     }
-    
+
+    /***************************************************************************
+    Used previously for debugging. Ignore.
+    ***************************************************************************/
     private Node<E> getNodeRaw(int index) {
         Node<E> node = first;
-        
-        for (int i = 0; i < index; i++) 
+
+        for (int i = 0; i < index; i++)
             node = node.next;
-        
+
         return node;
     }
 }
