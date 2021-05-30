@@ -372,7 +372,7 @@ public class LinkedList<E>
      */
     @Override
     public ListIterator<E> listIterator(int index) {
-        throw new UnsupportedOperationException();
+        return new ListIter(index);
     }
 
     /**
@@ -854,6 +854,15 @@ public class LinkedList<E>
     }
 
     /***************************************************************************
+    Checks the element index. In the case of non-empty list, valid indices are
+    {@code 0, 1, ..., size - 1}.
+    ***************************************************************************/
+    private void checkElementIndex(int index) {
+        if (!isElementIndex(index))
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+    }
+
+    /***************************************************************************
     Used previously for debugging. Ignore.
     ***************************************************************************/
     private void checkInvariant() {
@@ -867,6 +876,15 @@ public class LinkedList<E>
                                 finger.index + "), expected node = " +
                                 finger.node + ", actual node = " + node);
         }
+    }
+
+    /***************************************************************************
+    Checks that the input index is a valid position index for add operation or
+    iterator position.
+    ***************************************************************************/
+    private void checkPositionIndex(int index) {
+        if (!isPositionIndex(index))
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
     }
     
     /***************************************************************************
@@ -903,6 +921,20 @@ public class LinkedList<E>
 
         return node;
     }
+
+    /***************************************************************************
+    Constructs an IndexOutOfBoundsException detail message.
+    ***************************************************************************/
+    private String getOutOfBoundsMessage(int index) {
+        return "Index: " + index + ", Size: " + size;
+    }
+
+    /***************************************************************************
+    Computes the recommended number of fingers.
+    ***************************************************************************/
+    private int getRecommendedNumberOfFingers() {
+        return (int) Math.ceil(Math.sqrt(size / 2.0));
+    }
     
     /***************************************************************************
     Inserts the input collection right before the node 'succ'.
@@ -936,6 +968,21 @@ public class LinkedList<E>
         //                                   0 1 |10 11 12| 3 4 5 6 7 8 9
         // Add fingers:
         addFingersAfterInsertAll(pred.next, succIndex, sz);
+    }
+
+    /***************************************************************************
+    Tells if the argument is the index of an existing element.
+    ***************************************************************************/
+    private boolean isElementIndex(int index) {
+        return index >= 0 && index < size;
+    }
+
+    /***************************************************************************
+    Tells if the argument is the index of a valid position for an iterator or an
+    add operation.
+    ***************************************************************************/
+    private boolean isPositionIndex(int index) {
+        return index >= 0 && index <= size;
     }
 
     /***************************************************************************
@@ -1163,6 +1210,17 @@ public class LinkedList<E>
         addFingersAfterSetAll();
     }
 
+    /***************************************************************************
+    Subtracts 'steps' positions from each index at least 'startingIndex'.
+    ***************************************************************************/
+    private void shiftIndicesToLeft(int startingIndex, int steps) {
+        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            if (finger.index >= startingIndex)
+                finger.index -= steps; // substract from index
+        }
+    }
+    
     /***************************************************************************
     For each finger with the index at least 'startIndex', add 'steps' to the
     index.
@@ -1465,62 +1523,88 @@ public class LinkedList<E>
                 throw new ConcurrentModificationException();
         }
     }
-
+    
     /***************************************************************************
-    Computes the recommended number of fingers.
+    Implements the list iterator over this list.
     ***************************************************************************/
-    private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size / 2.0));
-    }
+    private final class ListIter implements ListIterator<E> {
 
-    /***************************************************************************
-    Checks that the input index is a valid position index for add operation or
-    iterator position.
-    ***************************************************************************/
-    private void checkPositionIndex(int index) {
-        if (!isPositionIndex(index))
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
-    }
+        private Node<E> lastReturned;
+        private Node<E> next;
+        private int nextIndex;
+        private int expectedModCount = modCount;
+        
+        ListIter(int index) {
+            next = (index == size) ? null : node(index);
+            nextIndex = index;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+        
+        @Override
+        public E next() {
+            checkForComdification();
+            if (!hasNext()) 
+                throw new NoSuchElementException();
+            
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.item;
+        }
 
-    /***************************************************************************
-    Tells if the argument is the index of a valid position for an iterator or an
-    add operation.
-    ***************************************************************************/
-    private boolean isPositionIndex(int index) {
-        return index >= 0 && index <= size;
-    }
+        @Override
+        public boolean hasPrevious() {
+            return nextIndex > 0;
+        }
 
-    /***************************************************************************
-    Constructs an IndexOutOfBoundsException detail message.
-    ***************************************************************************/
-    private String outOfBoundsMsg(int index) {
-        return "Index: " + index + ", Size: " + size;
-    }
+        @Override
+        public E previous() {
+            checkForComdification();
+            if (!hasPrevious())
+                throw new NoSuchElementException();
+            
+            lastReturned = next = (next == null) ? last : next.prev;
+            nextIndex--;
+            return lastReturned.item;
+        }
 
-    /***************************************************************************
-    Checks the element index. In the case of non-empty list, valid indices are
-    {@code 0, 1, ..., size - 1}.
-    ***************************************************************************/
-    private void checkElementIndex(int index) {
-        if (!isElementIndex(index))
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
-    }
+        @Override
+        public int nextIndex() {
+            return nextIndex;
+        }
 
-    /***************************************************************************
-    Tells if the argument is the index of an existing element.
-    ***************************************************************************/
-    private boolean isElementIndex(int index) {
-        return index >= 0 && index < size;
-    }
+        @Override
+        public int previousIndex() {
+            return nextIndex - 1;
+        }
 
-    /***************************************************************************
-    Subtracts 'steps' positions from each index at least 'startingIndex'.
-    ***************************************************************************/
-    private void shiftIndicesToLeft(int startingIndex, int steps) {
-        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startingIndex)
-                finger.index -= steps; // substract from index
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void set(E e) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void add(E e) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            ListIterator.super.forEachRemaining(action); //To change body of generated methods, choose Tools | Templates.
+        }
+        
+        private final void checkForComdification() {
+            if (modCount != expectedModCount) 
+                throw new ConcurrentModificationException();
         }
     }
 }
