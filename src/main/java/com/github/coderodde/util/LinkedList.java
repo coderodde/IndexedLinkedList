@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -236,7 +237,7 @@ public class LinkedList<E>
      */
     @Override
     public Iterator<E> descendingIterator() {
-        throw new UnsupportedOperationException();
+        return new DescendingIterator();
     }
 
     /**
@@ -372,7 +373,7 @@ public class LinkedList<E>
      */
     @Override
     public ListIterator<E> listIterator(int index) {
-        return new ListIter(index);
+        return new EnhancedIterator(index);
     }
 
     /**
@@ -729,9 +730,6 @@ public class LinkedList<E>
             index += distanceBetweenFingers;
 
             for  (int j = 0; j < distanceBetweenFingers; j++) {
-                if (node.next == null)
-                    break;
-
                 node = node.next;
             }
 
@@ -1509,7 +1507,26 @@ public class LinkedList<E>
 
         @Override
         public void remove() {
-
+            checkForComodification();
+            if (lastReturned == null) 
+                throw new IllegalStateException();
+            
+            Node<E> lastNext = lastReturned.next;
+            int removalIndex = nextIndex - 1;
+            loadRemoveData(removalIndex);
+            
+            if (removeData.finger.index == removalIndex)
+                moveFingerOutOfRemovalLocation(removeData.finger);
+            
+            unlink(lastReturned, removalIndex);
+            
+            if (next == lastReturned)
+                next = lastNext;
+            else
+                nextIndex = removalIndex;
+            
+            lastReturned = null;
+            expectedModCount++;
         }
 
         @Override
@@ -1527,14 +1544,14 @@ public class LinkedList<E>
     /***************************************************************************
     Implements the list iterator over this list.
     ***************************************************************************/
-    private final class ListIter implements ListIterator<E> {
+    private final class EnhancedIterator implements ListIterator<E> {
 
         private Node<E> lastReturned;
         private Node<E> next;
         private int nextIndex;
         private int expectedModCount = modCount;
         
-        ListIter(int index) {
+        EnhancedIterator(int index) {
             next = (index == size) ? null : node(index);
             nextIndex = index;
         }
@@ -1584,27 +1601,75 @@ public class LinkedList<E>
 
         @Override
         public void remove() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            checkForComdification();
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            
+            Node<E> lastNext = lastReturned.next;
+            unlink(lastReturned, nextIndex - 1);
+            if (next == lastReturned)
+                next = lastNext;
+            else 
+                nextIndex--;
+            lastReturned = null;
+            expectedModCount++;
         }
 
         @Override
         public void set(E e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            if (lastReturned == null) 
+                throw new IllegalStateException();
+            checkForComdification();
+            lastReturned.item = e;
         }
 
         @Override
         public void add(E e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            checkForComdification();
+            lastReturned = null;
+            if (next == null) 
+                linkLast(e);
+            else
+                linkBefore(e, next, nextIndex - 1);
+            nextIndex++;
+            expectedModCount++;
         }
-
+        
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
-            ListIterator.super.forEachRemaining(action); //To change body of generated methods, choose Tools | Templates.
+            Objects.requireNonNull(action);
+            while (modCount == expectedModCount && nextIndex < size) {
+                action.accept(next.item);
+                lastReturned = next;
+                next = next.next;
+                nextIndex++;
+            }
+            checkForComdification();
         }
         
         private final void checkForComdification() {
             if (modCount != expectedModCount) 
                 throw new ConcurrentModificationException();
+        }
+    }
+    
+    private final class DescendingIterator implements Iterator<E> {
+
+        private final ListIterator<E> iterator = new EnhancedIterator(size());
+        
+        @Override
+        public boolean hasNext() {
+            return iterator.hasPrevious();
+        }
+
+        @Override
+        public E next() {
+            return iterator.previous();
+        }
+
+        @Override
+        public void remove() {
+            iterator.remove();
         }
     }
 }
