@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 import java.util.function.Consumer;
 import static org.junit.Assert.assertEquals;
@@ -257,28 +258,85 @@ public class LinkedListTest {
         list.iterator().forEachRemaining(myConsumer);
         assertEquals(10, myConsumer.total);
     }
-//    
-//    @Test
-//    public void basicIteratorRemoval() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//        Iterator<Integer> iter = list.iterator();
-//        
-//        iter.next();
-//        iter.next();
-//        iter.remove();
-//        
-//        assertEquals(4, list.size());
-//        
-//        iter = list.iterator();
-//        iter.next();
-//        iter.remove();
-//        
-//        assertEquals(3, list.size());
-//        
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(3), list.get(1));
-//        assertEquals(Integer.valueOf(4), list.get(2));
-//    }
+    
+    @Test
+    public void basicIteratorRemoval() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        Iterator<Integer> iter = list.iterator();
+        
+        iter.next();
+        iter.next();
+        iter.remove();
+        
+        assertEquals(4, list.size());
+        
+        iter = list.iterator();
+        iter.next();
+        iter.remove();
+        
+        assertEquals(3, list.size());
+        
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(3), list.get(1));
+        assertEquals(Integer.valueOf(4), list.get(2));
+    }
+    
+    @Test
+    public void enhancedIteratorTraversal() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        ListIterator<Integer> iter = list.listIterator();
+        
+        assertFalse(iter.hasPrevious());
+        
+        for (int i = 0; i < list.size(); i++) {
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+        
+        assertFalse(iter.hasNext());
+        
+        for (int i = 4; i >= 0; i--) {
+            assertTrue(iter.hasPrevious());
+            assertEquals(Integer.valueOf(i), iter.previous());
+        }
+        
+        iter = list.listIterator(2);
+        
+        assertEquals(Integer.valueOf(2), iter.next());
+        assertEquals(Integer.valueOf(2), iter.previous());
+        
+        iter = list.listIterator(3);
+        
+        assertEquals(Integer.valueOf(3), iter.next());
+        assertEquals(Integer.valueOf(4), iter.next());
+        
+        assertFalse(iter.hasNext());
+        assertTrue(iter.hasPrevious());
+    }
+    
+    @Test
+    public void enhancedIteratorAddition() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        ListIterator<Integer> iter = list.listIterator();
+        
+        iter.add(0);
+        
+        while (iter.hasNext()) {
+            iter.next();
+        }
+        
+        iter.add(4);
+        iter = list.listIterator();
+        
+        for (int i = 0; i < list.size(); i++) {
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+        
+        iter = list.listIterator(2);
+        iter.add(10);
+        
+        assertEquals(Integer.valueOf(10), list.get(2));
+    }
     
     private static boolean listsEqual(
             com.github.coderodde.util.LinkedList<Integer> list1, 

@@ -1531,8 +1531,14 @@ public class LinkedList<E>
 
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
-            while (hasNext())
-                action.accept(next());
+            Objects.requireNonNull(action);
+            while (modCount == expectedModCount && nextIndex < size) {
+                action.accept(next.item);
+                lastReturned = next;
+                next = next.next;
+                nextIndex++;
+            }
+            checkForComodification();
         }
 
         private final void checkForComodification() {
@@ -1606,11 +1612,19 @@ public class LinkedList<E>
                 throw new IllegalStateException();
             
             Node<E> lastNext = lastReturned.next;
-            unlink(lastReturned, nextIndex - 1);
+            int removalIndex = nextIndex - 1;
+            loadRemoveData(removalIndex);
+            
+            if (removeData.finger.index == removalIndex)
+                moveFingerOutOfRemovalLocation(removeData.finger);
+            
+            unlink(lastReturned, removalIndex);
+            
             if (next == lastReturned)
                 next = lastNext;
             else 
-                nextIndex--;
+                nextIndex = removalIndex;
+            
             lastReturned = null;
             expectedModCount++;
         }

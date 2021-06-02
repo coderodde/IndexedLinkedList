@@ -18,6 +18,8 @@ final class LinkedListBenchmark {
     private static final int REMOVE_OBJECT_OPERATIONS       = 500;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
+    
+    private static final int MAXIMUM_INTEGER = 1_000;
 
     private final long seed;
 
@@ -49,6 +51,10 @@ final class LinkedListBenchmark {
     void benchmark() {
         profile(BenchmarkChoice.BENCHMARK);
     }
+    
+    private static  Integer getRandomInteger(Random random) {
+        return random.nextInt(MAXIMUM_INTEGER + 1);
+    }
 
     private static List<Integer> createRandomCollection(Random random) {
         int size = 1 + random.nextInt(MAXIMUM_COLLECTION_SIZE);
@@ -56,7 +62,7 @@ final class LinkedListBenchmark {
         List<Integer> list = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
-            list.add(random.nextInt());
+            list.add(getRandomInteger(random));
         }
 
         return list;
@@ -122,6 +128,9 @@ final class LinkedListBenchmark {
         profileAddCollection();
         profileRemoveViaIndex();
         profileRemoveObject();
+        profileIteratorRemoval();
+        profileListIteratorAddition();
+        profileListIteratorRemoval();
         
         printTotalDurations();
 
@@ -213,6 +222,28 @@ final class LinkedListBenchmark {
         System.out.println();
     }
 
+    private void profileIteratorRemoval() {
+        profileIteratorRemovalRoddeList();
+        profileIteratorRemovalLinkedList();
+        profileIteratorRemovalArrayList();
+        profileIteratorRemovalTreeList();
+        
+        listsEqual();
+        System.out.println();
+    }
+    
+    private void profileListIteratorAddition() {
+        
+        listsEqual();
+        System.out.println();
+    }
+    
+    private void profileListIteratorRemoval() {
+        
+        listsEqual();
+        System.out.println();
+    }
+    
     private void printTotalDurations() {
         System.out.println("--- Total time elapsed ---");
         System.out.println(
@@ -392,6 +423,34 @@ final class LinkedListBenchmark {
                         ".remove(Object) in (ms): " +
                         durationMillis);
 
+        return durationMillis;
+    }
+    
+    private long profileIteratorRemoval(List<Integer> list) {
+        long startMillis = System.currentTimeMillis();
+        
+        Iterator<Integer> iterator = list.iterator();
+        int counter = 0;
+        
+        while (iterator.hasNext()) {
+            iterator.next();
+            
+            // Remove every 2nd element:
+            if (counter % 10 == 0) {
+                iterator.remove();
+            }
+            
+            counter++;
+        }
+        
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() +
+                        ".iterator().remove() in (ms): " +
+                        durationMillis);
+    
         return durationMillis;
     }
 
@@ -606,6 +665,22 @@ final class LinkedListBenchmark {
                         treeList,
                         REMOVE_OBJECT_OPERATIONS, 
                         randomTreeList);
+    }
+    
+    private void profileIteratorRemovalRoddeList() {
+        totalMillisRoddeList += profileIteratorRemoval(roddeList);
+    }
+    
+    private void profileIteratorRemovalLinkedList() {
+        totalMillisLinkedList += profileIteratorRemoval(linkedList);
+    }
+    
+    private void profileIteratorRemovalArrayList() {
+        totalMillisArrayList += profileIteratorRemoval(arrayList);
+    }
+    
+    private void profileIteratorRemovalTreeList() {
+        totalMillisTreeList += profileIteratorRemoval(treeList);
     }
 
     private void printTitle(BenchmarkChoice benchmarkChoice) {
