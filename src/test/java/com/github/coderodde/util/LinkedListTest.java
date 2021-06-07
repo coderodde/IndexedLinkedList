@@ -338,9 +338,48 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
     
+    @Test
+    public void bruteForceIteratorRemove() throws Exception {
+        list.addAll(getIntegerList(1000));
+        
+        int counter = 0;
+        List<Integer> arrayList = new ArrayList<>(list);
+        Iterator<Integer> iter = list.iterator();
+        Iterator<Integer> arrayListIter = arrayList.iterator();
+        int totalIterations = 0;
+        
+        while (iter.hasNext()) {
+            iter.next();
+            arrayListIter.next();
+            
+            System.out.println(totalIterations);
+            
+            if (counter % 10 == 0) {
+                
+                try {
+                    iter.remove();
+                } catch (IllegalStateException ex) {
+                    throw new Exception(ex);
+                }
+                
+                arrayListIter.remove();
+                counter = 0;
+            } else {
+                counter++;
+            }
+            
+            if (!listsEqual(list, arrayList)) {
+                throw new IllegalStateException(
+                        "totalIterations = " + totalIterations);
+            }
+            
+            totalIterations++;
+        }
+    }
+    
     private static boolean listsEqual(
             com.github.coderodde.util.LinkedList<Integer> list1, 
-            java.util.LinkedList<Integer> list2) {
+            java.util.List<Integer> list2) {
         
         if (list1.size() != list2.size()) {
             return false;
