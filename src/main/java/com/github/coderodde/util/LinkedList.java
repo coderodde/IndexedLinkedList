@@ -557,10 +557,10 @@ public class LinkedList<E>
                 if (x.item == null) {
                     unlink(x, index);
 
-                    if (mustRemoveFinger())
-                        removeFinger();
-
-                    shiftIndicesToLeftOnce(index + 1);
+//                    if (mustRemoveFinger())
+//                        removeFinger();
+//
+//                    shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
@@ -569,10 +569,10 @@ public class LinkedList<E>
                 if (o.equals(x.item)) {
                     unlink(x, index);
 
-                    if (mustRemoveFinger())
-                        removeFinger();
-
-                    shiftIndicesToLeftOnce(index + 1);
+//                    if (mustRemoveFinger())
+//                        removeFinger();
+//
+//                    shiftIndicesToLeftOnce(index + 1);
                     return true;
                 }
             }
@@ -863,7 +863,7 @@ public class LinkedList<E>
     /***************************************************************************
     Used previously for debugging. Ignore.
     ***************************************************************************/
-    private void checkInvariant() {
+    public void checkInvariant() {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             Node<E> node = getNodeRaw(finger.index);
@@ -1063,12 +1063,12 @@ public class LinkedList<E>
         Node<E> node = finger.node;
 
         if (index < finger.index) {
-            int distance = finger.index - index;
+            final int distance = finger.index - index;
 
             for (int i = 0; i < distance; i++)
                 node = node.prev;
         } else {
-            int distance = index - finger.index;
+            final int distance = index - finger.index;
 
             for (int i = 0; i < distance; i++)
                 node = node.next;
@@ -1513,6 +1513,7 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
+//            checkInvariant();
             loadRemoveData(removalIndex);
             
             if (removeData.finger.index == removalIndex)
@@ -1523,7 +1524,7 @@ public class LinkedList<E>
             if (next == lastReturned)
                 next = lastNext;
             else
-                nextIndex = removalIndex;
+                nextIndex--;
             
             lastReturned = null;
             expectedModCount++;

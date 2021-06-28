@@ -3,7 +3,7 @@ package com.github.coderodde.util.benchmark;
 public class LinkedListBenchmarkRunner {
     
     public static void main(String[] args) {
-        long seed = System.currentTimeMillis();
+        long seed = 0L;
         seed = System.currentTimeMillis();
         
         System.out.println("--- Seed = " + seed + " ---");

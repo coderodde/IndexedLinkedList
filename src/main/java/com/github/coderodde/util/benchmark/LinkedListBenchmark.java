@@ -427,9 +427,15 @@ final class LinkedListBenchmark {
     }
     
     private long profileIteratorRemoval(List<Integer> list) {
+        System.out.println("HELLO");
+        if (list instanceof com.github.coderodde.util.LinkedList) {
+            ((com.github.coderodde.util.LinkedList<?>) list).checkInvariant();
+        }
+        System.out.println("BYE");
         long startMillis = System.currentTimeMillis();
         
         Iterator<Integer> iterator = list.iterator();
+        int iterations = 0;
         int counter = 0;
         
         while (iterator.hasNext()) {
@@ -437,10 +443,17 @@ final class LinkedListBenchmark {
             
             // Remove every 2nd element:
             if (counter % 10 == 0) {
-                iterator.remove();
+                try {
+                    iterator.remove();
+                } catch (AssertionError ae) {
+                    System.out.println("iterations = " + iterations);
+                    System.err.println(ae.getMessage());
+                    System.exit(1);
+                }
             }
             
             counter++;
+            iterations++;
         }
         
         long endMillis = System.currentTimeMillis();
@@ -641,6 +654,7 @@ final class LinkedListBenchmark {
                         roddeList, 
                         REMOVE_OBJECT_OPERATIONS, 
                         randomRoddeList);
+        roddeList.checkInvariant();
     }
 
     private void profileRemoveObjectLinkedList() {    
