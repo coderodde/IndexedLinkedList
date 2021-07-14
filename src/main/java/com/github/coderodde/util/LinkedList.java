@@ -1248,7 +1248,7 @@ public class LinkedList<E>
     }
 
     /***************************************************************************
-    Unlinks the input node.
+    Unlinks the input node and adjusts the fingers.
     ***************************************************************************/
     private E unlink(Node<E> x, int index) {
         final E element = x.item;

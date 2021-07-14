@@ -393,6 +393,50 @@ public class LinkedListTest {
         }
     }
     
+    @Test
+    public void bruteForceRemoveObjectBeforeIteratorRemove() {
+        list.addAll(getIntegerList(1000));
+        Random random = new Random(1);
+        
+        for (int i = 0; i < 100; i++) {
+            Integer probe = list.get(random.nextInt(list.size()));
+            list.remove(probe);
+        }
+        
+        Iterator<Integer> iterator = list.iterator();
+        
+        
+    }
+    
+    @Test
+    public void findFailingRemoveObject() {
+        list.addAll(getIntegerList(3));
+        
+        Integer probe = list.get(1);
+        
+        list.remove(probe);
+        
+        Iterator<Integer> iterator = list.iterator();
+        Random random = new Random(100L);
+        int iter = 0;
+        
+        while (!list.isEmpty()) {
+//            System.out.println(iter++);
+            if (!iterator.hasNext()) {
+                iterator = list.iterator();
+                continue;
+            }
+            
+            iterator.next();
+            
+            if (random.nextBoolean()) {
+                iterator.remove();
+            }
+        }
+        
+//        throw new IllegalStateException("Bug not found!");
+    }
+    
     private static boolean listsEqual(
             com.github.coderodde.util.LinkedList<Integer> list1, 
             java.util.List<Integer> list2) {
