@@ -1036,7 +1036,7 @@ public class LinkedList<E>
     }
 
     /***************************************************************************
-    Appends the input element to the head of this list.
+    Appends the input element to the tail of this list.
     ***************************************************************************/
     private void linkLast(E e) {
         final Node<E> l = last;
@@ -1647,7 +1647,7 @@ public class LinkedList<E>
             if (next == null) 
                 linkLast(e);
             else
-                linkBefore(e, next, nextIndex - 1);
+                linkBefore(e, next, nextIndex);
             nextIndex++;
             expectedModCount++;
         }

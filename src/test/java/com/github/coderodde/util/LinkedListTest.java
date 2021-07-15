@@ -451,6 +451,106 @@ public class LinkedListTest {
         assertTrue(listsEqual(list, referenceList));
     }
     
+    @Test
+    public void iteratorAdd() {
+        list.addAll(getIntegerList(4));
+        
+        ListIterator<Integer> iterator = list.listIterator(1);
+        
+        assertEquals(1, iterator.nextIndex());
+        assertEquals(0, iterator.previousIndex());
+        
+        iterator.next();
+        
+        assertEquals(2, iterator.nextIndex());
+        assertEquals(1, iterator.previousIndex());
+        
+        iterator.add(Integer.valueOf(100));
+        
+        assertEquals(Integer.valueOf(0), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(100), list.get(2));
+        assertEquals(Integer.valueOf(2), list.get(3));
+        assertEquals(Integer.valueOf(3), list.get(4));
+    }
+    
+    @Test
+    public void bruteForceIteratorTest() {
+        list.addAll(getIntegerList(100));
+        List<Integer> referenceList = new java.util.LinkedList<>(list);
+        
+        ListIterator<Integer> iterator1 = list.listIterator(2);
+        ListIterator<Integer> iterator2 = referenceList.listIterator(2);
+        
+        long seed = 100L;
+        Random random = new Random(seed);
+        
+        while (iterator1.hasNext()) {
+            if (!iterator2.hasNext()) {
+                fail("Iterator mismatch on hasNext().");
+            }
+            
+            iterator1.next();
+            iterator2.next();
+            
+            if (random.nextBoolean()) {
+                Integer integer = Integer.valueOf(random.nextInt(100));
+                iterator1.add(integer);
+                iterator2.add(integer);
+                assertTrue(listsEqual(list, referenceList));
+            }
+        }
+        
+        if (iterator2.hasNext()) {
+            fail("Java List iterator has more to offer.");
+        }
+    }
+    
+    @Test
+    public void listIteratorBruteForce() {
+        list.addAll(getIntegerList(100));
+        List<Integer> referenceList = new java.util.LinkedList<>(list);
+        
+        ListIterator<Integer> iterator1 = list.listIterator(2);
+        ListIterator<Integer> iterator2 = referenceList.listIterator(2);
+        
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        
+        System.out.println("listIteratorBruteForce.seed = " + seed);
+        
+        for (int op = 0; op < 50; op++) {
+            int choice = random.nextInt(10);
+            
+            if (choice < 2) {
+                if (iterator1.hasNext()) {
+                    iterator1.next();
+                }
+                    
+                if (iterator2.hasNext()) {
+                    iterator2.next();
+                }
+            } else if (choice == 2) {
+                if (iterator1.hasPrevious()) {
+                    iterator1.previous();
+                }
+                    
+                if (iterator2.hasPrevious()) {
+                    iterator2.previous();
+                }
+            } else if (choice < 6) {
+                iterator1.remove();
+                iterator2.remove();
+            } else {
+                Integer integer = Integer.valueOf(random.nextInt(1000));
+                iterator1.add(integer);
+                iterator2.add(integer);
+            }
+            
+            assertTrue(listsEqual(list, referenceList));
+        }
+    }
+    
     private static boolean listsEqual(
             com.github.coderodde.util.LinkedList<Integer> list1, 
             java.util.List<Integer> list2) {
