@@ -395,46 +395,63 @@ public class LinkedListTest {
     
     @Test
     public void bruteForceRemoveObjectBeforeIteratorRemove() {
-        list.addAll(getIntegerList(1000));
-        Random random = new Random(1);
+        LinkedList<String> ll = new com.github.coderodde.util.LinkedList<>();
         
-        for (int i = 0; i < 100; i++) {
-            Integer probe = list.get(random.nextInt(list.size()));
-            list.remove(probe);
-        }
-        
-        Iterator<Integer> iterator = list.iterator();
-        
-        
+        ll.add("a");
+        ll.add("b");
+        ll.add("c");
+        ll.add("d");
+    
+        ll.remove("b");
+        ll.remove("c");
+        ll.remove("d");
+        ll.remove("a");
     }
     
     @Test
     public void findFailingRemoveObject() {
-        list.addAll(getIntegerList(3));
+        java.util.LinkedList<Integer> referenceList = 
+                new java.util.LinkedList<>();
+        
+        list.addAll(getIntegerList(10));
+        referenceList.addAll(list);
         
         Integer probe = list.get(1);
         
         list.remove(probe);
+        referenceList.remove(probe);
         
-        Iterator<Integer> iterator = list.iterator();
+        Iterator<Integer> iterator1 = list.iterator();
+        Iterator<Integer> iterator2 = referenceList.iterator();
+        
         Random random = new Random(100L);
-        int iter = 0;
+        int iteration = 0;
         
         while (!list.isEmpty()) {
-//            System.out.println(iter++);
-            if (!iterator.hasNext()) {
-                iterator = list.iterator();
+            if (!iterator1.hasNext()) {
+                
+                if (iterator2.hasNext()) {
+                    throw new IllegalStateException();
+                }
+                
+                iterator1 = list.iterator();
+                iterator2 = referenceList.iterator();
                 continue;
             }
             
-            iterator.next();
+            iterator1.next();
+            iterator2.next();
             
             if (random.nextBoolean()) {
-                iterator.remove();
+                System.out.println("iteration = " + iteration);
+                iterator1.remove();
+                iterator2.remove();
             }
+            
+            iteration++;
         }
         
-//        throw new IllegalStateException("Bug not found!");
+        assertTrue(listsEqual(list, referenceList));
     }
     
     private static boolean listsEqual(
