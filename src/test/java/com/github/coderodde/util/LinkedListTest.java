@@ -425,7 +425,6 @@ public class LinkedListTest {
         Iterator<Integer> iterator2 = referenceList.iterator();
         
         Random random = new Random(100L);
-        int iteration = 0;
         
         while (!list.isEmpty()) {
             if (!iterator1.hasNext()) {
@@ -443,12 +442,10 @@ public class LinkedListTest {
             iterator2.next();
             
             if (random.nextBoolean()) {
-                System.out.println("iteration = " + iteration);
                 iterator1.remove();
                 iterator2.remove();
+                assertTrue(listsEqual(list, referenceList));
             }
-            
-            iteration++;
         }
         
         assertTrue(listsEqual(list, referenceList));

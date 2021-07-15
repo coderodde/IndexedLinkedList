@@ -555,30 +555,32 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
-                    unlink(x, index);
-
-//                    if (mustRemoveFinger())
-//                        removeFinger();
-//
-//                    shiftIndicesToLeftOnce(index + 1);
+                    removeNodeFromList(x, index);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
-                    unlink(x, index);
-
-//                    if (mustRemoveFinger())
-//                        removeFinger();
-//
-//                    shiftIndicesToLeftOnce(index + 1);
+                    removeNodeFromList(x, index);
                     return true;
                 }
             }
         }
 
         return false;
+    }
+    
+    /***************************************************************************
+    Removes the node from this list. Modifies the fingers as needed.
+    ***************************************************************************/
+    private E removeNodeFromList(Node<E> node, int index) {
+        loadRemoveData(index);
+
+        if (removeData.finger.index == index) 
+            moveFingerOutOfRemovalLocation(removeData.finger);
+
+        return unlink(node, index);
     }
 
     /**
