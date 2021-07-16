@@ -52,9 +52,6 @@ public class LinkedList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
 
-//    @java.io.Serial
-    private static final long serialVersionUID = 876323262645176354L;
-
     /**
      * Number of elements in the list.
      */
@@ -338,6 +335,31 @@ public class LinkedList<E>
             throw new NoSuchElementException();
         return l.item;
     }
+    
+    /**
+     * Returns the smallest index of the input object, or -1, if the object does
+     * not appear in this list.
+     * 
+     * @param o the object whose index to return.
+     * @return the index of {@code o}, or -1, if none is present.
+     */
+    public int indexOf(Object o) {
+        int index = 0;
+        
+        if (o == null) {
+            for (Node<E> x = first; x != null; x = x.next, index++) {
+                if (x.item == null)
+                    return index;
+            }
+        } else {
+            for (Node<E> x = first; x != null; x = x.next, index++) {
+                if (o.equals(x.item)) 
+                    return index;
+            }
+        }
+        
+        return -1;
+    }
 
     /**
      * Returns the basic iterator over this list supporting only traversal and
@@ -350,6 +372,32 @@ public class LinkedList<E>
         return new BasicIterator();
     }
 
+    /**
+     * Returns the index of the last appearance of the input object {@code o}.
+     * 
+     * @param o the object to search for.
+     * @return the largest index of {@code o}, or -1 if none is present.
+     */
+    public int lastIndexOf(Object o) {
+        int index = size;
+        
+        if (o == null) {
+            for (Node<E> x = last; x != null; x = x.prev) {
+                index--;
+                if (x.item == null) 
+                    return index;
+            }
+        } else {
+            for (Node<E> x = last; x != null; x = x.prev) {
+                index--;
+                if (o.equals(x.item)) 
+                    return index;
+            }
+        }
+        
+        return -1;
+    }
+    
     /**
      * Returns a list-iterator of the elements in this list (in proper
      * sequence), starting at the specified position in the list.
@@ -695,6 +743,9 @@ public class LinkedList<E>
         return size;
     }
 
+//    @java.io.Serial
+    private static final long serialVersionUID = -8812077630522402934L;
+    
     // Internal methods begin:
 
     /***************************************************************************
@@ -1340,6 +1391,44 @@ public class LinkedList<E>
 
     // Caches the removal data:
     private transient final RemoveData<E> removeData = new RemoveData<>();
+    
+    /**
+     * Reconstitutes this {@code LinkedList} instance from a stream
+     * (that is, deserializes it).
+     */
+    private void readObject(java.io.ObjectInputStream s) 
+            throws java.io.IOException, ClassNotFoundException {
+        // Read in any hidden serialization magic
+        s.defaultReadObject();
+
+        // Read in size
+        int size = s.readInt();
+
+        // Read in all elements in the proper order.
+        for (int i = 0; i < size; i++)
+            linkLast((E) s.readObject());
+    }
+    /**
+     * Saves the state of this {@code LinkedList} instance to a stream
+     * (that is, serializes it).
+     *
+     * @serialData The size of the list (the number of elements it
+     *             contains) is emitted (int), followed by all of its
+     *             elements (each an Object) in the proper order.
+     */
+//    @java.io.Serial
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        // Write out any hidden serialization magic
+        s.defaultWriteObject();
+
+        // Write out size
+        s.writeInt(size);
+
+        // Write out all elements in the proper order.
+        for (Node<E> x = first; x != null; x = x.next)
+            s.writeObject(x.item);
+    }
     
     /***************************************************************************
     Implements the doubly-linked list node.

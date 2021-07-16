@@ -1,5 +1,12 @@
 package com.github.coderodde.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +15,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -526,6 +535,63 @@ public class LinkedListTest {
         
         if (iterator2.hasNext()) {
             fail("Java List iterator has more to offer.");
+        }
+    }
+
+    @Test
+    public void indexOf() {
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        
+        list.add(3);
+        list.add(2);
+        list.add(1);
+        
+        assertEquals(0, list.indexOf(1));
+        assertEquals(1, list.indexOf(2));
+        assertEquals(2, list.indexOf(3));
+        
+        assertEquals(3, list.lastIndexOf(3));
+        assertEquals(4, list.lastIndexOf(2));
+        assertEquals(5, list.lastIndexOf(1));
+    }
+    
+    private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
+    
+    @Test
+    public void serialization() {
+        list.add(10);
+        list.add(13);
+        list.add(12);
+        
+        try {
+            FileOutputStream fos =
+                    new FileOutputStream(SERIALIZATION_FILE_NAME);
+            
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            
+            oos.writeObject(list);
+            oos.flush();
+            oos.close();
+            
+            FileInputStream fis = new FileInputStream(SERIALIZATION_FILE_NAME   );
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            
+            com.github.coderodde.util.LinkedList<Integer> ll =    
+                    (com.github.coderodde.util.LinkedList<Integer>)
+                    ois.readObject();
+                    
+            ois.close();
+            
+            assertTrue(listsEqual(list, ll));
+            
+        } catch (FileNotFoundException ex) {
+            
+        } catch (IOException ex) {
+            Logger.getLogger(LinkedListTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LinkedListTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
