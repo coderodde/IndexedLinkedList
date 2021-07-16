@@ -1390,7 +1390,7 @@ public class LinkedList<E>
     }
 
     // Caches the removal data:
-    private transient final RemoveData<E> removeData = new RemoveData<>();
+    private transient RemoveData<E> removeData = new RemoveData<>();
     
     /**
      * Reconstitutes this {@code LinkedList} instance from a stream
@@ -1401,13 +1401,32 @@ public class LinkedList<E>
         // Read in any hidden serialization magic
         s.defaultReadObject();
 
-        // Read in size
         int size = s.readInt();
+        this.size = 0;
+        this.fingerStack = new FingerStack<>();
+        this.removeData = new RemoveData<>();
 
+        if (size == 0) {
+            return;
+        }
+        
+        Node<E> rightmostNode = new Node<>();
+        rightmostNode.item = (E) s.readObject();
+        first = rightmostNode;
+        
         // Read in all elements in the proper order.
-        for (int i = 0; i < size; i++)
-            linkLast((E) s.readObject());
+        for (int i = 0; i < size; i++) {
+            E item = (E) s.readObject();
+            Node<E> node = new Node<>();
+            node.item = item;
+            rightmostNode.next = node;
+            node.prev = rightmostNode;
+            rightmostNode = node;
+        }
+        
+        last = rightmostNode;
     }
+    
     /**
      * Saves the state of this {@code LinkedList} instance to a stream
      * (that is, serializes it).

@@ -583,8 +583,8 @@ public class LinkedListTest {
                     ois.readObject();
                     
             ois.close();
-            
-            assertTrue(listsEqual(list, ll));
+            boolean equal = listsEqual(list, ll);
+            assertTrue(equal);
             
         } catch (FileNotFoundException ex) {
             
