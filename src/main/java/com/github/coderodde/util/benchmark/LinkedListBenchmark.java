@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 import org.apache.commons.collections4.list.TreeList;
 
@@ -128,7 +129,6 @@ final class LinkedListBenchmark {
         profileAddCollection();
         profileRemoveViaIndex();
         profileRemoveObject();
-        profileIteratorRemoval();
         profileListIteratorAddition();
         profileListIteratorRemoval();
         
@@ -222,23 +222,21 @@ final class LinkedListBenchmark {
         System.out.println();
     }
 
-    private void profileIteratorRemoval() {
-        profileIteratorRemovalRoddeList();
-        profileIteratorRemovalLinkedList();
-        profileIteratorRemovalArrayList();
-        profileIteratorRemovalTreeList();
-        
-        listsEqual();
-        System.out.println();
-    }
-    
     private void profileListIteratorAddition() {
+        profileListIteratorAdditionRoddeList();
+        profileListIteratorAdditionLinkedList();
+        profileListIteratorAdditionArrayList();
+        profileListIteratorAdditionTreeList();
         
         listsEqual();
         System.out.println();
     }
     
     private void profileListIteratorRemoval() {
+        profileListIteratorRemovalRoddeList();
+        profileListIteratorRemovalLinkedList();
+        profileListIteratorRemovalArrayList();
+        profileListIteratorRemovalTreeList();
         
         listsEqual();
         System.out.println();
@@ -426,7 +424,7 @@ final class LinkedListBenchmark {
         return durationMillis;
     }
     
-    private long profileIteratorRemoval(List<Integer> list) {
+    private long profileListIteratorRemoval(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
         Iterator<Integer> iterator = list.iterator();
         int counter = 0;
@@ -438,6 +436,41 @@ final class LinkedListBenchmark {
             if (counter % 10 == 0) {
                 try {
                     iterator.remove();
+                } catch (AssertionError ae) {
+                    System.err.println(ae.getMessage());
+                    System.exit(1);
+                }
+            }
+            
+            counter++;
+        }
+        
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() +
+                        ".iterator().remove() in (ms): " +
+                        durationMillis);
+    
+        return durationMillis;
+    }
+    
+    private long profileListIteratorAddition(
+            List<Integer> list, Random random) {
+        
+        long startMillis = System.currentTimeMillis();
+        ListIterator<Integer> iterator = list.listIterator(1);
+        int counter = 0;
+        
+        while (iterator.hasNext()) {
+            iterator.next();
+            
+            // Remove every 2nd element:
+            if (counter % 10 == 0) {
+                try {
+                    Integer integer = Integer.valueOf(random.nextInt(10_000));
+                    iterator.add(integer);
                 } catch (AssertionError ae) {
                     System.err.println(ae.getMessage());
                     System.exit(1);
@@ -672,20 +705,44 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
     
-    private void profileIteratorRemovalRoddeList() {
-        totalMillisRoddeList += profileIteratorRemoval(roddeList);
+    private void profileListIteratorRemovalRoddeList() {
+        totalMillisRoddeList += profileListIteratorRemoval(roddeList);
     }
     
-    private void profileIteratorRemovalLinkedList() {
-        totalMillisLinkedList += profileIteratorRemoval(linkedList);
+    private void profileListIteratorRemovalLinkedList() {
+        totalMillisLinkedList += profileListIteratorRemoval(linkedList);
     }
     
-    private void profileIteratorRemovalArrayList() {
-        totalMillisArrayList += profileIteratorRemoval(arrayList);
+    private void profileListIteratorRemovalArrayList() {
+        totalMillisArrayList += profileListIteratorRemoval(arrayList);
     }
     
-    private void profileIteratorRemovalTreeList() {
-        totalMillisTreeList += profileIteratorRemoval(treeList);
+    private void profileListIteratorRemovalTreeList() {
+        totalMillisTreeList += profileListIteratorRemoval(treeList);
+    }
+    
+    private void profileListIteratorAdditionRoddeList() {
+        totalMillisRoddeList += 
+                profileListIteratorAddition(roddeList, randomRoddeList);
+    }
+    
+    private void profileListIteratorAdditionLinkedList() {
+        totalMillisLinkedList +=
+                profileListIteratorAddition(
+                        linkedList, 
+                        randomJavaUtilLinkedList);
+    }
+    
+    private void profileListIteratorAdditionArrayList() {
+        totalMillisArrayList += 
+                profileListIteratorAddition(
+                        arrayList, 
+                        randomJavaUtilArrayList);
+    }
+    
+    private void profileListIteratorAdditionTreeList() {
+        totalMillisTreeList += 
+                profileListIteratorAddition(treeList, randomTreeList);
     }
 
     private void printTitle(BenchmarkChoice benchmarkChoice) {
