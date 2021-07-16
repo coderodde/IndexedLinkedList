@@ -566,16 +566,16 @@ public class LinkedListTest {
         list.add(12);
         
         try {
-            FileOutputStream fos =
-                    new FileOutputStream(SERIALIZATION_FILE_NAME);
+            File file = new File(SERIALIZATION_FILE_NAME);
             
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             
             oos.writeObject(list);
             oos.flush();
             oos.close();
             
-            FileInputStream fis = new FileInputStream(SERIALIZATION_FILE_NAME   );
+            FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
             
             com.github.coderodde.util.LinkedList<Integer> ll =    
@@ -586,6 +586,10 @@ public class LinkedListTest {
             boolean equal = listsEqual(list, ll);
             assertTrue(equal);
             
+            if (!file.delete()) {
+                file.deleteOnExit();
+            }
+            
         } catch (FileNotFoundException ex) {
             
         } catch (IOException ex) {
@@ -593,6 +597,14 @@ public class LinkedListTest {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(LinkedListTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    @Test
+    public void streams() {
+        list.addAll(getIntegerList(10));
+        
+        list.parallelStream().anyMatch(e -> e == 2);
+        list.stream().anyMatch(e -> e == 2);
     }
     
     private static boolean listsEqual(

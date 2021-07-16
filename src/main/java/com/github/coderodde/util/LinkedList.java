@@ -988,6 +988,13 @@ public class LinkedList<E>
     }
     
     /***************************************************************************
+    Computes the recommended number of fingers for {@code size} elements.
+    ***************************************************************************/
+    private static int getRecommendedNumberOfFingers(int size) {
+        return (int) Math.ceil(Math.sqrt(size / 2.0));
+    }
+    
+    /***************************************************************************
     Inserts the input collection right before the node 'succ'.
     ***************************************************************************/
     private void insertAll(
@@ -1410,15 +1417,32 @@ public class LinkedList<E>
             return;
         }
         
+        if (size == 1) {
+            Node<E> newNode = new Node<>();
+            newNode.item = (E) s.readObject();
+            first = last = newNode;
+            addFinger(newNode, 0);
+            return;
+        }
+        
         Node<E> rightmostNode = new Node<>();
         rightmostNode.item = (E) s.readObject();
         first = rightmostNode;
         
+        int numberOfRequestedFingers = getRecommendedNumberOfFingers(size);
+        final int distance = size / numberOfRequestedFingers;
+        int startOffset = distance / 2;
+        
         // Read in all elements in the proper order.
-        for (int i = 0; i < size; i++) {
+        for (int i = 1; i < size; i++) {
             E item = (E) s.readObject();
             Node<E> node = new Node<>();
             node.item = item;
+            
+            if (i - startOffset % distance == 0) {
+                addFinger(node, i);
+            }
+            
             rightmostNode.next = node;
             node.prev = rightmostNode;
             rightmostNode = node;
