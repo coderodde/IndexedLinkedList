@@ -743,7 +743,7 @@ public class LinkedList<E>
         return size;
     }
 
-//    @java.io.Serial
+    @java.io.Serial
     private static final long serialVersionUID = -8812077630522402934L;
     
     // Internal methods begin:
@@ -1403,6 +1403,7 @@ public class LinkedList<E>
      * Reconstitutes this {@code LinkedList} instance from a stream
      * (that is, deserializes it).
      */
+    @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
             throws java.io.IOException, ClassNotFoundException {
         // Read in any hidden serialization magic
@@ -1459,7 +1460,7 @@ public class LinkedList<E>
      *             contains) is emitted (int), followed by all of its
      *             elements (each an Object) in the proper order.
      */
-//    @java.io.Serial
+    @java.io.Serial
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic

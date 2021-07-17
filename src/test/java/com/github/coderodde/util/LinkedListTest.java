@@ -192,7 +192,7 @@ public class LinkedListTest {
     @Test
     public void bruteForceAddCollectionAtIndex() {
         long seed = System.currentTimeMillis();
-        System.out.println("bruteForceAddCollectionAtIndex.seed = " + seed);
+        System.out.println("- bruteForceAddCollectionAtIndex.seed = " + seed);
         Random random = new Random(seed);
         
         list.addAll(getIntegerList());
