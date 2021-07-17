@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
@@ -742,6 +743,27 @@ public class LinkedList<E>
     public int size() {
         return size;
     }
+    
+//    /**
+//     * Creates a <em><a href="Spliterator.html#binding">late-binding</a></em>
+//     * and <em>fail-fast</em> {@link Spliterator} over the elements in this
+//     * list.
+//     *
+//     * <p>The {@code Spliterator} reports {@link Spliterator#SIZED} and
+//     * {@link Spliterator#ORDERED}.  Overriding implementations should document
+//     * the reporting of additional characteristic values.
+//     *
+//     * @implNote
+//     * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
+//     * and implements {@code trySplit} to permit limited parallelism..
+//     *
+//     * @return a {@code Spliterator} over the elements in this list
+//     * @since 1.8
+//     */
+//    @Override
+//    public Spliterator<E> spliterator() {
+//        return new LinkedListSpliterator(this, -1, 0);
+//    }
 
     @java.io.Serial
     private static final long serialVersionUID = -8812077630522402934L;
@@ -1822,4 +1844,6 @@ public class LinkedList<E>
             iterator.remove();
         }
     }
+    
+    
 }

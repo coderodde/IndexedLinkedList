@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.stream.Collectors;
 import org.apache.commons.collections4.list.TreeList;
 
 final class LinkedListBenchmark {
@@ -131,6 +132,8 @@ final class LinkedListBenchmark {
         profileRemoveObject();
         profileListIteratorAddition();
         profileListIteratorRemoval();
+        profileStream();
+        profileParallelStream();
         
         printTotalDurations();
 
@@ -237,6 +240,26 @@ final class LinkedListBenchmark {
         profileListIteratorRemovalLinkedList();
         profileListIteratorRemovalArrayList();
         profileListIteratorRemovalTreeList();
+        
+        listsEqual();
+        System.out.println();
+    }
+    
+    private void profileStream() {
+        profileStreamRoddeList();
+        profileStreamLinkedList();
+        profileStreamArrayList();
+        profileStreamTreeList();
+        
+        listsEqual();
+        System.out.println();
+    }
+    
+    private void profileParallelStream() {
+        profileParallelStreamRoddeList();
+        profileParallelStreamLinkedList();
+        profileParallelStreamArrayList();
+        profileParallelStreamTreeList();
         
         listsEqual();
         System.out.println();
@@ -488,6 +511,36 @@ final class LinkedListBenchmark {
                         ".iterator().remove() in (ms): " +
                         durationMillis);
     
+        return durationMillis;
+    }
+    
+    private long profileStream(List<Integer> list) {
+        long startMillis = System.currentTimeMillis();
+        
+        list.stream().map(x -> 2 * x).collect(Collectors.toList());
+        
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() +
+                        ".stream() in (ms): " + durationMillis);
+        
+        return durationMillis;
+    }
+    
+    private long profileParallelStream(List<Integer> list) {
+        long startMillis = System.currentTimeMillis();
+        
+        list.stream().parallel().map(x -> 2 * x).collect(Collectors.toList());
+        
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() +
+                        ".stream().parallel() in (ms): " + durationMillis);
+        
         return durationMillis;
     }
 
@@ -743,6 +796,38 @@ final class LinkedListBenchmark {
     private void profileListIteratorAdditionTreeList() {
         totalMillisTreeList += 
                 profileListIteratorAddition(treeList, randomTreeList);
+    }
+    
+    private void profileStreamRoddeList() {
+        totalMillisRoddeList += profileStream(roddeList);
+    }
+    
+    private void profileStreamLinkedList() {
+        totalMillisLinkedList += profileStream(linkedList);
+    }
+    
+    private void profileStreamArrayList() {
+        totalMillisArrayList += profileStream(arrayList);
+    }
+    
+    private void profileStreamTreeList() {
+        totalMillisTreeList += profileStream(treeList);
+    }
+    
+    private void profileParallelStreamRoddeList() {
+        totalMillisRoddeList += profileParallelStream(roddeList);
+    }
+    
+    private void profileParallelStreamLinkedList() {
+        totalMillisLinkedList += profileParallelStream(linkedList);
+    }
+    
+    private void profileParallelStreamArrayList() {
+        totalMillisArrayList += profileParallelStream(arrayList);
+    }
+    
+    private void profileParallelStreamTreeList() {
+        totalMillisTreeList += profileParallelStream(treeList);
     }
 
     private void printTitle(BenchmarkChoice benchmarkChoice) {
