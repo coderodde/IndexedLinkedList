@@ -1409,7 +1409,7 @@ public class LinkedList<E>
         s.defaultReadObject();
 
         int size = s.readInt();
-        this.size = 0;
+        this.size = size;
         this.fingerStack = new FingerStack<>();
         this.removeData = new RemoveData<>();
 
@@ -1439,7 +1439,7 @@ public class LinkedList<E>
             Node<E> node = new Node<>();
             node.item = item;
             
-            if (i - startOffset % distance == 0) {
+            if ((i - startOffset) % distance == 0) {
                 addFinger(node, i);
             }
             

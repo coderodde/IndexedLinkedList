@@ -590,12 +590,46 @@ public class LinkedListTest {
                 file.deleteOnExit();
             }
             
-        } catch (FileNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
+            fail(ex.getMessage());
+        }   
+    }
+    
+    @Test
+    public void bruteforceSerialization() {
+        for (int i = 0; i < 20; i++) {
+            list.addAll(getIntegerList(i));
             
-        } catch (IOException ex) {
-            Logger.getLogger(LinkedListTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LinkedListTest.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                File file = new File(SERIALIZATION_FILE_NAME);
+
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+                oos.writeObject(list);
+                oos.flush();
+                oos.close();
+
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                com.github.coderodde.util.LinkedList<Integer> ll =    
+                        (com.github.coderodde.util.LinkedList<Integer>)
+                        ois.readObject();
+
+                ois.close();
+                boolean equal = listsEqual(list, ll);
+                assertTrue(equal);
+
+                if (!file.delete()) {
+                    file.deleteOnExit();
+                }
+            
+            } catch (IOException | ClassNotFoundException ex) {
+                fail(ex.getMessage());
+            }   
+            
+            list.clear();
         }
     }
     
