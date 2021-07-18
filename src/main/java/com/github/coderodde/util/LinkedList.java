@@ -1854,17 +1854,17 @@ public class LinkedList<E>
         
         private final LinkedList<E> list;
         private LinkedList.Node<E> node;
-        private final int lengthOfSpliterator;
-        private final int offsetOfSpliterator;
-        private int numberOfProcessedElements;
-        private int expectedModCount;
+        private long lengthOfSpliterator;
+        private final long offsetOfSpliterator;
+        private long numberOfProcessedElements;
+        private final int expectedModCount;
         
         private LinkedListSpliterator(LinkedList<E> list,
-                                      int lengthOfSpliterator,
-                                      int offsetOfSpliterator,
+                                      long lengthOfSpliterator,
+                                      long offsetOfSpliterator,
                                       int expectedModCount) {
             this.list = list;
-            this.node = list.node(offsetOfSpliterator);
+            this.node = list.node((int) offsetOfSpliterator);
             this.lengthOfSpliterator = lengthOfSpliterator;
             this.offsetOfSpliterator = offsetOfSpliterator;
             this.expectedModCount = expectedModCount;
@@ -1872,10 +1872,9 @@ public class LinkedList<E>
 
         @Override
         public boolean tryAdvance(Consumer<? super E> action) {
-            if (numberOfProcessedElements == lengthOfSpliterator) {
+            if (action == null) throw new NullPointerException();
+            if (numberOfProcessedElements == lengthOfSpliterator)
                 return false;
-            }
-            
             numberOfProcessedElements++;
             Node<E> node = this.node;
             E item = node.item;
@@ -1889,10 +1888,9 @@ public class LinkedList<E>
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             if (action == null) throw new NullPointerException();
-            for (
-                    int i = numberOfProcessedElements; 
-                    i < lengthOfSpliterator; 
-                    i++) {
+            for (long i = numberOfProcessedElements; 
+                 i < lengthOfSpliterator; 
+                 i++) {
                 E item = node.item;
                 action.accept(item);
                 node = node.next;
@@ -1904,11 +1902,20 @@ public class LinkedList<E>
 
         @Override
         public Spliterator<E> trySplit() {
-            long currentSpliteratorLength = estimateSize() / 2;
+            long size = estimateSize();
+            if (size == 0L) return null;
+            
+            long currentSpliteratorLength = size / 2;
             if (currentSpliteratorLength < MINIMUM_BATCH_SIZE)
                 return null;
             
-            return null;
+            long newSpliteratorLength = size - currentSpliteratorLength;
+            this.lengthOfSpliterator -= newSpliteratorLength;
+            return new LinkedListSpliterator<>(
+                    list, 
+                    newSpliteratorLength, 
+                    offsetOfSpliterator + currentSpliteratorLength,
+                    expectedModCount);
         }
 
         @Override
