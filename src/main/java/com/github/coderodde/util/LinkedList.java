@@ -28,6 +28,7 @@ package com.github.coderodde.util;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.Iterator;
@@ -36,7 +37,9 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
+import jdk.jfr.Experimental;
 
 /**
  *
@@ -744,26 +747,26 @@ public class LinkedList<E>
         return size;
     }
     
-//    /**
-//     * Creates a <em><a href="Spliterator.html#binding">late-binding</a></em>
-//     * and <em>fail-fast</em> {@link Spliterator} over the elements in this
-//     * list.
-//     *
-//     * <p>The {@code Spliterator} reports {@link Spliterator#SIZED} and
-//     * {@link Spliterator#ORDERED}.  Overriding implementations should document
-//     * the reporting of additional characteristic values.
-//     *
-//     * @implNote
-//     * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
-//     * and implements {@code trySplit} to permit limited parallelism..
-//     *
-//     * @return a {@code Spliterator} over the elements in this list
-//     * @since 1.8
-//     */
-//    @Override
-//    public Spliterator<E> spliterator() {
-//        return new LinkedListSpliterator(this, -1, 0);
-//    }
+    /**
+     * Creates a <em><a href="Spliterator.html#binding">late-binding</a></em>
+     * and <em>fail-fast</em> {@link Spliterator} over the elements in this
+     * list.
+     *
+     * <p>The {@code Spliterator} reports {@link Spliterator#SIZED} and
+     * {@link Spliterator#ORDERED}.  Overriding implementations should document
+     * the reporting of additional characteristic values.
+     *
+     * @implNote
+     * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
+     * and implements {@code trySplit} to permit limited parallelism..
+     *
+     * @return a {@code Spliterator} over the elements in this list
+     * @since 1.8
+     */
+    @Override
+    public Spliterator<E> spliterator() {
+        return new LinkedListSpliterator<E>(this, size, 0, modCount);
+    }
 
     @java.io.Serial
     private static final long serialVersionUID = -8812077630522402934L;
@@ -1845,5 +1848,97 @@ public class LinkedList<E>
         }
     }
     
-    
+    private static final class LinkedListSpliterator<E> implements Spliterator<E> {
+        
+        private static final long MINIMUM_BATCH_SIZE = 1 << 10;
+        
+        private final LinkedList<E> list;
+        private LinkedList.Node<E> node;
+        private final int lengthOfSpliterator;
+        private final int offsetOfSpliterator;
+        private int numberOfProcessedElements;
+        private int expectedModCount;
+        
+        private LinkedListSpliterator(LinkedList<E> list,
+                                      int lengthOfSpliterator,
+                                      int offsetOfSpliterator,
+                                      int expectedModCount) {
+            this.list = list;
+            this.node = list.node(offsetOfSpliterator);
+            this.lengthOfSpliterator = lengthOfSpliterator;
+            this.offsetOfSpliterator = offsetOfSpliterator;
+            this.expectedModCount = expectedModCount;
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super E> action) {
+            if (numberOfProcessedElements == lengthOfSpliterator) {
+                return false;
+            }
+            
+            numberOfProcessedElements++;
+            Node<E> node = this.node;
+            E item = node.item;
+            action.accept(item);
+            this.node = this.node.next;
+            if (list.modCount != expectedModCount) 
+                throw new ConcurrentModificationException();
+            return true;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            if (action == null) throw new NullPointerException();
+            for (
+                    int i = numberOfProcessedElements; 
+                    i < lengthOfSpliterator; 
+                    i++) {
+                E item = node.item;
+                action.accept(item);
+                node = node.next;
+            }
+            numberOfProcessedElements = lengthOfSpliterator;
+            if (list.modCount != expectedModCount) 
+                throw new ConcurrentModificationException();
+        }
+
+        @Override
+        public Spliterator<E> trySplit() {
+            long currentSpliteratorLength = estimateSize() / 2;
+            if (currentSpliteratorLength < MINIMUM_BATCH_SIZE)
+                return null;
+            
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            return (long)(lengthOfSpliterator - numberOfProcessedElements);
+        }
+
+        @Override
+        public long getExactSizeIfKnown() {
+            return estimateSize();
+        }
+
+        @Override
+        public int characteristics() {
+            return Spliterator.ORDERED | 
+                   Spliterator.SUBSIZED |
+                   Spliterator.SIZED;
+        }
+        
+        @Override
+        public boolean hasCharacteristics(int characteristics) {
+            switch (characteristics) {
+                case Spliterator.ORDERED:
+                case Spliterator.SIZED:
+                case Spliterator.SUBSIZED:
+                    return true;
+                    
+                default:
+                    return false;
+            }
+        }
+    }
 }
