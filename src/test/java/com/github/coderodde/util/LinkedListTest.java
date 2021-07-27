@@ -2,7 +2,6 @@ package com.github.coderodde.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,15 +9,18 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import junit.framework.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -557,6 +559,106 @@ public class LinkedListTest {
         assertEquals(5, list.lastIndexOf(1));
     }
     
+    @Test
+    public void spliterator1() {
+        list.addAll(getIntegerList(6));
+        
+        Spliterator<Integer> split1 = list.spliterator();
+        Spliterator<Integer> split2 = split1.trySplit();
+        
+        assertEquals(3L, split1.estimateSize());
+        assertEquals(3L, split1.getExactSizeIfKnown());
+        
+        assertEquals(3L, split2.estimateSize());
+        assertEquals(3L, split2.getExactSizeIfKnown());
+        
+        class MyConsumer implements Consumer<Integer> {
+
+            @Override
+            public void accept(Integer t) {
+                assertEquals((int) t, (int) list.get(t));
+            }
+        }
+        
+        MyConsumer myConsumer = new MyConsumer();
+        
+        assertTrue(split1.tryAdvance(myConsumer));
+        assertTrue(split1.tryAdvance(myConsumer));
+        assertTrue(split1.tryAdvance(myConsumer));
+        assertFalse(split1.tryAdvance(myConsumer));
+        
+        assertTrue(split2.tryAdvance(myConsumer));
+        assertTrue(split2.tryAdvance(myConsumer));
+        assertTrue(split2.tryAdvance(myConsumer));
+        assertFalse(split2.tryAdvance(myConsumer));
+        
+        class MyConsumer2 implements Consumer<Integer> {
+
+            List<Integer> result = new ArrayList<>();
+            
+            @Override
+            public void accept(Integer t) {
+                result.add(t);
+            }
+        }
+        
+        Spliterator spliterator = list.spliterator().trySplit();
+        MyConsumer2 myConsumer2 = new MyConsumer2();
+        spliterator.forEachRemaining(myConsumer2);
+        
+        assertEquals(3, myConsumer2.result.size());
+        assertEquals(Integer.valueOf(3), myConsumer2.result.get(0));
+        assertEquals(Integer.valueOf(4), myConsumer2.result.get(1));
+        assertEquals(Integer.valueOf(5), myConsumer2.result.get(2));
+    }
+    
+    @Test
+    public void spliterator2() {
+        list.addAll(getIntegerList(6));
+        Spliterator split = list.spliterator();
+        
+        assertEquals(6L, split.getExactSizeIfKnown());
+        assertEquals(6L, split.estimateSize());
+        
+        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
+        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
+        
+        Spliterator split2 = split.trySplit();
+        assertNotNull(split2);
+        
+        for (int i = 2; i < 4; i++) {
+            Integer integer = list.get(i);
+            assertTrue(split.tryAdvance((j) -> assertEquals(integer, j)));
+        }
+        
+        assertFalse(split.tryAdvance((i) -> list.get(0)));
+        
+        for (int i = 4; i < 6; i++) {
+            Integer integer = list.get(i);
+            assertTrue(split2.tryAdvance((j) -> 
+                    assertEquals(integer, j)));
+        }
+        
+        assertFalse(split2.tryAdvance((i) -> {}));
+    }
+    
+    @Test
+    public void bruteforceSpliterator() {
+        list.addAll(getIntegerList(1_000_000));
+        Collections.<Integer>shuffle(list);
+        
+        List<Integer> newList = 
+               list.parallelStream()
+                   .map(i -> 2 * i)
+                   .collect(Collectors.toList());
+       
+        for (int i = 0; i < list.size(); i++) {
+            Integer integer1 = 2 * list.get(i);
+            Integer integer2 = newList.get(i);
+            assertEquals(integer1, integer2);
+        }
+    }
+    
     private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
     
     @Test
@@ -633,7 +735,7 @@ public class LinkedListTest {
         }
     }
     
-    @Test
+//    @Test
     public void streams() {
         list.addAll(getIntegerList(10));
         

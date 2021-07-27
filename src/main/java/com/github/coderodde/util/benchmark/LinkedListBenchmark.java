@@ -517,10 +517,14 @@ final class LinkedListBenchmark {
     private long profileStream(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
         
-        list.stream().map(x -> 2 * x).collect(Collectors.toList());
+        List<Integer> newList =
+                list.stream().map(x -> 2 * x).collect(Collectors.toList());
         
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
+        
+        list.clear();
+        list.addAll(newList);
         
         System.out.println(
                 list.getClass().getName() +
@@ -532,10 +536,16 @@ final class LinkedListBenchmark {
     private long profileParallelStream(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
         
-        list.stream().parallel().map(x -> 2 * x).collect(Collectors.toList());
+        List<Integer> newList = list.stream()
+                        .parallel()
+                        .map(x -> 2 * x)
+                        .collect(Collectors.toList());
         
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
+        
+        list.clear();
+        list.addAll(newList);
         
         System.out.println(
                 list.getClass().getName() +

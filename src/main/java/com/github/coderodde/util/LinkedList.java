@@ -1439,16 +1439,16 @@ public class LinkedList<E>
         this.fingerStack = new FingerStack<>();
         this.removeData = new RemoveData<>();
 
-        if (size == 0) {
-            return;
-        }
-        
-        if (size == 1) {
-            Node<E> newNode = new Node<>();
-            newNode.item = (E) s.readObject();
-            first = last = newNode;
-            addFinger(newNode, 0);
-            return;
+        switch (size) {
+            case 0:
+                return;
+                
+            case 1:
+                Node<E> newNode = new Node<>();
+                newNode.item = (E) s.readObject();
+                first = last = newNode;
+                addFinger(newNode, 0);
+                return;
         }
         
         Node<E> rightmostNode = new Node<>();
@@ -1848,15 +1848,16 @@ public class LinkedList<E>
         }
     }
     
-    private static final class LinkedListSpliterator<E> implements Spliterator<E> {
+    private static final class LinkedListSpliterator<E> 
+            implements Spliterator<E> {
         
-        private static final long MINIMUM_BATCH_SIZE = 1 << 10;
+        private static final long MINIMUM_BATCH_SIZE = 0;
         
         private final LinkedList<E> list;
         private LinkedList.Node<E> node;
         private long lengthOfSpliterator;
-        private final long offsetOfSpliterator;
         private long numberOfProcessedElements;
+        private long offsetOfSpliterator;
         private final int expectedModCount;
         
         private LinkedListSpliterator(LinkedList<E> list,
@@ -1876,10 +1877,9 @@ public class LinkedList<E>
             if (numberOfProcessedElements == lengthOfSpliterator)
                 return false;
             numberOfProcessedElements++;
-            Node<E> node = this.node;
             E item = node.item;
             action.accept(item);
-            this.node = this.node.next;
+            node = node.next;
             if (list.modCount != expectedModCount) 
                 throw new ConcurrentModificationException();
             return true;
@@ -1902,19 +1902,27 @@ public class LinkedList<E>
 
         @Override
         public Spliterator<E> trySplit() {
-            long size = estimateSize();
-            if (size == 0L) return null;
+            final long sizeLeft = estimateSize();
+            if (sizeLeft == 0L) return null;
             
-            long currentSpliteratorLength = size / 2;
-            if (currentSpliteratorLength < MINIMUM_BATCH_SIZE)
+            long newThisSpliteratorLength = sizeLeft / 2L;
+            if (newThisSpliteratorLength < MINIMUM_BATCH_SIZE)
                 return null;
             
-            long newSpliteratorLength = size - currentSpliteratorLength;
-            this.lengthOfSpliterator -= newSpliteratorLength;
+            this.lengthOfSpliterator = newThisSpliteratorLength;
+            this.numberOfProcessedElements = 0;
+            final long nextSpliteratorLength = 
+                    sizeLeft - newThisSpliteratorLength;
+            
+            this.offsetOfSpliterator += newThisSpliteratorLength;
+            
+            final long nextSpliteratorOffset = 
+                    this.offsetOfSpliterator + newThisSpliteratorLength;
+            
             return new LinkedListSpliterator<>(
                     list, 
-                    newSpliteratorLength, 
-                    offsetOfSpliterator + currentSpliteratorLength,
+                    nextSpliteratorLength, // length
+                    nextSpliteratorOffset, // offset
                     expectedModCount);
         }
 
@@ -1934,18 +1942,18 @@ public class LinkedList<E>
                    Spliterator.SUBSIZED |
                    Spliterator.SIZED;
         }
-        
-        @Override
-        public boolean hasCharacteristics(int characteristics) {
-            switch (characteristics) {
-                case Spliterator.ORDERED:
-                case Spliterator.SIZED:
-                case Spliterator.SUBSIZED:
-                    return true;
-                    
-                default:
-                    return false;
-            }
-        }
+//        
+//        @Override
+//        public boolean hasCharacteristics(int characteristics) {
+//            switch (characteristics) {
+//                case Spliterator.ORDERED:
+//                case Spliterator.SIZED:
+//                case Spliterator.SUBSIZED:
+//                    return true;
+//                    
+//                default:
+//                    return false;
+//            }
+//        }
     }
 }
