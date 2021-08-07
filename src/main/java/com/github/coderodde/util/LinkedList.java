@@ -28,7 +28,6 @@ package com.github.coderodde.util;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.Iterator;
@@ -37,9 +36,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Consumer;
-import jdk.jfr.Experimental;
 
 /**
  *
