@@ -643,6 +643,38 @@ public class LinkedListTest {
     }
     
     @Test
+    public void spliterator3() {
+        list.addAll(getIntegerList(10));
+        Spliterator mainSpliterator = list.spliterator();
+        assertTrue(mainSpliterator.tryAdvance(i -> {}));
+        
+        Spliterator spliterator2 = mainSpliterator.trySplit();
+        
+        ////
+        assertTrue(mainSpliterator.tryAdvance(
+                i -> assertEquals(list.get((int) i), i)));
+        
+        assertTrue(mainSpliterator.tryAdvance(
+                i -> assertEquals(list.get((int) i), i)));
+        
+        assertTrue(mainSpliterator.tryAdvance(
+                i -> assertEquals(list.get((int) i), i)));
+        
+        assertTrue(mainSpliterator.tryAdvance(
+                i -> assertEquals(list.get((int) i), i)));
+        ////
+        
+        assertFalse(mainSpliterator.tryAdvance(i -> {}));
+        
+        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
+        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
+        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
+        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
+        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
+        assertFalse(spliterator2.tryAdvance(i -> {}));
+    }
+    
+    @Test
     public void bruteforceSpliterator() {
         list.addAll(getIntegerList(1_000_000));
         Collections.<Integer>shuffle(list);
@@ -657,6 +689,20 @@ public class LinkedListTest {
             Integer integer2 = newList.get(i);
             assertEquals(integer1, integer2);
         }
+    }
+    
+    @Test
+    public void bruteforceSpliterator2() {
+        list.addAll(getIntegerList(1_000_000));
+        Collections.shuffle(list);
+        
+        List<Integer> otherList = 
+                list.parallelStream().collect(Collectors.toList());
+        
+        list.sort(Integer::compare);
+        otherList.sort(Integer::compare);
+        
+        assertEquals(otherList, list);
     }
     
     private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";

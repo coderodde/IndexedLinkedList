@@ -1910,14 +1910,15 @@ public class LinkedList<E>
                 return null;
             
             this.lengthOfSpliterator = newThisSpliteratorLength;
-            this.numberOfProcessedElements = 0;
             final long nextSpliteratorLength = 
                     sizeLeft - newThisSpliteratorLength;
             
-            this.offsetOfSpliterator += newThisSpliteratorLength;
-            
             final long nextSpliteratorOffset = 
-                    this.offsetOfSpliterator + newThisSpliteratorLength;
+                    this.offsetOfSpliterator + 
+                    this.numberOfProcessedElements + 
+                    newThisSpliteratorLength;
+            
+            this.numberOfProcessedElements = 0;
             
             return new LinkedListSpliterator<>(
                     list, 
