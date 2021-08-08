@@ -626,8 +626,8 @@ public class LinkedList<E>
     private E removeNodeFromList(Node<E> node, int index) {
         loadRemoveData(index);
 
-        if (removeData.finger.index == index) 
-            moveFingerOutOfRemovalLocation(removeData.finger);
+        if (removedDataFinger.index == index) 
+            moveFingerOutOfRemovalLocation(removedDataFinger);
 
         return unlink(node, index);
     }
@@ -646,11 +646,11 @@ public class LinkedList<E>
         loadRemoveData(index);
 
         // Make sure that no finger is on our way pointing to the node to remove
-        if (removeData.finger.index == index)
-            moveFingerOutOfRemovalLocation(removeData.finger);
+        if (removedDataFinger.index == index)
+            moveFingerOutOfRemovalLocation(removedDataFinger);
 
         // Once here, the list is not empty and has at least one finger!
-        return unlink(removeData.node, index);
+        return unlink(removedDataNode, index);
     }
 
     /**
@@ -1156,8 +1156,8 @@ public class LinkedList<E>
                 node = node.next;
         }
 
-        removeData.finger = finger;
-        removeData.node = node;
+        removedDataFinger = finger;
+        removedDataNode = node;
     }
 
     /***************************************************************************
@@ -1411,15 +1411,10 @@ public class LinkedList<E>
 
         return element;
     }
-
-    // Implements a type for holding information describing a removal operation.
-    private static final class RemoveData<E> {
-        Node<E> node;
-        Finger<E> finger;
-    }
-
+    
     // Caches the removal data:
-    private transient RemoveData<E> removeData = new RemoveData<>();
+    private transient Node<E> removedDataNode;
+    private transient Finger<E> removedDataFinger;
     
     /**
      * Reconstitutes this {@code LinkedList} instance from a stream
@@ -1434,7 +1429,6 @@ public class LinkedList<E>
         int size = s.readInt();
         this.size = size;
         this.fingerStack = new FingerStack<>();
-        this.removeData = new RemoveData<>();
 
         switch (size) {
             case 0:
@@ -1670,11 +1664,11 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
-//            checkInvariant();
+            //checkInvariant();
             loadRemoveData(removalIndex);
             
-            if (removeData.finger.index == removalIndex)
-                moveFingerOutOfRemovalLocation(removeData.finger);
+            if (removedDataFinger.index == removalIndex)
+                moveFingerOutOfRemovalLocation(removedDataFinger);
             
             unlink(lastReturned, removalIndex);
             
@@ -1773,8 +1767,8 @@ public class LinkedList<E>
             int removalIndex = nextIndex - 1;
             loadRemoveData(removalIndex);
             
-            if (removeData.finger.index == removalIndex)
-                moveFingerOutOfRemovalLocation(removeData.finger);
+            if (removedDataFinger.index == removalIndex)
+                moveFingerOutOfRemovalLocation(removedDataFinger);
             
             unlink(lastReturned, removalIndex);
             

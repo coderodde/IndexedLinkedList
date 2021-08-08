@@ -1,6 +1,7 @@
 package com.github.coderodde.util.benchmark;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,7 @@ final class LinkedListBenchmark {
     private static final int ADD_COLLECTION_AT_OPERATIONS   = 4_000;
     private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
     private static final int REMOVE_VIA_INDEX_OPERATIONS    = 10_000;
-    private static final int REMOVE_OBJECT_OPERATIONS       = 500;
+    private static final int REMOVE_OBJECT_OPERATIONS       = 1_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
     
@@ -260,6 +261,11 @@ final class LinkedListBenchmark {
         profileParallelStreamLinkedList();
         profileParallelStreamArrayList();
         profileParallelStreamTreeList();
+        
+        Collections.sort(treeList);
+        Collections.sort(roddeList);
+        Collections.sort(arrayList);
+        Collections.sort(linkedList);
         
         listsEqual();
         System.out.println();
@@ -508,7 +514,7 @@ final class LinkedListBenchmark {
         
         System.out.println(
                 list.getClass().getName() +
-                        ".iterator().remove() in (ms): " +
+                        ".iterator().add() in (ms): " +
                         durationMillis);
     
         return durationMillis;

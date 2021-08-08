@@ -17,7 +17,6 @@ import java.util.Random;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import junit.framework.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
