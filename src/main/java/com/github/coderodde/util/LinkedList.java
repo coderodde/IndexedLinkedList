@@ -1842,7 +1842,7 @@ public class LinkedList<E>
     private static final class LinkedListSpliterator<E> 
             implements Spliterator<E> {
         
-        private static final long MINIMUM_BATCH_SIZE = 0;
+        private static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
         
         private final LinkedList<E> list;
         private LinkedList.Node<E> node;
