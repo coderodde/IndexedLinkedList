@@ -558,7 +558,7 @@ public class LinkedListTest {
         assertEquals(5, list.lastIndexOf(1));
     }
     
-    @Test
+//    @Test
     public void spliterator1() {
         list.addAll(getIntegerList(10_000));
         
@@ -614,7 +614,79 @@ public class LinkedListTest {
         }
     }
     
+    class MyIntegerConsumer implements Consumer<Integer> {
+
+        List<Integer> ints = new ArrayList<>();
+        
+        @Override
+        public void accept(Integer t) {
+            ints.add(t);
+        }
+    }
+    
     @Test
+    @SuppressWarnings("empty-statement")
+    public void basicSpliteratorUsage() {
+        list.addAll(getIntegerList(10_000));
+        
+        Spliterator<Integer> spliterator1 = list.spliterator();
+        Spliterator<Integer> spliterator2 = spliterator1.trySplit();
+        
+        //// spliterator 2 : spliterator 1
+        
+        assertEquals(5000, spliterator1.getExactSizeIfKnown());
+        assertEquals(5000, spliterator2.getExactSizeIfKnown());
+        
+        
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(0), Integer.valueOf(0))));
+        
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(1), Integer.valueOf(1))));
+        
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(2), Integer.valueOf(2))));
+        
+        
+        
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5000), Integer.valueOf(5000))));
+        
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5001), Integer.valueOf(5001))));
+        
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5002), Integer.valueOf(5002))));
+        
+        //// spliterator 3 : spliterator 2 : splitereator 1
+        
+        Spliterator<Integer> spliterator3 = spliterator2.trySplit();
+        
+        assertEquals(4997, spliterator1.getExactSizeIfKnown());
+        
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(3), Integer.valueOf(3))));
+        
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(4), Integer.valueOf(4))));
+        
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(5), Integer.valueOf(5))));
+        
+        //// 
+        
+        MyIntegerConsumer consumer = new MyIntegerConsumer();
+        
+        while (spliterator1.tryAdvance(consumer));
+        
+        for (int i = 0; i < consumer.ints.size(); i++) {
+            Integer actualInteger = consumer.ints.get(i);
+            Integer expectedInteger = 5003 + i;
+            assertEquals(expectedInteger, actualInteger);
+        }
+    }
+    
+//    @Test
     public void spliterator2() {
         list.addAll(getIntegerList(6_000));
         Spliterator split = list.spliterator();
@@ -650,7 +722,7 @@ public class LinkedListTest {
         assertFalse(split2.tryAdvance(i -> {}));
     }
     
-    @Test
+//    @Test
     public void spliterator3() {
         list.addAll(getIntegerList(10_000));
         Spliterator mainSpliterator = list.spliterator();
@@ -696,9 +768,8 @@ public class LinkedListTest {
                    .map(i -> 2 * i)
                    .collect(Collectors.toList());
         
-        newList.sort(Integer::compare);
-        list.sort(Integer::compare);
-       
+        assertEquals(newList.size(), list.size());
+        
         for (int i = 0; i < list.size(); i++) {
             Integer integer1 = 2 * list.get(i);
             Integer integer2 = newList.get(i);
@@ -706,7 +777,7 @@ public class LinkedListTest {
         }
     }
     
-    @Test
+//    @Test
     public void bruteforceSpliterator2() {
         list.addAll(getIntegerList(1_000_000));
         Collections.shuffle(list);
@@ -793,6 +864,29 @@ public class LinkedListTest {
             }   
             
             list.clear();
+        }
+    }
+    
+//    @Test
+    public void forStackOverflow() {
+        list.addAll(getIntegerList(10_000));
+        List<Integer> parallelList =
+                list.stream()
+                    .parallel()
+                    .collect(Collectors.toList());
+        
+        assertEquals(list.size(), parallelList.size());
+        
+        for (int i = 0; i < list.size(); i++) {
+            Integer expectedInteger = list.get(i);
+            Integer actualInteger = parallelList.get(i);
+            
+            if (!expectedInteger.equals(actualInteger)) {
+                System.out.println(
+                        i + " -> " + expectedInteger + " vs. " + actualInteger);
+            }
+            
+            assertEquals(expectedInteger, actualInteger);
         }
     }
     

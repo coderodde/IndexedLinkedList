@@ -762,7 +762,7 @@ public class LinkedList<E>
      */
     @Override
     public Spliterator<E> spliterator() {
-        return new LinkedListSpliterator<E>(this, size, 0, modCount);
+        return new LinkedListSpliterator<E>(this, first, size, 0, modCount);
     }
 
     @java.io.Serial
@@ -1852,11 +1852,12 @@ public class LinkedList<E>
         private final int expectedModCount;
         
         private LinkedListSpliterator(LinkedList<E> list,
+                                      Node<E> node,
                                       long lengthOfSpliterator,
                                       long offsetOfSpliterator,
                                       int expectedModCount) {
             this.list = list;
-            this.node = list.node((int) offsetOfSpliterator);
+            this.node = node;
             this.lengthOfSpliterator = lengthOfSpliterator;
             this.offsetOfSpliterator = offsetOfSpliterator;
             this.expectedModCount = expectedModCount;
@@ -1891,30 +1892,59 @@ public class LinkedList<E>
                 throw new ConcurrentModificationException();
         }
 
+//        @Override
+//        public Spliterator<E> trySplit() {
+//            final long sizeLeft = estimateSize();
+//            if (sizeLeft == 0L) return null;
+//            
+//            long newThisSpliteratorLength = sizeLeft / 2L;
+//            if (newThisSpliteratorLength < MINIMUM_BATCH_SIZE)
+//                return null;
+//            
+//            this.lengthOfSpliterator = newThisSpliteratorLength;
+//            final long nextSpliteratorLength = 
+//                    sizeLeft - newThisSpliteratorLength;
+//            
+//            final long nextSpliteratorOffset = 
+//                    this.offsetOfSpliterator + 
+//                    this.numberOfProcessedElements + 
+//                    newThisSpliteratorLength;
+//            
+//            this.numberOfProcessedElements = 0;
+//            
+//            return new LinkedListSpliterator<>(
+//                    list, 
+//                    nextSpliteratorLength, // length
+//                    nextSpliteratorOffset, // offset
+//                    expectedModCount);
+//        }
+        
         @Override
         public Spliterator<E> trySplit() {
             final long sizeLeft = estimateSize();
-            if (sizeLeft == 0L) return null;
-            
-            long newThisSpliteratorLength = sizeLeft / 2L;
-            if (newThisSpliteratorLength < MINIMUM_BATCH_SIZE)
+            if (sizeLeft == 0) 
                 return null;
             
-            this.lengthOfSpliterator = newThisSpliteratorLength;
-            final long nextSpliteratorLength = 
-                    sizeLeft - newThisSpliteratorLength;
+            final long thisSpliteratorNewLength = sizeLeft / 2L;
             
-            final long nextSpliteratorOffset = 
-                    this.offsetOfSpliterator + 
-                    this.numberOfProcessedElements + 
-                    newThisSpliteratorLength;
+            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE)
+                return null;
             
-            this.numberOfProcessedElements = 0;
+            final long newSpliteratorLength = 
+                    sizeLeft - thisSpliteratorNewLength;
+            
+            final long newSpliteratorOffset = this.offsetOfSpliterator;
+            
+            this.offsetOfSpliterator += newSpliteratorLength;
+            this.lengthOfSpliterator -= newSpliteratorLength;
+            Node<E> newSpliteratorNode = this.node;
+            this.node = list.node((int) this.offsetOfSpliterator);
             
             return new LinkedListSpliterator<>(
-                    list, 
-                    nextSpliteratorLength, // length
-                    nextSpliteratorOffset, // offset
+                    list,
+                    newSpliteratorNode,
+                    newSpliteratorLength, // length
+                    newSpliteratorOffset, // offset
                     expectedModCount);
         }
 
