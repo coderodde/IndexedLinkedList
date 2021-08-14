@@ -686,7 +686,7 @@ public class LinkedListTest {
         }
     }
     
-//    @Test
+    @Test
     public void spliterator2() {
         list.addAll(getIntegerList(6_000));
         Spliterator split = list.spliterator();
@@ -700,29 +700,35 @@ public class LinkedListTest {
         assertEquals(5998, split.getExactSizeIfKnown());
         
         // 5998 elements left / 2 = 2999 per spliterator:
-        Spliterator split2 = split.trySplit();
+        Spliterator leftSpliterator = split.trySplit();
         
-        assertNotNull(split2);
+        assertNotNull(leftSpliterator);
         assertEquals(2999, split.getExactSizeIfKnown());
-        assertEquals(2999, split2.getExactSizeIfKnown());
+        assertEquals(2999, leftSpliterator.getExactSizeIfKnown());
         
-        for (int i = 2; i < 3001; i++) {
+        //// leftSpliterator = [1, 2999]
+        
+        for (int i = 2; i < 3000; i++) {
             Integer integer = list.get(i);
-            assertTrue(split.tryAdvance((j) -> assertEquals(integer, j)));
+            assertTrue(
+                    leftSpliterator.tryAdvance(
+                            (j) -> assertEquals(integer, j)));
+        }
+        
+        //// split = [3001, 5999]
+        
+        assertTrue(split.tryAdvance(i -> assertEquals(2999, i)));
+        assertTrue(split.tryAdvance(i -> assertEquals(3000, i)));
+        assertTrue(split.tryAdvance(i -> assertEquals(3001, i)));
+        
+        while (split.getExactSizeIfKnown() > 0) {
+            split.tryAdvance(i -> {});
         }
         
         assertFalse(split.tryAdvance(i -> {}));
-        
-        for (int i = 3001; i < 6000; i++) {
-            Integer integer = list.get(i);
-            assertTrue(split2.tryAdvance((j) -> 
-                    assertEquals(integer, j)));
-        }
-        
-        assertFalse(split2.tryAdvance(i -> {}));
     }
     
-//    @Test
+    @Test
     public void spliterator3() {
         list.addAll(getIntegerList(10_000));
         Spliterator mainSpliterator = list.spliterator();
@@ -739,21 +745,12 @@ public class LinkedListTest {
                     i -> assertEquals(list.get((int) i), i)));
         }
         
-        class MyConsumer implements Consumer<Integer> {
-            List<Integer> ints = new ArrayList<>(5000);
-
-            @Override
-            public void accept(Integer t) {
-                ints.add(t);
-            }
-        }
-        
-        MyConsumer consumer = new MyConsumer();
+        MyIntegerConsumer consumer = new MyIntegerConsumer();
         spliterator2.forEachRemaining(consumer);
         
-        for (int i = 0; i < 5_000; i++) {
-            Integer integer = consumer.ints.get(i);
-            Integer expectedInteger = Integer.valueOf(i + 5_000);
+        for (int j = 11; j < 5_000; j++) {
+            Integer integer = consumer.ints.get(j);
+            Integer expectedInteger = Integer.valueOf(j);
             assertEquals(expectedInteger, integer);
         }
     }
@@ -775,20 +772,6 @@ public class LinkedListTest {
             Integer integer2 = newList.get(i);
             assertEquals(integer1, integer2);
         }
-    }
-    
-//    @Test
-    public void bruteforceSpliterator2() {
-        list.addAll(getIntegerList(1_000_000));
-        Collections.shuffle(list);
-        
-        List<Integer> otherList = 
-                list.parallelStream().collect(Collectors.toList());
-        
-        list.sort(Integer::compare);
-        otherList.sort(Integer::compare);
-        
-        assertEquals(otherList, list);
     }
     
     private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
@@ -865,37 +848,6 @@ public class LinkedListTest {
             
             list.clear();
         }
-    }
-    
-//    @Test
-    public void forStackOverflow() {
-        list.addAll(getIntegerList(10_000));
-        List<Integer> parallelList =
-                list.stream()
-                    .parallel()
-                    .collect(Collectors.toList());
-        
-        assertEquals(list.size(), parallelList.size());
-        
-        for (int i = 0; i < list.size(); i++) {
-            Integer expectedInteger = list.get(i);
-            Integer actualInteger = parallelList.get(i);
-            
-            if (!expectedInteger.equals(actualInteger)) {
-                System.out.println(
-                        i + " -> " + expectedInteger + " vs. " + actualInteger);
-            }
-            
-            assertEquals(expectedInteger, actualInteger);
-        }
-    }
-    
-//    @Test
-    public void streams() {
-        list.addAll(getIntegerList(10));
-        
-        list.parallelStream().anyMatch(e -> e == 2);
-        list.stream().anyMatch(e -> e == 2);
     }
     
     private static boolean listsEqual(
