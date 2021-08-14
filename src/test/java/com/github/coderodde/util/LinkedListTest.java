@@ -652,34 +652,38 @@ public class LinkedListTest {
     
     @Test
     public void spliterator3() {
-        list.addAll(getIntegerList(10));
+        list.addAll(getIntegerList(10_000));
         Spliterator mainSpliterator = list.spliterator();
+        
+        // mainSpliterator has 9999 elements:
         assertTrue(mainSpliterator.tryAdvance(i -> {}));
         
+        // mainSpliterator has 4999 elements
+        // spliterator2 has 5000 elements
         Spliterator spliterator2 = mainSpliterator.trySplit();
         
-        ////
-        assertTrue(mainSpliterator.tryAdvance(
-                i -> assertEquals(list.get((int) i), i)));
+        for (int j = 1; j < 5000; j++) {
+            assertTrue(mainSpliterator.tryAdvance(
+                    i -> assertEquals(list.get((int) i), i)));
+        }
         
-        assertTrue(mainSpliterator.tryAdvance(
-                i -> assertEquals(list.get((int) i), i)));
+        class MyConsumer implements Consumer<Integer> {
+            List<Integer> ints = new ArrayList<>(5000);
+
+            @Override
+            public void accept(Integer t) {
+                ints.add(t);
+            }
+        }
         
-        assertTrue(mainSpliterator.tryAdvance(
-                i -> assertEquals(list.get((int) i), i)));
+        MyConsumer consumer = new MyConsumer();
+        spliterator2.forEachRemaining(consumer);
         
-        assertTrue(mainSpliterator.tryAdvance(
-                i -> assertEquals(list.get((int) i), i)));
-        ////
-        
-        assertFalse(mainSpliterator.tryAdvance(i -> {}));
-        
-        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
-        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
-        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
-        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
-        assertTrue(spliterator2.tryAdvance(i -> assertEquals(list.get((int) i), i)));
-        assertFalse(spliterator2.tryAdvance(i -> {}));
+        for (int i = 0; i < 5_000; i++) {
+            Integer integer = consumer.ints.get(i);
+            Integer expectedInteger = Integer.valueOf(i + 5_000);
+            assertEquals(expectedInteger, integer);
+        }
     }
     
     @Test
@@ -691,6 +695,9 @@ public class LinkedListTest {
                list.parallelStream()
                    .map(i -> 2 * i)
                    .collect(Collectors.toList());
+        
+        newList.sort(Integer::compare);
+        list.sort(Integer::compare);
        
         for (int i = 0; i < list.size(); i++) {
             Integer integer1 = 2 * list.get(i);
