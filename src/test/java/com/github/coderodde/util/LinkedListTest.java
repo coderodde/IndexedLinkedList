@@ -558,62 +558,6 @@ public class LinkedListTest {
         assertEquals(5, list.lastIndexOf(1));
     }
     
-//    @Test
-//    public void spliterator1() {
-//        list.addAll(getIntegerList(10_000));
-//        
-//        Spliterator<Integer> split1 = list.spliterator();
-//        Spliterator<Integer> split2 = split1.trySplit();
-//        
-//        assertEquals(5_000L, split1.estimateSize());
-//        assertEquals(5_000L, split1.getExactSizeIfKnown());
-//        
-//        assertEquals(5_000L, split2.estimateSize());
-//        assertEquals(5_000L, split2.getExactSizeIfKnown());
-//        
-//        class MyConsumer implements Consumer<Integer> {
-//
-//            @Override
-//            public void accept(Integer t) {
-//                assertEquals((int) t, (int) list.get(t));
-//            }
-//        }
-//        
-//        MyConsumer myConsumer = new MyConsumer();
-//        
-//        for (int i = 0; i < 5_000; i++) {
-//            assertTrue(split1.tryAdvance(myConsumer));
-//        }
-//        
-//        assertFalse(split1.tryAdvance(myConsumer));
-//        
-//        for (int i = 0; i < 5_000; i++) {
-//            assertTrue(split2.tryAdvance(myConsumer));
-//        }
-//        
-//        assertFalse(split2.tryAdvance(myConsumer));
-//        
-//        class MyConsumer2 implements Consumer<Integer> {
-//
-//            List<Integer> result = new ArrayList<>();
-//            
-//            @Override
-//            public void accept(Integer t) {
-//                result.add(t);
-//            }
-//        }
-//        
-//        Spliterator spliterator = list.spliterator().trySplit();
-//        MyConsumer2 myConsumer2 = new MyConsumer2();
-//        spliterator.forEachRemaining(myConsumer2);
-//        
-//        assertEquals(5_000, myConsumer2.result.size());
-//        
-//        for (int i = 5_000; i < 10_000; i++) {
-//            assertEquals(Integer.valueOf(i), myConsumer2.result.get(i - 5_000));
-//        }
-//    }
-    
     class MyIntegerConsumer implements Consumer<Integer> {
 
         List<Integer> ints = new ArrayList<>();
@@ -750,7 +694,7 @@ public class LinkedListTest {
     }
     
     @Test
-    public void spliterator2() {
+    public void spliterator() {
         list.addAll(getIntegerList(6_000));
         Spliterator split = list.spliterator();
         
@@ -790,34 +734,6 @@ public class LinkedListTest {
         
         assertFalse(split.tryAdvance(i -> {}));
     }
-    
-//    @Test
-//    public void splerator3() {
-//        list.addAll(getIntegerList(10_000));
-//        Spliterator mainSpliterator = list.spliterator();
-//        
-//        // mainSpliterator has 9999 elements:
-//        assertTrue(mainSpliterator.tryAdvance(i -> {}));
-//        
-//        // mainSpliterator has 4999 elements
-//        // spliterator2 has 5000 elements
-//        Spliterator spliterator2 = mainSpliterator.trySplit();
-//        
-//        assertEquals(5_000, spliterator2.getExactSizeIfKnown());
-//        assertEquals(4_999, mainSpliterator.getExactSizeIfKnown());
-//        
-//        for (int j = 1; j < 5000; j++) {
-//            assertTrue(mainSpliterator.tryAdvance(
-//                    i -> assertEquals(list.get((int) i), i)));
-//        }
-//        
-//        MyIntegerConsumer consumer = new MyIntegerConsumer();
-//        spliterator2.forEachRemaining(consumer);
-//        
-//        for (int j = 1; j < 5_000; j++) {
-//            assertEquals(Integer.valueOf(j), consumer.ints.get(j));
-//        }
-//    }
     
     @Test
     public void bruteforceSpliterator() {

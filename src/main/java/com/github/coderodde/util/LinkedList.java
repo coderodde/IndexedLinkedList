@@ -169,7 +169,6 @@ public class LinkedList<E>
         else
             insertAll(c, node(index), index);
 
-//        checkInvariant();
         return true;
     }
 
@@ -619,18 +618,6 @@ public class LinkedList<E>
 
         return false;
     }
-    
-    /***************************************************************************
-    Removes the node from this list. Modifies the fingers as needed.
-    ***************************************************************************/
-    private E removeNodeFromList(Node<E> node, int index) {
-        loadRemoveData(index);
-
-        if (removedDataFinger.index == index) 
-            moveFingerOutOfRemovalLocation(removedDataFinger);
-
-        return unlink(node, index);
-    }
 
     /**
      * Removes the element residing at the given index.
@@ -768,7 +755,7 @@ public class LinkedList<E>
     @java.io.Serial
     private static final long serialVersionUID = -8812077630522402934L;
     
-    // Internal methods begin:
+    // Internal implementation methods begin:
 
     /***************************************************************************
     Adds a finger pointing to the input node at the input index.
@@ -1192,7 +1179,7 @@ public class LinkedList<E>
     Returns true only if this list requires more fingers.
     ***************************************************************************/
     private boolean mustAddFinger() {
-        // here, fingerStack.size() == getRecommendedFingerCount(), or,
+        // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
@@ -1202,7 +1189,7 @@ public class LinkedList<E>
     /***************************************************************************
     ***************************************************************************/
     private boolean mustRemoveFinger() {
-        // here, fingerStack.size() == getRecommendedFingerCount(), or,
+        // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() + 1
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
@@ -1264,6 +1251,18 @@ public class LinkedList<E>
     }
     
     /***************************************************************************
+    Removes the node from this list. Modifies the fingers as needed.
+    ***************************************************************************/
+    private E removeNodeFromList(Node<E> node, int index) {
+        loadRemoveData(index);
+
+        if (removedDataFinger.index == index) 
+            moveFingerOutOfRemovalLocation(removedDataFinger);
+
+        return unlink(node, index);
+    }
+    
+    /***************************************************************************
     Sets the input collection as a list.
     ***************************************************************************/
     private void setAll(Collection<? extends E> c) {
@@ -1300,6 +1299,14 @@ public class LinkedList<E>
                 finger.index -= steps; // substract from index
         }
     }
+
+    /***************************************************************************
+    Shifts all the indices at least 'startingIndex' one position towards smaller
+    index values.
+    ***************************************************************************/
+    private void shiftIndicesToLeftOnce(int startingIndex) {
+        shiftIndicesToLeft(startingIndex, 1);
+    }
     
     /***************************************************************************
     For each finger with the index at least 'startIndex', add 'steps' to the
@@ -1311,14 +1318,6 @@ public class LinkedList<E>
             if (finger.index >= startIndex)
                 finger.index += steps;
         }
-    }
-
-    /***************************************************************************
-    Shifts all the indices at least 'startingIndex' one position towards smaller
-    index values.
-    ***************************************************************************/
-    private void shiftIndicesToLeftOnce(int startingIndex) {
-        shiftIndicesToLeft(startingIndex, 1);
     }
 
     /***************************************************************************
@@ -1570,42 +1569,6 @@ public class LinkedList<E>
 
         Finger<E> get(int index) {
             return fingerArray[index];
-        }
-
-        // Rewinds all fingers with index at least 'startingIndex' 'steps'
-        // positions to left or right depending whether 'steps' is negative or
-        // positive:
-        private void rewind(int startingIndex, int steps) {
-            for (int i = 0; i < size; i++) {
-                Finger<E> finger = fingerArray[i];
-                if (finger.index >= startingIndex)
-                    finger.index += steps;
-            }
-        }
-
-        // Rewinds all fingers with index at least 'startingIndex' one position
-        // to the left:
-        void rewindLeft(int startingIndex) {
-            rewind(startingIndex, -1);
-        }
-
-
-        // Rewinds all fingers with index at least 'startingIndex' one position
-        // to the right:
-        void rewindRight(int startingIndex) {
-            rewind(startingIndex, 1);
-        }
-
-        // Rewinds all fingers with index at least 'startingIndex' 'steps'
-        // positions to the left:
-        void rewindLeft(int startingIndex, int steps) {
-            rewind(startingIndex, -steps);
-        }
-
-        // Rewinds all fingers with index at least 'startingIndex' 'steps'
-        // positions to the right:
-        void rewindRight(int startingIndex, int steps) {
-            rewind(startingIndex, steps);
         }
 
         // Clears this finger stack:
@@ -1891,33 +1854,6 @@ public class LinkedList<E>
             if (list.modCount != expectedModCount) 
                 throw new ConcurrentModificationException();
         }
-
-//        @Override
-//        public Spliterator<E> trySplit() {
-//            final long sizeLeft = estimateSize();
-//            if (sizeLeft == 0L) return null;
-//            
-//            long newThisSpliteratorLength = sizeLeft / 2L;
-//            if (newThisSpliteratorLength < MINIMUM_BATCH_SIZE)
-//                return null;
-//            
-//            this.lengthOfSpliterator = newThisSpliteratorLength;
-//            final long nextSpliteratorLength = 
-//                    sizeLeft - newThisSpliteratorLength;
-//            
-//            final long nextSpliteratorOffset = 
-//                    this.offsetOfSpliterator + 
-//                    this.numberOfProcessedElements + 
-//                    newThisSpliteratorLength;
-//            
-//            this.numberOfProcessedElements = 0;
-//            
-//            return new LinkedListSpliterator<>(
-//                    list, 
-//                    nextSpliteratorLength, // length
-//                    nextSpliteratorOffset, // offset
-//                    expectedModCount);
-//        }
         
         @Override
         public Spliterator<E> trySplit() {
@@ -1964,18 +1900,18 @@ public class LinkedList<E>
                    Spliterator.SUBSIZED |
                    Spliterator.SIZED;
         }
-//        
-//        @Override
-//        public boolean hasCharacteristics(int characteristics) {
-//            switch (characteristics) {
-//                case Spliterator.ORDERED:
-//                case Spliterator.SIZED:
-//                case Spliterator.SUBSIZED:
-//                    return true;
-//                    
-//                default:
-//                    return false;
-//            }
-//        }
+        
+        @Override
+        public boolean hasCharacteristics(int characteristics) {
+            switch (characteristics) {
+                case Spliterator.ORDERED:
+                case Spliterator.SIZED:
+                case Spliterator.SUBSIZED:
+                    return true;
+                    
+                default:
+                    return false;
+            }
+        }
     }
 }
