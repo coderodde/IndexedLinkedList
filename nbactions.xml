@@ -52,4 +52,11 @@
                 <exec.appArgs></exec.appArgs>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-Coverage</actionName>
+            <displayName>Coverage</displayName>
+            <goals>
+                <goal>cobertura:cobertura</goal>
+            </goals>
+        </action>
     </actions>

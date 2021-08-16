@@ -33,6 +33,9 @@ final class LinkedListBenchmark {
     
     private com.github.coderodde.util.LinkedList<Integer> roddeList = 
             new com.github.coderodde.util.LinkedList<>();
+    
+//    private com.github.coderodde.util.LinkedListV2<Integer> roddeList2 = 
+//            new com.github.coderodde.util.LinkedListV2<>();
 
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
