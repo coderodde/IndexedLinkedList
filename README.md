@@ -2,7 +2,7 @@
 
 This repository maintains the implementation of a linked list data structure that runs single-element operations in &Theta;(sqrt(n)) time.
 
-The blog post explaining the (simple, high school level) math behind this data structure may be find behind [this link](http://coderodde.github.io/weblog/#eill).
+The blog post explaining the (simple, high school level) math behind this data structure may be found behind [this link](http://coderodde.github.io/weblog/#eill).
 
 Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4 `org.apache.commons.collections4.list.TreeList.java`](https://github.com/apache/commons-collections/blob/master/src/main/java/org/apache/commons/collections4/list/TreeList.java) (which runs all the single-element operations in log(N) time due to the AVL-tree algorithm), while (apart from having ceil(N/2) fingers, each consisting from a reference and an `int` value) having smaller memory footprint: for each node, our list maintains 3 references; each node in the `TreeList` consists of 3 references, 2 `int` values and 2 `boolean` values.
 
