@@ -9,7 +9,7 @@ Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4
 ## Running time comparison
 
 | Operation      | ArrayList | java.util.LinkedList | coderodde LinkedList |
-| -------------------------------------------------------------------------|
+| -------------- | --------- | -------------------- | -------------------- |
 | add(int)       | O(n)      | O(n)                 | O(sqrt(n))           |
 | addFirst       | O(n)      | O(1)                 | O(sqrt(n))           |
 | addLast        | O(1)      | O(1)                 | O(1)                 |
