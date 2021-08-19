@@ -6,6 +6,23 @@ The blog post explaining the (simple, high school level) math behind this data s
 
 Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4 `org.apache.commons.collections4.list.TreeList.java`](https://github.com/apache/commons-collections/blob/master/src/main/java/org/apache/commons/collections4/list/TreeList.java) (which runs all the single-element operations in log(N) time due to the AVL-tree algorithm), while (apart from having ceil(N/2) fingers, each consisting from a reference and an `int` value) having smaller memory footprint: for each node, our list maintains 3 references; each node in the `TreeList` consists of 3 references, 2 `int` values and 2 `boolean` values.
 
+## Running time comparison
+
+|                | ArrayList | java.util.LinkedList | coderodde LinkedList |
+| ---------------------------------------------------
+| add(int)       | O(n)      | O(n)                 |
+| addFirst       | O(n)      | O(1)                 |
+| addLast        | O(1)      | O(1)                 |
+| get            | O(1)      | O(n)                 |
+| remove(int)    | O(n)      | O(n)                 |
+| removeFirst    | O(n)      | O(1)                 |
+| removeLast     | O(1)      | O(1)                 |
+| remove(Object) | O(n)      | O(n)                 |
+| setAll         | O(m)      | O(m)                 |
+| prependAll     | O(m + n)  | O(m)                 |
+| appendAll      | O(m)      | O(m)                 |
+| insertAll      | O(m + n)  | O(m + n)             |
+
 ## Benchmark output
 
 On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB L2 cache and 8 MB L3 cache, the benchmark gives typically the following results:
