@@ -8,20 +8,22 @@ Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4
 
 ## Running time comparison
 
-| Operation      | ArrayList | java.util.LinkedList | coderodde LinkedList |
-| -------------- | --------- | -------------------- | -------------------- |
-| add(int)       | O(n)      | O(n)                 | O(sqrt(n))           |
-| addFirst       | O(n)      | O(1)                 | O(sqrt(n))           |
-| addLast        | O(1)      | O(1)                 | O(1)                 |
-| get            | O(1)      | O(n)                 | O(sqrt(n))           |
-| remove(int)    | O(n)      | O(n)                 | O(sqrt(n))           |
-| removeFirst    | O(n)      | O(1)                 | O(sqrt(n))           |
-| removeLast     | O(1)      | O(1)                 | O(1)                 |
-| remove(Object) | O(n)      | O(n)                 | O(n)                 |
-| setAll         | O(m)      | O(m)                 | O(m)                 |
-| prependAll     | O(m + n)  | O(m)                 | O(m + sqrt(n))       |
-| appendAll      | O(m)      | O(m)                 | O(m)                 |
-| insertAll      | O(m + n)  | O(m + n)             | O(m + sqrt(n))       |
+| Operation        | ArrayList | java.util.LinkedList | coderodde LinkedList |
+| ---------------- | --------- | -------------------- | -------------------- |
+| `add(int)`       | O(n)      | O(n)                 | O(sqrt(n))           |
+| `addFirst`       | O(n)      | O(1)                 | O(sqrt(n))           |
+| `addLast`        | O(1)      | O(1)                 | O(1)                 |
+| `get`            | O(1)      | O(n)                 | O(sqrt(n))           |
+| `remove(int)`    | O(n)      | O(n)                 | O(sqrt(n))           |
+| `removeFirst`    | O(n)      | O(1)                 | O(sqrt(n))           |
+| `removeLast`     | O(1)      | O(1)                 | O(1)                 |
+| `remove(Object)` | O(n)      | O(n)                 | O(n)                 |
+| `setAll`         | O(m)      | O(m)                 | O(m)                 |
+| `prependAll`     | O(m + n)  | O(m)                 | O(m + sqrt(n))       |
+| `appendAll`      | O(m)      | O(m)                 | O(m)                 |
+| `insertAll`      | O(m + n)  | O(m + n)             | O(m + sqrt(n))       |
+
+Above, `n` is the current size of a list, and `m` is the size of a newly added collection.
 
 ## Benchmark output
 
