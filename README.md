@@ -18,12 +18,12 @@ Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4
 | `removeFirst`    | ***O(n)***     | ***O(1)***           | ***O(sqrt(n))***     | ***O(log n)***     |
 | `removeLast`     | ***O(1)***     | ***O(1)***           | ***O(1)***           | ***O(log n)***     |
 | `remove(Object)` | ***O(n)***     | ***O(n)***           | ***O(n)***           | ***O(n)***         |
-| `setAll`         | ***O(m)***     | ***O(m)***           | ***O(m)***           | ***O(n)***         |
+| `setAll`         | ***O(n)***     | ***O(n)***           | ***O(n)***           | ***O(n)***         |
 | `prependAll`     | ***O(m + n)*** | ***O(m)***           | ***O(m + sqrt(n))*** | ***O(m log n)***   |
 | `appendAll`      | ***O(m)***     | ***O(m)***           | ***O(m)***           | ***O(m + log n)*** |
 | `insertAll`      | ***O(m + n)*** | ***O(m + n)***       | ***O(m + sqrt(n))*** | ***O(m log n)***   |
 
-Above, `n` is the current size of a list, and `m` is the size of a newly added collection.
+Above, ***n*** is the current size of a list, and ***m*** is the size of a newly added collection.
 
 ## Benchmark output
 
