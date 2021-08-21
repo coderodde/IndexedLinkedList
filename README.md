@@ -10,7 +10,7 @@ Our `LinkedList` exhibits performance comparable to [Apache Commons Collections4
 
 | Operation        | ArrayList | java.util.LinkedList | coderodde LinkedList | TreeList     |
 | ---------------- | --------- | -------------------- | -------------------- | ------------ |
-| `add(int)`       | O(n)      | O(n)                 | _O(sqrt(n))_           | O(log n)     |
+| `add(int)`       | O(n)      | O(n)                 | ***O(sqrt(n))***         | O(log n)     |
 | `addFirst`       | O(n)      | O(1)                 | _O(sqrt(n))_           | O(log n)     |
 | `addLast`        | O(1)      | O(1)                 | _O(1)_                 | O(log n)     |
 | `get`            | O(1)      | O(n)                 | _O(sqrt(n))_           | O(log n)     |
