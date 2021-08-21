@@ -21,7 +21,7 @@ final class LinkedListBenchmark {
     private static final int REMOVE_OBJECT_OPERATIONS       = 1_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
-    
+
     private static final int MAXIMUM_INTEGER = 1_000;
 
     private final long seed;
@@ -30,7 +30,7 @@ final class LinkedListBenchmark {
     private Random randomJavaUtilArrayList;
     private Random randomRoddeList;
     private Random randomTreeList;
-    
+
     private com.github.coderodde.util.LinkedList<Integer> roddeList = 
             new com.github.coderodde.util.LinkedList<>();
 
@@ -54,7 +54,7 @@ final class LinkedListBenchmark {
     void benchmark() {
         profile(BenchmarkChoice.BENCHMARK);
     }
-    
+
     private static  Integer getRandomInteger(Random random) {
         return random.nextInt(MAXIMUM_INTEGER + 1);
     }
@@ -135,7 +135,7 @@ final class LinkedListBenchmark {
         profileListIteratorRemoval();
         profileStream();
         profileParallelStream();
-        
+
         printTotalDurations();
 
         resetLists();
@@ -231,46 +231,46 @@ final class LinkedListBenchmark {
         profileListIteratorAdditionLinkedList();
         profileListIteratorAdditionArrayList();
         profileListIteratorAdditionTreeList();
-        
+
         listsEqual();
         System.out.println();
     }
-    
+
     private void profileListIteratorRemoval() {
         profileListIteratorRemovalRoddeList();
         profileListIteratorRemovalLinkedList();
         profileListIteratorRemovalArrayList();
         profileListIteratorRemovalTreeList();
-        
+
         listsEqual();
         System.out.println();
     }
-    
+
     private void profileStream() {
         profileStreamRoddeList();
         profileStreamLinkedList();
         profileStreamArrayList();
         profileStreamTreeList();
-        
+
         listsEqual();
         System.out.println();
     }
-    
+
     private void profileParallelStream() {
         profileParallelStreamRoddeList();
         profileParallelStreamLinkedList();
         profileParallelStreamArrayList();
         profileParallelStreamTreeList();
-        
+
         Collections.sort(treeList);
         Collections.sort(roddeList);
         Collections.sort(arrayList);
         Collections.sort(linkedList);
-        
+
         listsEqual();
         System.out.println();
     }
-    
+
     private void printTotalDurations() {
         System.out.println("--- Total time elapsed ---");
         System.out.println(
@@ -452,15 +452,15 @@ final class LinkedListBenchmark {
 
         return durationMillis;
     }
-    
+
     private long profileListIteratorRemoval(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
         Iterator<Integer> iterator = list.iterator();
         int counter = 0;
-        
+
         while (iterator.hasNext()) {
             iterator.next();
-            
+
             // Remove every 2nd element:
             if (counter % 10 == 0) {
                 try {
@@ -470,31 +470,31 @@ final class LinkedListBenchmark {
                     System.exit(1);
                 }
             }
-            
+
             counter++;
         }
-        
+
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
-        
+
         System.out.println(
                 list.getClass().getName() +
                         ".iterator().remove() in (ms): " +
                         durationMillis);
-    
+
         return durationMillis;
     }
-    
+
     private long profileListIteratorAddition(
             List<Integer> list, Random random) {
-        
+
         long startMillis = System.currentTimeMillis();
         ListIterator<Integer> iterator = list.listIterator(1);
         int counter = 0;
-        
+
         while (iterator.hasNext()) {
             iterator.next();
-            
+
             // Remove every 2nd element:
             if (counter % 10 == 0) {
                 try {
@@ -505,58 +505,58 @@ final class LinkedListBenchmark {
                     System.exit(1);
                 }
             }
-            
+
             counter++;
         }
-        
+
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
-        
+
         System.out.println(
                 list.getClass().getName() +
                         ".iterator().add() in (ms): " +
                         durationMillis);
-    
+
         return durationMillis;
     }
-    
+
     private long profileStream(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
-        
+
         List<Integer> newList =
                 list.stream().map(x -> 2 * x).collect(Collectors.toList());
-        
+
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
-        
+
         list.clear();
         list.addAll(newList);
-        
+
         System.out.println(
                 list.getClass().getName() +
                         ".stream() in (ms): " + durationMillis);
-        
+
         return durationMillis;
     }
-    
+
     private long profileParallelStream(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
-        
+
         List<Integer> newList = list.stream()
                         .parallel()
                         .map(x -> 2 * x)
                         .collect(Collectors.toList());
-        
+
         long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
-        
+
         list.clear();
         list.addAll(newList);
-        
+
         System.out.println(
                 list.getClass().getName() +
                         ".stream().parallel() in (ms): " + durationMillis);
-        
+
         return durationMillis;
     }
 
@@ -581,7 +581,7 @@ final class LinkedListBenchmark {
                                 ADD_FIRST_OPERATIONS, 
                                 randomJavaUtilArrayList);
     }
-    
+
     private void profileAddFirstTreeList() {
         totalMillisTreeList += 
                 profileAddFirst(treeList,
@@ -773,75 +773,75 @@ final class LinkedListBenchmark {
                         REMOVE_OBJECT_OPERATIONS, 
                         randomTreeList);
     }
-    
+
     private void profileListIteratorRemovalRoddeList() {
         totalMillisRoddeList += profileListIteratorRemoval(roddeList);
     }
-    
+
     private void profileListIteratorRemovalLinkedList() {
         totalMillisLinkedList += profileListIteratorRemoval(linkedList);
     }
-    
+
     private void profileListIteratorRemovalArrayList() {
         totalMillisArrayList += profileListIteratorRemoval(arrayList);
     }
-    
+
     private void profileListIteratorRemovalTreeList() {
         totalMillisTreeList += profileListIteratorRemoval(treeList);
     }
-    
+
     private void profileListIteratorAdditionRoddeList() {
         totalMillisRoddeList += 
                 profileListIteratorAddition(roddeList, randomRoddeList);
     }
-    
+
     private void profileListIteratorAdditionLinkedList() {
         totalMillisLinkedList +=
                 profileListIteratorAddition(
                         linkedList, 
                         randomJavaUtilLinkedList);
     }
-    
+
     private void profileListIteratorAdditionArrayList() {
         totalMillisArrayList += 
                 profileListIteratorAddition(
                         arrayList, 
                         randomJavaUtilArrayList);
     }
-    
+
     private void profileListIteratorAdditionTreeList() {
         totalMillisTreeList += 
                 profileListIteratorAddition(treeList, randomTreeList);
     }
-    
+
     private void profileStreamRoddeList() {
         totalMillisRoddeList += profileStream(roddeList);
     }
-    
+
     private void profileStreamLinkedList() {
         totalMillisLinkedList += profileStream(linkedList);
     }
-    
+
     private void profileStreamArrayList() {
         totalMillisArrayList += profileStream(arrayList);
     }
-    
+
     private void profileStreamTreeList() {
         totalMillisTreeList += profileStream(treeList);
     }
-    
+
     private void profileParallelStreamRoddeList() {
         totalMillisRoddeList += profileParallelStream(roddeList);
     }
-    
+
     private void profileParallelStreamLinkedList() {
         totalMillisLinkedList += profileParallelStream(linkedList);
     }
-    
+
     private void profileParallelStreamArrayList() {
         totalMillisArrayList += profileParallelStream(arrayList);
     }
-    
+
     private void profileParallelStreamTreeList() {
         totalMillisTreeList += profileParallelStream(treeList);
     }
