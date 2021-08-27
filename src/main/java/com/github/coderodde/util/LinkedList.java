@@ -559,7 +559,7 @@ public class LinkedList<E>
     @Override
     public E poll() {
         final Node<E> f = first;
-        return (f == null) ? null : unlinkFirst();
+        return (f == null) ? null : removeFirst();
     }
 
     /**
@@ -573,7 +573,7 @@ public class LinkedList<E>
     @Override
     public E pollFirst() {
         final Node<E> f = first;
-        return (f == null) ? null : unlinkFirst();
+        return (f == null) ? null : removeFirst();
     }
 
     /**
@@ -701,10 +701,23 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      */
     public E removeFirst() {
-        final Node<E> f = first;
-        if (f == null)
-            throw new NoSuchElementException();
-        return unlinkFirst();
+        checkElementIndex(0);
+        
+        Finger<E> finger = getClosestFingerAndRewind(0);
+        Node<E> nodeToRemove = finger.node;
+        E returnValue = nodeToRemove.item;
+        
+        moveFingerOutOfRemovalLocation(finger);
+        unlinkFirst();
+        decreaseSize();
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+            fixFingersAfterRemoval(size);
+        }
+        
+        shiftIndicesToLeftOnce(0);
+        return returnValue;
     }
 
     /**
@@ -1426,10 +1439,7 @@ public class LinkedList<E>
     /***************************************************************************
     Unlinks the head node from this list.
     ***************************************************************************/
-    private E unlinkFirst() {
-        shiftIndicesToLeftOnce(1);
-
-        final E element = first.item;
+    private void unlinkFirst() {
         final Node<E> next = first.next;
         first.item = null;
         first.next = null; // help GC
@@ -1439,16 +1449,6 @@ public class LinkedList<E>
             last = null;
         else
             next.prev = null;
-
-        size--;
-        modCount++;
-
-        if (mustRemoveFinger()) {
-            removeFinger();
-            fixFingersAfterRemoval(0);
-        }
-
-        return element;
     }
 
     /***************************************************************************

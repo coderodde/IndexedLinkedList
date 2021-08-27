@@ -18,10 +18,11 @@ final class LinkedListBenchmark {
     private static final int ADD_AT_OPERATIONS              = 10_000;
     private static final int ADD_COLLECTION_AT_OPERATIONS   = 4_000;
     private static final int ADD_LAST_COLLECTION_OPERATIONS = 10_000;
-    private static final int REMOVE_VIA_INDEX_OPERATIONS    = 10_000;
+    private static final int REMOVE_VIA_INDEX_OPERATIONS    = 10;
     private static final int REMOVE_OBJECT_OPERATIONS       = 1_000;
     private static final int GET_OPERATIONS                 = 2_000;
     private static final int REMOVE_FIRST_OPERATIONS        = 2_000;
+    private static final int REMOVE_LAST_OPERATIONS         = 10_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 

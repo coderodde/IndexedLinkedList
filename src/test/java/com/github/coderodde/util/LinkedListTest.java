@@ -840,13 +840,53 @@ public class LinkedListTest {
         
         list.remove(Integer.valueOf(3));
         list.remove(1);
-//        list.add(0);
-//        list.add(1);
-//        list.add(2);
-//        list.removeLast();
-//        assertEquals(list.size(), 2);
-//        assertEquals(Integer.valueOf(0), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(list.size(), 2);
+        assertEquals(Integer.valueOf(0), list.get(0));
+        assertEquals(Integer.valueOf(2), list.get(1));
+    }
+    
+    @Test
+    public void bruteForceRemoveAt() {
+        long seed = System.currentTimeMillis();
+        System.out.println("--- bruteForceRemoveAt, seed = " + seed);
+        Random random = new Random(seed);
+        
+        list.addAll(getIntegerList(100));
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        Integer probe = Integer.valueOf(13);
+        
+        list.remove(probe);
+        referenceList.remove(probe);
+        
+        while (!list.isEmpty()) {
+            int index = random.nextInt(list.size());
+            list.remove(index);
+            referenceList.remove(index);
+            
+            listsEqual(list, referenceList);
+        } 
+    }
+    
+    // Should not throw anything:
+    @Test
+    public void bugRemoveFirst() {
+        list.addAll(getIntegerList(5));
+        
+        assertEquals(5, list.size());
+        
+        for (int i = 0; i < 2; i++) {
+            list.removeFirst();
+        }
+        
+        long seed = 1630064666251L; // System.currentTimeMillis();
+        System.out.println("--- bugRemoveFirst: seed = " + seed + " ---");
+        Random random = new Random(seed);
+        
+        while (!list.isEmpty()) {
+            int index = random.nextInt(list.size());
+            list.remove(index);
+        }
     }
 
     private static boolean listsEqual(
