@@ -854,12 +854,17 @@ public class LinkedListTest {
         list.addAll(getIntegerList(100));
         List<Integer> referenceList = new ArrayList<>(list);
         
-        Integer probe = Integer.valueOf(13);
+        Integer probe = Integer.valueOf(3);
         
         list.remove(probe);
         referenceList.remove(probe);
         
+        int iters = 0;
+        
         while (!list.isEmpty()) {
+            System.out.println("iters = " + iters);
+            iters++;
+            
             int index = random.nextInt(list.size());
             list.remove(index);
             referenceList.remove(index);
@@ -879,13 +884,40 @@ public class LinkedListTest {
             list.removeFirst();
         }
         
-        long seed = 1630064666251L; // System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         System.out.println("--- bugRemoveFirst: seed = " + seed + " ---");
         Random random = new Random(seed);
+        List<Integer> referenceList = new ArrayList<>(list);
         
         while (!list.isEmpty()) {
             int index = random.nextInt(list.size());
             list.remove(index);
+            referenceList.remove(index);
+            assertTrue(listsEqual(list, referenceList));
+        }
+    }
+    
+    // Should not throw anything:
+    @Test
+    public void bugRemoveLast() {
+        list.addAll(getIntegerList(10));
+        
+        assertEquals(10, list.size());
+        
+        for (int i = 0; i < 5; i++) {
+            list.removeLast();
+        }
+        
+        long seed = System.currentTimeMillis();
+        System.out.println("--- bugRemoveLast: seed = " + seed + " ---");
+        Random random = new Random(seed);
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        while (!list.isEmpty()) {
+            int index = random.nextInt(list.size());
+            list.remove(index);
+            referenceList.remove(index);
+            assertTrue(listsEqual(list, referenceList));
         }
     }
 

@@ -587,7 +587,7 @@ public class LinkedList<E>
     @Override
     public E pollLast() {
         final Node<E> l = last;
-        return (l == null) ? null : unlinkLast();
+        return (l == null) ? null : removeLast();
     }
 
     /**
@@ -701,23 +701,24 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      */
     public E removeFirst() {
-        checkElementIndex(0);
-        
-        Finger<E> finger = getClosestFingerAndRewind(0);
-        Node<E> nodeToRemove = finger.node;
-        E returnValue = nodeToRemove.item;
-        
-        moveFingerOutOfRemovalLocation(finger);
-        unlinkFirst();
-        decreaseSize();
-        
-        if (mustRemoveFinger()) {
-            removeFinger();
-            fixFingersAfterRemoval(size);
-        }
-        
-        shiftIndicesToLeftOnce(0);
-        return returnValue;
+        return remove(0);
+//        checkElementIndex(0);
+//        
+//        Finger<E> finger = getClosestFingerAndRewind(0);
+//        Node<E> nodeToRemove = finger.node;
+//        E returnValue = nodeToRemove.item;
+//        
+//        moveFingerOutOfRemovalLocation(finger);
+//        unlinkFirst();
+//        decreaseSize();
+//        
+//        if (mustRemoveFinger()) {
+//            removeFinger();
+//            fixFingersAfterRemoval(0);
+//        }
+//        
+//        shiftIndicesToLeftOnce(0);
+//        return returnValue;
     }
 
     /**
@@ -741,10 +742,23 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      */
     public E removeLast() {
-        final Node<E> l = last;
-        if (l == null)
-            throw new NoSuchElementException();
-        return unlinkLast();
+        return remove(size - 1);
+//        checkElementIndex(size - 1);
+//        
+//        Finger<E> finger = getClosestFingerAndRewind(size - 1);
+//        Node<E> nodeToRemove = finger.node;
+//        E returnValue = nodeToRemove.item;
+//        
+//        moveFingerOutOfRemovalLocation(finger);
+//        unlinkLast();
+//        decreaseSize();
+//        
+//        if (mustRemoveFinger()) {
+//            removeFinger();
+//            fixFingersAfterRemoval(size - 1);
+//        }
+//        
+//        return returnValue;
     }
 
     /**
@@ -1003,6 +1017,19 @@ public class LinkedList<E>
                                 finger.index + "), expected node = " +
                                 finger.node + ", actual node = " + node);
         }
+    }
+    
+    boolean fingersSortedByIndex() {
+        for (int i = 0, sz = fingerStack.size() - 1; i < sz; i++) {
+            Finger<E> finger1 = fingerStack.get(i);
+            Finger<E> finger2 = fingerStack.get(i + 1);
+            
+            if (finger1.index > finger2.index) {
+                return false;
+            }
+        }
+        
+        return true;
     }
  
    /***************************************************************************
@@ -1454,8 +1481,7 @@ public class LinkedList<E>
     /***************************************************************************
     Unlinks the tail node from this list.
     ***************************************************************************/
-    private E unlinkLast() {
-        final E element = last.item;
+    private void unlinkLast() {
         final Node<E> prev = last.prev;
         last.item = null;
         last.prev = null; // help GC
@@ -1465,16 +1491,6 @@ public class LinkedList<E>
             first = null;
         else
             prev.next = null;
-
-        size--;
-        modCount++;
-
-        if (mustRemoveFinger()) {
-            removeFinger();
-            fixFingersAfterRemoval(size);
-        }
-
-        return element;
     }
     
     // Used in the removal operations:
