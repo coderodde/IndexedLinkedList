@@ -683,7 +683,6 @@ public class LinkedList<E>
         
         moveFingerOutOfRemovalLocation(finger);
         unlink(nodeToRemove);
-        shiftIndicesToLeftOnce(index + 1);
         decreaseSize();
         
         if (mustRemoveFinger()) {
@@ -691,15 +690,8 @@ public class LinkedList<E>
             fixFingersAfterRemoval(index);
         }
         
+        shiftIndicesToLeftOnce(index + 1);
         return returnValue;
-        
-//        if (mustRemoveFinger()) {
-//            removeFinger();
-//            fixFingersAfterRemoval(index);
-//        }
-//
-//        // Once here, the list is not empty and has at least one finger!
-//        return returnValue;
     }
 
     /**
@@ -1702,13 +1694,7 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
-            //checkInvariant();
             LinkedList.this.remove(removalIndex);
-            
-            if (removedDataFinger.index == removalIndex)
-                moveFingerOutOfRemovalLocation(removedDataFinger);
-            
-            unlink(lastReturned);
             
             if (next == lastReturned)
                 next = lastNext;
@@ -1803,12 +1789,7 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
-//            loadRemoveData(removalIndex);
-            
-            if (removedDataFinger.index == removalIndex)
-                moveFingerOutOfRemovalLocation(removedDataFinger);
-            
-            unlink(lastReturned);
+            LinkedList.this.remove(removalIndex);
             
             if (next == lastReturned)
                 next = lastNext;

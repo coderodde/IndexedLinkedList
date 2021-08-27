@@ -351,7 +351,7 @@ public class LinkedListTest {
     }
 
     @Test
-    public void findFailingIterat() {
+    public void findFailingIterator() {
         list.addAll(getIntegerList(345_850));
         Iterator<Integer> iterator = list.iterator();
         int counter = 0;
@@ -372,7 +372,7 @@ public class LinkedListTest {
     public void bruteForceIteratorRemove() throws Exception {
         list.addAll(getIntegerList(1000));
 
-        int counter = 0;
+        int counter = 1;
         List<Integer> arrayList = new ArrayList<>(list);
         Iterator<Integer> iter = list.iterator();
         Iterator<Integer> arrayListIter = arrayList.iterator();
@@ -385,7 +385,6 @@ public class LinkedListTest {
             if (counter % 10 == 0) {
 
                 try {
-                    System.out.println(totalIterations);
                     iter.remove();
                 } catch (IllegalStateException ex) {
                     throw new Exception(ex);
