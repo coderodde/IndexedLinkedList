@@ -221,6 +221,8 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(2), list.remove(2));
         assertEquals(Integer.valueOf(0), list.remove(0));
         assertEquals(Integer.valueOf(4), list.remove(2));
+        assertEquals(Integer.valueOf(3), list.remove(1));
+        assertEquals(Integer.valueOf(1), list.remove(0));
     }
 
     @Test
@@ -383,6 +385,7 @@ public class LinkedListTest {
             if (counter % 10 == 0) {
 
                 try {
+                    System.out.println(totalIterations);
                     iter.remove();
                 } catch (IllegalStateException ex) {
                     throw new Exception(ex);
@@ -828,6 +831,23 @@ public class LinkedListTest {
 
             list.clear();
         }
+    }
+    
+    @Test
+    public void bugCheckInvariantAfterRemoval() {
+        for (int i = 0; i < 4; i++) {
+            list.add(i);
+        }
+        
+        list.remove(Integer.valueOf(3));
+        list.remove(1);
+//        list.add(0);
+//        list.add(1);
+//        list.add(2);
+//        list.removeLast();
+//        assertEquals(list.size(), 2);
+//        assertEquals(Integer.valueOf(0), list.get(0));
+//        assertEquals(Integer.valueOf(1), list.get(1));
     }
 
     private static boolean listsEqual(

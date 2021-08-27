@@ -48,23 +48,6 @@ import java.util.function.Consumer;
  * 
  * The running time table is as follows:
  * 
- * <table>
- *      <tr><th>Operatoon</th> <th>ArrayList</th> <th>java.util.LinkedList</th> <th>collections4 LInkedList</th> <th>TreeList</th></tr>
- *      
- *      <tr><td><code> add(int)       </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> addFirst       </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> addLast        </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(1)           </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> get(int)       </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n)()    </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> remove(int)    </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> remeoveFirst   </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> removeLast     </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(1)           </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
- *      <tr><td><code> remove(Object) </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(n)           </b></i></td> <td><i><b> O(n)         </b></i></td></tr>
- *      <tr><td><code> setAll         </code></td> <td><i><b> O(m)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(n)           </b></i></td> <td><i><b> O(n)         </b></i></td></tr>
- *      <tr><td><code> prependAll     </code></td> <td><i><b> O(m + n)  </b></i>/</td> <td><i><b> O(m)     </b></i></td> <td><i><b> O(m + sqrt(n)) </b></i></td> <td><i><b> O(m log n)   </b></i></td></tr>
- *      <tr><td><code> appendAll      </code></td> <td><i><b> O(m)      </b></i>/</td> <td><i><b> O(m)     </b></i></td> <td><i><b> O(m)           </b></i></td> <td><i><b> O(m + log n) </b></i></td></tr>
- *      <tr><td><code> insertAll      </code></td> <td><i><b> O(m + n)  </b></i>/</td> <td><i><b> O(m + n) </b></i></td> <td><i><b> O(m + sqrt(n)) </b></i></td> <td><i><b> O(m log n)   </b></i></td></tr>
- * </table>
- * 
  * <p>All of the operations perform as could be expected for a doubly-linked
  * list.  Operations that index into the list will traverse the list from
  * the beginning or the end, whichever is closer to the specified index.
@@ -668,14 +651,14 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
-                    removeNodeFromList(x, index);
+                    remove(index);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
-                    removeNodeFromList(x, index);
+                    remove(index);
                     return true;
                 }
             }
@@ -693,16 +676,30 @@ public class LinkedList<E>
     */
     public E remove(int index) {
         checkElementIndex(index);
-
-        // Loads the removeData!
-        loadRemoveData(index);
-
-        // Make sure that no finger is on our way pointing to the node to remove
-        if (removedDataFinger.index == index)
-            moveFingerOutOfRemovalLocation(removedDataFinger);
-
-        // Once here, the list is not empty and has at least one finger!
-        return unlink(removedDataNode, index);
+        
+        Finger<E> finger = getClosestFingerAndRewind(index);
+        Node<E> nodeToRemove = finger.node;
+        E returnValue = nodeToRemove.item;
+        
+        moveFingerOutOfRemovalLocation(finger);
+        unlink(nodeToRemove);
+        shiftIndicesToLeftOnce(index + 1);
+        decreaseSize();
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+            fixFingersAfterRemoval(index);
+        }
+        
+        return returnValue;
+        
+//        if (mustRemoveFinger()) {
+//            removeFinger();
+//            fixFingersAfterRemoval(index);
+//        }
+//
+//        // Once here, the list is not empty and has at least one finger!
+//        return returnValue;
     }
 
     /**
@@ -761,7 +758,7 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (x.item == null) {
-                    unlink(x, index);
+                    unlink(x);
 
                     if (mustRemoveFinger())
                         removeFinger();
@@ -773,7 +770,7 @@ public class LinkedList<E>
         } else {
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (o.equals(x.item)) {
-                    unlink(x, index);
+                    unlink(x);
 
                     if (mustRemoveFinger())
                         removeFinger();
@@ -1002,8 +999,8 @@ public class LinkedList<E>
                                 finger.node + ", actual node = " + node);
         }
     }
-
-    /***************************************************************************
+ 
+   /***************************************************************************
     Checks that the input index is a valid position index for add operation or
     iterator position.
     ***************************************************************************/
@@ -1192,24 +1189,24 @@ public class LinkedList<E>
     /***************************************************************************
     Loads the removal operation related data.
     ***************************************************************************/
-    private void loadRemoveData(int index) {
+    private Finger<E> getClosestFingerAndRewind(int index) {
         Finger<E> finger = getClosestFinger(index);
-        Node<E> node = finger.node;
 
         if (index < finger.index) {
             final int distance = finger.index - index;
-
+            finger.index -= distance;
+            
             for (int i = 0; i < distance; i++)
-                node = node.prev;
+                finger.node = finger.node.prev;
         } else {
             final int distance = index - finger.index;
-
+            finger.index += distance;
+            
             for (int i = 0; i < distance; i++)
-                node = node.next;
+                finger.node = finger.node.next;
         }
 
-        removedDataFinger = finger;
-        removedDataNode = node;
+        return finger;
     }
 
     /***************************************************************************
@@ -1218,10 +1215,8 @@ public class LinkedList<E>
     nodes.
     ***************************************************************************/
     private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
-        if (size == 1) {
-            fingerStack.pop();
+        if (size() < 2) 
             return;
-        }
 
         if (finger.node.prev != null) {
             // Move the finger one position to the left:
@@ -1315,17 +1310,17 @@ public class LinkedList<E>
         fingerStack.pop();
     }
     
-    /***************************************************************************
-    Removes the node from this list. Modifies the fingers as needed.
-    ***************************************************************************/
-    private E removeNodeFromList(Node<E> node, int index) {
-        loadRemoveData(index);
-
-        if (removedDataFinger.index == index) 
-            moveFingerOutOfRemovalLocation(removedDataFinger);
-
-        return unlink(node, index);
-    }
+//    /***************************************************************************
+//    Removes the node from this list. Modifies the fingers as needed.
+//    ***************************************************************************/
+//    private E removeNodeFromList(Node<E> node, int index) {
+//        loadRemoveData(index);
+//
+//        if (removedDataFinger.index == index) 
+//            moveFingerOutOfRemovalLocation(removedDataFinger);
+//
+//        return unlink(node, index);
+//    }
     
     /***************************************************************************
     Sets the input collection as a list.
@@ -1396,8 +1391,7 @@ public class LinkedList<E>
     /***************************************************************************
     Unlinks the input node and adjusts the fingers.
     ***************************************************************************/
-    private E unlink(Node<E> x, int index) {
-        final E element = x.item;
+    private void unlink(Node<E> x) {
         final Node<E> next = x.next;
         final Node<E> prev = x.prev;
 
@@ -1414,16 +1408,27 @@ public class LinkedList<E>
             next.prev = prev;
             x.next = null;
         }
-
-        x.item = null;
+    }
+    
+    private void decreaseSize() {
         size--;
         modCount++;
-
-        if (mustRemoveFinger())
-            removeFinger();
-
-        shiftIndicesToLeftOnce(index + 1);
-        return element;
+    }
+    
+    private void fixFingersAfterRemoval(int index) {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.index == index) {
+                if (finger.index > 0) {
+                    finger.index--;
+                    finger.node = finger.node.prev;
+                } else {
+                    finger.index++;
+                    finger.node = finger.node.next;
+                }
+            }
+        }
     }
 
     /***************************************************************************
@@ -1446,8 +1451,10 @@ public class LinkedList<E>
         size--;
         modCount++;
 
-        if (mustRemoveFinger())
-            fingerStack.pop();
+        if (mustRemoveFinger()) {
+            removeFinger();
+            fixFingersAfterRemoval(0);
+        }
 
         return element;
     }
@@ -1470,14 +1477,15 @@ public class LinkedList<E>
         size--;
         modCount++;
 
-        if (mustRemoveFinger())
-            fingerStack.pop();
+        if (mustRemoveFinger()) {
+            removeFinger();
+            fixFingersAfterRemoval(size);
+        }
 
         return element;
     }
     
-    // Caches the removal data:
-    private transient Node<E> removedDataNode;
+    // Used in the removal operations:
     private transient Finger<E> removedDataFinger;
     
     /**
@@ -1625,7 +1633,9 @@ public class LinkedList<E>
         }
 
         void pop() {
-            fingerArray[--size] = null;
+            Finger<E> finger = fingerArray[--size];
+            fingerArray[size] = null;
+            finger.node = null;
         }
 
         int size() {
@@ -1693,12 +1703,12 @@ public class LinkedList<E>
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
             //checkInvariant();
-            loadRemoveData(removalIndex);
+            LinkedList.this.remove(removalIndex);
             
             if (removedDataFinger.index == removalIndex)
                 moveFingerOutOfRemovalLocation(removedDataFinger);
             
-            unlink(lastReturned, removalIndex);
+            unlink(lastReturned);
             
             if (next == lastReturned)
                 next = lastNext;
@@ -1793,12 +1803,12 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
-            loadRemoveData(removalIndex);
+//            loadRemoveData(removalIndex);
             
             if (removedDataFinger.index == removalIndex)
                 moveFingerOutOfRemovalLocation(removedDataFinger);
             
-            unlink(lastReturned, removalIndex);
+            unlink(lastReturned);
             
             if (next == lastReturned)
                 next = lastNext;

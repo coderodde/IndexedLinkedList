@@ -1,0 +1,37 @@
+
+ * <table>
+ *      <tr><th>Operation</th> <th>ArrayList</th> <th>java.util.LinkedList</th> <th>collections4 LInkedList</th> <th>TreeList</th></tr>
+ *      
+ *      <tr><td><code> add(int)       </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> addFirst       </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> addLast        </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(1)           </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> get(int)       </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n)()    </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> remove(int)    </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> remeoveFirst   </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(sqrt(n))     </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> removeLast     </code></td> <td><i><b> O(1)      </b></i>/</td> <td><i><b> O(1)     </b></i></td> <td><i><b> O(1)           </b></i></td> <td><i><b> O(log n)     </b></i></td></tr>
+ *      <tr><td><code> remove(Object) </code></td> <td><i><b> O(n)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(n)           </b></i></td> <td><i><b> O(n)         </b></i></td></tr>
+ *      <tr><td><code> setAll         </code></td> <td><i><b> O(m)      </b></i>/</td> <td><i><b> O(n)     </b></i></td> <td><i><b> O(n)           </b></i></td> <td><i><b> O(n)         </b></i></td></tr>
+ *      <tr><td><code> prependAll     </code></td> <td><i><b> O(m + n)  </b></i>/</td> <td><i><b> O(m)     </b></i></td> <td><i><b> O(m + sqrt(n)) </b></i></td> <td><i><b> O(m log n)   </b></i></td></tr>
+ *      <tr><td><code> appendAll      </code></td> <td><i><b> O(m)      </b></i>/</td> <td><i><b> O(m)     </b></i></td> <td><i><b> O(m)           </b></i></td> <td><i><b> O(m + log n) </b></i></td></tr>
+ *      <tr><td><code> insertAll      </code></td> <td><i><b> O(m + n)  </b></i>/</td> <td><i><b> O(m + n) </b></i></td> <td><i><b> O(m + sqrt(n)) </b></i></td> <td><i><b> O(m log n)   </b></i></td></tr>
+ * </table>
+ * 
+ * The performance figures might resemble the following:
+ * 
+ * <table>
+ *      <tr><th>Operation</th> <th>ArrayList</th> <th>java.util.LinkedList</th> <th>collections4 LInkedList</th> <th>TreeList</th></tr>
+ *      
+ *      <tr><td><code> addFirst       </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> addLast        </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> add(int)       </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> appendAll      </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> insertAll      </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> get(int)       </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> remove(int)    </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> remove(Object) </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> remeoveFirst   </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> removeLast     </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> setAll         </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ *      <tr><td><code> prependAll     </code></td> <td><i><b>  </b></i>/</td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td> <td><i><b>  </b></i></td></tr>
+ * </table>
+ * 
