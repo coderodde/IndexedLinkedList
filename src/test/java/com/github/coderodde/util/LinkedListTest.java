@@ -896,12 +896,23 @@ public class LinkedListTest {
     public void bugRemoveAt() {
         list.addAll(getIntegerList(10));
         
+        list.checkInvariant();
         assertEquals(Integer.valueOf(5), list.remove(5));
+        
+        list.checkInvariant();
         assertEquals(Integer.valueOf(3), list.remove(3));
+        
+        list.checkInvariant();
         assertEquals(Integer.valueOf(2), list.remove(2));
+        
+        list.checkInvariant();
         assertEquals(Integer.valueOf(1), list.remove(1));
+        
+        list.checkInvariant();
         // list = [0, 4, 5, 7, 8, 8]
         assertEquals(Integer.valueOf(8), list.remove(4));
+        
+        list.checkInvariant();
     }
     
     // Should not throw anything:

@@ -1009,6 +1009,20 @@ public class LinkedList<E>
     public void checkInvariant() {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.node.prev == null && finger.node.next == null) {
+                throw new AssertionError("checkInvariant() failed at finger " +
+                        finger + ": null siblings");
+            }
+            
+            int onLeftNodes = countLeft(finger);
+            int onRightNodes = countRight(finger);
+            
+            if (onLeftNodes + 1 + onRightNodes != this.size) {
+                throw new AssertionError("checkInvariant() failed at finger (" +
+                        finger + ".");
+            }
+            
             Node<E> node = getNodeRaw(finger.index);
 
             if (finger.node != node)
@@ -1017,6 +1031,30 @@ public class LinkedList<E>
                                 finger.index + "), expected node = " +
                                 finger.node + ", actual node = " + node);
         }
+    }
+    
+    private int countLeft(Finger<E> finger) {
+        Node<E> node = finger.node.prev;
+        int count = 0;
+        
+        while (node != null) {
+            node = node.prev;
+            count++;
+        }
+        
+        return count;
+    }
+    
+    private int countRight(Finger<E> finger) {
+        Node<E> node = finger.node.next;
+        int count = 0;
+        
+        while (node != null) {
+            node = node.next;
+            count++;
+        }
+        
+        return count;
     }
     
     boolean fingersSortedByIndex() {
