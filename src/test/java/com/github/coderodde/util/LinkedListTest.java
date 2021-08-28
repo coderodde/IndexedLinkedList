@@ -846,12 +846,12 @@ public class LinkedListTest {
     }
     
     @Test
-    public void bruteForceRemoveAt() {
-        long seed = System.currentTimeMillis();
+    public void bruteForceRemoveAt1() {
+        long seed = 1630132561853L; //System.currentTimeMillis();
         System.out.println("--- bruteForceRemoveAt, seed = " + seed);
         Random random = new Random(seed);
         
-        list.addAll(getIntegerList(100));
+        list.addAll(getIntegerList(1000));
         List<Integer> referenceList = new ArrayList<>(list);
         
         Integer probe = Integer.valueOf(3);
@@ -871,6 +871,37 @@ public class LinkedListTest {
             
             listsEqual(list, referenceList);
         } 
+    }
+    
+    @Test
+    public void bruteForceRemoveAt2() {
+        long seed = 1630133801156L; // System.currentTimeMillis();
+        System.out.println("--- bruteForceRemoveAt2: seed = " + seed);
+        Random random = new Random(seed);
+        int iters = 0;
+        
+        while (true) {
+            list.addAll(getIntegerList(10));
+            System.out.println("common: " + iters++);
+            
+            while (!list.isEmpty()) {
+                int index = random.nextInt(list.size());
+                System.out.println("random index = " + index);
+                list.remove(index);
+            }
+        }
+    }
+    
+    @Test
+    public void bugRemoveAt() {
+        list.addAll(getIntegerList(10));
+        
+        assertEquals(Integer.valueOf(5), list.remove(5));
+        assertEquals(Integer.valueOf(3), list.remove(3));
+        assertEquals(Integer.valueOf(2), list.remove(2));
+        assertEquals(Integer.valueOf(1), list.remove(1));
+        // list = [0, 4, 5, 7, 8, 8]
+        assertEquals(Integer.valueOf(8), list.remove(4));
     }
     
     // Should not throw anything:
