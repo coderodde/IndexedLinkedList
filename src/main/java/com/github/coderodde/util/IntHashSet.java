@@ -27,6 +27,8 @@ class IntHashSet {
     }
     
     void add(int integer) {
+        size++;
+        
         if (shouldExpand())
             expand();
         
@@ -55,6 +57,8 @@ class IntHashSet {
     }
     
     void remove(int integer) {
+        size--;
+        
         if (shouldContract()) 
             contract();
         
@@ -81,6 +85,12 @@ class IntHashSet {
             previous = current;
             current = next;
         }
+    }
+    
+    public void clear() {
+         size = 0;
+         table = new IntHashTableCollisionChainNode[INITIAL_CAPACITY];
+         mask = table.length - 1;
     }
     
     private IntHashTableCollisionChainNode[] table = 
