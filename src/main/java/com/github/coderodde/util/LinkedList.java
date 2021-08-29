@@ -1290,38 +1290,35 @@ public class LinkedList<E>
         if (size < 2) 
             return;
         
-        if (!fingerStack.fingerSet.contains(finger))
-            return;
+        int leftProbeIndex = finger.index - 1;
+        int rightProbeIndex = finger.index + 1;
         
-        for (int i = 0, sz = this.fingerStack.size; i < sz; i++) {
-            Finger<E> probeFinger = this.fingerStack.get(i);
-//            Finger<E> probeFingerRightSibling =
+        Node<E> leftProbeNode = finger.node.prev;
+        Node<E> rightProbeNode = finger.node.next;
+        
+        while (true) {
+            if (leftProbeNode != null && 
+                    fingerStack.containsIndex(leftProbeIndex)) {
+                
+                finger.index = leftProbeIndex;
+                finger.node = leftProbeNode;
+                return;
+            }
             
+            leftProbeIndex--;
+            leftProbeNode = leftProbeNode.prev;
             
-//            if (!fingerStack.fingerSet.contains(probeFinger)) {
-//                finger.
-//                return;
-//            }
-//            if (otherFinger.node.next != null) {
-//                
-//            }
-//            
-//            if (otherFinger.node.prev )
+            if (rightProbeNode != null 
+                    && fingerStack.containsIndex(rightProbeIndex)) {
+                
+                finger.index = rightProbeIndex;
+                finger.node = rightProbeNode;
+                return;
+            }
+            
+            rightProbeIndex++;
+            rightProbeNode = rightProbeNode.next;
         }
-        
-//        final Node<E> startNode = finger.node;
-//        final int numberOfLeftSiblings = finger.index;
-//        final int numberOfRightSiblings = size - finger.index - 1;
-//        
-//        int leftSiblings = 1;
-//        int rightSiblings = 1;
-//        
-//        while (leftSiblings < numberOfLeftSiblings 
-//                && rightSiblings < numberOfRightSiblings) {
-//            
-//        }
-
-        throw new IllegalStateException("Removing from an empty list.");
     }
     
     /***************************************************************************
@@ -1786,29 +1783,31 @@ public class LinkedList<E>
     private static final class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
 
-        private final Set<Finger<E>> fingerSet = new HashSet<>();
-        private Finger<E>[] fingerArray;
+        private final IntHashSet fingerIndexSet = new IntHashSet();
+        private Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
         private int size = 0;
-
-        FingerStack() {
-            this.fingerArray = new Finger[INITIAL_CAPACITY];
-        }
 
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();
             fingerArray[size++] = finger;
-            fingerSet.add(finger);
+            fingerIndexSet.add(finger.index);
         }
 
         void pop() {
-            Finger<E> finger = fingerArray[--size];
+            --size;
+            contractFingerArrayIfNeeded();
+            Finger<E> finger = fingerArray[size];
             fingerArray[size] = null;
-            fingerSet.remove(finger);
+            fingerIndexSet.remove(finger.index);
             finger.node = null;
         }
         
+        boolean containsIndex(int index) {
+            return fingerIndexSet.contains(index);
+        }
+        
         boolean contains(Finger<E> finger) {
-            return fingerSet.contains(finger);
+            return fingerIndexSet.contains(finger.index);
         }
 
         int size() {
@@ -1827,12 +1826,23 @@ public class LinkedList<E>
             }
 
             size = 0;
+            fingerIndexSet.clear();
+            fingerArray = new Finger[INITIAL_CAPACITY];
         }
 
         // Makes sure that the next finger fits in this finger stack:
         private void enlargeFingerArrayIfNeeded() {
             if (size == fingerArray.length) {
-                final int nextCapacity = 3 * fingerArray.length / 2;
+                final int nextCapacity = 2 * fingerArray.length;
+                fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
+            }
+        }
+        
+        // We can save some space while keeping the finger array operations 
+        // amortized O(1):
+        private void contractFingerArrayIfNeeded() {
+            if (size * 4 <= fingerArray.length) {
+                final int nextCapacity = fingerArray.length / 2;
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
