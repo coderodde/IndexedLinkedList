@@ -1,5 +1,6 @@
 package com.github.coderodde.util;
 
+import java.util.Random;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -92,5 +93,69 @@ public class IntHashSetTest {
         for (int i = 0; i < 100; i++) {
             assertFalse(set.contains(i));
         }
+    }
+    
+    @Test 
+    public void bruteForceAdd() {
+        long seed = 1630240301175L; //System.currentTimeMillis();
+        System.out.println(
+                "--- IntHashSetTest.bruteForceAdd: seed = " + seed + " ---");
+        
+        Random random = new Random(seed);
+        
+        int[] data = new int[10_000];
+        
+        for (int i = 0; i < data.length; i++) {
+            int datum = random.nextInt(5_000);
+            data[i] = datum;
+            set.add(datum);
+        }
+        
+        for (int i = 0; i < data.length; i++) {
+            System.out.println(i);
+            assertTrue(set.contains(data[i]));
+        }
+    }
+    
+    @Test
+    public void bruteForceRemove() {
+        long seed = 1630239687427L; // System.currentTimeMillis();
+        System.out.println(
+                "--- IntHashSetTest.bruteForceRemove: seed = " + seed + " ---");
+        
+        Random random = new Random(seed);
+        
+        int[] data = new int[10_000];
+        
+        for (int i = 0; i < data.length; i++) {
+            int datum = random.nextInt(5_000);
+            data[i] = datum;
+            set.add(datum);
+        }
+        
+        shuffle(data, random);
+        
+        for (int i = 0; i < data.length; i++) {
+            int datum = data[i];
+            
+            if (set.contains(datum)) {
+                set.remove(datum);
+            } 
+            
+            assertFalse(set.contains(datum));
+        }
+    }
+    
+    private static void shuffle(int[] data, Random random) {
+        for (int i = data.length - 1; i > 0; --i) {
+            final int j = random.nextInt(i + 1);
+            swap(data, i, j);
+        }
+    }
+    
+    private static void swap(int[] data, int i, int j) {
+        int tmp = data[i];
+        data[i] = data[j];
+        data[j] = tmp;
     }
 }

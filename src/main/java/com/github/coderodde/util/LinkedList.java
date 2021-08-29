@@ -1348,7 +1348,9 @@ public class LinkedList<E>
         // 4: 2
         // 5: 2
         // Q: remove finger.index from the set?
+        assert fingerStack.fingerIndexSet.contains(finger.index) : "finger not present";
         fingerStack.fingerIndexSet.remove(finger.index);
+        assert fingerStack.fingerIndexSet.contains(finger.index) : "finger not removed";
         
         int leftProbeIndex = finger.index - 1;
         int rightProbeIndex = finger.index + 1;
@@ -1359,7 +1361,7 @@ public class LinkedList<E>
         while (true) {
             
             if (leftProbeIndex >= 0) {
-                if (!fingerStack.containsIndex(leftProbeIndex)) {
+                if (!fingerStack.fingerIndexSet.contains(leftProbeIndex)) {
                     finger.index = leftProbeIndex;
                     finger.node = leftProbeNode;
                     fingerStack.fingerIndexSet.add(finger.index);
@@ -1371,7 +1373,7 @@ public class LinkedList<E>
             }
             
             if (rightProbeIndex < size) {
-                if (!fingerStack.containsIndex(rightProbeIndex)) {
+                if (!fingerStack.fingerIndexSet.contains(rightProbeIndex)) {
                     finger.index = rightProbeIndex;
                     finger.node = rightProbeNode;
                     fingerStack.fingerIndexSet.add(finger.index);
@@ -1867,14 +1869,6 @@ public class LinkedList<E>
             fingerArray[size] = null;
             fingerIndexSet.remove(finger.index);
             finger.node = null;
-        }
-        
-        boolean containsIndex(int index) {
-            return fingerIndexSet.contains(index);
-        }
-        
-        boolean contains(Finger<E> finger) {
-            return fingerIndexSet.contains(finger.index);
         }
 
         int size() {

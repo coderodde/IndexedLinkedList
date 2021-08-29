@@ -397,7 +397,6 @@ public class LinkedListTest {
         int totalIterations = 0;
 
         while (iter.hasNext()) {
-            System.out.println("total iters: " + totalIterations);
 
             iter.next();
             arrayListIter.next();
@@ -405,6 +404,7 @@ public class LinkedListTest {
             
             if (counter % 10 == 0) {
 
+                System.out.println("total iters: " + totalIterations);
                 try {
                     iter.remove();
                 } catch (IllegalStateException ex) {

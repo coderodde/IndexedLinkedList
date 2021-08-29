@@ -105,6 +105,7 @@ class IntHashSet implements Iterable<Integer> {
                         integer, 
                         table[targetCollisionChainIndex]);
         
+        newNode.next = table[targetCollisionChainIndex];
         table[targetCollisionChainIndex] = newNode;
     }
     
