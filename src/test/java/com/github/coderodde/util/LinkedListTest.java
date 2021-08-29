@@ -163,15 +163,21 @@ public class LinkedListTest {
         }
     }
 
-//    @Test
+    @Test
     public void testRemoveInt() {
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
 
+        // [0, 1, 2, 3, 4]
         assertEquals(Integer.valueOf(0), list.remove(0));
+        // [1, 2, 3, 4]
         assertEquals(Integer.valueOf(4), list.remove(3));
+        // [1, 2, 3]
         assertEquals(Integer.valueOf(2), list.remove(1));
+        // [1, 3]
         assertEquals(Integer.valueOf(1), list.remove(0));
+        // [3]
         assertEquals(Integer.valueOf(3), list.remove(0));
+        // []
     }
 
     @Test
@@ -283,7 +289,7 @@ public class LinkedListTest {
         assertEquals(10, myConsumer.total);
     }
 
-//    @Test
+    @Test
     public void basicIteratorRemoval() {
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         Iterator<Integer> iter = list.iterator();
@@ -362,7 +368,7 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
 
-//    @Test
+    @Test
     public void findFailingIterator() {
         list.addAll(getIntegerList(345_850));
         Iterator<Integer> iterator = list.iterator();
@@ -371,7 +377,7 @@ public class LinkedListTest {
         while (iterator.hasNext()) {
             iterator.next();
 
-            // Remove every 2nd element:
+            // Remove every 10th element:
             if (counter % 10 == 0) {
                     iterator.remove();
             }
@@ -380,10 +386,10 @@ public class LinkedListTest {
         }
     }
 
-//    @Test
+    @Test
     public void bruteForceIteratorRemove() throws Exception {
         list.addAll(getIntegerList(1000));
-
+ 
         int counter = 1;
         List<Integer> arrayList = new ArrayList<>(list);
         Iterator<Integer> iter = list.iterator();
@@ -391,9 +397,12 @@ public class LinkedListTest {
         int totalIterations = 0;
 
         while (iter.hasNext()) {
+            System.out.println("total iters: " + totalIterations);
+
             iter.next();
             arrayListIter.next();
-
+            list.checkInvariant();
+            
             if (counter % 10 == 0) {
 
                 try {
@@ -904,7 +913,7 @@ public class LinkedListTest {
         }
     }
     
-//    @Test
+    @Test
     public void bugRemoveAt() {
         list.addAll(getIntegerList(10));
         
@@ -928,7 +937,7 @@ public class LinkedListTest {
     }
     
     // Should not throw anything:
-//    @Test
+    @Test
     public void bugRemoveFirst() {
         list.addAll(getIntegerList(5));
         
@@ -952,7 +961,7 @@ public class LinkedListTest {
     }
     
     // Should not throw anything:
-//    @Test
+    @Test
     public void bugRemoveLast() {
         list.addAll(getIntegerList(10));
         

@@ -684,8 +684,8 @@ public class LinkedList<E>
         if (closestFinger.index == index) {
             Node<E> nodeToRemove = closestFinger.node;
             E returnValue = nodeToRemove.item;
-            unlink(nodeToRemove);
             moveFingerOutOfRemovalLocation(closestFinger);
+            unlink(nodeToRemove);
             decreaseSize();
             
             if (mustRemoveFinger())
@@ -878,6 +878,7 @@ public class LinkedList<E>
     private void addFinger(Node<E> node, int index) {
         final Finger<E> finger = new Finger<>(node, index);
         fingerStack.push(finger);
+        fingerStack.fingerIndexSet.add(index);
     }
     
     /***************************************************************************
@@ -1250,7 +1251,6 @@ public class LinkedList<E>
         modCount++;
 
         if (mustAddFinger())
-            // CHECK: append?
             addFinger(newNode, index);
     }
 
@@ -1296,7 +1296,7 @@ public class LinkedList<E>
         size++;
         modCount++;
 
-        if (mustAddFinger())
+        if (mustAddFinger()) 
             addFinger(newNode, size - 1);
     }
 
@@ -1331,6 +1331,14 @@ public class LinkedList<E>
     ***************************************************************************/
     private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
         if (fingerStack.size == 1) {
+            if (finger.index > 0) {
+                finger.index--;
+                finger.node = finger.node.prev;
+            } else {
+                finger.index++;
+                finger.node = finger.node.next;
+            }
+            
             return;
         }
         
@@ -1339,8 +1347,8 @@ public class LinkedList<E>
         // 3: 2
         // 4: 2
         // 5: 2
-        
-//        fingerStack.fingerIndexSet.remove(finger.index);
+        // Q: remove finger.index from the set?
+        fingerStack.fingerIndexSet.remove(finger.index);
         
         int leftProbeIndex = finger.index - 1;
         int rightProbeIndex = finger.index + 1;
@@ -1351,7 +1359,7 @@ public class LinkedList<E>
         while (true) {
             
             if (leftProbeIndex >= 0) {
-                if (fingerStack.containsIndex(leftProbeIndex)) {
+                if (!fingerStack.containsIndex(leftProbeIndex)) {
                     finger.index = leftProbeIndex;
                     finger.node = leftProbeNode;
                     fingerStack.fingerIndexSet.add(finger.index);
@@ -1363,7 +1371,7 @@ public class LinkedList<E>
             }
             
             if (rightProbeIndex < size) {
-                if (fingerStack.containsIndex(rightProbeIndex)) {
+                if (!fingerStack.containsIndex(rightProbeIndex)) {
                     finger.index = rightProbeIndex;
                     finger.node = rightProbeNode;
                     fingerStack.fingerIndexSet.add(finger.index);
