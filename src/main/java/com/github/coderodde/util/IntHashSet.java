@@ -94,12 +94,12 @@ class IntHashSet implements Iterable<Integer> {
             return;
         }
         
-        final int targetCollisionChainIndex = integer & mask;
         size++;
         
         if (shouldExpand())
             expand();
         
+        final int targetCollisionChainIndex = integer & mask;
         final IntHashTableCollisionChainNode newNode = 
                 new IntHashTableCollisionChainNode(
                         integer, 

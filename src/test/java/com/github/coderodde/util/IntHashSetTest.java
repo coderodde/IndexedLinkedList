@@ -97,7 +97,8 @@ public class IntHashSetTest {
     
     @Test 
     public void bruteForceAdd() {
-        long seed = 1630240301175L; //System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
+        
         System.out.println(
                 "--- IntHashSetTest.bruteForceAdd: seed = " + seed + " ---");
         
@@ -112,14 +113,14 @@ public class IntHashSetTest {
         }
         
         for (int i = 0; i < data.length; i++) {
-            System.out.println(i);
             assertTrue(set.contains(data[i]));
         }
     }
     
     @Test
     public void bruteForceRemove() {
-        long seed = 1630239687427L; // System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
+        
         System.out.println(
                 "--- IntHashSetTest.bruteForceRemove: seed = " + seed + " ---");
         
