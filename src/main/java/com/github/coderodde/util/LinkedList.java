@@ -30,11 +30,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -1285,22 +1287,39 @@ public class LinkedList<E>
     nodes.
     ***************************************************************************/
     private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
-        if (size() < 2) 
+        if (size < 2) 
             return;
-
-        if (finger.node.prev != null) {
-            // Move the finger one position to the left:
-            finger.node = finger.node.prev;
-            finger.index--;
+        
+        if (!fingerStack.fingerSet.contains(finger))
             return;
+        
+        for (int i = 0, sz = this.fingerStack.size; i < sz; i++) {
+            Finger<E> probeFinger = this.fingerStack.get(i);
+//            Finger<E> probeFingerRightSibling =
+            
+            
+//            if (!fingerStack.fingerSet.contains(probeFinger)) {
+//                finger.
+//                return;
+//            }
+//            if (otherFinger.node.next != null) {
+//                
+//            }
+//            
+//            if (otherFinger.node.prev )
         }
-
-        if (finger.node.next != null) {
-            // Move the finger one position to the right:
-            finger.node = finger.node.next;
-            finger.index++;
-            return;
-        }
+        
+//        final Node<E> startNode = finger.node;
+//        final int numberOfLeftSiblings = finger.index;
+//        final int numberOfRightSiblings = size - finger.index - 1;
+//        
+//        int leftSiblings = 1;
+//        int rightSiblings = 1;
+//        
+//        while (leftSiblings < numberOfLeftSiblings 
+//                && rightSiblings < numberOfRightSiblings) {
+//            
+//        }
 
         throw new IllegalStateException("Removing from an empty list.");
     }
@@ -1638,6 +1657,26 @@ public class LinkedList<E>
         public String toString() {
             return "[Finger; index = " + index + ", item = " + node.item + "]";
         }
+        
+        @Override
+        public int hashCode() {
+            return index;
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+            
+            if (o == this)
+                return true;
+            
+            if (!o.getClass().equals(Finger.class)) 
+                return false;
+            
+            Finger<E> otherFinger = (Finger<E>) o;
+            return index == otherFinger.index;
+        }
 
         // Moves this finger 'steps' position to the left
         void rewindLeft(int steps) {
@@ -1657,6 +1696,87 @@ public class LinkedList<E>
             index += steps;
         }
     }
+    
+    private static final class IntHashTable {
+        
+        private static final int INITIAL_CAPACITY = 8;
+        private static final float MAXIMUM_LOAD_FACTOR = 0.75f;
+        
+        private static final class IntHashTableCollisionChainNode {
+            IntHashTableCollisionChainNode next;
+            int integer;
+
+            public IntHashTableCollisionChainNode(int integer) {
+                this.integer = integer;
+            }
+        }
+        
+        private IntHashTableCollisionChainNode[] table = 
+                new IntHashTableCollisionChainNode[INITIAL_CAPACITY];
+        
+        private int size;
+        
+        void add(int integer) {
+            if (shouldExpand())
+                expand();
+            
+            final int bucketIndex = integer % table.length;
+            final IntHashTableCollisionChainNode newNode = 
+                    new IntHashTableCollisionChainNode(integer);
+            
+            if (table[bucketIndex] == null) {
+                table[bucketIndex] = newNode;
+            } else {
+                newNode.next = table[bucketIndex];
+                table[bucketIndex] = newNode;
+            }
+            
+            size++;
+        }
+        
+        void remove(int integer) {
+//            IntHashTableCollisionChainNode nodeToRemove = findNode(integer);
+            
+        }
+        
+//        private IntHashTableCollisionChainNode findNode(int integer) {
+////            final int hashTableCollisionChainBucketIndex = 
+////                    integer 
+//            IntHashTableCollisionChainNode probe = 
+//        }
+        
+        private boolean shouldExpand() {
+            return size / table.length > MAXIMUM_LOAD_FACTOR;
+        }
+       
+        private void expand() {
+            final int nextHashTableCapacity = 3 * table.length / 2;
+            IntHashTableCollisionChainNode[] expandedHashTable = 
+                    new IntHashTableCollisionChainNode[nextHashTableCapacity];
+            
+            for (int i = 0; i < table.length; i++) {
+                IntHashTableCollisionChainNode node = table[i];
+                
+                while (node != null) {
+                    int index = hash(node.integer, nextHashTableCapacity);
+                    
+                    if (expandedHashTable[index] != null) {
+                        expandedHashTable[index].next = node;
+                    }
+                    
+//                    exp
+                }
+            }
+            
+            this.table = expandedHashTable;
+        }
+        
+//        private void add(IntHashTableCollisionChainNode[])
+        
+        private int hash(int integer, int capacity) {
+            return integer % capacity;
+        }
+    }
 
     /***************************************************************************
     Implements a simple, array-based stack for storing the node fingers.
@@ -1666,6 +1786,7 @@ public class LinkedList<E>
     private static final class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
 
+        private final Set<Finger<E>> fingerSet = new HashSet<>();
         private Finger<E>[] fingerArray;
         private int size = 0;
 
@@ -1676,12 +1797,18 @@ public class LinkedList<E>
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();
             fingerArray[size++] = finger;
+            fingerSet.add(finger);
         }
 
         void pop() {
             Finger<E> finger = fingerArray[--size];
             fingerArray[size] = null;
+            fingerSet.remove(finger);
             finger.node = null;
+        }
+        
+        boolean contains(Finger<E> finger) {
+            return fingerSet.contains(finger);
         }
 
         int size() {
