@@ -30,13 +30,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -878,7 +876,6 @@ public class LinkedList<E>
     private void addFinger(Node<E> node, int index) {
         final Finger<E> finger = new Finger<>(node, index);
         fingerStack.push(finger);
-        fingerStack.fingerIndexSet.add(index);
     }
     
     /***************************************************************************
@@ -1350,7 +1347,7 @@ public class LinkedList<E>
         // Q: remove finger.index from the set?
         assert fingerStack.fingerIndexSet.contains(finger.index) : "finger not present";
         fingerStack.fingerIndexSet.remove(finger.index);
-        assert fingerStack.fingerIndexSet.contains(finger.index) : "finger not removed";
+        assert !fingerStack.fingerIndexSet.contains(finger.index) : "finger not removed";
         
         int leftProbeIndex = finger.index - 1;
         int rightProbeIndex = finger.index + 1;
@@ -1505,12 +1502,21 @@ public class LinkedList<E>
     ***************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size; i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
+            final Finger<E> finger = fingerStack.get(i);
+            
             if (finger.index >= startingIndex) {
                 final int nextIndex = finger.index - steps;
+                finger.updateIndex = nextIndex;
                 fingerStack.fingerIndexSet.remove(finger.index);
-                fingerStack.fingerIndexSet.add(nextIndex);
-                finger.index = nextIndex;
+            }
+        }
+        
+        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+            final Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.index >= startingIndex) {
+                finger.index = finger.updateIndex;
+                fingerStack.fingerIndexSet.add(finger.index);
             }
         }
     }
@@ -1529,9 +1535,22 @@ public class LinkedList<E>
     ***************************************************************************/
     private void shiftIndicesToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            if (finger.index >= startIndex)
-                finger.index += steps;
+            final Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.index >= startIndex) {
+                final int nextIndex = finger.index + steps;
+                finger.updateIndex = nextIndex;
+                fingerStack.fingerIndexSet.remove(finger.index);
+            }
+        }
+        
+        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+            final Finger<E> finger = fingerStack.get(i);
+            
+            if (finger.index >= startIndex) {
+                finger.index = finger.updateIndex;
+                fingerStack.fingerIndexSet.add(finger.index);
+            }
         }
     }
 
@@ -1713,6 +1732,7 @@ public class LinkedList<E>
     private static final class Finger<E> {
         Node<E> node;
         int index; // Index at which 'node' is located.
+        int updateIndex;
 
         Finger(Node<E> node, int index) {
             this.node = node;
