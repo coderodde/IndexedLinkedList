@@ -52,6 +52,7 @@
                     <includes>
                         <include>**/*.java</include>
                     </includes>
+                    <runOrder>alphabetical</runOrder>
                 </configuration>
             </plugin>
             
