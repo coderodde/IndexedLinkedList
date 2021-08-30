@@ -1379,6 +1379,8 @@ public class LinkedList<E>
                 
                 rightProbeIndex++;
                 rightProbeNode = rightProbeNode.next;
+            } else {
+                assert leftProbeIndex >= 0 : "Infinite loop!";
             }
         }
     }
