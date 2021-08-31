@@ -94,30 +94,30 @@ public class LinkedListTest {
         bar("addFirst done!");
     }
 
-//    @Test(expected = IndexOutOfBoundsException.class)
-//    public void throwsOnAccessingEmptyList() {
-//        list.get(0);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnNegativeIndexInEmptyList() {
-//        list.get(-1);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnNegativeIndexInNonEmptyList() {
-//        list.addFirst(10);
-//        list.get(-1);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnTooLargeIndex() {
-//        list.addFirst(10);
-//        list.addLast(20);
-//        list.get(2);
-//    }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void throwsOnAccessingEmptyList() {
+        list.get(0);
+    }
 
-//    @Test // checked!
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnNegativeIndexInEmptyList() {
+        list.get(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnNegativeIndexInNonEmptyList() {
+        list.addFirst(10);
+        list.get(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnTooLargeIndex() {
+        list.addFirst(10);
+        list.addLast(20);
+        list.get(2);
+    }
+
+    @Test // checked!
     public void addIndexAndElement() {
         bar("addIndexedAndElement");
         
@@ -144,7 +144,7 @@ public class LinkedListTest {
         bar("addIndexedAndElement done!");
     }
 
-//    @Test // checked!
+    @Test // checked!
     public void addCollectionOneElementToEmptyList() {
         bar("addCollectionOneElementToEmptyList");
         
@@ -160,7 +160,7 @@ public class LinkedListTest {
         bar("addCollectionOneElementToEmptyList done!");
     }
 
-//    @Test // checked!
+    @Test // checked!
     public void addCollectionThreeElementsToEmptyList() {
         bar("addCollectionThreeElementsToEmptyList");
         
@@ -180,7 +180,7 @@ public class LinkedListTest {
         bar("addCollectionThreeElementsToEmptyList done!");
     }
 
-//    @Test // checked!
+    @Test // checked!
     public void addCollectionAtIndex() {
         bar("addCollectionAtIndex");
         
@@ -240,7 +240,7 @@ public class LinkedListTest {
         bar("basicIteratorUsage done!");
     }
 
-//    @Test // checked!
+    @Test // checked!
     public void bruteForceAddCollectionAtIndex() {
         long seed = System.currentTimeMillis();
         
@@ -268,7 +268,7 @@ public class LinkedListTest {
         bar("bruteForceAddCollectionAtIndex done!");
     }
 
-//    @Test // checked!
+    @Test // checked!
     public void removeAtIndex() {
         bar("removeAtIndex");
         
@@ -316,7 +316,7 @@ public class LinkedListTest {
         bar("removeObject done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void basicIteratorTraversal() {
         bar("basicIteratorTraversal");
         
@@ -349,7 +349,7 @@ public class LinkedListTest {
         bar("basicIteratorTraversal done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void basicIteratorRemoval() {
         bar("basicIteratorRemoval");
         
@@ -375,7 +375,7 @@ public class LinkedListTest {
         bar("basicIteratorRemoval done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void enhancedIteratorTraversal() {
         bar("enhancedIteratorTraversal");
         
@@ -415,19 +415,23 @@ public class LinkedListTest {
     // Used to find a failing removal sequence:
     @Test // shadowed
     public void removeAtFindFailing() {
-        long seed = 1630327401821L; System.currentTimeMillis();
+        long seed = 1L; System.currentTimeMillis();
         bar("removeAtFindFailing: seed = " + seed);
         
         Random random = new Random(seed);
         int yeah = 0;
         while (true) {
-            System.out.println("yeah = " + yeah);
-            System.out.flush();
+//            System.out.println("yeah = " + yeah);
             yeah++;
             
-            list.addAll(getIntegerList(5));
+            list.clear();
+            list.addAll(getIntegerList(45));
             
             List<Integer> indices = new ArrayList<>();
+            
+            if (yeah == 100) {
+                return;
+            }
             
             while (!list.isEmpty()) {
                 int index = random.nextInt(list.size());
@@ -446,7 +450,33 @@ public class LinkedListTest {
         }
     }
     
-//    @Test // shadowed
+    @Test
+    public void bugTinyRemoveInt() {
+        bar("bugTinyRemoveInt");
+        
+        list.addAll(getIntegerList(5));
+        
+        list.checkInvariant();
+        list.remove(4);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();
+        list.remove(2);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();
+        
+        bar("bugTinyRemoveInt done!");        
+    }
+    
+    @Test // shadowed
     public void removeAtIndex1() {
         bar("removeAtIndex1");
         
@@ -455,7 +485,7 @@ public class LinkedListTest {
         
         for (int i = 0; i < indices.length; i++) {
             int index = indices[i];
-            System.out.println("ye = " + index);
+//            System.out.println("ye = " + index);
             list.checkInvariant();
             list.remove(index);
             list.checkInvariant();
@@ -464,7 +494,7 @@ public class LinkedListTest {
         bar("removeAtIndex1 done!");
     }
 
-//    @Test
+    @Test
     public void enhancedIteratorAddition() {
         bar("enhancedIteratorAddition");
         
@@ -492,7 +522,7 @@ public class LinkedListTest {
         bar("enhancedIteratorAddition done!");
     }
 
-//    @Test
+    @Test
     public void findFailingIterator() {
         System.out.println(getBar("findFailingIterator"));
         
@@ -501,21 +531,23 @@ public class LinkedListTest {
         int counter = 0;
 
         while (iterator.hasNext()) {
-            System.out.println("size = " + list.size());
-            Integer integer = iterator.next();
-
+            System.out.println("size = " + list.size() + " counter = " + counter);
+            assertEquals(Integer.valueOf(counter), iterator.next());
+            
+            list.setDebug(true);
             // Remove every 10th element:
             if (counter % 10 == 0) {
-                    iterator.remove();
+                iterator.remove();
             }
 
             counter++;
         }
         
+        list.setDebug(false);
         System.out.println(getBar("findFailingIterator done!"));
     }
 
-//    @Test
+    @Test
     public void bruteForceIteratorRemove() throws Exception {
         System.out.println(getBar("bruteForceIteratorRemove"));
         
@@ -581,7 +613,7 @@ public class LinkedListTest {
 //                getBar("bruteForceRemoveObjectBeforeIteratorRemove"));
 //    }
 
-//    @Test
+    @Test
     public void findFailingRemoveObject() {
         System.out.println(getBar("findFailingRemoveObject"));
         
@@ -655,7 +687,7 @@ public class LinkedListTest {
         bar("iteratorAdd done!");
     }
 
-//    @Test
+    @Test
     public void bruteForceIteratorTest() {
         bar("bruteForceIteratorTest");
         
@@ -813,7 +845,7 @@ public class LinkedListTest {
         bar("basicSpliteratorUsage done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void spliteratorForEachRemaining() {
         bar("spliteratorForEachRemaining");
         
@@ -830,7 +862,7 @@ public class LinkedListTest {
         bar("spliteratorForEachRemaining done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void spliteratorForEachRemainingTwoSpliterators() {
         bar("spliteratorForEachRemainingTwoSpliterators");
         
@@ -855,7 +887,7 @@ public class LinkedListTest {
         bar("spliteratorForEachRemainingTwoSpliterators done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void spliteratorForEachRemainingWithAdvance() {
         bar("spliteratorForEachRemainingWithAdvance");
         
@@ -888,7 +920,7 @@ public class LinkedListTest {
         bar("spliteratorForEachRemainingWithAdvance done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void spliterator() {
         bar("spliterator");
         
@@ -934,7 +966,7 @@ public class LinkedListTest {
         bar("spliterator done!");
     }
 
-//    @Test // checked
+    @Test // checked
     public void bruteforceSpliterator() {
         bar("bruteforceSpliterator");
         
@@ -1033,7 +1065,7 @@ public class LinkedListTest {
         }
     }
     
-//    @Test // checked
+    @Test // checked
     public void bugCheckInvariantAfterRemoval() {
         bar("bugCheckInvariantAfterRemoval");
         
@@ -1050,7 +1082,7 @@ public class LinkedListTest {
         bar("bugCheckInvariantAfterRemoval done!");
     }
     
-//    @Test
+    @Test
     public void bruteForceRemoveAt1() {
         long seed = 1630132561853L; //System.currentTimeMillis();
         bar("bruteForceRemoveAt1: seed = " + seed);
@@ -1081,7 +1113,7 @@ public class LinkedListTest {
         bar("bruteForceRemoveA1t done!");
     }
     
-//    @Test
+    @Test
     public void bruteForceRemoveAt2() {
         long seed = 1630133801156L; // System.currentTimeMillis();
         bar("bruteForceRemoveAt2: seed = " + seed);

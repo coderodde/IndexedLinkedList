@@ -1499,21 +1499,34 @@ public class LinkedList<E>
         addFingersAfterSetAll();
     }
 
+    void setDebug(boolean debug) {
+        fingerStack.setDebug(debug);
+    }
+    
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
     ***************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
-        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            if (fingerStack.debug) {
+                System.out.println("i is " + i + ", sz is " + sz);
+            }
+            
             final Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
                 final int nextIndex = finger.index - steps;
                 finger.updateIndex = nextIndex;
+                
                 fingerStack.fingerIndexSet.remove(finger.index);
+                
+                if (fingerStack.fingerIndexSet.contains(finger.index)) {
+                    assert false : "hell yeah";
+                }
             }
         }
         
-        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             final Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
@@ -1546,7 +1559,7 @@ public class LinkedList<E>
             }
         }
         
-        for (int i = 0, sz = fingerStack.size; i < sz; i++) {
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             final Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startIndex) {
@@ -1877,6 +1890,11 @@ public class LinkedList<E>
         private final IntHashSet fingerIndexSet = new IntHashSet();
         private Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
         private int size = 0;
+        private boolean debug = false;
+        
+        void setDebug(boolean debug) {
+            this.debug = debug;
+        }
 
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();
@@ -1911,6 +1929,11 @@ public class LinkedList<E>
             size = 0;
             fingerIndexSet.clear();
             fingerArray = new Finger[INITIAL_CAPACITY];
+        }
+        
+        @Override
+        public String toString() {
+            return "size = " + size;
         }
 
         // Makes sure that the next finger fits in this finger stack:
