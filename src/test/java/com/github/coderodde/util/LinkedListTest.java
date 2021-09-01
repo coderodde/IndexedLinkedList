@@ -557,19 +557,18 @@ public class LinkedListTest {
         bar("enhancedIteratorAddition done!");
     }
 
-//    @Test
+    @Test
     public void findFailingIterator() {
-        System.out.println(getBar("findFailingIterator"));
+        bar("findFailingIterator");
         
-        list.addAll(getIntegerList(345_850));
+        list.addAll(getIntegerList(3850));
         Iterator<Integer> iterator = list.iterator();
         int counter = 0;
 
         while (iterator.hasNext()) {
-            System.out.println("size = " + list.size() + " counter = " + counter);
+//            System.out.println("size = " + list.size() + " counter = " + counter);
             assertEquals(Integer.valueOf(counter), iterator.next());
             
-            list.setDebug(true);
             // Remove every 10th element:
             if (counter % 10 == 0) {
                 iterator.remove();
@@ -578,7 +577,6 @@ public class LinkedListTest {
             counter++;
         }
         
-        list.setDebug(false);
         System.out.println(getBar("findFailingIterator done!"));
     }
 
@@ -713,7 +711,7 @@ public class LinkedListTest {
 
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
-        System.out.println("- bruteForceIteratorTest: seed = " + seed);
+        bar("bruteForceIteratorTest: seed = " + seed);
 
         while (iterator1.hasNext()) {
             if (!iterator2.hasNext()) {
@@ -1127,9 +1125,9 @@ public class LinkedListTest {
         bar("bruteForceRemoveA1t done!");
     }
     
-    @Test
+//    @Test
     public void bruteForceRemoveAt2() {
-        long seed = System.currentTimeMillis();
+        long seed = 1630487847317L; // System.currentTimeMillis();
         
         bar("bruteForceRemoveAt2: seed = " + seed);
 
@@ -1142,6 +1140,7 @@ public class LinkedListTest {
             while (!list.isEmpty()) {
                 int index = random.nextInt(list.size());
                 indices.add(index);
+                System.out.println(indices);
                 
                 try {
                     list.remove(index);
@@ -1164,23 +1163,16 @@ public class LinkedListTest {
         bar("bugRemoveAt2");
         
         list.addAll(getIntegerList(10));
-        final int[] indices = {1, 7, 7, 1, 3, 2, 2, 1, 0, 0 };
+        final int[] indices = { 7, 7, 4, 1, 2, 1, 3, 1, 1, 0 };
         
         for (int i = 0; i < indices.length; i++) {
             final int index = indices[i];
-            System.out.println("i = " + i + ", index = " + index);
+//            System.out.println("i = " + i + ", index = " + index);
             
-            try {
-                list.checkInvariant();
-                list.remove(index);
-                list.checkInvariant();
-            } catch (Error ae) {
-                fail("ae: " + ae.getMessage());
-                return;
-            } catch (Exception ex) {
-                fail("ex: " + ex.getMessage());
-                return;
-            }
+            list.checkInvariant();
+            list.remove(index);
+            list.checkInvariant();
+//            System.out.println("index = " + index + ", i = " + i);
         }
         
         bar("bugRemoveAt2 done!");

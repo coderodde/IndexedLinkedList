@@ -1,28 +1,3 @@
-/*
- * Copyright (c) 1997, 2019, Oracle and/or its affiliates. All rights reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
- *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
- *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
- */
-
 package com.github.coderodde.util;
 
 import java.util.AbstractSequentialList;
@@ -85,14 +60,11 @@ import java.util.function.Consumer;
  * exception for its correctness:   <i>the fail-fast behavior of iterators
  * should be used only to detect bugs.</i>
  *
- * <p>This class is a member of the
- * <a href="{@docRoot}/java.base/java/util/package-summary.html#CollectionsFramework">
- * Java Collections Framework</a>.
- *
- * @author  Josh Bloch
+ * @author  Rodion "coderodde" Efremov
  * @see     List
  * @see     ArrayList
- * @since 1.2
+ * @version 1.6 (Sep 1, 2021)
+ * @since 1.6 (Sep 1, 2021)
  * @param <E> the type of elements held in this collection
  */
 
@@ -165,7 +137,7 @@ public class LinkedList<E>
      */
     public void add(int index, E element) {
         checkPositionIndex(index);
-
+        
         if (index == size)
             linkLast(element);
         else
@@ -666,25 +638,6 @@ public class LinkedList<E>
 
         return false;
     }
-
-    private void removeObjectImpl(Node<E> node, int index) {
-        // Make sure no finger is pointing to 'node':
-        makeSureNoFingerPointsTo(node, index);
-        unlink(node);
-        decreaseSize();
-        
-        if (mustRemoveFinger()) 
-            removeFinger();
-        
-        shiftIndicesToLeftOnce(index + 1);
-    }
-    
-    private void makeSureNoFingerPointsTo(Node<E> node, int index) {
-        Finger<E> finger = getClosestFinger(index);
-        
-        if (finger.node == node)
-            moveFingerOutOfRemovalLocation(finger);
-    }
     
     /**
      * Removes the element residing at the given index.
@@ -724,25 +677,6 @@ public class LinkedList<E>
             shiftIndicesToLeftOnce(index + 1);
             return returnValue;
         }
-    }
-    
-    // If steps < 0, rewind to the left. Otherwise, rewind to the right.
-    private Node<E> rewind(Finger<E> finger, int steps) {
-        Node<E> node = finger.node;
-        
-        if (steps > 0) {
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
-        } else {
-            steps = -steps;
-            
-            for (int i = 0; i < steps; i++) {
-                node = node.next;
-            }
-        }
-        
-        return node;
     }
 
     /**
@@ -1067,35 +1001,39 @@ public class LinkedList<E>
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             
-            if (finger.node.prev == null && finger.node.next == null) {
-                throw new AssertionError("checkInvariant() failed at finger " +
-                        finger + ": null siblings");
-            }
+            assert finger.node.prev != null || finger.node.next != null :
+                    "checkInvariant() failed: finger " + finger + " has " +
+                    "null siblings.";
             
-            if (!fingerStack.fingerIndexSet.contains(finger.index)) {
-                throw new AssertionError(
-                        "Set does not contain " + finger.index);
-            }
+            assert fingerStack.fingerIndexSet.contains(finger.index) :
+                    "checkInvariant() failed: Set does not contain " + finger;
             
-            int onLeftNodes = countLeft(finger);
-            int onRightNodes = countRight(finger);
+            final int onLeftNodes = countLeft(finger);
+            final int onRightNodes = countRight(finger);
             
-            if (onLeftNodes + 1 + onRightNodes != this.size) {
-                throw new AssertionError("checkInvariant() failed at finger (" +
-                        finger + ".");
-            }
+            assert this.size == onLeftNodes + 1 + onRightNodes :
+                    "checkInvariant() failed at finger (" + finger +
+                    "), prefix/suffix error";
             
             Node<E> node = getNodeRaw(finger.index);
 
-            if (finger.node != node)
-                throw new AssertionError(
-                        "checkInvariant() failed at finger index (" +
-                                finger.index + "), expected node = " +
-                                finger.node + ", actual node = " + node);
+            assert finger.node == node : 
+                    "checkInvariant() failed: finger/node mismatch: " + 
+                    "(finger = " + finger + ", node = " + node + ")";
         }
     }
     
-    private int countLeft(Finger<E> finger) {
+   /***************************************************************************
+    Checks that the input index is a valid position index for add operation or
+    iterator position.
+    ***************************************************************************/
+    private void checkPositionIndex(int index) {
+        if (!isPositionIndex(index))
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+    }
+    
+    // Used for checkInvariant()
+    private static <E> int countLeft(Finger<E> finger) {
         Node<E> node = finger.node.prev;
         int count = 0;
         
@@ -1107,7 +1045,8 @@ public class LinkedList<E>
         return count;
     }
     
-    private int countRight(Finger<E> finger) {
+    // Used for checkInvariant()
+    private static <E> int countRight(Finger<E> finger) {
         Node<E> node = finger.node.next;
         int count = 0;
         
@@ -1119,26 +1058,9 @@ public class LinkedList<E>
         return count;
     }
     
-    boolean fingersSortedByIndex() {
-        for (int i = 0, sz = fingerStack.size() - 1; i < sz; i++) {
-            Finger<E> finger1 = fingerStack.get(i);
-            Finger<E> finger2 = fingerStack.get(i + 1);
-            
-            if (finger1.index > finger2.index) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
- 
-   /***************************************************************************
-    Checks that the input index is a valid position index for add operation or
-    iterator position.
-    ***************************************************************************/
-    private void checkPositionIndex(int index) {
-        if (!isPositionIndex(index))
-            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+    private void decreaseSize() {
+        size--;
+        modCount++;
     }
     
     /***************************************************************************
@@ -1187,14 +1109,19 @@ public class LinkedList<E>
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size / 2.0));
+        return (int) Math.ceil(Math.sqrt(size / 2.0) / 10.0);
     }
     
     /***************************************************************************
     Computes the recommended number of fingers for {@code size} elements.
     ***************************************************************************/
     private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.ceil(Math.sqrt(size / 2.0));
+        return (int) Math.ceil(Math.sqrt(size / 2.0) / 10.0);
+    }
+    
+    private void increaseSize() {
+        size++;
+        modCount++;
     }
     
     /***************************************************************************
@@ -1294,11 +1221,6 @@ public class LinkedList<E>
         if (mustAddFinger())
             addFinger(newNode, 0);
     }
-    
-    private void increaseSize() {
-        size++;
-        modCount++;
-    }
 
     /***************************************************************************
     Appends the input element to the tail of this list.
@@ -1319,6 +1241,16 @@ public class LinkedList<E>
 
         if (mustAddFinger()) 
             addFinger(newNode, size - 1);
+    }
+    
+    /***************************************************************************
+    Makes sure that the input node is not being pointed to by a finger.
+    ***************************************************************************/
+    private void makeSureNoFingerPointsTo(Node<E> node, int index) {
+        Finger<E> finger = getClosestFinger(index);
+        
+        if (finger.node == node)
+            moveFingerOutOfRemovalLocation(finger);
     }
 
     /***************************************************************************
@@ -1452,17 +1384,41 @@ public class LinkedList<E>
         fingerStack.pop();
     }
     
-//    /***************************************************************************
-//    Removes the node from this list. Modifies the fingers as needed.
-//    ***************************************************************************/
-//    private E removeNodeFromList(Node<E> node, int index) {
-//        loadRemoveData(index);
-//
-//        if (removedDataFinger.index == index) 
-//            moveFingerOutOfRemovalLocation(removedDataFinger);
-//
-//        return unlink(node, index);
-//    }
+    /***************************************************************************
+    Implements the node removal. 
+    ***************************************************************************/
+    private void removeObjectImpl(Node<E> node, int index) {
+        // Make sure no finger is pointing to 'node':
+        makeSureNoFingerPointsTo(node, index);
+        unlink(node);
+        decreaseSize();
+        
+        if (mustRemoveFinger()) 
+            removeFinger();
+        
+        shiftIndicesToLeftOnce(index + 1);
+    }
+    
+    /***************************************************************************
+    If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.
+    ***************************************************************************/
+    private Node<E> rewind(Finger<E> finger, int steps) {
+        Node<E> node = finger.node;
+        
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                node = node.prev;
+            }
+        } else {
+            steps = -steps;
+            
+            for (int i = 0; i < steps; i++) {
+                node = node.next;
+            }
+        }
+        
+        return node;
+    }
     
     /***************************************************************************
     Sets the input collection as a list.
@@ -1491,30 +1447,17 @@ public class LinkedList<E>
         addFingersAfterSetAll();
     }
 
-    void setDebug(boolean debug) {
-        fingerStack.setDebug(debug);
-    }
-    
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
     ***************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            if (fingerStack.debug) {
-                System.out.println("i is " + i + ", sz is " + sz);
-            }
-            
             final Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
                 final int nextIndex = finger.index - steps;
                 finger.updateIndex = nextIndex;
-                
                 fingerStack.fingerIndexSet.remove(finger.index);
-                
-                if (fingerStack.fingerIndexSet.contains(finger.index)) {
-                    assert false : "hell yeah";
-                }
             }
         }
         
@@ -1590,60 +1533,6 @@ public class LinkedList<E>
             x.next = null;
         }
     }
-    
-    private void decreaseSize() {
-        size--;
-        modCount++;
-    }
-    
-    private void fixFingersAfterRemoval(int index) {
-        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            
-            if (finger.index == index) {
-                if (finger.index > 0) {
-                    finger.index--;
-                    finger.node = finger.node.prev;
-                } else {
-                    finger.index++;
-                    finger.node = finger.node.next;
-                }
-            }
-        }
-    }
-
-    /***************************************************************************
-    Unlinks the head node from this list.
-    ***************************************************************************/
-    private void unlinkFirst() {
-        final Node<E> next = first.next;
-        first.item = null;
-        first.next = null; // help GC
-        first = next;
-
-        if (next == null)
-            last = null;
-        else
-            next.prev = null;
-    }
-
-    /***************************************************************************
-    Unlinks the tail node from this list.
-    ***************************************************************************/
-    private void unlinkLast() {
-        final Node<E> prev = last.prev;
-        last.item = null;
-        last.prev = null; // help GC
-        last = prev;
-
-        if (prev == null)
-            first = null;
-        else
-            prev.next = null;
-    }
-    
-    // Used in the removal operations:
-    private transient Finger<E> removedDataFinger;
     
     /**
      * Reconstitutes this {@code LinkedList} instance from a stream
@@ -1751,26 +1640,6 @@ public class LinkedList<E>
             return "[Finger; index = " + index + ", item = " + node.item + "]";
         }
         
-        @Override
-        public int hashCode() {
-            return index;
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (o == null)
-                return false;
-            
-            if (o == this)
-                return true;
-            
-            if (!o.getClass().equals(Finger.class)) 
-                return false;
-            
-            Finger<E> otherFinger = (Finger<E>) o;
-            return index == otherFinger.index;
-        }
-
         // Moves this finger 'steps' position to the left
         void rewindLeft(int steps) {
             for (int i = 0; i < steps; i++) {
@@ -1790,87 +1659,6 @@ public class LinkedList<E>
         }
     }
     
-    private static final class IntHashTable {
-        
-        private static final int INITIAL_CAPACITY = 8;
-        private static final float MAXIMUM_LOAD_FACTOR = 0.75f;
-        
-        private static final class IntHashTableCollisionChainNode {
-            IntHashTableCollisionChainNode next;
-            int integer;
-
-            public IntHashTableCollisionChainNode(int integer) {
-                this.integer = integer;
-            }
-        }
-        
-        private IntHashTableCollisionChainNode[] table = 
-                new IntHashTableCollisionChainNode[INITIAL_CAPACITY];
-        
-        private int size;
-        
-        void add(int integer) {
-            if (shouldExpand())
-                expand();
-            
-            final int bucketIndex = integer % table.length;
-            final IntHashTableCollisionChainNode newNode = 
-                    new IntHashTableCollisionChainNode(integer);
-            
-            if (table[bucketIndex] == null) {
-                table[bucketIndex] = newNode;
-            } else {
-                newNode.next = table[bucketIndex];
-                table[bucketIndex] = newNode;
-            }
-            
-            size++;
-        }
-        
-        void remove(int integer) {
-//            IntHashTableCollisionChainNode nodeToRemove = findNode(integer);
-            
-        }
-        
-//        private IntHashTableCollisionChainNode findNode(int integer) {
-////            final int hashTableCollisionChainBucketIndex = 
-////                    integer 
-//            IntHashTableCollisionChainNode probe = 
-//        }
-        
-        private boolean shouldExpand() {
-            return size / table.length > MAXIMUM_LOAD_FACTOR;
-        }
-       
-        private void expand() {
-            final int nextHashTableCapacity = 3 * table.length / 2;
-            IntHashTableCollisionChainNode[] expandedHashTable = 
-                    new IntHashTableCollisionChainNode[nextHashTableCapacity];
-            
-            for (int i = 0; i < table.length; i++) {
-                IntHashTableCollisionChainNode node = table[i];
-                
-                while (node != null) {
-                    int index = hash(node.integer, nextHashTableCapacity);
-                    
-                    if (expandedHashTable[index] != null) {
-                        expandedHashTable[index].next = node;
-                    }
-                    
-//                    exp
-                }
-            }
-            
-            this.table = expandedHashTable;
-        }
-        
-//        private void add(IntHashTableCollisionChainNode[])
-        
-        private int hash(int integer, int capacity) {
-            return integer % capacity;
-        }
-    }
-
     /***************************************************************************
     Implements a simple, array-based stack for storing the node fingers.
     
@@ -1882,11 +1670,6 @@ public class LinkedList<E>
         private final IntHashSet fingerIndexSet = new IntHashSet();
         private Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
         private int size = 0;
-        private boolean debug = false;
-        
-        void setDebug(boolean debug) {
-            this.debug = debug;
-        }
 
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();

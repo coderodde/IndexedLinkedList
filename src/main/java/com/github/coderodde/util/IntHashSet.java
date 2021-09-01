@@ -14,13 +14,11 @@ public class IntHashSet {
     private static final int INITIAL_CAPACITY = 8;
     private static final float MAXIMUM_LOAD_FACTOR = 0.75f;
 
-    private static final class IntHashTableCollisionChainNode {
-        IntHashTableCollisionChainNode next;
+    private static final class Node {
+        Node next;
         int integer;
 
-        IntHashTableCollisionChainNode(
-                int integer, 
-                IntHashTableCollisionChainNode next) {
+        Node(int integer, Node next) {
             this.integer = integer;
             this.next = next;
         }
@@ -31,9 +29,7 @@ public class IntHashSet {
         }
     }
 
-    private IntHashTableCollisionChainNode[] table = 
-            new IntHashTableCollisionChainNode[INITIAL_CAPACITY];
-
+    private Node[] table = new Node[INITIAL_CAPACITY];
     private int size = 0;
     private int mask = INITIAL_CAPACITY - 1;
     
@@ -53,8 +49,8 @@ public class IntHashSet {
             expand();
 
         final int targetCollisionChainIndex = integer & mask;
-        final IntHashTableCollisionChainNode newNode = 
-                new IntHashTableCollisionChainNode(
+        final Node newNode = 
+                new Node(
                         integer, 
                         table[targetCollisionChainIndex]);
 
@@ -64,7 +60,7 @@ public class IntHashSet {
 
     public boolean contains(int integer) {
         final int collisionChainIndex = integer & mask;
-        IntHashTableCollisionChainNode node = table[collisionChainIndex];
+        Node node = table[collisionChainIndex];
 
         while (node != null) {
             if (node.integer == integer) {
@@ -89,13 +85,13 @@ public class IntHashSet {
 
         final int targetCollisionChainIndex = integer & mask;
 
-        IntHashTableCollisionChainNode current = 
+        Node current = 
                 table[targetCollisionChainIndex];
 
-        IntHashTableCollisionChainNode previous = null;
+        Node previous = null;
 
         while (current != null) {
-            IntHashTableCollisionChainNode next = current.next;
+            Node next = current.next;
 
             if (current.integer == integer) {
                 if (previous == null) {
@@ -114,7 +110,7 @@ public class IntHashSet {
 
     public void clear() {
          size = 0;
-         table = new IntHashTableCollisionChainNode[INITIAL_CAPACITY];
+         table = new Node[INITIAL_CAPACITY];
          mask = table.length - 1;
     }
 
@@ -126,17 +122,16 @@ public class IntHashSet {
     // Keep remove(int) an amortized O(1)
     private boolean shouldContract() {
         if (table.length == INITIAL_CAPACITY) {
+            // Do not ocntract below INITIAL_CAPACITY:
             return false;
         }
         
-        final int maxCurrentQuota = (int)(table.length * MAXIMUM_LOAD_FACTOR);
-        final int minCurrentQuota = maxCurrentQuota / 4;
-        return size < minCurrentQuota;
+        return size < table.length / 4;
     }
 
     private void expand() {
-        IntHashTableCollisionChainNode[] newTable = 
-                new IntHashTableCollisionChainNode[table.length * 2];
+        Node[] newTable = 
+                new Node[table.length * 2];
 
         rehash(newTable);
         table = newTable;
@@ -144,18 +139,18 @@ public class IntHashSet {
     }
 
     private void contract() {
-        IntHashTableCollisionChainNode[] newTable = 
-                new IntHashTableCollisionChainNode[table.length / 4];
+        Node[] newTable = 
+                new Node[table.length / 4];
 
         rehash(newTable);
         table = newTable;
         mask = table.length - 1;
     }
 
-    private void rehash(IntHashTableCollisionChainNode[] newTable) {
-        for (IntHashTableCollisionChainNode node : table) {
+    private void rehash(Node[] newTable) {
+        for (Node node : table) {
             while (node != null) {
-                final IntHashTableCollisionChainNode next = node.next;
+                final Node next = node.next;
                 final int rehashedIndex = getHashValue(node.integer, newTable);
 
                 node.next = newTable[rehashedIndex];
@@ -167,7 +162,7 @@ public class IntHashSet {
 
     private static int getHashValue(
             int integer, 
-            IntHashTableCollisionChainNode[] newTable) {
+            Node[] newTable) {
         return integer & (newTable.length - 1);
     }
 }
