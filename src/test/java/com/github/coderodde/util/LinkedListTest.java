@@ -404,7 +404,7 @@ public class LinkedListTest {
     // Used to find a failing removal sequence:
     @Test // shadowed
     public void removeAtFindFailing() {
-        long seed = 1L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         bar("removeAtFindFailing: seed = " + seed);
         
         Random random = new Random(seed);
@@ -1052,7 +1052,7 @@ public class LinkedListTest {
     
     @Test
     public void bruteForceRemoveAt1() {
-        long seed = 1630132561853L; //System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         bar("bruteForceRemoveAt1: seed = " + seed);
         
         Random random = new Random(seed);
@@ -1083,9 +1083,7 @@ public class LinkedListTest {
     
     @Test
     public void bruteForceRemoveAt2() {
-        long seed = 1630133801156L; 
-        seed = System.currentTimeMillis();
-        seed = 1630473287235L;
+        long seed = System.currentTimeMillis();
         
         bar("bruteForceRemoveAt2: seed = " + seed);
 
