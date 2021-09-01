@@ -115,9 +115,16 @@ public class IntHashSet2 {
         if (size * 4 <= table.length && table.length >= INITIAL_CAPACITY * 4) {
             Node[] newTable = new Node[table.length / 4];
             mask = newTable.length - 1;
+            int i = 0;
             
             for (Node currentNode : table) {
                 while (currentNode != null) {
+                    if (currentNode == node) {
+                        // Omit the node with the target integer:
+                        currentNode = currentNode.next;
+                        continue;
+                    }
+                    
                     Node nextNode = currentNode.next;
                     
                     int newTableHash = currentNode.integer & mask;
@@ -129,11 +136,8 @@ public class IntHashSet2 {
             }
             
             table = newTable;
-            targetCollisionChainIndex = integer & mask;
-        }
-        
-        if (prev == null) {
-            table[targetCollisionChainIndex] =
+        } else  if (prev == null) {
+            table[targetCollisionChainIndex] = 
                     table[targetCollisionChainIndex].next;
         } else {
             prev.next = prev.next.next;
