@@ -651,14 +651,14 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (x.item == null) {
-                    remove(index);
+                    removeObjectImpl(x, index);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
                 if (o.equals(x.item)) {
-                    remove(index);
+                    removeObjectImpl(x, index);
                     return true;
                 }
             }
@@ -667,6 +667,25 @@ public class LinkedList<E>
         return false;
     }
 
+    private void removeObjectImpl(Node<E> node, int index) {
+        // Make sure no finger is pointing to 'node':
+        makeSureNoFingerPointsTo(node, index);
+        unlink(node);
+        decreaseSize();
+        
+        if (mustRemoveFinger()) 
+            removeFinger();
+        
+        shiftIndicesToLeftOnce(index + 1);
+    }
+    
+    private void makeSureNoFingerPointsTo(Node<E> node, int index) {
+        Finger<E> finger = getClosestFinger(index);
+        
+        if (finger.node == node)
+            moveFingerOutOfRemovalLocation(finger);
+    }
+    
     /**
      * Removes the element residing at the given index.
      * The procedure:
@@ -733,24 +752,21 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      */
     public E removeFirst() {
-        return remove(0);
-//        checkElementIndex(0);
-//        
-//        Finger<E> finger = getClosestFingerAndRewind(0);
-//        Node<E> nodeToRemove = finger.node;
-//        E returnValue = nodeToRemove.item;
-//        
-//        moveFingerOutOfRemovalLocation(finger);
-//        unlinkFirst();
-//        decreaseSize();
-//        
-//        if (mustRemoveFinger()) {
-//            removeFinger();
-//            fixFingersAfterRemoval(0);
-//        }
-//        
-//        shiftIndicesToLeftOnce(0);
-//        return returnValue;
+        checkElementIndex(0);
+        
+        E returnValue = first.item;
+        decreaseSize();
+        
+        first = first.next;
+        
+        if (first == null)
+            last = null;
+        
+        if (mustRemoveFinger())
+            removeFinger();
+        
+        shiftIndicesToLeftOnce(1);
+        return returnValue;
     }
 
     /**
@@ -764,7 +780,25 @@ public class LinkedList<E>
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        return remove(o);
+        int index = 0;
+
+        if (o == null) {
+            for (Node<E> x = first; x != null; x = x.next, index++) {
+                if (x.item == null) {
+                    removeObjectImpl(x, index);
+                    return true;
+                }
+            }
+        } else {
+            for (Node<E> x = first; x != null; x = x.next, index++) {
+                if (o.equals(x.item)) {
+                    removeObjectImpl(x, index);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -774,23 +808,20 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      */
     public E removeLast() {
-        return remove(size - 1);
-//        checkElementIndex(size - 1);
-//        
-//        Finger<E> finger = getClosestFingerAndRewind(size - 1);
-//        Node<E> nodeToRemove = finger.node;
-//        E returnValue = nodeToRemove.item;
-//        
-//        moveFingerOutOfRemovalLocation(finger);
-//        unlinkLast();
-//        decreaseSize();
-//        
-//        if (mustRemoveFinger()) {
-//            removeFinger();
-//            fixFingersAfterRemoval(size - 1);
-//        }
-//        
-//        return returnValue;
+        checkElementIndex(size - 1);
+        
+        E returnValue = last.item;
+        decreaseSize();
+        
+        last = last.prev;
+        
+        if (last == null)
+            first = null;
+        
+        if (mustRemoveFinger())
+            removeFinger();
+        
+        return returnValue;
     }
 
     /**
@@ -809,24 +840,14 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (x.item == null) {
-                    unlink(x);
-
-                    if (mustRemoveFinger())
-                        removeFinger();
-
-                    shiftIndicesToLeftOnce(index + 1);
+                    removeObjectImpl(x, index);
                     return true;
                 }
             }
         } else {
             for (Node<E> x = last; x != null; x = x.prev, index--) {
                 if (o.equals(x.item)) {
-                    unlink(x);
-
-                    if (mustRemoveFinger())
-                        removeFinger();
-
-                    shiftIndicesToLeftOnce(index + 1);
+                    removeObjectImpl(x, index);
                     return true;
                 }
             }
@@ -1268,11 +1289,15 @@ public class LinkedList<E>
         else
             f.prev = newNode;
 
-        size++;
-        modCount++;
+        increaseSize();
 
         if (mustAddFinger())
             addFinger(newNode, 0);
+    }
+    
+    private void increaseSize() {
+        size++;
+        modCount++;
     }
 
     /***************************************************************************
@@ -1290,35 +1315,10 @@ public class LinkedList<E>
         else
             l.next = newNode;
 
-        size++;
-        modCount++;
+        increaseSize();
 
         if (mustAddFinger()) 
             addFinger(newNode, size - 1);
-    }
-
-    /***************************************************************************
-    Loads the removal operation related data.
-    ***************************************************************************/
-    private Finger<E> getClosestFingerAndRewind(int index) {
-        Finger<E> finger = getClosestFinger(index);
-        fingerStack.fingerIndexSet.remove(finger.index);
-        
-        if (index < finger.index) {
-            final int distance = finger.index - index;
-            finger.index -= distance;
-            
-            for (int i = 0; i < distance; i++)
-                finger.node = finger.node.prev;
-        } else {
-            final int distance = index - finger.index;
-            finger.index += distance;
-            
-            for (int i = 0; i < distance; i++)
-                finger.node = finger.node.next;
-        }
-
-        return finger;
     }
 
     /***************************************************************************
@@ -1339,15 +1339,7 @@ public class LinkedList<E>
             return;
         }
         
-        // 1: 1
-        // 2: 1
-        // 3: 2
-        // 4: 2
-        // 5: 2
-        // Q: remove finger.index from the set?
-        assert fingerStack.fingerIndexSet.contains(finger.index) : "finger not present";
         fingerStack.fingerIndexSet.remove(finger.index);
-        assert !fingerStack.fingerIndexSet.contains(finger.index) : "finger not removed";
         
         int leftProbeIndex = finger.index - 1;
         int rightProbeIndex = finger.index + 1;
@@ -1992,7 +1984,7 @@ public class LinkedList<E>
             
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
-            LinkedList.this.remove(removalIndex);
+            removeObjectImpl(lastReturned, removalIndex);
             
             if (next == lastReturned)
                 next = lastNext;
@@ -2085,9 +2077,9 @@ public class LinkedList<E>
             if (lastReturned == null)
                 throw new IllegalStateException();
             
-            Node<E> lastNext = lastReturned.next;
-            int removalIndex = nextIndex - 1;
-            LinkedList.this.remove(removalIndex);
+            final Node<E> lastNext = lastReturned.next;
+            final int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
             
             if (next == lastReturned)
                 next = lastNext;
@@ -2110,10 +2102,12 @@ public class LinkedList<E>
         public void add(E e) {
             checkForComdification();
             lastReturned = null;
+            
             if (next == null) 
                 linkLast(e);
             else
                 linkBefore(e, next, nextIndex);
+            
             nextIndex++;
             expectedModCount++;
         }

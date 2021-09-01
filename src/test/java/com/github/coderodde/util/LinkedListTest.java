@@ -228,6 +228,52 @@ public class LinkedListTest {
         
         bar("basicIteratorUsage done!");
     }
+    
+    @Test
+    public void removeFirstLast() {
+        list.addAll(getIntegerList(5));
+        
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        list.removeFirst();
+        referenceList.remove(0);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeFirst();
+        referenceList.remove(0);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeLast();
+        referenceList.remove(referenceList.size() - 1);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeLast();
+        referenceList.remove(referenceList.size() - 1);
+        
+        assertTrue(listsEqual(list, referenceList));
+    }
+    
+    @Test
+    public void removeFirstLastOccurrence() {
+        com.github.coderodde.util.LinkedList<Integer> l =
+                new LinkedList<>();
+        
+        list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
+        l.addAll(list);
+        
+        list.removeFirstOccurrence(2);
+        l.removeFirstOccurrence(2);
+        
+        assertTrue(listsEqual(list, l));
+        
+        list.removeLastOccurrence(3);
+        l.removeLastOccurrence(3);
+        
+        assertTrue(listsEqual(list, l));
+    }
 
     @Test // checked!
     public void bruteForceAddCollectionAtIndex() {

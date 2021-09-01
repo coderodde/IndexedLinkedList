@@ -22,7 +22,6 @@ final class LinkedListBenchmark {
     private static final int REMOVE_OBJECT_OPERATIONS       = 1_000;
     private static final int GET_OPERATIONS                 = 2_000;
     private static final int REMOVE_FIRST_OPERATIONS        = 2_000;
-    private static final int REMOVE_LAST_OPERATIONS         = 10_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 
@@ -570,7 +569,7 @@ final class LinkedListBenchmark {
 
         return durationMillis;
     }
-
+    
     private long profileListIteratorRemoval(List<Integer> list) {
         long startMillis = System.currentTimeMillis();
         Iterator<Integer> iterator = list.iterator();
@@ -949,7 +948,7 @@ final class LinkedListBenchmark {
                         REMOVE_OBJECT_OPERATIONS, 
                         randomTreeList);
     }
-
+    
     private void profileListIteratorRemovalRoddeList() {
         totalMillisRoddeList += profileListIteratorRemoval(roddeList);
     }
