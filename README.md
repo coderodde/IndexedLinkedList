@@ -30,171 +30,159 @@ Above, ***n*** is the current size of a list, and ***m*** is the size of a newly
 On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB L2 cache and 8 MB L3 cache, the benchmark gives typically the following results:
 
 ```
-cd C:\Users\rodde\Documents\LinkedList; "JAVA_HOME=C:\\Program Files\\Java\\jdk-16.0.2" cmd /c "\"C:\\Program Files\\NetBeans-12.4\\netbeans\\java\\maven\\bin\\mvn.cmd\" -Dexec.args=\"${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}\" -Dexec.executable=\"C:\\Program Files\\Java\\jdk-16.0.2\\bin\\java.exe\" -Dexec.mainClass=com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner -Dexec.vmArgs= -Dexec.appArgs= -Dmaven.ext.class.path=\"C:\\Program Files\\NetBeans-12.4\\netbeans\\java\\maven-nblib\\netbeans-eventspy.jar\" -Dfile.encoding=UTF-8 org.codehaus.mojo:exec-maven-plugin:3.0.0:exec"
-Running NetBeans Compile On Save execution. Phase execution is skipped and output directories of dependency projects (with Compile on Save turned on) will be used instead of their jar artifacts.
-Invalid macro definition.
-
-C:\Users\rodde\Documents\LinkedList>echo off 
-Scanning for projects...
-
-----------------< com.github.coderodde.util:LinkedList >----------------
-Building LinkedList 1.6
---------------------------------[ jar ]---------------------------------
-
---- exec-maven-plugin:3.0.0:exec (default-cli) @ LinkedList ---
-<<< LinkedList seed = 1629956432123 >>>
+<<< LinkedList seed = 1630488442461 >>>
 
 === WARMUP RUN ===
-com.github.coderodde.util.LinkedList.addFirst in (ms): 1688
-java.util.LinkedList.addFirst in (ms): 4
-java.util.ArrayList.addFirst in (ms): 768
-org.apache.commons.collections4.list.TreeList.addFirst in (ms): 53
+com.github.coderodde.util.LinkedList.addFirst in (ms): 100
+java.util.LinkedList.addFirst in (ms): 18
+java.util.ArrayList.addFirst in (ms): 412
+org.apache.commons.collections4.list.TreeList.addFirst in (ms): 31
 
-com.github.coderodde.util.LinkedList.addLast in (ms): 10
-java.util.LinkedList.addLast in (ms): 6
-java.util.ArrayList.addLast in (ms): 5
-org.apache.commons.collections4.list.TreeList.addLast in (ms): 52
+com.github.coderodde.util.LinkedList.addLast in (ms): 8
+java.util.LinkedList.addLast in (ms): 5
+java.util.ArrayList.addLast in (ms): 4
+org.apache.commons.collections4.list.TreeList.addLast in (ms): 41
 
-com.github.coderodde.util.LinkedList.add(int, E) in (ms): 171
-java.util.LinkedList.add(int, E) in (ms): 2691
-java.util.ArrayList.add(int, E) in (ms): 222
-org.apache.commons.collections4.list.TreeList.add(int, E) in (ms): 22
+com.github.coderodde.util.LinkedList.add(int, E) in (ms): 110
+java.util.LinkedList.add(int, E) in (ms): 1427
+java.util.ArrayList.add(int, E) in (ms): 97
+org.apache.commons.collections4.list.TreeList.add(int, E) in (ms): 11
 
-com.github.coderodde.util.LinkedList.addAll(Collection) in (ms): 11
-java.util.LinkedList.addAll(Collection) in (ms): 11
-java.util.ArrayList.addAll(Collection) in (ms): 7
-org.apache.commons.collections4.list.TreeList.addAll(Collection) in (ms): 42
+com.github.coderodde.util.LinkedList.addAll(Collection) in (ms): 7
+java.util.LinkedList.addAll(Collection) in (ms): 9
+java.util.ArrayList.addAll(Collection) in (ms): 4
+org.apache.commons.collections4.list.TreeList.addAll(Collection) in (ms): 22
 
-com.github.coderodde.util.LinkedList.addAll(int, Collection) in (ms): 69
-java.util.LinkedList.addAll(int, Collection) in (ms): 2370
-java.util.ArrayList.addAll(int, Collection) in (ms): 189
-org.apache.commons.collections4.list.TreeList.addAll(int, Collection) in (ms): 21
+com.github.coderodde.util.LinkedList.addAll(int, Collection) in (ms): 75
+java.util.LinkedList.addAll(int, Collection) in (ms): 1367
+java.util.ArrayList.addAll(int, Collection) in (ms): 74
+org.apache.commons.collections4.list.TreeList.addAll(int, Collection) in (ms): 14
 
-com.github.coderodde.util.LinkedList.get(int) in (ms): 13
-java.util.LinkedList.get(int) in (ms): 1436
-java.util.ArrayList.get(int) in (ms): 3
+com.github.coderodde.util.LinkedList.get(int) in (ms): 31
+java.util.LinkedList.get(int) in (ms): 788
+java.util.ArrayList.get(int) in (ms): 0
 org.apache.commons.collections4.list.TreeList.get(int) in (ms): 2
 
-com.github.coderodde.util.LinkedList.removeFirst() in (ms): 118
-java.util.LinkedList.removeFirst() in (ms): 1
-java.util.ArrayList.removeFirst() in (ms): 159
-org.apache.commons.collections4.list.TreeList.removeFirst() in (ms): 2
+com.github.coderodde.util.LinkedList.removeFirst() in (ms): 223
+java.util.LinkedList.removeFirst() in (ms): 0
+java.util.ArrayList.removeFirst() in (ms): 88
+org.apache.commons.collections4.list.TreeList.removeFirst() in (ms): 1
 
-com.github.coderodde.util.LinkedList.removeLast() in (ms): 17
+com.github.coderodde.util.LinkedList.removeLast() in (ms): 54
 java.util.LinkedList.removeLast() in (ms): 0
 java.util.ArrayList.removeLast() in (ms): 0
 org.apache.commons.collections4.list.TreeList.removeLast() in (ms): 2
 
 com.github.coderodde.util.LinkedList.remove(int) in (ms): 0
-java.util.LinkedList.remove(int) in (ms): 3
-java.util.ArrayList.remove(int) in (ms): 0
-org.apache.commons.collections4.list.TreeList.remove(int) in (ms): 1
-
-com.github.coderodde.util.LinkedList.remove(Object) in (ms): 80
-java.util.LinkedList.remove(Object) in (ms): 15
-java.util.ArrayList.remove(Object) in (ms): 96
-org.apache.commons.collections4.list.TreeList.remove(Object) in (ms): 45
-
-com.github.coderodde.util.LinkedList.iterator().add() in (ms): 546
-java.util.LinkedList.iterator().add() in (ms): 14
-java.util.ArrayList.iterator().add() in (ms): 1294
-org.apache.commons.collections4.list.TreeList.iterator().add() in (ms): 39
-
-com.github.coderodde.util.LinkedList.iterator().remove() in (ms): 843
-java.util.LinkedList.iterator().remove() in (ms): 17
-java.util.ArrayList.iterator().remove() in (ms): 1456
-org.apache.commons.collections4.list.TreeList.iterator().remove() in (ms): 39
-
-com.github.coderodde.util.LinkedList.stream() in (ms): 74
-java.util.LinkedList.stream() in (ms): 18
-java.util.ArrayList.stream() in (ms): 24
-org.apache.commons.collections4.list.TreeList.stream() in (ms): 32
-
-com.github.coderodde.util.LinkedList.stream().parallel() in (ms): 38
-java.util.LinkedList.stream().parallel() in (ms): 39
-java.util.ArrayList.stream().parallel() in (ms): 31
-org.apache.commons.collections4.list.TreeList.stream().parallel() in (ms): 251
-
---- Total time elapsed ---
-com.github.coderodde.util.LinkedList in (ms): 3678
-java.util.LinkedList in (ms): 6625
-java.util.ArrayList in (ms): 4254
-org.apache.commons.collections4.list.TreeList in (ms): 603
-
-=== BENCHMARK RUN ===
-com.github.coderodde.util.LinkedList.addFirst in (ms): 1358
-java.util.LinkedList.addFirst in (ms): 6
-java.util.ArrayList.addFirst in (ms): 702
-org.apache.commons.collections4.list.TreeList.addFirst in (ms): 24
-
-com.github.coderodde.util.LinkedList.addLast in (ms): 11
-java.util.LinkedList.addLast in (ms): 3
-java.util.ArrayList.addLast in (ms): 5
-org.apache.commons.collections4.list.TreeList.addLast in (ms): 44
-
-com.github.coderodde.util.LinkedList.add(int, E) in (ms): 138
-java.util.LinkedList.add(int, E) in (ms): 2507
-java.util.ArrayList.add(int, E) in (ms): 144
-org.apache.commons.collections4.list.TreeList.add(int, E) in (ms): 4
-
-com.github.coderodde.util.LinkedList.addAll(Collection) in (ms): 9
-java.util.LinkedList.addAll(Collection) in (ms): 3
-java.util.ArrayList.addAll(Collection) in (ms): 5
-org.apache.commons.collections4.list.TreeList.addAll(Collection) in (ms): 13
-
-com.github.coderodde.util.LinkedList.addAll(int, Collection) in (ms): 56
-java.util.LinkedList.addAll(int, Collection) in (ms): 2657
-java.util.ArrayList.addAll(int, Collection) in (ms): 116
-org.apache.commons.collections4.list.TreeList.addAll(int, Collection) in (ms): 18
-
-com.github.coderodde.util.LinkedList.get(int) in (ms): 9
-java.util.LinkedList.get(int) in (ms): 1471
-java.util.ArrayList.get(int) in (ms): 0
-org.apache.commons.collections4.list.TreeList.get(int) in (ms): 1
-
-com.github.coderodde.util.LinkedList.removeFirst() in (ms): 115
-java.util.LinkedList.removeFirst() in (ms): 0
-java.util.ArrayList.removeFirst() in (ms): 115
-org.apache.commons.collections4.list.TreeList.removeFirst() in (ms): 1
-
-com.github.coderodde.util.LinkedList.removeLast() in (ms): 7
-java.util.LinkedList.removeLast() in (ms): 0
-java.util.ArrayList.removeLast() in (ms): 1
-org.apache.commons.collections4.list.TreeList.removeLast() in (ms): 1
-
-com.github.coderodde.util.LinkedList.remove(int) in (ms): 0
-java.util.LinkedList.remove(int) in (ms): 1
-java.util.ArrayList.remove(int) in (ms): 2
+java.util.LinkedList.remove(int) in (ms): 4
+java.util.ArrayList.remove(int) in (ms): 1
 org.apache.commons.collections4.list.TreeList.remove(int) in (ms): 0
 
-com.github.coderodde.util.LinkedList.remove(Object) in (ms): 34
-java.util.LinkedList.remove(Object) in (ms): 5
-java.util.ArrayList.remove(Object) in (ms): 58
-org.apache.commons.collections4.list.TreeList.remove(Object) in (ms): 13
+com.github.coderodde.util.LinkedList.remove(Object) in (ms): 15
+java.util.LinkedList.remove(Object) in (ms): 8
+java.util.ArrayList.remove(Object) in (ms): 41
+org.apache.commons.collections4.list.TreeList.remove(Object) in (ms): 23
 
-com.github.coderodde.util.LinkedList.iterator().add() in (ms): 639
-java.util.LinkedList.iterator().add() in (ms): 17
-java.util.ArrayList.iterator().add() in (ms): 1136
-org.apache.commons.collections4.list.TreeList.iterator().add() in (ms): 23
+com.github.coderodde.util.LinkedList.iterator().add() in (ms): 38
+java.util.LinkedList.iterator().add() in (ms): 8
+java.util.ArrayList.iterator().add() in (ms): 607
+org.apache.commons.collections4.list.TreeList.iterator().add() in (ms): 93
 
-com.github.coderodde.util.LinkedList.iterator().remove() in (ms): 613
-java.util.LinkedList.iterator().remove() in (ms): 7
-java.util.ArrayList.iterator().remove() in (ms): 1416
-org.apache.commons.collections4.list.TreeList.iterator().remove() in (ms): 59
+com.github.coderodde.util.LinkedList.iterator().remove() in (ms): 36
+java.util.LinkedList.iterator().remove() in (ms): 9
+java.util.ArrayList.iterator().remove() in (ms): 741
+org.apache.commons.collections4.list.TreeList.iterator().remove() in (ms): 27
 
-com.github.coderodde.util.LinkedList.stream() in (ms): 8
-java.util.LinkedList.stream() in (ms): 7
-java.util.ArrayList.stream() in (ms): 5
-org.apache.commons.collections4.list.TreeList.stream() in (ms): 13
+com.github.coderodde.util.LinkedList.stream() in (ms): 34
+java.util.LinkedList.stream() in (ms): 11
+java.util.ArrayList.stream() in (ms): 67
+org.apache.commons.collections4.list.TreeList.stream() in (ms): 16
 
-com.github.coderodde.util.LinkedList.stream().parallel() in (ms): 4
-java.util.LinkedList.stream().parallel() in (ms): 206
-java.util.ArrayList.stream().parallel() in (ms): 5
-org.apache.commons.collections4.list.TreeList.stream().parallel() in (ms): 28
+com.github.coderodde.util.LinkedList.stream().parallel() in (ms): 32
+java.util.LinkedList.stream().parallel() in (ms): 67
+java.util.ArrayList.stream().parallel() in (ms): 14
+org.apache.commons.collections4.list.TreeList.stream().parallel() in (ms): 40
 
 --- Total time elapsed ---
-com.github.coderodde.util.LinkedList in (ms): 3001
-java.util.LinkedList in (ms): 6890
-java.util.ArrayList in (ms): 3710
-org.apache.commons.collections4.list.TreeList in (ms): 242
+com.github.coderodde.util.LinkedList in (ms): 763
+java.util.LinkedList in (ms): 3721
+java.util.ArrayList in (ms): 2150
+org.apache.commons.collections4.list.TreeList in (ms): 323
+
+=== BENCHMARK RUN ===
+com.github.coderodde.util.LinkedList.addFirst in (ms): 41
+java.util.LinkedList.addFirst in (ms): 0
+java.util.ArrayList.addFirst in (ms): 482
+org.apache.commons.collections4.list.TreeList.addFirst in (ms): 16
+
+com.github.coderodde.util.LinkedList.addLast in (ms): 0
+java.util.LinkedList.addLast in (ms): 16
+java.util.ArrayList.addLast in (ms): 3
+org.apache.commons.collections4.list.TreeList.addLast in (ms): 17
+
+com.github.coderodde.util.LinkedList.add(int, E) in (ms): 80
+java.util.LinkedList.add(int, E) in (ms): 1317
+java.util.ArrayList.add(int, E) in (ms): 97
+org.apache.commons.collections4.list.TreeList.add(int, E) in (ms): 6
+
+com.github.coderodde.util.LinkedList.addAll(Collection) in (ms): 7
+java.util.LinkedList.addAll(Collection) in (ms): 6
+java.util.ArrayList.addAll(Collection) in (ms): 7
+org.apache.commons.collections4.list.TreeList.addAll(Collection) in (ms): 8
+
+com.github.coderodde.util.LinkedList.addAll(int, Collection) in (ms): 58
+java.util.LinkedList.addAll(int, Collection) in (ms): 1277
+java.util.ArrayList.addAll(int, Collection) in (ms): 67
+org.apache.commons.collections4.list.TreeList.addAll(int, Collection) in (ms): 13
+
+com.github.coderodde.util.LinkedList.get(int) in (ms): 27
+java.util.LinkedList.get(int) in (ms): 737
+java.util.ArrayList.get(int) in (ms): 1
+org.apache.commons.collections4.list.TreeList.get(int) in (ms): 0
+
+com.github.coderodde.util.LinkedList.removeFirst() in (ms): 90
+java.util.LinkedList.removeFirst() in (ms): 0
+java.util.ArrayList.removeFirst() in (ms): 67
+org.apache.commons.collections4.list.TreeList.removeFirst() in (ms): 0
+
+com.github.coderodde.util.LinkedList.removeLast() in (ms): 52
+java.util.LinkedList.removeLast() in (ms): 0
+java.util.ArrayList.removeLast() in (ms): 0
+org.apache.commons.collections4.list.TreeList.removeLast() in (ms): 0
+
+com.github.coderodde.util.LinkedList.remove(int) in (ms): 1
+java.util.LinkedList.remove(int) in (ms): 4
+java.util.ArrayList.remove(int) in (ms): 1
+org.apache.commons.collections4.list.TreeList.remove(int) in (ms): 0
+
+com.github.coderodde.util.LinkedList.remove(Object) in (ms): 6
+java.util.LinkedList.remove(Object) in (ms): 3
+java.util.ArrayList.remove(Object) in (ms): 38
+org.apache.commons.collections4.list.TreeList.remove(Object) in (ms): 10
+
+com.github.coderodde.util.LinkedList.iterator().add() in (ms): 52
+java.util.LinkedList.iterator().add() in (ms): 17
+java.util.ArrayList.iterator().add() in (ms): 618
+org.apache.commons.collections4.list.TreeList.iterator().add() in (ms): 17
+
+com.github.coderodde.util.LinkedList.iterator().remove() in (ms): 32
+java.util.LinkedList.iterator().remove() in (ms): 4
+java.util.ArrayList.iterator().remove() in (ms): 767
+org.apache.commons.collections4.list.TreeList.iterator().remove() in (ms): 24
+
+com.github.coderodde.util.LinkedList.stream() in (ms): 5
+java.util.LinkedList.stream() in (ms): 5
+java.util.ArrayList.stream() in (ms): 0
+org.apache.commons.collections4.list.TreeList.stream() in (ms): 0
+
+com.github.coderodde.util.LinkedList.stream().parallel() in (ms): 82
+java.util.LinkedList.stream().parallel() in (ms): 6
+java.util.ArrayList.stream().parallel() in (ms): 4
+org.apache.commons.collections4.list.TreeList.stream().parallel() in (ms): 156
+
+--- Total time elapsed ---
+com.github.coderodde.util.LinkedList in (ms): 533
+java.util.LinkedList in (ms): 3392
+java.util.ArrayList in (ms): 2152
+org.apache.commons.collections4.list.TreeList in (ms): 267
 ```
