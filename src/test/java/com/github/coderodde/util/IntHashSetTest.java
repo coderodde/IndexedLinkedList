@@ -14,6 +14,45 @@ public class IntHashSetTest {
     public void beforeTest() {
         set.clear();
     }
+    
+    @Test
+    public void removeBug() {
+        for (int i = 0; i < 9; i++) 
+            set.add(i);
+        
+        for (int i = 0; i < 9; i++) 
+            set.remove(i);
+    }
+    
+    @Test
+    public void removeFirstMiddleLast() {
+        // All three ints will end up in the same collision chain:
+        set.add(1);  // 0b00001
+        set.add(9);  // 0b01001
+        set.add(17); // 0b10001
+        
+        assertTrue(set.contains(1));
+        assertTrue(set.contains(9));
+        assertTrue(set.contains(17));
+        
+        set.remove(1);
+        
+        assertFalse(set.contains(1));
+        assertTrue(set.contains(9));
+        assertTrue(set.contains(17));
+        
+        set.remove(17);
+        
+        assertFalse(set.contains(1));
+        assertTrue(set.contains(9));
+        assertFalse(set.contains(17));
+        
+        set.remove(9);
+        
+        assertFalse(set.contains(1));
+        assertFalse(set.contains(9));
+        assertFalse(set.contains(17));
+    }
 
     @Test
     public void add() {
