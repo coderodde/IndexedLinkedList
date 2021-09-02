@@ -1,5 +1,9 @@
 package com.github.coderodde.util;
 
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 /**
  * This class implements a simple hash set for non-negative {@code int} values.
  * It is used in the {@link com.github.coderodde.util.LinkedList} in order to 
@@ -12,7 +16,6 @@ package com.github.coderodde.util;
 public class IntHashSet {
 
     private static final int INITIAL_CAPACITY = 8;
-    private static final float MAXIMUM_LOAD_FACTOR = 0.75f;
 
     private static final class Node {
         Node next;
@@ -39,22 +42,40 @@ public class IntHashSet {
     }
 
     public void add(int integer) {
-        if (contains(integer)) {
-            return;
+        int targetCollisionChainIndex = integer & mask;
+        Node node = table[targetCollisionChainIndex];
+        
+        while (node != null) {
+            if (node.integer == integer) {
+                return;
+            }
+            
+            node = node.next;
         }
-
+        
         size++;
-
-        if (shouldExpand())
-            expand();
-
-        final int targetCollisionChainIndex = integer & mask;
-        final Node newNode = 
-                new Node(
-                        integer, 
-                        table[targetCollisionChainIndex]);
-
-        newNode.next = table[targetCollisionChainIndex];
+        
+        if (size > table.length) {
+            Node[] newTable = new Node[2 * table.length];
+            mask = newTable.length - 1;
+            
+            for (Node currentNode : table) {
+                while (currentNode != null) {
+                    Node nextNode = currentNode.next;
+                    
+                    int newTableHash = currentNode.integer & mask;
+                    currentNode.next = newTable[newTableHash];
+                    newTable[newTableHash] = currentNode;
+                    
+                    currentNode = nextNode;
+                }
+            }
+            
+            table = newTable;
+            targetCollisionChainIndex = integer & mask;
+        }
+        
+        Node newNode = new Node(integer, table[targetCollisionChainIndex]);
         table[targetCollisionChainIndex] = newNode;
     }
 
@@ -74,37 +95,52 @@ public class IntHashSet {
     }
 
     public void remove(int integer) {
-        if (!contains(integer)) {
-            return;
+        int targetCollisionChainIndex = integer & mask;
+        Node node = table[targetCollisionChainIndex];
+        Node prev = null;
+        
+        while (node != null) {
+            if (node.integer == integer) {
+                break;
+            }
+            
+            prev = node;
+            node = node.next;
         }
+        
+        if (node == null) 
+            return;
 
         size--;
-
-        if (shouldContract()) 
-            contract();
-
-        final int targetCollisionChainIndex = integer & mask;
-
-        Node current = 
-                table[targetCollisionChainIndex];
-
-        Node previous = null;
-
-        while (current != null) {
-            Node next = current.next;
-
-            if (current.integer == integer) {
-                if (previous == null) {
-                    table[targetCollisionChainIndex] = next;
-                } else {
-                    previous.next = next;
+        
+        if (size * 4 <= table.length && table.length >= INITIAL_CAPACITY * 4) {
+            Node[] newTable = new Node[table.length / 4];
+            mask = newTable.length - 1;
+            
+            for (Node currentNode : table) {
+                while (currentNode != null) {
+                    if (currentNode == node) {
+                        // Omit the node with the target integer:
+                        currentNode = currentNode.next;
+                        continue;
+                    }
+                    
+                    Node nextNode = currentNode.next;
+                    
+                    int newTableHash = currentNode.integer & mask;
+                    currentNode.next = newTable[newTableHash];
+                    newTable[newTableHash] = currentNode;
+                    
+                    currentNode = nextNode;
                 }
-
-                return;
             }
-
-            previous = current;
-            current = next;
+            
+            table = newTable;
+        } else  if (prev == null) {
+            table[targetCollisionChainIndex] = 
+                    table[targetCollisionChainIndex].next;
+        } else {
+            prev.next = prev.next.next;
         }
     }
 
@@ -113,56 +149,94 @@ public class IntHashSet {
          table = new Node[INITIAL_CAPACITY];
          mask = table.length - 1;
     }
+    
+    private static final int DATA_LENGTH = 5_000_000;
+    
 
-    // Keep add(int) an amortized O(1)
-    private boolean shouldExpand() {
-        return size > table.length * MAXIMUM_LOAD_FACTOR;
+    
+    public static void main(String[] args) {
+        Random random = new Random(10L);
+        
+        int[] addData      = getAddData(random);
+        int[] containsData = getAddData(random);
+        int[] removeData   = getRemoveData(random);
+        
+        for (int iter = 0; iter < 5; iter++) {
+            System.out.println(">>> Iteration: " + (iter + 1) + "/5");
+            
+            IntHashSet myset = new IntHashSet();
+            Set<Integer> set = new HashSet<>();
+
+            long start = System.currentTimeMillis();
+            for (int i : addData) {
+                myset.add(i);
+            }
+            long end = System.currentTimeMillis();
+
+            System.out.println("    IntHashSet.add in " + (end - start));
+
+            start = System.currentTimeMillis();
+            for (int i : addData) {
+                set.add(i);
+            }
+            end = System.currentTimeMillis();
+
+            System.out.println("    HashSet.add in " + (end - start) + "\n");
+
+            start = System.currentTimeMillis();
+            for (int i : containsData) {
+                myset.contains(i);
+            }
+            end = System.currentTimeMillis();
+
+            System.out.println("    IntHashSet.contains in " + (end - start));
+
+            start = System.currentTimeMillis();
+            for (int i : containsData) {
+                set.contains(i);
+            }
+            end = System.currentTimeMillis();
+
+            System.out.println("    HashSet.contains in " + (end - start) + 
+                    "\n");
+
+            start = System.currentTimeMillis();
+            for (int i : removeData) {
+                myset.remove(i);
+            }
+            end = System.currentTimeMillis();
+
+            System.out.println("    IntHashSet.remove in " + (end - start));
+
+            start = System.currentTimeMillis();
+            for (int i : removeData) {
+                set.remove(i);
+            }
+            end = System.currentTimeMillis();
+
+            System.out.println("    HashSet.remove in " + (end - start) + "\n");
+        }
     }
-
-    // Keep remove(int) an amortized O(1)
-    private boolean shouldContract() {
-        if (table.length == INITIAL_CAPACITY) {
-            // Do not ocntract below INITIAL_CAPACITY:
-            return false;
+        
+    private static int[] getAddData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+        
+    private static int[] getContainsData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+        
+    private static int[] getRemoveData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+    
+    private static int[] getData(int length, int maxValue, Random random) {
+        int[] data = new int[length];
+        
+        for (int i = 0; i < length; i++) {
+            data[i] = random.nextInt(maxValue + 1);
         }
         
-        return size < table.length / 4;
-    }
-
-    private void expand() {
-        Node[] newTable = 
-                new Node[table.length * 2];
-
-        rehash(newTable);
-        table = newTable;
-        mask = table.length - 1;
-    }
-
-    private void contract() {
-        Node[] newTable = 
-                new Node[table.length / 4];
-
-        rehash(newTable);
-        table = newTable;
-        mask = table.length - 1;
-    }
-
-    private void rehash(Node[] newTable) {
-        for (Node node : table) {
-            while (node != null) {
-                final Node next = node.next;
-                final int rehashedIndex = getHashValue(node.integer, newTable);
-
-                node.next = newTable[rehashedIndex];
-                newTable[rehashedIndex] = node;
-                node = next;
-            }
-        }
-    }
-
-    private static int getHashValue(
-            int integer, 
-            Node[] newTable) {
-        return integer & (newTable.length - 1);
+        return data;
     }
 }
