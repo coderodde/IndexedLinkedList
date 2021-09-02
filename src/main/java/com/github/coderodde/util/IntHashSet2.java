@@ -1,6 +1,7 @@
 package com.github.coderodde.util;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -115,7 +116,6 @@ public class IntHashSet2 {
         if (size * 4 <= table.length && table.length >= INITIAL_CAPACITY * 4) {
             Node[] newTable = new Node[table.length / 4];
             mask = newTable.length - 1;
-            int i = 0;
             
             for (Node currentNode : table) {
                 while (currentNode != null) {
@@ -150,9 +150,17 @@ public class IntHashSet2 {
          mask = table.length - 1;
     }
     
-    private static final int ITERATIONS = 5_000_000;
+    private static final int DATA_LENGTH = 5_000_000;
+    
+
     
     public static void main(String[] args) {
+        Random random = new Random(10L);
+        
+        int[] addData      = getAddData(random);
+        int[] containsData = getAddData(random);
+        int[] removeData   = getRemoveData(random);
+        
         for (int iter = 0; iter < 5; iter++) {
             System.out.println(">>> Iteration: " + (iter + 1) + "/5");
             
@@ -160,52 +168,75 @@ public class IntHashSet2 {
             Set<Integer> set = new HashSet<>();
 
             long start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : addData) {
                 myset.add(i);
             }
             long end = System.currentTimeMillis();
 
-            System.out.println("IntHashSet.add in " + (end - start));
+            System.out.println("    IntHashSet.add in " + (end - start));
 
             start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : addData) {
                 set.add(i);
             }
             end = System.currentTimeMillis();
 
-            System.out.println("HashSet.add in " + (end - start) + "\n");
+            System.out.println("    HashSet.add in " + (end - start) + "\n");
 
             start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : containsData) {
                 myset.contains(i);
             }
             end = System.currentTimeMillis();
 
-            System.out.println("IntHashSet.contains in " + (end - start));
+            System.out.println("    IntHashSet.contains in " + (end - start));
 
             start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : containsData) {
                 set.contains(i);
             }
             end = System.currentTimeMillis();
 
-            System.out.println("HashSet.contains in " + (end - start) + "\n");
+            System.out.println("    HashSet.contains in " + (end - start) + 
+                    "\n");
 
             start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : removeData) {
                 myset.remove(i);
             }
             end = System.currentTimeMillis();
 
-            System.out.println("IntHashSet.remove in " + (end - start));
+            System.out.println("    IntHashSet.remove in " + (end - start));
 
             start = System.currentTimeMillis();
-            for (int i = 0; i < ITERATIONS; i++) {
+            for (int i : removeData) {
                 set.remove(i);
             }
             end = System.currentTimeMillis();
 
-            System.out.println("HashSet.remove in " + (end - start) + "\n");
+            System.out.println("    HashSet.remove in " + (end - start) + "\n");
         }
+    }
+        
+    private static int[] getAddData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+        
+    private static int[] getContainsData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+        
+    private static int[] getRemoveData(Random random) {
+        return getData(DATA_LENGTH, 3 * DATA_LENGTH / 2, random);
+    }
+    
+    private static int[] getData(int length, int maxValue, Random random) {
+        int[] data = new int[length];
+        
+        for (int i = 0; i < length; i++) {
+            data[i] = random.nextInt(maxValue + 1);
+        }
+        
+        return data;
     }
 }
