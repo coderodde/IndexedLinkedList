@@ -18,15 +18,9 @@ import java.util.function.Consumer;
  * interfaces.  Implements all optional list operations, and permits all
  * elements (including {@code null}).
  *
- * <p>This implementation maintains <code>ceil(sqrt(n/2))</code> fingers, which
- * allows faster <code>add(int, E)</code> and <code>remove(int)</code>.
+ * <p>This implementation maintains <code>ceil(sqrt(n/2)/10)</code> fingers, 
+ * which allows faster operations in methods requesting an integer index.
  * 
- * The running time table is as follows:
- * 
- * <p>All of the operations perform as could be expected for a doubly-linked
- * list.  Operations that index into the list will traverse the list from
- * the beginning or the end, whichever is closer to the specified index.
- *
  * <p><strong>Note that this implementation is not synchronized.</strong>
  * If multiple threads access a linked list concurrently, and at least
  * one of the threads modifies the list structurally, it <i>must</i> be
@@ -67,38 +61,35 @@ import java.util.function.Consumer;
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the type of elements held in this collection
  */
-
 public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
 
     /**
-     * Number of elements in the list.
+     * Number of elements in this list.
      */
     private int size = 0;
 
     /**
-     * Pointer to first node.
+     * The first node.
      */
     private transient Node<E> first;
 
     /**
-     * Pointer to last node.
+     * The last node.
      */
     private transient Node<E> last;
 
     /**
-     * Stack of fingers.
+     * The stack of fingers.
      */
     private transient FingerStack<E> fingerStack = new FingerStack<>();
 
     /**
      * Constructs an empty list.
      */
-    public LinkedList() {
-
-    }
+    public LinkedList() {}
 
     /**
      * Constructs a list containing the elements of the specified
@@ -119,8 +110,9 @@ public class LinkedList<E>
      * <p>This method is equivalent to {@link #addLast}.
      *
      * @param e element to be appended to this list
-     * @return {@code true} (as specified by {@link Collection#add})
+     * @return {@code true} (as specified by {@link Collection#add}).
      */
+    @Override
     public boolean add(E e) {
         linkLast(e);
         return true;
@@ -128,13 +120,14 @@ public class LinkedList<E>
 
     /**
      * Inserts the specified element at the specified position in this list.
-     * Shifts the element currently at that position (if any) and any
-     * subsequent elements to the right (adds one to their indices).
+     * The affected finger indices will be incremented by one. A finger 
+     * {@code F} is <i>affected</i>, if {@code F.index >= index}.
      *
-     * @param index index at which the specified element is to be inserted
-     * @param element element to be inserted
+     * @param index index at which the specified element is to be inserted.
+     * @param element element to be inserted.
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    @Override
     public void add(int index, E element) {
         checkPositionIndex(index);
         
@@ -146,35 +139,34 @@ public class LinkedList<E>
 
     /**
      * Appends all of the elements in the specified collection to the end of
-     * this list, in the order that they are returned by the specified
-     * collection's iterator.  The behavior of this operation is undefined if
-     * the specified collection is modified while the operation is in
-     * progress.  (Note that this will occur if the specified collection is
-     * this list, and it's nonempty.)
+     * this list, in the order they are returned by the specified collection's
+     * iterator.  The behavior of this operation is undefined if the specified 
+     * collection is modified while the operation is in progress.  (Note that 
+     * this will occur if the specified collection is this list, and it's
+     * nonempty.)
      *
-     * @param c collection containing elements to be added to this list
-     * @return {@code true} if this list changed as a result of the call
-     * @throws NullPointerException if the specified collection is null
+     * @param c collection containing elements to be added to this list.
+     * @return {@code true} if this list changed as a result of the call.
+     * @throws NullPointerException if the specified collection is null.
      */
+    @Override
     public boolean addAll(Collection<? extends E> c) {
         return addAll(size, c);
     }
 
     /**
-     * Inserts all of the elements in the specified collection into this
-     * list, starting at the specified position.  Shifts the element
-     * currently at that position (if any) and any subsequent elements to
-     * the right (increases their indices).  The new elements will appear
-     * in the list in the order that they are returned by the
-     * specified collection's iterator.
+     * Inserts all of the elements in the specified collection into this list, 
+     * starting at the specified position. For each finger {@code F} with 
+     * {@code F.index >= index} will increment {@code F.index} by 1.
      *
-     * @param index index at which to insert the first element
-     *              from the specified collection
-     * @param c collection containing elements to be added to this list
-     * @return {@code true} if this list changed as a result of the call
+     * @param index index at which to insert the first element from the
+     *              specified collection.
+     * @param c collection containing elements to be added to this list.
+     * @return {@code true} if this list changed as a result of the call.
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws NullPointerException if the specified collection is null
      */
+    @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         checkPositionIndex(index);
         if (c.isEmpty())
@@ -195,8 +187,9 @@ public class LinkedList<E>
     /**
      * Inserts the specified element at the beginning of this list.
      *
-     * @param e the element to add
+     * @param e the element to add.
      */
+    @Override
     public void addFirst(E e) {
         linkFirst(e);
     }
@@ -206,24 +199,23 @@ public class LinkedList<E>
      *
      * <p>This method is equivalent to {@link #add}.
      *
-     * @param e the element to add
+     * @param e the element to add.
      */
+    @Override
     public void addLast(E e) {
         linkLast(e);
     }
 
     /**
-     * Removes all of the elements from this list.
-     * The list will be empty after this call returns.
+     * Removes all of the elements from this list. The list will be empty after 
+     * this call returns.
      */
+    @Override
     public void clear() {
         fingerStack.clear();
         size = 0;
 
-        // Clearing all of the links between nodes is "unnecessary", but:
-        // - helps a generational GC if the discarded nodes inhabit
-        //   more than one generation
-        // - is sure to free memory even if there is a reachable Iterator
+        // Help GC:
         for (Node<E> node = first; node != null;) {
             node.prev = null;
             node.item = null;
@@ -237,20 +229,22 @@ public class LinkedList<E>
     }
 
     /**
-     * Returns {@code true} if this list contains the specified element.
-     * More formally, returns {@code true} if and only if this list contains
-     * at least one element {@code e} such that
-     * {@code Objects.equals(o, e)}.
+     * Returns {@code true} if this list contains the specified element. More 
+     * formally, returns {@code true} if and only if this list contains at least 
+     * one element {@code e} such that {@code Objects.equals(o, e)}.
      *
      * @param o element whose presence in this list is to be tested
      * @return {@code true} if this list contains the specified element
      */
+    @Override
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
     }
 
     /**
-     * @since 1.6
+     * Returns a basic, descending iterator over this list.
+     * 
+     * @return the descending iterator.
      */
     @Override
     public Iterator<E> descendingIterator() {
@@ -260,9 +254,8 @@ public class LinkedList<E>
     /**
      * Retrieves, but does not remove, the head (first element) of this list.
      *
-     * @return the head of this list
-     * @throws NoSuchElementException if this list is empty
-     * @since 1.5
+     * @return the head of this list.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E element() {
@@ -320,10 +313,11 @@ public class LinkedList<E>
     /**
      * Returns the element at the specified position in this list.
      *
-     * @param index index of the element to return
-     * @return the element at the specified position in this list
+     * @param index index of the element to return.
+     * @return the element at the specified position in this list.
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    @Override
     public E get(int index) {
         checkElementIndex(index);
         return node(index).item;
@@ -332,9 +326,10 @@ public class LinkedList<E>
     /**
      * Returns the first element in this list.
      *
-     * @return the first element in this list
-     * @throws NoSuchElementException if this list is empty
+     * @return the first element in this list.
+     * @throws NoSuchElementException if this list is empty.
      */
+    @Override
     public E getFirst() {
         final Node<E> f = first;
         if (f == null)
@@ -346,9 +341,10 @@ public class LinkedList<E>
     /**
      * Returns the last element in this list.
      *
-     * @return the last element in this list
-     * @throws NoSuchElementException if this list is empty
+     * @return the last element in this list.
+     * @throws NoSuchElementException if this list is empty.
      */
+    @Override
     public E getLast() {
         final Node<E> l = last;
         if (l == null)
@@ -363,6 +359,7 @@ public class LinkedList<E>
      * @param o the object whose index to return.
      * @return the index of {@code o}, or -1, if none is present.
      */
+    @Override
     public int indexOf(Object o) {
         int index = 0;
         
@@ -398,6 +395,7 @@ public class LinkedList<E>
      * @param o the object to search for.
      * @return the largest index of {@code o}, or -1 if none is present.
      */
+    @Override
     public int lastIndexOf(Object o) {
         int index = size;
         
@@ -433,9 +431,9 @@ public class LinkedList<E>
      * time in the future.
      *
      * @param index index of the first element to be returned from the
-     *              list-iterator (by a call to {@code next})
+     *              list-iterator (by a call to {@code next}).
      * @return a ListIterator of the elements in this list (in proper
-     *         sequence), starting at the specified position in the list
+     *         sequence), starting at the specified position in the list.
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
@@ -445,11 +443,10 @@ public class LinkedList<E>
     }
 
     /**
-     * Adds the specified element as the tail (last element) of this list.
+     * Adds the specified element as the tail of this list.
      *
-     * @param e the element to add
-     * @return {@code true} (as specified by {@link Queue#offer})
-     * @since 1.5
+     * @param e the element to add.
+     * @return {@code true} (as specified by {@link Queue#offer}).
      */
     @Override
     public boolean offer(E e) {
@@ -460,8 +457,7 @@ public class LinkedList<E>
      * Inserts the specified element at the front of this list.
      *
      * @param e the element to insert
-     * @return {@code true} (as specified by {@link Deque#offerFirst})
-     * @since 1.6
+     * @return {@code true} (as specified by {@link Deque#offerFirst}).
      */
     @Override
     public boolean offerFirst(E e) {
@@ -472,9 +468,8 @@ public class LinkedList<E>
     /**
      * Inserts the specified element at the end of this list.
      *
-     * @param e the element to insert
-     * @return {@code true} (as specified by {@link Deque#offerLast})
-     * @since 1.6
+     * @param e the element to insert.
+     * @return {@code true} (as specified by {@link Deque#offerLast}).
      */
     @Override
     public boolean offerLast(E e) {
@@ -485,8 +480,7 @@ public class LinkedList<E>
     /**
      * Retrieves, but does not remove, the head (first element) of this list.
      *
-     * @return the head of this list, or {@code null} if this list is empty
-     * @since 1.5
+     * @return the head of this list, or {@code null} if this list is empty.
      */
     @Override
     public E peek() {
@@ -498,9 +492,8 @@ public class LinkedList<E>
      * Retrieves, but does not remove, the first element of this list,
      * or returns {@code null} if this list is empty.
      *
-     * @return the first element of this list, or {@code null}
-     *         if this list is empty
-     * @since 1.6
+     * @return the first element of this list, or {@code null} if this list is 
+     *         empty.
      */
     @Override
     public E peekFirst() {
@@ -512,9 +505,8 @@ public class LinkedList<E>
      * Retrieves, but does not remove, the last element of this list,
      * or returns {@code null} if this list is empty.
      *
-     * @return the last element of this list, or {@code null}
-     *         if this list is empty
-     * @since 1.6
+     * @return the last element of this list, or {@code null} if this list is 
+     *         empty.
      */
     @Override
     public E peekLast() {
@@ -526,7 +518,6 @@ public class LinkedList<E>
      * Retrieves and removes the head (first element) of this list.
      *
      * @return the head of this list, or {@code null} if this list is empty
-     * @since 1.5
      */
     @Override
     public E poll() {
@@ -535,12 +526,11 @@ public class LinkedList<E>
     }
 
     /**
-     * Retrieves and removes the first element of this list,
-     * or returns {@code null} if this list is empty.
+     * Retrieves and removes the first element of this list, or returns 
+     * {@code null} if this list is empty.
      *
-     * @return the first element of this list, or {@code null} if
-     *     this list is empty
-     * @since 1.6
+     * @return the first element of this list, or {@code null} if this list is 
+     *         empty.
      */
     @Override
     public E pollFirst() {
@@ -549,12 +539,11 @@ public class LinkedList<E>
     }
 
     /**
-     * Retrieves and removes the last element of this list,
-     * or returns {@code null} if this list is empty.
+     * Retrieves and removes the last element of this list, or returns 
+     * {@code null} if this list is empty.
      *
-     * @return the last element of this list, or {@code null} if
-     *     this list is empty
-     * @since 1.6
+     * @return the last element of this list, or {@code null} if this list is 
+     *         empty.
      */
     @Override
     public E pollLast() {
@@ -563,15 +552,14 @@ public class LinkedList<E>
     }
 
     /**
-     * Pops an element from the stack represented by this list.  In other
-     * words, removes and returns the first element of this list.
+     * Pops an element from the stack represented by this list. In other words,
+     * removes and returns the first element of this list.
      *
      * <p>This method is equivalent to {@link #removeFirst()}.
      *
-     * @return the element at the front of this list (which is the top
-     *         of the stack represented by this list)
-     * @throws NoSuchElementException if this list is empty
-     * @since 1.6
+     * @return the element at the front of this list (which is the top of the 
+     *         stack represented by this list).
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E pop() {
@@ -579,13 +567,12 @@ public class LinkedList<E>
     }
 
     /**
-     * Pushes an element onto the stack represented by this list.  In other
+     * Pushes an element onto the stack represented by this list. In other 
      * words, inserts the element at the front of this list.
      *
      * <p>This method is equivalent to {@link #addFirst}.
      *
-     * @param e the element to push
-     * @since 1.6
+     * @param e the element to push.
      */
     @Override
     public void push(E e) {
@@ -595,28 +582,31 @@ public class LinkedList<E>
     /**
      * Retrieves and removes the head (first element) of this list.
      *
-     * @return the head of this list
-     * @throws NoSuchElementException if this list is empty
+     * @return the head of this list.
+     * @throws NoSuchElementException if this list is empty.
      * @since 1.5
      */
     @Override
     public E remove() {
+        if (size == 0) {
+            throw new NoSuchElementException("remove() from empty LinkedList.");
+        }
+        
         return removeFirst();
     }
 
     /**
-     * Removes the first occurrence of the specified element from this list,
-     * if it is present.  If this list does not contain the element, it is
-     * unchanged.  More formally, removes the element with the lowest index
-     * {@code i} such that
-     * {@code Objects.equals(o, get(i))}
-     * (if such an element exists).  Returns {@code true} if this list
-     * contained the specified element (or equivalently, if this list
-     * changed as a result of the call).
+     * Removes the first occurrence of the specified element from this list, if 
+     * it is present.  If this list does not contain the element, it is 
+     * unchanged.  More formally, removes the element with the lowest index 
+     * {@code i} such that {@code Objects.equals(o, get(i))} (if such an element 
+     * exists). Returns {@code true} if this list contained the specified 
+     * element (or equivalently, if this list changed as a result of the call).
      *
-     * @param o element to be removed from this list, if present
-     * @return {@code true} if this list contained the specified element
+     * @param o element to be removed from this list, if present.
+     * @return {@code true} if this list contained the specified element.
      */
+    @Override
     public boolean remove(Object o) {
         int index = 0;
 
@@ -641,11 +631,12 @@ public class LinkedList<E>
     
     /**
      * Removes the element residing at the given index.
-     * The procedure:
-     * 1. Find the node N to remove
-     * 2. If N is fingered by F, move F left/right
-     * 3. unlink(N)
+     * 
+     * @param index the index of the element to remove.
+     * @return the removed element. (The one that resided at the index 
+     *         {@code index}.)
     */
+    @Override
     public E remove(int index) {
         checkElementIndex(index);
         
@@ -682,10 +673,16 @@ public class LinkedList<E>
     /**
      * Removes and returns the first element from this list.
      *
-     * @return the first element from this list
-     * @throws NoSuchElementException if this list is empty
+     * @return the first element from this list.
+     * @throws NoSuchElementException if this list is empty.
      */
+    @Override
     public E removeFirst() {
+        if (size == 0) {
+            throw new NoSuchElementException(
+                    "removeFirst from an empty LinkedList");
+        }
+        
         checkElementIndex(0);
         
         E returnValue = first.item;
@@ -704,13 +701,12 @@ public class LinkedList<E>
     }
 
     /**
-     * Removes the first occurrence of the specified element in this
-     * list (when traversing the list from head to tail).  If the list
-     * does not contain the element, it is unchanged.
+     * Removes the first occurrence of the specified element in this list (when 
+     * traversing the list from head to tail). If the list does not contain the 
+     * element, it is unchanged.
      *
-     * @param o element to be removed from this list, if present
-     * @return {@code true} if the list contained the specified element
-     * @since 1.6
+     * @param o element to be removed from this list, if present.
+     * @return {@code true} only if the list contained the specified element.
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
@@ -738,10 +734,15 @@ public class LinkedList<E>
     /**
      * Removes and returns the last element from this list.
      *
-     * @return the last element from this list
-     * @throws NoSuchElementException if this list is empty
+     * @return the last element from this list.
+     * @throws NoSuchElementException if this list is empty.
      */
+    @Override
     public E removeLast() {
+        if (size == 0) {
+            throw new NoSuchElementException("removeLast on empty LinkedList");
+        }
+        
         checkElementIndex(size - 1);
         
         E returnValue = last.item;
@@ -759,13 +760,12 @@ public class LinkedList<E>
     }
 
     /**
-     * Removes the last occurrence of the specified element in this
-     * list (when traversing the list from head to tail).  If the list
-     * does not contain the element, it is unchanged.
+     * Removes the last occurrence of the specified element in this list (when 
+     * traversing the list from tail to head). If the list does not contain the
+     * element, it is unchanged.
      *
-     * @param o element to be removed from this list, if present
-     * @return {@code true} if the list contained the specified element
-     * @since 1.6
+     * @param o element to be removed from this list, if present.
+     * @return {@code true} only if the list contained the specified element.
      */
     @Override
     public boolean removeLastOccurrence(Object o) {
@@ -793,8 +793,9 @@ public class LinkedList<E>
     /**
      * Returns the number of elements in this list.
      *
-     * @return the number of elements in this list
+     * @return the number of elements in this list.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -812,12 +813,11 @@ public class LinkedList<E>
      * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
      * and implements {@code trySplit} to permit limited parallelism..
      *
-     * @return a {@code Spliterator} over the elements in this list
-     * @since 1.8
+     * @return a {@code Spliterator} over the elements in this list.
      */
     @Override
     public Spliterator<E> spliterator() {
-        return new LinkedListSpliterator<E>(this, first, size, 0, modCount);
+        return new LinkedListSpliterator<>(this, first, size, 0, modCount);
     }
 
     @java.io.Serial
@@ -983,7 +983,7 @@ public class LinkedList<E>
 
     /***************************************************************************
     Checks the element index. In the case of non-empty list, valid indices are
-    {@code 0, 1, ..., size - 1}.
+    '{ 0, 1, ..., size - 1 }'.
     ***************************************************************************/
     private void checkElementIndex(int index) {
         if (!isElementIndex(index))
@@ -1025,7 +1025,8 @@ public class LinkedList<E>
     
    /***************************************************************************
     Checks that the input index is a valid position index for add operation or
-    iterator position.
+    iterator position. In other words, checks that {@code index} is in the set
+    '{ 0, 1, ..., size}'.
     ***************************************************************************/
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index))
@@ -1109,14 +1110,14 @@ public class LinkedList<E>
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size / 2.0) / 10.0);
+        return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
     /***************************************************************************
-    Computes the recommended number of fingers for {@code size} elements.
+    Computes the recommended number of fingers for 'size' elements.
     ***************************************************************************/
     private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.ceil(Math.sqrt(size / 2.0) / 10.0);
+        return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
     private void increaseSize() {
@@ -1480,8 +1481,8 @@ public class LinkedList<E>
     }
     
     /***************************************************************************
-    For each finger with the index at least 'startIndex', add 'steps' to the
-    index. TODO: deal with the index set
+    For each finger with the index at least 'startIndex', add 'steps' to the 
+    index.
     ***************************************************************************/
     private void shiftIndicesToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
@@ -1513,7 +1514,7 @@ public class LinkedList<E>
     }
 
     /***************************************************************************
-    Unlinks the input node and adjusts the fingers.
+    Unlinks the input node from the actual doubly-linked list.
     ***************************************************************************/
     private void unlink(Node<E> x) {
         final Node<E> next = x.next;
@@ -1660,9 +1661,8 @@ public class LinkedList<E>
     }
     
     /***************************************************************************
-    Implements a simple, array-based stack for storing the node fingers.
-    
-    @param <E> the list element type
+    Implements a simple, array-based stack for storing the node fingers for
+    items of type 'E'.
     ***************************************************************************/
     private static final class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
@@ -1732,8 +1732,6 @@ public class LinkedList<E>
 
     /***************************************************************************
     This class implements a basic iterator over this list.
-
-    @param E the element type.
     ***************************************************************************/
     private final class BasicIterator implements Iterator<E> {
 
@@ -1797,7 +1795,7 @@ public class LinkedList<E>
     }
     
     /***************************************************************************
-    Implements the list iterator over this list.
+    Implements the enhanced list iterator over this list.
     ***************************************************************************/
     private final class EnhancedIterator implements ListIterator<E> {
 
@@ -2034,15 +2032,13 @@ public class LinkedList<E>
         
         @Override
         public boolean hasCharacteristics(int characteristics) {
-            switch (characteristics) {
-                case Spliterator.ORDERED:
-                case Spliterator.SIZED:
-                case Spliterator.SUBSIZED:
-                    return true;
+            return switch (characteristics) {
+                case Spliterator.ORDERED, 
+                     Spliterator.SIZED, 
+                     Spliterator.SUBSIZED -> true;
                     
-                default:
-                    return false;
-            }
+                default -> false;
+            };
         }
     }
 }
