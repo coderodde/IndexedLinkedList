@@ -113,8 +113,8 @@ public class IntHashSet {
 
         size--;
         
-        if (size * 4 <= table.length && table.length >= INITIAL_CAPACITY * 4) {
-            Node[] newTable = new Node[table.length / 4];
+        if (size * 4 <= table.length && table.length != INITIAL_CAPACITY) {
+            Node[] newTable = new Node[table.length / 2];
             mask = newTable.length - 1;
             
             for (Node currentNode : table) {
@@ -158,7 +158,7 @@ public class IntHashSet {
         Random random = new Random(10L);
         
         int[] addData      = getAddData(random);
-        int[] containsData = getAddData(random);
+        int[] containsData = getContainsData(random);
         int[] removeData   = getRemoveData(random);
         
         for (int iter = 0; iter < 5; iter++) {

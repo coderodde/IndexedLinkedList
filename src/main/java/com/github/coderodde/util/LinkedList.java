@@ -641,33 +641,27 @@ public class LinkedList<E>
         checkElementIndex(index);
         
         Finger<E> closestFinger = getClosestFinger(index);
+        E returnValue;
+        Node<E> nodeToRemove;
         
         if (closestFinger.index == index) {
-            Node<E> nodeToRemove = closestFinger.node;
-            E returnValue = nodeToRemove.item;
-            moveFingerOutOfRemovalLocation(closestFinger);
-            unlink(nodeToRemove);
-            decreaseSize();
-            
-            if (mustRemoveFinger())
-                removeFinger();
-            
-            shiftIndicesToLeftOnce(index + 1);
-            return returnValue;
+            nodeToRemove = closestFinger.node;
+            moveFingerOutOfRemovalLocation(closestFinger);    
         } else {
             // Keep the fingers at their original position.
             // Find the target node:
-            Node<E> node = rewind(closestFinger, closestFinger.index - index);
-            E returnValue = node.item;
-            unlink(node);
-            decreaseSize();
-            
-            if (mustRemoveFinger())
-                removeFinger();
-            
-            shiftIndicesToLeftOnce(index + 1);
-            return returnValue;
+            nodeToRemove = rewind(closestFinger, closestFinger.index - index);
         }
+        
+        returnValue = nodeToRemove.item;
+        unlink(nodeToRemove);
+        decreaseSize();
+
+        if (mustRemoveFinger())
+            removeFinger();
+
+        shiftIndicesToLeftOnce(index + 1);
+        return returnValue;
     }
 
     /**
