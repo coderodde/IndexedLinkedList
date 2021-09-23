@@ -33,7 +33,73 @@ public class LinkedListTest {
     public void setUp() {
         list.clear();
     }
+    
+    @Test
+    public void constructAdd() {
+        List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
+        
+        assertEquals(3, l.size());
+        
+        assertEquals("a", l.get(0));
+        assertEquals("b", l.get(1));
+        assertEquals("c", l.get(2));
+    }
 
+    @Test
+    public void contains() {
+        assertFalse(list.contains(Integer.valueOf(1)));
+        assertFalse(list.contains(Integer.valueOf(2)));
+        assertFalse(list.contains(Integer.valueOf(3)));
+        
+        assertEquals(0, list.size());
+        assertTrue(list.isEmpty());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(3, list.size());
+        assertFalse(list.isEmpty());
+        
+        assertTrue(list.contains(Integer.valueOf(1)));
+        assertTrue(list.contains(Integer.valueOf(2)));
+        assertTrue(list.contains(Integer.valueOf(3)));
+    }
+    
+    @Test
+    public void descendingIterator() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> iterator = list.descendingIterator();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(3), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(1), iterator.next());
+        
+        assertFalse(iterator.hasNext());
+    }
+    
+    @Test
+    public void descendingIteratorRemove() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> iterator = list.descendingIterator();
+        
+        iterator.next();
+        iterator.remove();
+        
+        assertEquals(2, list.size());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(1), iterator.next());
+        
+        assertFalse(iterator.hasNext());
+    }
+    
     @Test // checked!
     public void add() {
         bar("add");
