@@ -10,10 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -98,6 +101,102 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(1), iterator.next());
         
         assertFalse(iterator.hasNext());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void elementThrowsOnEmptyList() {
+        list.element();
+    }
+    
+    @Test
+    public void element() {
+        list.add(1);
+        list.add(2);
+        
+        assertEquals(Integer.valueOf(1), list.element());
+        
+        list.remove();
+        
+        assertEquals(Integer.valueOf(2), list.element());
+    }
+    
+    @Test
+    public void listEquals() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        List<Integer> otherList = Arrays.asList(1, 2, 3, 4);
+        
+        assertTrue(list.equals(otherList));
+        
+        list.remove(Integer.valueOf(3));
+        
+        assertFalse(list.equals(otherList));
+        
+        assertFalse(list.equals(null));
+        assertTrue(list.equals(list));
+        
+        Set<Integer> set = new HashSet<>(list);
+        
+        assertFalse(list.equals(set));
+        
+        list.clear();
+        list.addAll(Arrays.asList(0, 1, 2, 3));
+        otherList = Arrays.asList(0, 1, 4, 3);
+        
+        assertFalse(list.equals(otherList));
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void getFirstThrowsOnEmptyList() {
+        list.getFirst();
+    }
+    
+    @Test
+    public void getFirst() {
+        list.addAll(Arrays.asList(10, 20));
+        assertEquals(Integer.valueOf(10), list.getFirst());
+        
+        list.removeFirst();
+        
+        assertEquals(Integer.valueOf(20), list.getFirst());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void getLastThrowsOnEmptyList() {
+        list.getLast();
+    }
+    
+    @Test
+    public void getLast() {
+        list.addAll(Arrays.asList(10, 20));
+        assertEquals(Integer.valueOf(20), list.getLast());
+        
+        list.removeLast();
+        
+        assertEquals(Integer.valueOf(10), list.getLast());
+    }
+    
+    @Test
+    public void indexOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
+        
+        assertEquals(2, list.indexOf(null));
+        
+        list.set(2, 5);
+        list.set(4, 10);
+        
+        assertEquals(-1, list.indexOf(null));
+    }
+    
+    @Test
+    public void lastIndexOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
+        
+        assertEquals(4, list.lastIndexOf(null));
+        
+        list.set(2, 5);
+        list.set(4, 10);
+        
+        assertEquals(-1, list.lastIndexOf(null));
     }
     
     @Test // checked!
