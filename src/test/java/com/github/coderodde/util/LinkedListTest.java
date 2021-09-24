@@ -109,7 +109,7 @@ public class LinkedListTest {
     public void elementThrowsOnEmptyList() {
         list.element();
     }
-    
+
     @Test
     public void element() {
         list.add(1);
