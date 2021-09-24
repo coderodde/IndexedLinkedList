@@ -1,6 +1,7 @@
 package com.github.coderodde.util;
 
 import java.util.AbstractSequentialList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -278,10 +279,11 @@ public class LinkedList<E>
 
         if (o == this)
             return true;
-
-        if (!o.getClass().equals(o.getClass()))
+        
+        if (!(o instanceof List)) {
             return false;
-
+        }
+        
         List<?> otherList = (List<?>) o;
 
         if (size != otherList.size())
