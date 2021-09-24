@@ -233,6 +233,106 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(-1), list.peek());
     }
     
+    @Test
+    public void peekFirst() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peekFirst());
+        
+        list.addFirst(1);
+        
+        assertEquals(Integer.valueOf(1), list.peekFirst());
+    
+        list.addFirst(Integer.valueOf(-1));
+
+        assertEquals(Integer.valueOf(-1), list.peekFirst());
+    }
+    
+    @Test
+    public void peekLast() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peekLast());
+        
+        list.addLast(1);
+        
+        assertEquals(Integer.valueOf(1), list.peekLast());
+    
+        list.addLast(2);
+
+        assertEquals(Integer.valueOf(2), list.peekLast());
+    }
+    
+    @Test
+    public void poll() {
+        assertNull(list.poll());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.poll());
+        assertEquals(Integer.valueOf(2), list.poll());
+        assertEquals(Integer.valueOf(3), list.poll());
+    }
+    
+    @Test
+    public void pollFirst() {
+        assertNull(list.pollFirst());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.pollFirst());
+        assertEquals(Integer.valueOf(2), list.pollFirst());
+        assertEquals(Integer.valueOf(3), list.pollFirst());
+    }
+    
+    @Test
+    public void pollLast() {
+        assertNull(list.pollLast());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(3), list.pollLast());
+        assertEquals(Integer.valueOf(2), list.pollLast());
+        assertEquals(Integer.valueOf(1), list.pollLast());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void removeFirstThrowsOnEmptyList() {
+        list.removeFirst();
+    }
+    
+    @Test
+    public void pop() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.pop());
+        assertEquals(Integer.valueOf(2), list.pop());
+        assertEquals(Integer.valueOf(3), list.pop());
+    }
+    
+    @Test
+    public void push() {
+        list.push(1);
+        list.push(2);
+        list.push(3);
+        
+        assertTrue(list.equals(Arrays.asList(3, 2, 1)));
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void removeThrowsOnEmptyList() {
+        list.remove();
+    }
+    
+//    @Test(expected = NoSuchElementException.class)
+//    public void removeFirstThrowsOnEmptyList() {
+//        list.removeFirst();
+//    }
+    
     @Test(expected = NoSuchElementException.class)
     public void getFirstThrowsOnEmptyList() {
         list.getFirst();
