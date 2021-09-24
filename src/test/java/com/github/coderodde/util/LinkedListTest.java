@@ -328,10 +328,84 @@ public class LinkedListTest {
         list.remove();
     }
     
-//    @Test(expected = NoSuchElementException.class)
-//    public void removeFirstThrowsOnEmptyList() {
-//        list.removeFirst();
-//    }
+    class BadList extends com.github.coderodde.util.LinkedList<Integer> {
+        
+        class BadListIterator implements Iterator<Integer> {
+
+            @Override
+            public boolean hasNext() {
+                return true;
+            }
+
+            @Override
+            public Integer next() {
+                return Integer.valueOf(3);
+            }
+        }
+        
+        @Override
+        public Iterator<Integer> iterator() {
+            return new BadListIterator();
+        };
+        
+        public int size() {
+            return 2;
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void badThisIterator() {
+        List<Integer> arrayList = Arrays.asList(3, 3);
+        BadList badList = new BadList();
+        badList.addAll(Arrays.asList(3, 3));
+        badList.equals(arrayList);
+    }
+    
+    @Test
+    public void removeFirstOccurrenceOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
+        
+        assertTrue(list.removeFirstOccurrence(null));
+        
+        // Remove the last null value:
+        list.set(3, 10);
+        
+        assertFalse(list.removeFirstOccurrence(null));
+    }
+    
+    @Test
+    public void removeLastOccurrenceOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
+        
+        assertTrue(list.removeLastOccurrence(null));
+        
+        // Remove the last null value:
+        list.set(2, 10);
+        
+        assertFalse(list.removeLastOccurrence(null));
+    }
+    
+    @Test
+    public void appendAll() {
+        list.addAll(Arrays.asList(0, 1, 2));
+        
+        List<Integer> arrayList = new ArrayList<>();
+        
+        for (int i = 3; i < 20_000; i++) {
+            arrayList.add(i);
+        }
+        
+        list.addAll(arrayList);
+        
+        for (int i = 0; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(i));
+        }
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void removeLastThrowsOnEmptyList() {
+        list.removeLast();
+    }
     
     @Test(expected = NoSuchElementException.class)
     public void getFirstThrowsOnEmptyList() {
