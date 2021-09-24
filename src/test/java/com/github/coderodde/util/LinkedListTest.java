@@ -402,6 +402,76 @@ public class LinkedListTest {
         }
     }
     
+    @Test
+    public void prependAll() {
+        List<Integer> l = new ArrayList<>();
+        
+        for (int i = 0; i < 10_000; i++) {
+            l.add(i);
+        }
+        
+        list.addAll(l);
+        
+        l = new ArrayList<>();
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            l.add(i);
+        }
+        
+        list.addAll(0, l);
+        
+        int index = 0;
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+    }
+    
+    @Test
+    public void insertAll() {
+        for (int i = 0; i < 20_000; i++) {
+            list.add(i);
+        }
+        
+        List<Integer> arrayList = new ArrayList<>(10_000);
+        
+        for (int i = 20_000; i < 30_000; i++) {
+            arrayList.add(i);
+        }
+        
+        list.addAll(10_000, arrayList);
+        
+        int index = 0;
+        
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 20_000; i < 30_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));    
+        }
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkPositionIndexThrowsOnNegativeIndex() {
+        list.add(-1, Integer.valueOf(0));
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void checkPositionIndxThrowsOnTooLargeIndex() {
+        list.add(Integer.valueOf(0));
+        
+        list.add(2, Integer.valueOf(1));
+    }
+    
     @Test(expected = NoSuchElementException.class)
     public void removeLastThrowsOnEmptyList() {
         list.removeLast();
