@@ -686,7 +686,7 @@ public class LinkedList<E>
         
         if (first == null)
             last = null;
-        
+
         if (mustRemoveFinger())
             removeFinger();
         
