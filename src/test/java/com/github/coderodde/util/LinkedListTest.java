@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -143,6 +145,92 @@ public class LinkedListTest {
         otherList = Arrays.asList(0, 1, 4, 3);
         
         assertFalse(list.equals(otherList));
+    }
+    
+    class DummyList extends ArrayList<Integer> {
+        private final class DummyIterator implements Iterator<Integer> {
+
+            @Override
+            public boolean hasNext() {
+                return true;
+            }
+
+            @Override
+            public Integer next() {
+                return Integer.valueOf(0);
+            }
+        }
+        
+        public Iterator<Integer> iterator()  {
+            return new DummyIterator();
+        }
+        
+        public int size() {
+            return 2;
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void listEqualsThrowsOnBadIterator() {
+        DummyList dummyList = new DummyList();
+        list.addAll(Arrays.asList(0, 0));
+        list.equals(dummyList);
+    }
+    
+    @Test
+    public void offer() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offer(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offer(2);
+        
+        assertTrue(list.equals(Arrays.asList(1, 2)));
+    }
+    
+    @Test
+    public void offerFirst() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offerFirst(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offerFirst(2);
+        
+        assertTrue(list.equals(Arrays.asList(2, 1)));
+    }
+    
+    @Test
+    public void offerLast() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offerLast(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offerLast(2);
+        
+        assertTrue(list.equals(Arrays.asList(1, 2)));
+    }
+    
+    @Test
+    public void peek() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peek());
+        
+        list.addLast(1);
+        
+        assertEquals(Integer.valueOf(0), list.peek());
+    
+        list.addFirst(Integer.valueOf(-1));
+
+        assertEquals(Integer.valueOf(-1), list.peek());
     }
     
     @Test(expected = NoSuchElementException.class)
