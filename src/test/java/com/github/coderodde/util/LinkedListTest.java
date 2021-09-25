@@ -617,6 +617,20 @@ public class LinkedListTest {
         assertFalse(iter.hasNext());
     }
     
+    @Test
+    public void basicIteratorRemove2() {
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        iter.next();
+        iter.remove();
+        iter.next();
+        iter.next();
+    }
+    
     @Test(expected = ConcurrentModificationException.class)
     public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(1_000_000));
@@ -656,8 +670,6 @@ public class LinkedListTest {
         
         iter.previous();
     }
-    
-    
     
     @Test(expected = IllegalStateException.class)
     public void enhancedIteratorThrowsOnDoubleRemove() {
