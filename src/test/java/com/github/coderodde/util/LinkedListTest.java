@@ -740,6 +740,22 @@ public class LinkedListTest {
         assertFalse(spliterator.hasCharacteristics(Spliterator.SORTED));
     }
     
+    @Test
+    public void enhancedListIteratorForEachRemaining() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        
+        List<Integer> storageList = new ArrayList<>(3);
+        ListIterator<Integer> iter = list.listIterator(1);
+        
+        iter.next();
+        
+        iter.forEachRemaining((e) -> {
+            storageList.add(e);
+        });
+        
+        storageList.equals(Arrays.asList(2, 3, 4));
+    }
+    
     @Test(expected = NoSuchElementException.class) 
     public void enhancedIteratorNextThrowsOnNoNext() {
         list.addAll(getIntegerList(20));
