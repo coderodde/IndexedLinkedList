@@ -1767,12 +1767,7 @@ public class LinkedList<E>
             Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
-            
-            if (next == lastReturned)
-                next = lastNext;
-            else
-                nextIndex--;
-            
+            nextIndex--;
             lastReturned = null;
             expectedModCount++;
         }
@@ -1862,12 +1857,7 @@ public class LinkedList<E>
             final Node<E> lastNext = lastReturned.next;
             final int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
-            
-            if (next == lastReturned)
-                next = lastNext;
-            else 
-                nextIndex = removalIndex;
-            
+            nextIndex = removalIndex;
             lastReturned = null;
             expectedModCount++;
         }
