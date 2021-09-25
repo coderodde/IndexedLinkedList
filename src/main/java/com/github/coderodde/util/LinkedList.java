@@ -132,10 +132,11 @@ public class LinkedList<E>
     public void add(int index, E element) {
         checkPositionIndex(index);
         
-        if (index == size)
+        if (index == size) {
             linkLast(element);
-        else
+        } else {
             linkBefore(element, node(index), index);
+        }
     }
 
     /**
@@ -170,18 +171,20 @@ public class LinkedList<E>
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         checkPositionIndex(index);
-        if (c.isEmpty())
+        if (c.isEmpty()) {
             return false;
+        }
 
-        if (size == 0)
+        if (size == 0) {
             setAll(c);
-        else if (index == 0)
+        } else if (index == 0) {
             prependAll(c);
-        else if (index == size)
+        } else if (index == size) {
             appendAll(c);
-        else
+        } else {
             insertAll(c, node(index), index);
-
+        }
+        
         return true;
     }
 
@@ -274,11 +277,13 @@ public class LinkedList<E>
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null)
+        if (o == null) {
             return false;
+        }
 
-        if (o == this)
+        if (o == this) {
             return true;
+        }
         
         if (!(o instanceof List)) {
             return false;
@@ -286,8 +291,9 @@ public class LinkedList<E>
         
         List<?> otherList = (List<?>) o;
 
-        if (size != otherList.size())
+        if (size != otherList.size()) {
             return false;
+        }
 
         Iterator<?> iterator1 = iterator();
         Iterator<?> iterator2 = otherList.iterator();
@@ -296,18 +302,20 @@ public class LinkedList<E>
             Object object1 = iterator1.next();
             Object object2 = iterator2.next();
 
-            if (!java.util.Objects.equals(object1, object2))
+            if (!java.util.Objects.equals(object1, object2)) {
                 return false;
+            }
         }
 
         boolean iterator1HasMore = iterator1.hasNext();
         boolean iterator2HasMore = iterator2.hasNext();
 
-        if (iterator1HasMore || iterator2HasMore)
+        if (iterator1HasMore || iterator2HasMore) {
             throw new IllegalStateException(
                     iterator1HasMore ?
                             "This list has more elements to offer" :
                             "Argument list has more elements to offer");
+        }
 
         return true;
     }
@@ -333,10 +341,12 @@ public class LinkedList<E>
      */
     @Override
     public E getFirst() {
-        final Node<E> f = first;
-        if (f == null)
+        Node<E> f = first;
+        
+        if (f == null) {
             throw new NoSuchElementException();
-
+        }
+        
         return f.item;
     }
 
@@ -348,9 +358,12 @@ public class LinkedList<E>
      */
     @Override
     public E getLast() {
-        final Node<E> l = last;
-        if (l == null)
+        Node<E> l = last;
+        
+        if (l == null) {
             throw new NoSuchElementException();
+        }
+        
         return l.item;
     }
     
@@ -367,13 +380,15 @@ public class LinkedList<E>
         
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (x.item == null)
+                if (x.item == null) {
                     return index;
+                }
             }
         } else {
             for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (o.equals(x.item)) 
+                if (o.equals(x.item)) {
                     return index;
+                }
             }
         }
         
@@ -404,14 +419,18 @@ public class LinkedList<E>
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev) {
                 index--;
-                if (x.item == null) 
+                
+                if (x.item == null) {
                     return index;
+                }
             }
         } else {
             for (Node<E> x = last; x != null; x = x.prev) {
                 index--;
-                if (o.equals(x.item)) 
+                
+                if (o.equals(x.item)) {
                     return index;
+                }
             }
         }
         
@@ -486,8 +505,7 @@ public class LinkedList<E>
      */
     @Override
     public E peek() {
-        final Node<E> f = first;
-        return (f == null) ? null : f.item;
+        return first == null ? null : first.item;
     }
 
     /**
@@ -499,8 +517,7 @@ public class LinkedList<E>
      */
     @Override
     public E peekFirst() {
-        final Node<E> f = first;
-        return (f == null) ? null : f.item;
+        return first == null ? null : first.item;
     }
 
     /**
@@ -512,8 +529,7 @@ public class LinkedList<E>
      */
     @Override
     public E peekLast() {
-        final Node<E> l = last;
-        return (l == null) ? null : l.item;
+        return last == null ? null : last.item;
     }
 
     /**
@@ -523,8 +539,7 @@ public class LinkedList<E>
      */
     @Override
     public E poll() {
-        final Node<E> f = first;
-        return (f == null) ? null : removeFirst();
+        return first == null ? null : removeFirst();
     }
 
     /**
@@ -536,8 +551,7 @@ public class LinkedList<E>
      */
     @Override
     public E pollFirst() {
-        final Node<E> f = first;
-        return (f == null) ? null : removeFirst();
+        return first == null ? null : removeFirst();
     }
 
     /**
@@ -549,8 +563,7 @@ public class LinkedList<E>
      */
     @Override
     public E pollLast() {
-        final Node<E> l = last;
-        return (l == null) ? null : removeLast();
+        return last == null ? null : removeLast();
     }
 
     /**
@@ -659,8 +672,9 @@ public class LinkedList<E>
         unlink(nodeToRemove);
         decreaseSize();
 
-        if (mustRemoveFinger())
+        if (mustRemoveFinger()) {
             removeFinger();
+        }
 
         shiftIndicesToLeftOnce(index + 1);
         return returnValue;
@@ -686,11 +700,13 @@ public class LinkedList<E>
         
         first = first.next;
         
-        if (first == null)
+        if (first == null) {
             last = null;
+        }
 
-        if (mustRemoveFinger())
+        if (mustRemoveFinger()) {
             removeFinger();
+        }
         
         shiftIndicesToLeftOnce(1);
         return returnValue;
@@ -746,11 +762,13 @@ public class LinkedList<E>
         
         last = last.prev;
         
-        if (last == null)
+        if (last == null) {
             first = null;
+        }
         
-        if (mustRemoveFinger())
+        if (mustRemoveFinger()) {
             removeFinger();
+        }
         
         return returnValue;
     }
@@ -825,8 +843,7 @@ public class LinkedList<E>
     Adds a finger pointing to the input node at the input index.
     ***************************************************************************/
     private void addFinger(Node<E> node, int index) {
-        final Finger<E> finger = new Finger<>(node, index);
-        fingerStack.push(finger);
+        fingerStack.push(new Finger<>(node ,index));
     }
     
     /***************************************************************************
@@ -836,19 +853,21 @@ public class LinkedList<E>
             Node<E> first,
             int firstIndex,
             int collectionSize) {
-        final int numberOfNewFingers =
+        int numberOfNewFingers = 
                 getRecommendedNumberOfFingers() - fingerStack.size();
 
-        if (numberOfNewFingers == 0)
+        if (numberOfNewFingers == 0) {
             return;
+        }
 
-        final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
-        final int nodesToSkip = distanceBetweenFingers / 2;
+        int distanceBetweenFingers = collectionSize / numberOfNewFingers;
+        int nodesToSkip = distanceBetweenFingers / 2;
         int index = firstIndex + nodesToSkip;
         Node<E> node = first;
 
-        for (int i = 0; i < nodesToSkip; i++)
+        for (int i = 0; i < nodesToSkip; i++) {
             node = node.next;
+        }
 
         addFinger(node, index);
 
@@ -869,28 +888,30 @@ public class LinkedList<E>
     private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
                                           int indexOfInsertedRangeHead,
                                           int collectionSize) {
-        final int numberOfNewFingers =
+        int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
 
-        if (numberOfNewFingers == 0)
+        if (numberOfNewFingers == 0) {
             return;
+        }
 
-        final int distanceBetweenFingers = collectionSize / numberOfNewFingers;
-        final int startOffset = distanceBetweenFingers / 2;
-
+        int distanceBetweenFingers = collectionSize / numberOfNewFingers;
+        int startOffset = distanceBetweenFingers / 2;
         int index = indexOfInsertedRangeHead + startOffset;
         Node<E> node = headNodeOfInsertedRange;
 
-        for (int i = 0; i < startOffset; i++)
+        for (int i = 0; i < startOffset; i++) {
            node = node.next;
+        }
 
         addFinger(node, index);
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
 
-            for (int j = 0; j < distanceBetweenFingers; j++)
+            for (int j = 0; j < distanceBetweenFingers; j++) {
                 node = node.next;
+            }
 
             addFinger(node, index);
         }
@@ -900,27 +921,30 @@ public class LinkedList<E>
     Adds fingers after prepending a collection to this list.
     ***************************************************************************/
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
-        final int numberOfNewFingers =
+        int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerStack.size();
 
-        if (numberOfNewFingers == 0)
+        if (numberOfNewFingers == 0) {
             return;
+        }
 
-        final int distance = collectionSize / numberOfNewFingers;
-        final int startIndex = distance / 2;
+        int distance = collectionSize / numberOfNewFingers;
+        int startIndex = distance / 2;
         int index = startIndex;
         Node<E> node = first;
 
-        for (int i = 0; i < startIndex; i++)
+        for (int i = 0; i < startIndex; i++) {
             node = node.next;
+        }
 
         addFinger(node, index);
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
 
-            for (int j = 0; j < distance; j++)
+            for (int j = 0; j < distance; j++) {
                 node = node.next;
+            }
 
             addFinger(node, index);
         }
@@ -930,26 +954,29 @@ public class LinkedList<E>
     Adds fingers after setting a collection as a list.
     ***************************************************************************/
     private void addFingersAfterSetAll() {
-        final int numberOfNewFingers = getRecommendedNumberOfFingers();
+        int numberOfNewFingers = getRecommendedNumberOfFingers();
 
-        if (numberOfNewFingers == 0)
+        if (numberOfNewFingers == 0) {
             return;
+        }
 
-        final int distance = size / numberOfNewFingers;
-        final int startIndex = distance / 2;
+        int distance = size / numberOfNewFingers;
+        int startIndex = distance / 2;
         int index = startIndex;
         Node<E> node = first;
 
-        for (int i = 0; i < startIndex; i++)
+        for (int i = 0; i < startIndex; i++) {
             node = node.next;
+        }
 
         addFinger(node, startIndex);
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
 
-            for (int j = 0; j < distance; j++)
+            for (int j = 0; j < distance; j++) {
                 node = node.next;
+            }
 
             addFinger(node, index);
         }
@@ -960,7 +987,7 @@ public class LinkedList<E>
     ***************************************************************************/
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
-        final Node<E> oldLast = last;
+        Node<E> oldLast = last;
 
         for (E item : c) {
             Node<E> newNode = new Node<>();
@@ -982,8 +1009,9 @@ public class LinkedList<E>
     '{ 0, 1, ..., size - 1 }'.
     ***************************************************************************/
     private void checkElementIndex(int index) {
-        if (!isElementIndex(index))
+        if (!isElementIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
     }
 
     /***************************************************************************
@@ -1004,8 +1032,8 @@ public class LinkedList<E>
             assert fingerStack.fingerIndexSet.contains(finger.index) :
                     "checkInvariant() failed: Set does not contain " + finger;
             
-            final int onLeftNodes = countLeft(finger);
-            final int onRightNodes = countRight(finger);
+            int onLeftNodes = countLeft(finger);
+            int onRightNodes = countRight(finger);
             
             assert this.size == onLeftNodes + 1 + onRightNodes :
                     "checkInvariant() failed at finger (" + finger +
@@ -1025,8 +1053,9 @@ public class LinkedList<E>
     '{ 0, 1, ..., size}'.
     ***************************************************************************/
     private void checkPositionIndex(int index) {
-        if (!isPositionIndex(index))
+        if (!isPositionIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
     }
     
     // Used for checkInvariant()
@@ -1071,8 +1100,9 @@ public class LinkedList<E>
             Finger<E> finger = fingerStack.get(i);
             int distance = Math.abs(finger.index - index);
 
-            if (distance == 0)
+            if (distance == 0) {
                 return finger;
+            }
 
             if (bestDistance > distance) {
                 bestDistance = distance;
@@ -1089,8 +1119,9 @@ public class LinkedList<E>
     private Node<E> getNodeRaw(int index) {
         Node<E> node = first;
 
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++) {
             node = node.next;
+        }
 
         return node;
     }
@@ -1129,7 +1160,7 @@ public class LinkedList<E>
             Node<E> succ,
             int succIndex) {
 
-        final Node<E> pred = succ.prev;
+        Node<E> pred = succ.prev;
         Node<E> prev = pred;
 
         for (E item : c) {
@@ -1176,8 +1207,8 @@ public class LinkedList<E>
     private void linkBefore(E e, Node<E> succ, int index) {
         shiftIndicesToRightOnce(index);
 
-        final Node<E> pred = succ.prev;
-        final Node<E> newNode = new Node<>();
+        Node<E> pred = succ.prev;
+        Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.next = succ;
         succ.prev = newNode;
@@ -1192,8 +1223,9 @@ public class LinkedList<E>
         size++;
         modCount++;
 
-        if (mustAddFinger())
+        if (mustAddFinger()) {
             addFinger(newNode, index);
+        }
     }
 
     /***************************************************************************
@@ -1202,42 +1234,46 @@ public class LinkedList<E>
     private void linkFirst(E e) {
         shiftIndicesToRightOnce(0);
 
-        final Node<E> f = first;
-        final Node<E> newNode = new Node<>();
+        Node<E> f = first;
+        Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.next = f;
         first = newNode;
 
-        if (f == null)
+        if (f == null) {
             last = newNode;
-        else
+        } else {
             f.prev = newNode;
+        }
 
         increaseSize();
 
-        if (mustAddFinger())
+        if (mustAddFinger()) {
             addFinger(newNode, 0);
+        }
     }
 
     /***************************************************************************
     Appends the input element to the tail of this list.
     ***************************************************************************/
     private void linkLast(E e) {
-        final Node<E> l = last;
-        final Node<E> newNode = new Node<>();
+        Node<E> l = last;
+        Node<E> newNode = new Node<>();
         newNode.item = e;
         newNode.prev = l;
         last = newNode;
 
-        if (l == null)
+        if (l == null) {
             first = newNode;
-        else
+        } else {
             l.next = newNode;
-
+        }
+        
         increaseSize();
 
-        if (mustAddFinger()) 
+        if (mustAddFinger()) {
             addFinger(newNode, size - 1);
+        }
     }
     
     /***************************************************************************
@@ -1246,8 +1282,9 @@ public class LinkedList<E>
     private void makeSureNoFingerPointsTo(Node<E> node, int index) {
         Finger<E> finger = getClosestFinger(index);
         
-        if (finger.node == node)
+        if (finger.node == node) {
             moveFingerOutOfRemovalLocation(finger);
+        }
     }
 
     /***************************************************************************
@@ -1349,7 +1386,7 @@ public class LinkedList<E>
     ***************************************************************************/
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
-        final Node<E> oldFirst = first;
+        Node<E> oldFirst = first;
         first = new Node<>();
         first.item = iterator.next();
 
@@ -1394,8 +1431,9 @@ public class LinkedList<E>
         unlink(node);
         decreaseSize();
         
-        if (mustRemoveFinger()) 
+        if (mustRemoveFinger()) {
             removeFinger();
+        }
         
         shiftIndicesToLeftOnce(index + 1);
     }
@@ -1453,7 +1491,7 @@ public class LinkedList<E>
     ***************************************************************************/
     private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            final Finger<E> finger = fingerStack.get(i);
+            Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
                 final int nextIndex = finger.index - steps;
@@ -1463,7 +1501,7 @@ public class LinkedList<E>
         }
         
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            final Finger<E> finger = fingerStack.get(i);
+            Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
                 finger.index = finger.updateIndex;
@@ -1486,7 +1524,7 @@ public class LinkedList<E>
     ***************************************************************************/
     private void shiftIndicesToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
-            final Finger<E> finger = fingerStack.get(i);
+            Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startIndex) {
                 final int nextIndex = finger.index + steps;
@@ -1496,7 +1534,7 @@ public class LinkedList<E>
         }
         
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            final Finger<E> finger = fingerStack.get(i);
+            Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startIndex) {
                 finger.index = finger.updateIndex;
@@ -1517,8 +1555,8 @@ public class LinkedList<E>
     Unlinks the input node from the actual doubly-linked list.
     ***************************************************************************/
     private void unlink(Node<E> x) {
-        final Node<E> next = x.next;
-        final Node<E> prev = x.prev;
+        Node<E> next = x.next;
+        Node<E> prev = x.prev;
 
         if (prev == null) {
             first = next;
@@ -1566,7 +1604,7 @@ public class LinkedList<E>
         first = rightmostNode;
         
         int numberOfRequestedFingers = getRecommendedNumberOfFingers(size);
-        final int distance = size / numberOfRequestedFingers;
+        int distance = size / numberOfRequestedFingers;
         int startOffset = distance / 2;
         
         // Read in all elements in the proper order.
@@ -1605,8 +1643,9 @@ public class LinkedList<E>
         s.writeInt(size);
 
         // Write out all elements in the proper order.
-        for (Node<E> x = first; x != null; x = x.next)
+        for (Node<E> x = first; x != null; x = x.next) {
             s.writeObject(x.item);
+        }
     }
     
     /***************************************************************************
@@ -1725,7 +1764,7 @@ public class LinkedList<E>
         private void contractFingerArrayIfNeeded() {
             if (size * 4 <= fingerArray.length 
                     && fingerArray.length > INITIAL_CAPACITY) {
-                final int nextCapacity = fingerArray.length / 2;
+                int nextCapacity = fingerArray.length / 2;
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
@@ -1749,8 +1788,10 @@ public class LinkedList<E>
         @Override
         public E next() {
             checkForComodification();
-            if (!hasNext())
+            
+            if (!hasNext()) {
                 throw new NoSuchElementException();
+            }
 
             lastReturned = next;
             next = next.next;
@@ -1761,8 +1802,10 @@ public class LinkedList<E>
         @Override
         public void remove() {
             checkForComodification();
-            if (lastReturned == null) 
+            
+            if (lastReturned == null) {
                 throw new IllegalStateException();
+            }
             
             int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
@@ -1774,18 +1817,21 @@ public class LinkedList<E>
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
+            
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
                 lastReturned = next;
                 next = next.next;
                 nextIndex++;
             }
+            
             checkForComodification();
         }
 
         private final void checkForComodification() {
-            if (modCount != expectedModCount)
+            if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
         }
     }
     
@@ -1814,8 +1860,10 @@ public class LinkedList<E>
         @Override
         public E next() {
             checkForComdification();
-            if (!hasNext()) 
+            
+            if (!hasNext()) {
                 throw new NoSuchElementException();
+            }
             
             lastReturned = next;
             next = next.next;
@@ -1831,8 +1879,10 @@ public class LinkedList<E>
         @Override
         public E previous() {
             checkForComdification();
-            if (!hasPrevious())
+            
+            if (!hasPrevious()) {
                 throw new NoSuchElementException();
+            }
             
             lastReturned = next = (next == null) ? last : next.prev;
             nextIndex--;
@@ -1852,11 +1902,13 @@ public class LinkedList<E>
         @Override
         public void remove() {
             checkForComdification();
-            if (lastReturned == null)
-                throw new IllegalStateException();
             
-            final Node<E> lastNext = lastReturned.next;
-            final int removalIndex = nextIndex - 1;
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            Node<E> lastNext = lastReturned.next;
+            int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
             
             if (next == lastReturned) {
@@ -1871,8 +1923,10 @@ public class LinkedList<E>
 
         @Override
         public void set(E e) {
-            if (lastReturned == null) 
+            if (lastReturned == null) {
                 throw new IllegalStateException();
+            }
+            
             checkForComdification();
             lastReturned.item = e;
         }
@@ -1880,12 +1934,14 @@ public class LinkedList<E>
         @Override
         public void add(E e) {
             checkForComdification();
+            
             lastReturned = null;
             
-            if (next == null) 
+            if (next == null) {
                 linkLast(e);
-            else
+            } else {
                 linkBefore(e, next, nextIndex);
+            }
             
             nextIndex++;
             expectedModCount++;
@@ -1894,18 +1950,21 @@ public class LinkedList<E>
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
+            
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
                 lastReturned = next;
                 next = next.next;
                 nextIndex++;
             }
+            
             checkForComdification();
         }
         
         private final void checkForComdification() {
-            if (modCount != expectedModCount) 
+            if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
         }
     }
     
@@ -1954,21 +2013,32 @@ public class LinkedList<E>
 
         @Override
         public boolean tryAdvance(Consumer<? super E> action) {
-            if (action == null) throw new NullPointerException();
-            if (numberOfProcessedElements == lengthOfSpliterator)
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            
+            if (numberOfProcessedElements == lengthOfSpliterator) {
                 return false;
+            }
+            
             numberOfProcessedElements++;
             E item = node.item;
             action.accept(item);
             node = node.next;
-            if (list.modCount != expectedModCount) 
+            
+            if (list.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
+                
             return true;
         }
 
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
-            if (action == null) throw new NullPointerException();
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            
             for (long i = numberOfProcessedElements; 
                  i < lengthOfSpliterator; 
                  i++) {
@@ -1976,30 +2046,36 @@ public class LinkedList<E>
                 action.accept(item);
                 node = node.next;
             }
+            
             numberOfProcessedElements = lengthOfSpliterator;
-            if (list.modCount != expectedModCount) 
+            
+            if (list.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
         }
         
         @Override
         public Spliterator<E> trySplit() {
-            final long sizeLeft = estimateSize();
-            if (sizeLeft == 0) 
+            long sizeLeft = estimateSize();
+            
+            if (sizeLeft == 0) {
                 return null;
+            }
+                
+            long thisSpliteratorNewLength = sizeLeft / 2L;
             
-            final long thisSpliteratorNewLength = sizeLeft / 2L;
-            
-            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE)
+            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE) {
                 return null;
+            }
             
-            final long newSpliteratorLength = 
-                    sizeLeft - thisSpliteratorNewLength;
-            
-            final long newSpliteratorOffset = this.offsetOfSpliterator;
+            long newSpliteratorLength = sizeLeft - thisSpliteratorNewLength;
+            long newSpliteratorOffset = this.offsetOfSpliterator;
             
             this.offsetOfSpliterator += newSpliteratorLength;
             this.lengthOfSpliterator -= newSpliteratorLength;
+            
             Node<E> newSpliteratorNode = this.node;
+            
             this.node = list.node((int) this.offsetOfSpliterator);
             
             return new LinkedListSpliterator<>(
