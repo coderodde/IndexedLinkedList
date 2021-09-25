@@ -1665,7 +1665,7 @@ public class LinkedList<E>
     items of type 'E'.
     ***************************************************************************/
     static final class FingerStack<E> {
-        private static final int INITIAL_CAPACITY = 8;
+        static final int INITIAL_CAPACITY = 8;
 
         // package private for unit testing
         final IntHashSet fingerIndexSet = new IntHashSet();
