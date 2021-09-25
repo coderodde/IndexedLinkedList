@@ -1612,7 +1612,7 @@ public class LinkedList<E>
     /***************************************************************************
     Implements the doubly-linked list node.
     ***************************************************************************/
-    private static class Node<E> {
+    static class Node<E> {
         E item;
         Node<E> prev;
         Node<E> next;
