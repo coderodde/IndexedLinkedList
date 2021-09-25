@@ -1,5 +1,6 @@
 package com.github.coderodde.util;
 
+import com.github.coderodde.util.LinkedList.Finger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -490,6 +491,22 @@ public class LinkedListTest {
         list.removeFirst();
         
         assertEquals(Integer.valueOf(20), list.getFirst());
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void moveFingerOutOfRemovalLocation() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        list.fingerStack.fingerArray[0] = new Finger<>(list.node(0), 0);
+        list.fingerStack.fingerArray[1] = new Finger<>(list.node(1), 1);
+        list.fingerStack.fingerArray[2] = new Finger<>(list.node(2), 2);
+        
+        list.fingerStack.fingerIndexSet.add(0);
+        list.fingerStack.fingerIndexSet.add(1);
+        list.fingerStack.fingerIndexSet.add(2);
+        
+        list.fingerStack.size = 3;
+        list.moveFingerOutOfRemovalLocation(list.fingerStack.fingerArray[1]);
     }
     
     @Test(expected = NoSuchElementException.class)

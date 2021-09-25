@@ -85,7 +85,7 @@ public class LinkedList<E>
     /**
      * The stack of fingers.
      */
-    private transient FingerStack<E> fingerStack = new FingerStack<>();
+    transient FingerStack<E> fingerStack = new FingerStack<>();
 
     /**
      * Constructs an empty list.
@@ -1255,8 +1255,10 @@ public class LinkedList<E>
     in order to make sure that after removal, all the fingers point to valid
     nodes.
     ***************************************************************************/
-    private void moveFingerOutOfRemovalLocation(Finger<E> finger) {
+    void moveFingerOutOfRemovalLocation(Finger<E> finger) {
         if (fingerStack.size == 1) {
+            fingerStack.fingerIndexSet.remove(finger.index);
+            
             if (finger.index > 0) {
                 finger.index--;
                 finger.node = finger.node.prev;
@@ -1265,6 +1267,7 @@ public class LinkedList<E>
                 finger.node = finger.node.next;
             }
             
+            fingerStack.fingerIndexSet.add(finger.index);
             return;
         }
         
@@ -1300,8 +1303,9 @@ public class LinkedList<E>
                 
                 rightProbeIndex++;
                 rightProbeNode = rightProbeNode.next;
-            } else {
-                assert leftProbeIndex >= 0 : "Infinite loop!";
+            } else if (leftProbeIndex == -1) {
+                throw new IllegalStateException(
+                        "Throwing out of possible infinite loop.");
             }
         }
     }
@@ -1328,7 +1332,7 @@ public class LinkedList<E>
     /***************************************************************************
     Returns the node at index 'index'. Moves the closest finger to the node.
     ***************************************************************************/
-    private Node<E> node(int index) {
+    Node<E> node(int index) {
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
 
@@ -1622,7 +1626,7 @@ public class LinkedList<E>
     /***************************************************************************
     Implements the list node finger.
     ***************************************************************************/
-    private static final class Finger<E> {
+    static final class Finger<E> {
         Node<E> node;
         int index; // Index at which 'node' is located.
         int updateIndex;
@@ -1660,12 +1664,13 @@ public class LinkedList<E>
     Implements a simple, array-based stack for storing the node fingers for
     items of type 'E'.
     ***************************************************************************/
-    private static final class FingerStack<E> {
+    static final class FingerStack<E> {
         private static final int INITIAL_CAPACITY = 8;
 
-        private final IntHashSet fingerIndexSet = new IntHashSet();
-        private Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
-        private int size = 0;
+        // package private for unit testing
+        final IntHashSet fingerIndexSet = new IntHashSet();
+        Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
+        int size = 0;
 
         void push(Finger<E> finger) {
             enlargeFingerArrayIfNeeded();
