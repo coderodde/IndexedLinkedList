@@ -1,5 +1,6 @@
 package com.github.coderodde.util;
 
+import com.github.coderodde.util.LinkedList.BasicIterator;
 import com.github.coderodde.util.LinkedList.Finger;
 import com.github.coderodde.util.LinkedList.FingerStack;
 import com.github.coderodde.util.LinkedList.Node;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -567,6 +569,111 @@ public class LinkedListTest {
         assertEquals(FingerStack.INITIAL_CAPACITY, 
                      fingerStack.fingerArray.length);
     }   
+    
+    @Test(expected = NoSuchElementException.class)
+    public void basicIteratorNextThrowsOnNoNext() {
+        list.add(1);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        try {
+            iter.next();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.next();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void basicIteratorThrowsOnDoubleRemove() {
+        list.add(1);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        try {
+            iter.next();
+            iter.remove();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.remove();
+    }
+    
+    @Test
+    public void basicIteratorRemove1() {
+        list.add(1);
+        list.add(2);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        iter.next();
+        iter.remove();
+        iter.next();
+        iter.remove();
+        
+        assertEquals(0, list.size());
+        assertFalse(iter.hasNext());
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
+        list.addAll(getIntegerList(1_000_000));
+        
+        BasicIterator iter = (BasicIterator) list.iterator();
+        iter.expectedModCount = -1000;
+        
+        iter.forEachRemaining((e) -> {});
+    }
+    
+    @Test(expected = NoSuchElementException.class) 
+    public void enhancedIteratorNextThrowsOnNoNext() {
+        list.addAll(getIntegerList(20));
+        
+        ListIterator<Integer> iter = list.listIterator(19);
+        
+        try {
+            iter.next();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.next();
+    }
+    
+    @Test(expected = NoSuchElementException.class) 
+    public void enhancedIteratorPrevioiusThrowsOnNoPrevious() {
+        list.addAll(getIntegerList(20));
+        
+        ListIterator<Integer> iter = list.listIterator(1);
+        
+        try {
+            iter.previous();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.previous();
+    }
+    
+    
+    
+    @Test(expected = IllegalStateException.class)
+    public void enhancedIteratorThrowsOnDoubleRemove() {
+        list.add(1);
+        
+        ListIterator<Integer> iter = list.listIterator();
+        
+        try {
+            iter.next();
+            iter.remove();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.remove();
+    }
     
     @Test(expected = NoSuchElementException.class)
     public void getLastThrowsOnEmptyList() {

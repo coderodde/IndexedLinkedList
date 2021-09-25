@@ -1734,12 +1734,12 @@ public class LinkedList<E>
     /***************************************************************************
     This class implements a basic iterator over this list.
     ***************************************************************************/
-    private final class BasicIterator implements Iterator<E> {
+    final class BasicIterator implements Iterator<E> {
 
         private Node<E> lastReturned;
         private Node<E> next = first;
         private int nextIndex;
-        private int expectedModCount = modCount;
+        int expectedModCount = modCount;
 
         @Override
         public boolean hasNext() {
