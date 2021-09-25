@@ -566,7 +566,7 @@ public class LinkedListTest {
         
         assertEquals(FingerStack.INITIAL_CAPACITY, 
                      fingerStack.fingerArray.length);
-    }
+    }   
     
     @Test(expected = NoSuchElementException.class)
     public void getLastThrowsOnEmptyList() {
