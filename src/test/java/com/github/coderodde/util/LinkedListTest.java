@@ -1,6 +1,8 @@
 package com.github.coderodde.util;
 
 import com.github.coderodde.util.LinkedList.Finger;
+import com.github.coderodde.util.LinkedList.FingerStack;
+import com.github.coderodde.util.LinkedList.Node;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -507,6 +509,63 @@ public class LinkedListTest {
         
         list.fingerStack.size = 3;
         list.moveFingerOutOfRemovalLocation(list.fingerStack.fingerArray[1]);
+    }
+    
+    @Test
+    public void nodeToString() {
+        Node<String> node = new Node<>();
+        node.item = "hello";
+        assertEquals("[Node; item = hello]", node.toString());
+    }
+    
+    @Test
+    public void fingerToString() {
+        Node<String> node = new Node<>();
+        node.item = "World";
+        Finger<String> finger = new Finger<>(node, 1);
+        assertEquals("[Finger; index = 1, item = World]", finger.toString());
+    }
+    
+    @Test
+    public void fingerStackToString() {
+        FingerStack<String> fingerStack = new FingerStack<>();
+        
+        Node<String> node1 = new Node<>();
+        Node<String> node2 = new Node<>();
+        Node<String> node3 = new Node<>();
+        
+        Finger<String> finger1 = new Finger<>(node1, 1);
+        Finger<String> finger2 = new Finger<>(node2, 2);
+        Finger<String> finger3 = new Finger<>(node3, 2);
+        
+        fingerStack.push(finger1);
+        fingerStack.push(finger2);
+        
+        assertEquals("size = 2", fingerStack.toString());
+        
+        fingerStack.push(finger3);
+        
+        assertEquals("size = 3", fingerStack.toString());
+    }
+    
+    @Test
+    public void contractFingerStack() {
+        FingerStack<Integer> fingerStack = new FingerStack<>();
+        
+        for (int i = 0; i < 100; i++) {
+            Node<Integer> node = new Node<>();
+            node.item = i;
+            
+            Finger<Integer> finger = new Finger<>(node, i);
+            fingerStack.push(finger);
+        }
+        
+        while (fingerStack.size() > 0) {
+            fingerStack.pop();
+        }
+        
+        assertEquals(FingerStack.INITIAL_CAPACITY, 
+                     fingerStack.fingerArray.length);
     }
     
     @Test(expected = NoSuchElementException.class)

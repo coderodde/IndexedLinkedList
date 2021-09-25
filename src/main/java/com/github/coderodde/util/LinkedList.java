@@ -1612,7 +1612,7 @@ public class LinkedList<E>
     /***************************************************************************
     Implements the doubly-linked list node.
     ***************************************************************************/
-    private static class Node<E> {
+    static class Node<E> {
         E item;
         Node<E> prev;
         Node<E> next;
@@ -1665,7 +1665,7 @@ public class LinkedList<E>
     items of type 'E'.
     ***************************************************************************/
     static final class FingerStack<E> {
-        private static final int INITIAL_CAPACITY = 8;
+        static final int INITIAL_CAPACITY = 8;
 
         // package private for unit testing
         final IntHashSet fingerIndexSet = new IntHashSet();
