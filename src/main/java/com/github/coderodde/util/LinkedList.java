@@ -1764,7 +1764,6 @@ public class LinkedList<E>
             if (lastReturned == null) 
                 throw new IllegalStateException();
             
-            Node<E> lastNext = lastReturned.next;
             int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
             nextIndex--;
@@ -1793,12 +1792,14 @@ public class LinkedList<E>
     /***************************************************************************
     Implements the enhanced list iterator over this list.
     ***************************************************************************/
-    private final class EnhancedIterator implements ListIterator<E> {
+    final class EnhancedIterator implements ListIterator<E> {
 
         private Node<E> lastReturned;
         private Node<E> next;
         private int nextIndex;
-        private int expectedModCount = modCount;
+        
+        // Package-private for the sake of unit testing:
+        int expectedModCount = modCount;
         
         EnhancedIterator(int index) {
             next = (index == size) ? null : node(index);
@@ -1857,7 +1858,13 @@ public class LinkedList<E>
             final Node<E> lastNext = lastReturned.next;
             final int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
-            nextIndex = removalIndex;
+            
+            if (next == lastReturned) {
+                next = lastNext;
+            } else {
+                nextIndex = removalIndex;
+            }
+            
             lastReturned = null;
             expectedModCount++;
         }
@@ -1922,10 +1929,9 @@ public class LinkedList<E>
         }
     }
     
-    private static final class LinkedListSpliterator<E> 
-            implements Spliterator<E> {
+    static final class LinkedListSpliterator<E> implements Spliterator<E> {
         
-        private static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
+        static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
         
         private final LinkedList<E> list;
         private LinkedList.Node<E> node;

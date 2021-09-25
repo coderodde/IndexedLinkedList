@@ -1,6 +1,7 @@
 package com.github.coderodde.util;
 
 import com.github.coderodde.util.LinkedList.BasicIterator;
+import com.github.coderodde.util.LinkedList.EnhancedIterator;
 import com.github.coderodde.util.LinkedList.Finger;
 import com.github.coderodde.util.LinkedList.FingerStack;
 import com.github.coderodde.util.LinkedList.Node;
@@ -28,7 +29,6 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -92,7 +92,7 @@ public class LinkedListTest {
     }
     
     @Test
-    public void descendingIteratorRemove() {
+    public void descendingIteratorRemove1() {
         list.addAll(Arrays.asList(1, 2, 3));
         Iterator<Integer> iterator = list.descendingIterator();
         
@@ -109,6 +109,36 @@ public class LinkedListTest {
         
         assertFalse(iterator.hasNext());
     }
+    
+    @Test
+    public void descendingIteratorRemove2() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        
+        Iterator<Integer> iter = list.descendingIterator();
+        
+        iter.next();
+        iter.remove();
+        
+        assertEquals(Integer.valueOf(4), iter.next());
+        iter.remove();
+        
+        assertEquals(3, list.size());
+        
+        assertEquals(Integer.valueOf(3), iter.next());
+        iter.remove();
+        
+        assertEquals(2, list.size());
+        
+        iter.next();
+        iter.next();
+        
+        iter.remove();
+        
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(2), list.get(0));
+    }
+    
+    
     
     @Test(expected = NoSuchElementException.class)
     public void elementThrowsOnEmptyList() {
@@ -631,6 +661,17 @@ public class LinkedListTest {
         iter.next();
     }
     
+    @Test(expected = IllegalStateException.class) 
+    public void enhancedIteratorThrowsOnSetAfterRemove() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        
+        ListIterator<Integer> iter = list.listIterator(1);
+        
+        iter.next();
+        iter.remove();
+        iter.set(10);
+    }
+    
     @Test(expected = ConcurrentModificationException.class)
     public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(1_000_000));
@@ -639,6 +680,64 @@ public class LinkedListTest {
         iter.expectedModCount = -1000;
         
         iter.forEachRemaining((e) -> {});
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void 
+        enhancedIteratorForEachRemainingThrowsOnConcurrentModification() {
+            
+        list.addAll(getIntegerList(1_000_000));
+        
+        EnhancedIterator iter = (EnhancedIterator) list.listIterator();
+        iter.expectedModCount = -1;
+        
+        iter.forEachRemaining((e) -> {});
+    }
+        
+    @Test(expected = ConcurrentModificationException.class)
+    public void spliteratorThrowsOnConcurrentModification() {
+        list.addAll(getIntegerList(50_000));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        list.add(50_000);
+        
+        spliterator.tryAdvance((e) -> {});
+    }
+    
+    @Test
+    public void spliteratorTrySplitReturnsNullOnEmptyList() {
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertNull(spliterator.trySplit());
+    }
+    
+    @Test
+    public void spliteratorTrySplitReturnsNullOnTooSmallList() {
+        list.addAll(
+                getIntegerList(
+                        (int)
+                        (LinkedList
+                                .LinkedListSpliterator
+                                .MINIMUM_BATCH_SIZE - 1L)));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertNull(spliterator.trySplit());
+    }
+    
+    @Test
+    public void spliteratorHasCharasteristics() {
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertTrue(spliterator.hasCharacteristics(Spliterator.ORDERED));
+        assertTrue(spliterator.hasCharacteristics(Spliterator.SIZED));
+        assertTrue(spliterator.hasCharacteristics(Spliterator.SUBSIZED));
+        
+        assertFalse(spliterator.hasCharacteristics(Spliterator.CONCURRENT));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.DISTINCT));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.IMMUTABLE));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.NONNULL));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.SORTED));
     }
     
     @Test(expected = NoSuchElementException.class) 
