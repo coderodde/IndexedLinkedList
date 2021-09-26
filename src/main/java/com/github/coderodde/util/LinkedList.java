@@ -701,6 +701,8 @@ public class LinkedList<E>
         
         if (first == null) {
             last = null;
+        } else {
+            first.prev = null;
         }
 
         if (mustRemoveFinger()) {
@@ -763,6 +765,8 @@ public class LinkedList<E>
         
         if (last == null) {
             first = null;
+        } else {
+            last.next = null;
         }
         
         if (mustRemoveFinger()) {
@@ -1293,17 +1297,15 @@ public class LinkedList<E>
     ***************************************************************************/
     void moveFingerOutOfRemovalLocation(Finger<E> finger) {
         if (fingerStack.size == 1) {
-            fingerStack.fingerIndexSet.remove(finger.index);
             
             if (finger.index > 0) {
-                finger.index--;
+                fingerStack.fingerIndexSet.remove(finger.index);
+                fingerStack.fingerIndexSet.add(--finger.index);
                 finger.node = finger.node.prev;
             } else {
-                finger.index++;
                 finger.node = finger.node.next;
             }
             
-            fingerStack.fingerIndexSet.add(finger.index);
             return;
         }
         

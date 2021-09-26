@@ -756,6 +756,30 @@ public class LinkedListTest {
         storageList.equals(Arrays.asList(2, 3, 4));
     }
     
+    @Test(expected = NullPointerException.class)
+    public void 
+        spliteratorTryAdvanceThrowsNullPointerExceptionOnNullConsumer() {
+        list.spliterator().tryAdvance(null);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void 
+        spliteratorForEachRemainingThrowsNullPointerExceptionOnNullConsumer() {
+        list.spliterator().forEachRemaining(null);
+    }
+        
+    @Test(expected = ConcurrentModificationException.class)
+    public void 
+    spliteratorThrowsConcurrentModificationExceptionOnConcurrentModification() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        list.add(4);
+        spliterator.forEachRemaining((e) -> {});
+        list.forEach((e) -> {});
+    }
+    
     @Test(expected = NoSuchElementException.class) 
     public void enhancedIteratorNextThrowsOnNoNext() {
         list.addAll(getIntegerList(20));
@@ -843,8 +867,6 @@ public class LinkedListTest {
     
     @Test // checked!
     public void add() {
-        bar("add");
-        
         assertTrue(list.isEmpty());
         assertEquals(0, list.size());
 
@@ -862,13 +884,10 @@ public class LinkedListTest {
 
         assertEquals(Integer.valueOf(1), list.get(0));
         assertEquals(Integer.valueOf(2), list.get(1));
-        System.out.println(getBar("add done!"));
     }
 
     @Test // checked!
     public void addFirst() {
-        bar("addFirst");
-        
         assertTrue(list.isEmpty());
         assertEquals(0, list.size());
 
@@ -886,8 +905,6 @@ public class LinkedListTest {
 
         assertEquals(Integer.valueOf(2), list.get(0));
         assertEquals(Integer.valueOf(1), list.get(1));
-        
-        bar("addFirst done!");
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -915,8 +932,6 @@ public class LinkedListTest {
 
     @Test // checked!
     public void addIndexAndElement() {
-        bar("addIndexedAndElement");
-        
         list.add(0, 1);
         assertEquals(Integer.valueOf(1), list.get(0));
 
@@ -936,14 +951,10 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(1));
         assertEquals(Integer.valueOf(100), list.get(2));
         assertEquals(Integer.valueOf(10), list.get(3));
-        
-        bar("addIndexedAndElement done!");
     }
 
     @Test // checked!
     public void addCollectionOneElementToEmptyList() {
-        bar("addCollectionOneElementToEmptyList");
-        
         List<Integer> c = new ArrayList<>();
         c.add(100);
 
@@ -952,14 +963,10 @@ public class LinkedListTest {
         assertFalse(list.isEmpty());
         assertEquals(1, list.size());
         assertEquals(Integer.valueOf(100), list.get(0));
-        
-        bar("addCollectionOneElementToEmptyList done!");
     }
 
     @Test // checked!
     public void addCollectionThreeElementsToEmptyList() {
-        bar("addCollectionThreeElementsToEmptyList");
-        
         assertTrue(list.isEmpty());
         assertEquals(0, list.size());
 
@@ -972,14 +979,10 @@ public class LinkedListTest {
         for (int i = 0; i < list.size(); i++) {
             assertEquals(Integer.valueOf(i + 1), list.get(i));
         }
-        
-        bar("addCollectionThreeElementsToEmptyList done!");
     }
 
     @Test // checked!
     public void addCollectionAtIndex() {
-        bar("addCollectionAtIndex");
-        
         list.addAll(0, Arrays.asList(2, 3)); // setAll
         list.checkInvariant();
         list.addAll(0, Arrays.asList(0, 1)); // prependAll
@@ -992,14 +995,10 @@ public class LinkedListTest {
         for (int i = 0; i < list.size(); i++) {
             assertEquals(Integer.valueOf(i), list.get(i));
         }
-        
-        bar("addCollectionAtIndex done!");
     }
 
     @Test // shadowed
     public void removeInt() {
-        bar("removeInt");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
 
         // [0, 1, 2, 3, 4]
@@ -1013,13 +1012,10 @@ public class LinkedListTest {
         // [3]
         assertEquals(Integer.valueOf(3), list.remove(0));
         // []
-        bar("removeInt done!");
     }
 
     @Test // shadowed
     public void basicIteratorUsage() {
-        bar("basicIteratorUsage");
-        
         for (int i = 0; i < 1000; i++) {
             list.add(i);
         }
@@ -1032,8 +1028,6 @@ public class LinkedListTest {
         }
 
         assertFalse(iterator.hasNext());
-        
-        bar("basicIteratorUsage done!");
     }
     
     @Test
@@ -1084,11 +1078,7 @@ public class LinkedListTest {
 
     @Test // checked!
     public void bruteForceAddCollectionAtIndex() {
-        long seed = System.currentTimeMillis();
-        
-        bar("bruteForceAddCollectionAtIndex: seed = " + seed);
-        
-        Random random = new Random(seed);
+        Random random = new Random(100L);
 
         list.addAll(getIntegerList());
 
@@ -1106,14 +1096,10 @@ public class LinkedListTest {
                 fail("Lists not equal!");
             }
         }
-        
-        bar("bruteForceAddCollectionAtIndex done!");
     }
 
     @Test // checked!
     public void removeAtIndex() {
-        bar("removeAtIndex");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         list.checkInvariant();
         
@@ -1133,14 +1119,10 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(1), list.remove(0));
         list.checkInvariant();
         // []
-        
-        bar("removeAtIndex done!");
     }
 
     @Test // checked
     public void removeObject() {
-        bar("removeObject");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
 
         assertFalse(list.remove(Integer.valueOf(10)));
@@ -1154,14 +1136,10 @@ public class LinkedListTest {
         assertTrue(list.remove(Integer.valueOf(0)));
         assertTrue(list.remove(Integer.valueOf(2)));
         assertFalse(list.remove(Integer.valueOf(2)));
-        
-        bar("removeObject done!");
     }
 
     @Test // checked
     public void basicIteratorTraversal() {
-        bar("basicIteratorTraversal");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
 
         Iterator<Integer> iter = list.iterator();
@@ -1187,14 +1165,10 @@ public class LinkedListTest {
 
         list.iterator().forEachRemaining(myConsumer);
         assertEquals(10, myConsumer.total);
-        
-        bar("basicIteratorTraversal done!");
     }
 
     @Test // checked
     public void basicIteratorRemoval() {
-        bar("basicIteratorRemoval");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         Iterator<Integer> iter = list.iterator();
 
@@ -1213,14 +1187,10 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(2), list.get(0));
         assertEquals(Integer.valueOf(3), list.get(1));
         assertEquals(Integer.valueOf(4), list.get(2));
-        
-        bar("basicIteratorRemoval done!");
     }
 
     @Test // checked
     public void enhancedIteratorTraversal() {
-        bar("enhancedIteratorTraversal");
-        
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         ListIterator<Integer> iter = list.listIterator();
 
@@ -1250,20 +1220,15 @@ public class LinkedListTest {
 
         assertFalse(iter.hasNext());
         assertTrue(iter.hasPrevious());
-        
-        bar("enhancedIteratorTraversal done!");
     }
     
     // Used to find a failing removal sequence:
     @Test // shadowed
     public void removeAtFindFailing() {
-        long seed = System.currentTimeMillis();
-        bar("removeAtFindFailing: seed = " + seed);
         
-        Random random = new Random(seed);
+        Random random = new Random(200L);
         int yeah = 0;
         while (true) {
-//            System.out.println("yeah = " + yeah);
             yeah++;
             
             list.clear();
@@ -1284,8 +1249,6 @@ public class LinkedListTest {
                     list.remove(index);
                     list.checkInvariant();
                 } catch (AssertionError ae) {
-                    System.out.println(indices);
-                    bar("removeAtFindFailing done!");
                     return;
                 }
             }
@@ -1294,8 +1257,6 @@ public class LinkedListTest {
     
     @Test
     public void bugTinyRemoveInt() {
-        bar("bugTinyRemoveInt");
-        
         list.addAll(getIntegerList(5));
         
         list.checkInvariant();
@@ -1313,33 +1274,24 @@ public class LinkedListTest {
         list.checkInvariant();
         list.remove(0);
         
-        list.checkInvariant();
-        
-        bar("bugTinyRemoveInt done!");        
+        list.checkInvariant();      
     }
     
-    @Test // shadowed
+    @Test
     public void removeAtIndex1() {
-        bar("removeAtIndex1");
-        
         list.addAll(getIntegerList(10));
         int[] indices = { 9, 3, 3, 3, 1, 0 };
         
         for (int i = 0; i < indices.length; i++) {
             int index = indices[i];
-//            System.out.println("ye = " + index);
             list.checkInvariant();
             list.remove(index);
             list.checkInvariant();
         }
-        
-        bar("removeAtIndex1 done!");
     }
 
     @Test
     public void enhancedIteratorAddition() {
-        bar("enhancedIteratorAddition");
-        
         list.addAll(Arrays.asList(1, 2, 3));
         ListIterator<Integer> iter = list.listIterator();
 
@@ -1360,20 +1312,15 @@ public class LinkedListTest {
         iter.add(10);
 
         assertEquals(Integer.valueOf(10), list.get(2));
-        
-        bar("enhancedIteratorAddition done!");
     }
 
     @Test
     public void findFailingIterator() {
-        bar("findFailingIterator");
-        
         list.addAll(getIntegerList(3850));
         Iterator<Integer> iterator = list.iterator();
         int counter = 0;
 
         while (iterator.hasNext()) {
-//            System.out.println("size = " + list.size() + " counter = " + counter);
             assertEquals(Integer.valueOf(counter), iterator.next());
             
             // Remove every 10th element:
@@ -1383,14 +1330,10 @@ public class LinkedListTest {
 
             counter++;
         }
-        
-        System.out.println(getBar("findFailingIterator done!"));
     }
 
     @Test
     public void bruteForceIteratorRemove() throws Exception {
-        System.out.println(getBar("bruteForceIteratorRemove"));
-        
         list.addAll(getIntegerList(1000));
  
         int counter = 1;
@@ -1400,12 +1343,10 @@ public class LinkedListTest {
         int totalIterations = 0;
 
         while (iter.hasNext()) {
-//            System.out.println("total iters: " + totalIterations);
             
             iter.next();
             arrayListIter.next();
             list.checkInvariant();
-            
             
             if (counter % 10 == 0) {
 
@@ -1428,14 +1369,10 @@ public class LinkedListTest {
 
             totalIterations++;
         }
-        
-        System.out.println(getBar("bruteForceIteratorRemove done!"));
     }
 
     @Test
     public void findFailingRemoveObject() {
-        System.out.println(getBar("findFailingRemoveObject"));
-        
         java.util.LinkedList<Integer> referenceList = 
                 new java.util.LinkedList<>();
 
@@ -1475,14 +1412,10 @@ public class LinkedListTest {
         }
 
         assertTrue(listsEqual(list, referenceList));
-
-        System.out.println(getBar("findFailingRemoveObject done!"));
     }
 
     @Test
     public void iteratorAdd() {
-        bar("iteratorAdd");
-        
         list.addAll(getIntegerList(4));
 
         ListIterator<Integer> iterator = list.listIterator(1);
@@ -1502,23 +1435,16 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(100), list.get(2));
         assertEquals(Integer.valueOf(2), list.get(3));
         assertEquals(Integer.valueOf(3), list.get(4));
-        
-        bar("iteratorAdd done!");
     }
 
     @Test
     public void bruteForceIteratorTest() {
-        bar("bruteForceIteratorTest");
-        
         list.addAll(getIntegerList(100));
         List<Integer> referenceList = new java.util.LinkedList<>(list);
 
         ListIterator<Integer> iterator1 = list.listIterator(2);
         ListIterator<Integer> iterator2 = referenceList.listIterator(2);
-
-        long seed = System.currentTimeMillis();
-        Random random = new Random(seed);
-        bar("bruteForceIteratorTest: seed = " + seed);
+        Random random = new Random(300L);
 
         while (iterator1.hasNext()) {
             if (!iterator2.hasNext()) {
@@ -1561,14 +1487,10 @@ public class LinkedListTest {
         if (iterator2.hasNext()) {
             fail("Java List iterator has more to offer.");
         }
-        
-        bar("bruteForceIteratorTest done!");
     }
 
     @Test
     public void indexOf() {
-        bar("indexOf");
-        
         list.add(1);
         list.add(2);
         list.add(3);
@@ -1584,8 +1506,6 @@ public class LinkedListTest {
         assertEquals(3, list.lastIndexOf(3));
         assertEquals(4, list.lastIndexOf(2));
         assertEquals(5, list.lastIndexOf(1));
-        
-        bar("indexOf done!");
     }
 
     class MyIntegerConsumer implements Consumer<Integer> {
@@ -1601,8 +1521,6 @@ public class LinkedListTest {
     @Test
     @SuppressWarnings("empty-statement")
     public void basicSpliteratorUsage() {
-        bar("basicSpliteratorUsage");
-        
         list.addAll(getIntegerList(10_000));
 
         Spliterator<Integer> spliterator1 = list.spliterator();
@@ -1660,14 +1578,10 @@ public class LinkedListTest {
             Integer expectedInteger = 5003 + i;
             assertEquals(expectedInteger, actualInteger);
         }
-        
-        bar("basicSpliteratorUsage done!");
     }
 
     @Test // checked
     public void spliteratorForEachRemaining() {
-        bar("spliteratorForEachRemaining");
-        
         list.addAll(getIntegerList(10_000));
         Spliterator<Integer> split = list.spliterator();
         MyIntegerConsumer consumer = new MyIntegerConsumer();
@@ -1677,14 +1591,10 @@ public class LinkedListTest {
         for (int i = 0; i < 10_000; i++) {
             assertEquals(Integer.valueOf(i), consumer.ints.get(i));
         }
-        
-        bar("spliteratorForEachRemaining done!");
     }
 
     @Test // checked
     public void spliteratorForEachRemainingTwoSpliterators() {
-        bar("spliteratorForEachRemainingTwoSpliterators");
-        
         list.addAll(getIntegerList(10_000));
         Spliterator<Integer> splitRight = list.spliterator();
         Spliterator<Integer> splitLeft = splitRight.trySplit();
@@ -1702,14 +1612,10 @@ public class LinkedListTest {
         for (int i = 5_000; i < 10_000; i++) {
             assertEquals(Integer.valueOf(i), consumerRight.ints.get(i - 5_000));
         }
-        
-        bar("spliteratorForEachRemainingTwoSpliterators done!");
     }
 
     @Test // checked
     public void spliteratorForEachRemainingWithAdvance() {
-        bar("spliteratorForEachRemainingWithAdvance");
-        
         list.addAll(getIntegerList(10_000));
         Spliterator<Integer> rightSpliterator = list.spliterator();
 
@@ -1735,14 +1641,10 @@ public class LinkedListTest {
 
         assertTrue(rightSpliterator.tryAdvance(
                 i -> assertEquals(Integer.valueOf(5_001), i)));
-
-        bar("spliteratorForEachRemainingWithAdvance done!");
     }
 
     @Test // checked
     public void spliterator() {
-        bar("spliterator");
-        
         list.addAll(getIntegerList(6_000));
         Spliterator split = list.spliterator();
 
@@ -1781,14 +1683,10 @@ public class LinkedListTest {
         }
 
         assertFalse(split.tryAdvance(i -> {}));
-        
-        bar("spliterator done!");
     }
 
     @Test // checked
     public void bruteforceSpliterator() {
-        bar("bruteforceSpliterator");
-        
         list.addAll(getIntegerList(1_000_000));
         Collections.<Integer>shuffle(list);
 
@@ -1804,8 +1702,6 @@ public class LinkedListTest {
             Integer integer2 = newList.get(i);
             assertEquals(integer1, integer2);
         }
-        
-        bar("bruteforceSpliterator done!");
     }
 
     private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
@@ -1886,8 +1782,6 @@ public class LinkedListTest {
     
     @Test // checked
     public void bugCheckInvariantAfterRemoval() {
-        bar("bugCheckInvariantAfterRemoval");
-        
         for (int i = 0; i < 4; i++) {
             list.add(i);
         }
@@ -1897,16 +1791,11 @@ public class LinkedListTest {
         assertEquals(list.size(), 2);
         assertEquals(Integer.valueOf(0), list.get(0));
         assertEquals(Integer.valueOf(2), list.get(1));
-        
-        bar("bugCheckInvariantAfterRemoval done!");
     }
     
     @Test
     public void bruteForceRemoveAt1() {
-        long seed = System.currentTimeMillis();
-        bar("bruteForceRemoveAt1: seed = " + seed);
-        
-        Random random = new Random(seed);
+        Random random = new Random(400L);
         
         list.addAll(getIntegerList(1000));
         List<Integer> referenceList = new ArrayList<>(list);
@@ -1919,7 +1808,6 @@ public class LinkedListTest {
         int iters = 0;
         
         while (!list.isEmpty()) {
-//            System.out.println("iters = " + iters);
             iters++;
             
             int index = random.nextInt(list.size());
@@ -1928,26 +1816,20 @@ public class LinkedListTest {
             
             listsEqual(list, referenceList);
         } 
-        
-        bar("bruteForceRemoveA1t done!");
     }
     
-//    @Test
+    @Test
     public void bruteForceRemoveAt2() {
-        long seed = 1630487847317L; // System.currentTimeMillis();
-        
-        bar("bruteForceRemoveAt2: seed = " + seed);
-
+        long seed = 1630487847317L;
         Random random = new Random(seed);
         
-        while (true) {
+        for (int i = 0; i < 100; i++) {
             list.addAll(getIntegerList(10));
             List<Integer> indices = new ArrayList<>(list.size());
             
             while (!list.isEmpty()) {
                 int index = random.nextInt(list.size());
                 indices.add(index);
-                System.out.println(indices);
                 
                 try {
                     list.remove(index);
@@ -1961,34 +1843,23 @@ public class LinkedListTest {
             
             indices.clear();
         }
-        
-//        bar("bruteForceRemoveAt2 done!");
     }
     
     @Test
     public void bugRemoveAt2() {
-        bar("bugRemoveAt2");
-        
         list.addAll(getIntegerList(10));
         final int[] indices = { 7, 7, 4, 1, 2, 1, 3, 1, 1, 0 };
         
         for (int i = 0; i < indices.length; i++) {
             final int index = indices[i];
-//            System.out.println("i = " + i + ", index = " + index);
-            
             list.checkInvariant();
             list.remove(index);
             list.checkInvariant();
-//            System.out.println("index = " + index + ", i = " + i);
         }
-        
-        bar("bugRemoveAt2 done!");
     }
     
     @Test
     public void bugRemoveAt() {
-        bar("bugRemoveAt");
-        
         list.addAll(getIntegerList(10));
         
         list.checkInvariant();
@@ -2008,12 +1879,9 @@ public class LinkedListTest {
         assertEquals(Integer.valueOf(8), list.remove(4));
         
         list.checkInvariant();
-        
-        bar("bugRemoveAt done!");
     }
     
-    // Should not throw anything:
-    //@Test // checked!
+    @Test
     public void bugRemoveFirst() {
         list.addAll(getIntegerList(5));
         
@@ -2023,10 +1891,7 @@ public class LinkedListTest {
             list.removeFirst();
         }
         
-        long seed = System.currentTimeMillis();
-        bar("bugRemoveFirst: seed = " + seed);
-        
-        Random random = new Random(seed);
+        Random random = new Random(500L);
         List<Integer> referenceList = new ArrayList<>(list);
         
         while (!list.isEmpty()) {
@@ -2035,15 +1900,10 @@ public class LinkedListTest {
             referenceList.remove(index);
             assertTrue(listsEqual(list, referenceList));
         }
-        
-        bar("bugRemoveFirst done!");
     }
     
-    // Should not throw anything:
     @Test
     public void bugRemoveLast() {
-        bar("bugRemoveLast");
-        
         list.addAll(getIntegerList(10));
         
         assertEquals(10, list.size());
@@ -2052,10 +1912,7 @@ public class LinkedListTest {
             list.removeLast();
         }
         
-        long seed = System.currentTimeMillis();
-        bar("bugRemoveLast: seed = " + seed);
-        
-        Random random = new Random(seed);
+        Random random = new Random(600L);
         List<Integer> referenceList = new ArrayList<>(list);
         
         while (!list.isEmpty()) {
@@ -2064,8 +1921,6 @@ public class LinkedListTest {
             referenceList.remove(index);
             assertTrue(listsEqual(list, referenceList));
         }
-        
-        bar("bugRemoveLast done!");
     }
 
     private static boolean listsEqual(
@@ -2107,16 +1962,5 @@ public class LinkedListTest {
         }
 
         return list;
-    }
-    
-    private static String getBar(String text) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("--- LinkedList.");
-        stringBuilder.append(text);
-        return stringBuilder.toString();
-    }
-    
-    private static void bar(String text) {
-        System.out.println(getBar(text));
     }
 }
