@@ -97,8 +97,8 @@ public class LinkedList<E>
      * collection, in the order they are returned by the collection's
      * iterator.
      *
-     * @param  c the collection whose elements are to be placed into this list
-     * @throws NullPointerException if the specified collection is null
+     * @param  c the collection whose elements are to be placed into this list.
+     * @throws NullPointerException if the specified collection is null.
      */
     public LinkedList(Collection<? extends E> c) {
         this();
@@ -110,7 +110,7 @@ public class LinkedList<E>
      *
      * <p>This method is equivalent to {@link #addLast}.
      *
-     * @param e element to be appended to this list
+     * @param e element to be appended to this list.
      * @return {@code true} (as specified by {@link Collection#add}).
      */
     @Override
@@ -143,7 +143,7 @@ public class LinkedList<E>
      * Appends all of the elements in the specified collection to the end of
      * this list, in the order they are returned by the specified collection's
      * iterator.  The behavior of this operation is undefined if the specified 
-     * collection is modified while the operation is in progress.  (Note that 
+     * collection is modified while the operation is in progress. (Note that 
      * this will occur if the specified collection is this list, and it's
      * nonempty.)
      *
@@ -171,6 +171,7 @@ public class LinkedList<E>
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         checkPositionIndex(index);
+        
         if (c.isEmpty()) {
             return false;
         }
@@ -237,8 +238,8 @@ public class LinkedList<E>
      * formally, returns {@code true} if and only if this list contains at least 
      * one element {@code e} such that {@code Objects.equals(o, e)}.
      *
-     * @param o element whose presence in this list is to be tested
-     * @return {@code true} if this list contains the specified element
+     * @param o element whose presence in this list is to be tested.
+     * @return {@code true} if this list contains the specified element.
      */
     @Override
     public boolean contains(Object o) {
@@ -442,17 +443,16 @@ public class LinkedList<E>
      * sequence), starting at the specified position in the list.
      * Obeys the general contract of {@code List.listIterator(int)}.<p>
      *
-     * The list-iterator is <i>fail-fast</i>: if the list is structurally
+     * The list iterator is <i>fail-fast</i>: if the list is structurally
      * modified at any time after the Iterator is created, in any way except
-     * through the list-iterator's own {@code remove} or {@code add}
-     * methods, the list-iterator will throw a
-     * {@code ConcurrentModificationException}.  Thus, in the face of
-     * concurrent modification, the iterator fails quickly and cleanly, rather
-     * than risking arbitrary, non-deterministic behavior at an undetermined
-     * time in the future.
+     * through the list iterator's own {@code remove} or {@code add} methods,
+     * the list-iterator will throw a {@code ConcurrentModificationException}.  
+     * Thus, in the face of concurrent modification, the iterator fails quickly 
+     * and cleanly, rather than risking arbitrary, non-deterministic behavior at
+     * an undetermined time in the future.
      *
      * @param index index of the first element to be returned from the
-     *              list-iterator (by a call to {@code next}).
+     *              list iterator (by a call to {@code next}).
      * @return a ListIterator of the elements in this list (in proper
      *         sequence), starting at the specified position in the list.
      * @throws IndexOutOfBoundsException {@inheritDoc}
@@ -477,7 +477,7 @@ public class LinkedList<E>
     /**
      * Inserts the specified element at the front of this list.
      *
-     * @param e the element to insert
+     * @param e the element to insert.
      * @return {@code true} (as specified by {@link Deque#offerFirst}).
      */
     @Override
@@ -487,9 +487,9 @@ public class LinkedList<E>
     }
 
     /**
-     * Inserts the specified element at the end of this list.
+     * Appends the specified element at the end of this list.
      *
-     * @param e the element to insert.
+     * @param e the element to append
      * @return {@code true} (as specified by {@link Deque#offerLast}).
      */
     @Override
