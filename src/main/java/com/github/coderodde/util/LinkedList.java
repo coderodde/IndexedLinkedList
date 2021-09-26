@@ -1164,7 +1164,7 @@ public class LinkedList<E>
         Node<E> prev = pred;
 
         for (E item : c) {
-            final Node<E> newNode = new Node<>();
+            Node<E> newNode = new Node<>();
             newNode.item = item;
             newNode.prev = prev;
             prev.next = newNode;
@@ -1494,7 +1494,7 @@ public class LinkedList<E>
             Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startingIndex) {
-                final int nextIndex = finger.index - steps;
+                int nextIndex = finger.index - steps;
                 finger.updateIndex = nextIndex;
                 fingerStack.fingerIndexSet.remove(finger.index);
             }
@@ -1527,7 +1527,7 @@ public class LinkedList<E>
             Finger<E> finger = fingerStack.get(i);
             
             if (finger.index >= startIndex) {
-                final int nextIndex = finger.index + steps;
+                int nextIndex = finger.index + steps;
                 finger.updateIndex = nextIndex;
                 fingerStack.fingerIndexSet.remove(finger.index);
             }
@@ -1754,7 +1754,7 @@ public class LinkedList<E>
         // Makes sure that the next finger fits in this finger stack:
         private void enlargeFingerArrayIfNeeded() {
             if (size == fingerArray.length) {
-                final int nextCapacity = 2 * fingerArray.length;
+                int nextCapacity = 2 * fingerArray.length;
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
@@ -1828,7 +1828,7 @@ public class LinkedList<E>
             checkForComodification();
         }
 
-        private final void checkForComodification() {
+        private void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
@@ -1961,7 +1961,7 @@ public class LinkedList<E>
             checkForComdification();
         }
         
-        private final void checkForComdification() {
+        private void checkForComdification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
