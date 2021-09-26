@@ -599,7 +599,6 @@ public class LinkedList<E>
      *
      * @return the head of this list.
      * @throws NoSuchElementException if this list is empty.
-     * @since 1.5
      */
     @Override
     public E remove() {
@@ -718,7 +717,7 @@ public class LinkedList<E>
      * element, it is unchanged.
      *
      * @param o element to be removed from this list, if present.
-     * @return {@code true} only if the list contained the specified element.
+     * @return {@code true} only if this list contained the specified element.
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
@@ -779,7 +778,7 @@ public class LinkedList<E>
      * element, it is unchanged.
      *
      * @param o element to be removed from this list, if present.
-     * @return {@code true} only if the list contained the specified element.
+     * @return {@code true} only if this list contained the specified element.
      */
     @Override
     public boolean removeLastOccurrence(Object o) {
@@ -825,7 +824,7 @@ public class LinkedList<E>
      *
      * @implNote
      * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
-     * and implements {@code trySplit} to permit limited parallelism..
+     * and implements {@code trySplit} to permit limited parallelism.
      *
      * @return a {@code Spliterator} over the elements in this list.
      */
@@ -1358,7 +1357,6 @@ public class LinkedList<E>
     
     /***************************************************************************
     Returns true only if this list requires less fingers.
-    /***************************************************************************
     ***************************************************************************/
     private boolean mustRemoveFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
@@ -1574,8 +1572,8 @@ public class LinkedList<E>
     }
     
     /**
-     * Reconstitutes this {@code LinkedList} instance from a stream
-     * (that is, deserializes it).
+     * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
+     * deserializes it).
      */
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
@@ -1626,8 +1624,8 @@ public class LinkedList<E>
     }
     
     /**
-     * Saves the state of this {@code LinkedList} instance to a stream
-     * (that is, serializes it).
+     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
+     * serializes it).
      *
      * @serialData The size of the list (the number of elements it
      *             contains) is emitted (int), followed by all of its
