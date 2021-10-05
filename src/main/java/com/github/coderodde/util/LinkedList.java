@@ -1369,7 +1369,7 @@ public class LinkedList<E>
     /***************************************************************************
     Returns the node at index 'index'. Moves the closest finger to the node.
     ***************************************************************************/
-    Node<E> node(int index) {
+    protected Node<E> node(int index) {
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
 
@@ -1703,7 +1703,7 @@ public class LinkedList<E>
     Implements a simple, array-based stack for storing the node fingers for
     items of type 'E'.
     ***************************************************************************/
-    static final class FingerStack<E> {
+    static class FingerStack<E> {
         static final int INITIAL_CAPACITY = 8;
 
         // package private for unit testing
@@ -1752,7 +1752,7 @@ public class LinkedList<E>
         }
 
         // Makes sure that the next finger fits in this finger stack:
-        private void enlargeFingerArrayIfNeeded() {
+        void enlargeFingerArrayIfNeeded() {
             if (size == fingerArray.length) {
                 int nextCapacity = 2 * fingerArray.length;
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
