@@ -2,9 +2,7 @@ package com.github.coderodde.util;
 
 import com.github.coderodde.util.LinkedList.BasicIterator;
 import com.github.coderodde.util.LinkedList.EnhancedIterator;
-import com.github.coderodde.util.LinkedList.Finger;
 import com.github.coderodde.util.LinkedList.FingerStack;
-import com.github.coderodde.util.LinkedList.Node;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -545,15 +543,13 @@ public class LinkedListTest {
     
     @Test
     public void nodeToString() {
-        Node<String> node = new Node<>();
-        node.item = "hello";
+        Node<String> node = new Node<>("hello");
         assertEquals("[Node; item = hello]", node.toString());
     }
     
     @Test
     public void fingerToString() {
-        Node<String> node = new Node<>();
-        node.item = "World";
+        Node<String> node = new Node<>("World");
         Finger<String> finger = new Finger<>(node, 1);
         assertEquals("[Finger; index = 1, item = World]", finger.toString());
     }
@@ -562,9 +558,9 @@ public class LinkedListTest {
     public void fingerStackToString() {
         FingerStack<String> fingerStack = new FingerStack<>();
         
-        Node<String> node1 = new Node<>();
-        Node<String> node2 = new Node<>();
-        Node<String> node3 = new Node<>();
+        Node<String> node1 = new Node<>(null);
+        Node<String> node2 = new Node<>(null);
+        Node<String> node3 = new Node<>(null);
         
         Finger<String> finger1 = new Finger<>(node1, 1);
         Finger<String> finger2 = new Finger<>(node2, 2);
@@ -585,9 +581,7 @@ public class LinkedListTest {
         FingerStack<Integer> fingerStack = new FingerStack<>();
         
         for (int i = 0; i < 100; i++) {
-            Node<Integer> node = new Node<>();
-            node.item = i;
-            
+            Node<Integer> node = new Node<>(i);
             Finger<Integer> finger = new Finger<>(node, i);
             fingerStack.push(finger);
         }

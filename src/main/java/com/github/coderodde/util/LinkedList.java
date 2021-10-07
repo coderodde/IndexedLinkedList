@@ -303,7 +303,7 @@ public class LinkedList<E>
             Object object1 = iterator1.next();
             Object object2 = iterator2.next();
 
-            if (!java.util.Objects.equals(object1, object2)) {
+            if (!Objects.equals(object1, object2)) {
                 return false;
             }
         }
@@ -379,17 +379,9 @@ public class LinkedList<E>
     public int indexOf(Object o) {
         int index = 0;
         
-        if (o == null) {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (x.item == null) {
-                    return index;
-                }
-            }
-        } else {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (o.equals(x.item)) {
-                    return index;
-                }
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                return index;
             }
         }
         
@@ -417,21 +409,11 @@ public class LinkedList<E>
     public int lastIndexOf(Object o) {
         int index = size;
         
-        if (o == null) {
-            for (Node<E> x = last; x != null; x = x.prev) {
-                index--;
-                
-                if (x.item == null) {
-                    return index;
-                }
-            }
-        } else {
-            for (Node<E> x = last; x != null; x = x.prev) {
-                index--;
-                
-                if (o.equals(x.item)) {
-                    return index;
-                }
+        for (Node<E> x = last; x != null; x = x.prev) {
+            index--;
+
+            if (Objects.equals(o, x.item)) {
+                return index;
             }
         }
         
@@ -624,19 +606,10 @@ public class LinkedList<E>
     public boolean remove(Object o) {
         int index = 0;
 
-        if (o == null) {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (x.item == null) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
-            }
-        } else {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (o.equals(x.item)) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
             }
         }
 
@@ -724,23 +697,14 @@ public class LinkedList<E>
     @Override
     public boolean removeFirstOccurrence(Object o) {
         int index = 0;
-
-        if (o == null) {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (x.item == null) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
-            }
-        } else {
-            for (Node<E> x = first; x != null; x = x.next, index++) {
-                if (o.equals(x.item)) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
+        
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
             }
         }
-
+        
         return false;
     }
 
@@ -788,19 +752,10 @@ public class LinkedList<E>
     public boolean removeLastOccurrence(Object o) {
         int index = size - 1;
 
-        if (o == null) {
-            for (Node<E> x = last; x != null; x = x.prev, index--) {
-                if (x.item == null) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
-            }
-        } else {
-            for (Node<E> x = last; x != null; x = x.prev, index--) {
-                if (o.equals(x.item)) {
-                    removeObjectImpl(x, index);
-                    return true;
-                }
+        for (Node<E> x = last; x != null; x = x.prev, index--) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
             }
         }
 
@@ -846,7 +801,7 @@ public class LinkedList<E>
     Adds a finger pointing to the input node at the input index.
     ***************************************************************************/
     private void addFinger(Node<E> node, int index) {
-        fingerStack.push(new Finger<>(node ,index));
+        fingerStack.push(new Finger<>(node, index));
     }
     
     /***************************************************************************
@@ -993,7 +948,7 @@ public class LinkedList<E>
         Node<E> oldLast = last;
 
         for (E item : c) {
-            Node<E> newNode = new Node<>();
+            Node<E> newNode = new Node<>(item);
             newNode.item = item;
             newNode.prev = prev;
             prev.next = newNode;
@@ -1167,8 +1122,7 @@ public class LinkedList<E>
         Node<E> prev = pred;
 
         for (E item : c) {
-            Node<E> newNode = new Node<>();
-            newNode.item = item;
+            Node<E> newNode = new Node<>(item);
             newNode.prev = prev;
             prev.next = newNode;
             prev = newNode;
@@ -1184,7 +1138,7 @@ public class LinkedList<E>
         // Shift all the fingers positions past the 'succ' on the right 'sz'
         // positions to the right:
         shiftIndicesToRight(succIndex, sz);
-        //                                   0 1 |10 11 12| 3 4 5 6 7 8 9
+        
         // Add fingers:
         addFingersAfterInsertAll(pred.next, succIndex, sz);
     }
@@ -1211,8 +1165,7 @@ public class LinkedList<E>
         shiftIndicesToRightOnce(index);
 
         Node<E> pred = succ.prev;
-        Node<E> newNode = new Node<>();
-        newNode.item = e;
+        Node<E> newNode = new Node<>(e);
         newNode.next = succ;
         succ.prev = newNode;
 
@@ -1238,8 +1191,7 @@ public class LinkedList<E>
         shiftIndicesToRightOnce(0);
 
         Node<E> f = first;
-        Node<E> newNode = new Node<>();
-        newNode.item = e;
+        Node<E> newNode = new Node<>(e);
         newNode.next = f;
         first = newNode;
 
@@ -1261,8 +1213,7 @@ public class LinkedList<E>
     ***************************************************************************/
     private void linkLast(E e) {
         Node<E> l = last;
-        Node<E> newNode = new Node<>();
-        newNode.item = e;
+        Node<E> newNode = new Node<>(e);
         newNode.prev = l;
         last = newNode;
 
@@ -1387,14 +1338,12 @@ public class LinkedList<E>
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
         Node<E> oldFirst = first;
-        first = new Node<>();
-        first.item = iterator.next();
+        first = new Node<>(iterator.next());
 
         Node<E> prevNode = first;
 
         for (int i = 1, sz = c.size(); i < sz; i++) {
-            Node<E> newNode = new Node<>();
-            newNode.item = iterator.next();
+            Node<E> newNode = new Node<>(iterator.next());
             newNode.prev = prevNode;
             prevNode.next = newNode;
             prevNode = newNode;
@@ -1465,14 +1414,11 @@ public class LinkedList<E>
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
-        first = new Node<>();
-        first.item = iterator.next();
-
+        first = new Node<>(iterator.next());
         Node<E> prevNode = first;
 
         for (int i = 1, sz = c.size(); i < sz; i++) {
-            Node<E> newNode = new Node<>();
-            newNode.item = iterator.next();
+            Node<E> newNode = new Node<>(iterator.next());
             prevNode.next = newNode;
             newNode.prev = prevNode;
             prevNode = newNode;
@@ -1592,15 +1538,13 @@ public class LinkedList<E>
                 return;
                 
             case 1:
-                Node<E> newNode = new Node<>();
-                newNode.item = (E) s.readObject();
+                Node<E> newNode = new Node<>((E) s.readObject());
                 first = last = newNode;
                 addFinger(newNode, 0);
                 return;
         }
         
-        Node<E> rightmostNode = new Node<>();
-        rightmostNode.item = (E) s.readObject();
+        Node<E> rightmostNode = new Node<>((E) s.readObject());
         first = rightmostNode;
         
         int numberOfRequestedFingers = getRecommendedNumberOfFingers(size);
@@ -1609,9 +1553,7 @@ public class LinkedList<E>
         
         // Read in all elements in the proper order.
         for (int i = 1; i < size; i++) {
-            E item = (E) s.readObject();
-            Node<E> node = new Node<>();
-            node.item = item;
+            Node<E> node = new Node<>((E) s.readObject());
             
             if ((i - startOffset) % distance == 0) {
                 addFinger(node, i);
@@ -1645,57 +1587,6 @@ public class LinkedList<E>
         // Write out all elements in the proper order.
         for (Node<E> x = first; x != null; x = x.next) {
             s.writeObject(x.item);
-        }
-    }
-    
-    /***************************************************************************
-    Implements the doubly-linked list node.
-    ***************************************************************************/
-    static class Node<E> {
-        E item;
-        Node<E> prev;
-        Node<E> next;
-
-        @Override
-        public String toString() {
-            return "[Node; item = " + item + "]";
-        }
-    }
-
-    /***************************************************************************
-    Implements the list node finger.
-    ***************************************************************************/
-    static final class Finger<E> {
-        Node<E> node;
-        int index; // Index at which 'node' is located.
-        int updateIndex;
-
-        Finger(Node<E> node, int index) {
-            this.node = node;
-            this.index = index;
-        }
-
-        @Override
-        public String toString() {
-            return "[Finger; index = " + index + ", item = " + node.item + "]";
-        }
-        
-        // Moves this finger 'steps' position to the left
-        void rewindLeft(int steps) {
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
-
-            index -= steps;
-        }
-
-        // Moves this finger 'steps' position to the right
-        void rewindRight(int steps) {
-            for (int i = 0; i < steps; i++) {
-                node = node.next;
-            }
-
-            index += steps;
         }
     }
     
@@ -1993,7 +1884,7 @@ public class LinkedList<E>
         static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
         
         private final LinkedList<E> list;
-        private LinkedList.Node<E> node;
+        private Node<E> node;
         private long lengthOfSpliterator;
         private long numberOfProcessedElements;
         private long offsetOfSpliterator;

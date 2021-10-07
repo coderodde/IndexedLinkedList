@@ -1,6 +1,7 @@
 package com.github.coderodde.util;
 
-// This class implements the actual doubly-linked list node data type.
+// This class implements the finger into the doubly-linked list.
+
 class Finger<E> {
  
     Node<E> node;
@@ -14,9 +15,11 @@ class Finger<E> {
 
     @Override
     public String toString() {
-        return "[Finger; index = " + index + ", item = " + node.item + "]";
+        return "[Finger; index = " + index + 
+                ", item = " + ((node == null) ? "null" : node.item) + 
+                "]";
     }
-
+    
     // Moves this finger 'steps' position to the left
     void rewindLeft(int steps) {
         for (int i = 0; i < steps; i++) {
