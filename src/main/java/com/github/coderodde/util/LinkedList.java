@@ -911,7 +911,7 @@ public class LinkedList<E>
     /***************************************************************************
     Adds fingers after setting a collection as a list.
     ***************************************************************************/
-    private void addFingersAfterSetAll() {
+    protected void addFingersAfterSetAll() {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
 
         if (numberOfNewFingers == 0) {
@@ -943,7 +943,7 @@ public class LinkedList<E>
     /***************************************************************************
     Appends the input collection to the tail of this list.
     ***************************************************************************/
-    private void appendAll(Collection<? extends E> c) {
+    protected void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         Node<E> oldLast = last;
 
@@ -1094,7 +1094,7 @@ public class LinkedList<E>
     /***************************************************************************
     Computes the recommended number of fingers.
     ***************************************************************************/
-    private int getRecommendedNumberOfFingers() {
+    protected int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
@@ -1411,7 +1411,7 @@ public class LinkedList<E>
     /***************************************************************************
     Sets the input collection as a list.
     ***************************************************************************/
-    private void setAll(Collection<? extends E> c) {
+    protected void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
         first = new Node<>(iterator.next());
@@ -1435,7 +1435,7 @@ public class LinkedList<E>
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
     ***************************************************************************/
-    private void shiftIndicesToLeft(int startingIndex, int steps) {
+    protected void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             

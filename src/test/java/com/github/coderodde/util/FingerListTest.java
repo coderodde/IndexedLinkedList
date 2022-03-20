@@ -21,6 +21,8 @@ public class FingerListTest {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(3)), 3));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(6)), 6));
+        fl.fingerArray[4].index = 8;
+        fl.fingerArray[4].node = new Node<>(Integer.valueOf(1000));
         
         Finger<Integer> finger = fl.get(fl.getFingerIndex(0));
         assertEquals(0, finger.index);
@@ -31,8 +33,8 @@ public class FingerListTest {
         assertEquals(Integer.valueOf(1), finger.node.item);
         
         finger = fl.get(fl.getFingerIndex(2));
-        assertEquals(1, finger.index);
-        assertEquals(Integer.valueOf(1), finger.node.item);
+        assertEquals(3, finger.index);
+        assertEquals(Integer.valueOf(3), finger.node.item);
         
         finger = fl.get(fl.getFingerIndex(3));
         assertEquals(3, finger.index);
@@ -73,6 +75,10 @@ public class FingerListTest {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
+        
+        // Add end of finger list sentinel:
+        fl.fingerArray[3] = 
+                new Finger<>(new Node<Integer>(Integer.valueOf(100)), 10);
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 6);
         

@@ -5,7 +5,7 @@ public class LinkedListBenchmarkRunner {
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
 
-        System.out.println("<<< LinkedList seed = " + seed + " >>>");
+        System.out.println("<<< Benchmark seed = " + seed + " >>>");
         System.out.println();
 
         LinkedListBenchmark benchmark = new LinkedListBenchmark(seed);
