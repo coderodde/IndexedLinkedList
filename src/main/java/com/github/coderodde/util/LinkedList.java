@@ -387,6 +387,14 @@ public class LinkedList<E>
         
         return -1;
     }
+    
+    /**
+     * {@inheritDoc } 
+     */
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
 
     /**
      * Returns the basic iterator over this list supporting only traversal and
@@ -911,7 +919,7 @@ public class LinkedList<E>
     /***************************************************************************
     Adds fingers after setting a collection as a list.
     ***************************************************************************/
-    protected void addFingersAfterSetAll() {
+    private void addFingersAfterSetAll() {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
 
         if (numberOfNewFingers == 0) {
@@ -1094,7 +1102,7 @@ public class LinkedList<E>
     /***************************************************************************
     Computes the recommended number of fingers.
     ***************************************************************************/
-    protected int getRecommendedNumberOfFingers() {
+    private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
@@ -1411,7 +1419,7 @@ public class LinkedList<E>
     /***************************************************************************
     Sets the input collection as a list.
     ***************************************************************************/
-    protected void setAll(Collection<? extends E> c) {
+    private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
         first = new Node<>(iterator.next());

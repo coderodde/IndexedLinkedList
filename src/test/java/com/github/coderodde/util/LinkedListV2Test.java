@@ -1,47 +1,47 @@
-//package com.github.coderodde.util;
-//
-//import com.github.coderodde.util.LinkedList.BasicIterator;
-//import com.github.coderodde.util.LinkedList.EnhancedIterator;
-//import com.github.coderodde.util.LinkedList.FingerStack;
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.io.ObjectInputStream;
-//import java.io.ObjectOutputStream;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.Collection;
-//import java.util.Collections;
-//import java.util.ConcurrentModificationException;
-//import java.util.HashSet;
-//import java.util.Iterator;
-//import java.util.List;
-//import java.util.ListIterator;
-//import java.util.NoSuchElementException;
-//import java.util.Random;
-//import java.util.Set;
-//import java.util.Spliterator;
-//import java.util.function.Consumer;
-//import java.util.stream.Collectors;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertFalse;
-//import static org.junit.Assert.assertNotNull;
-//import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertTrue;
-//import static org.junit.Assert.fail;
-//import org.junit.Before;
-//import org.junit.Test;
-//
-//public class LinkedListV2Test {
-//
-//    private final LinkedListV2<Integer> list = new LinkedListV2<>();
-//    
-//    @Before
-//    public void setUp() {
-//        list.clear();
-//    }
-//    
+package com.github.coderodde.util;
+
+import com.github.coderodde.util.LinkedList.BasicIterator;
+import com.github.coderodde.util.LinkedList.EnhancedIterator;
+import com.github.coderodde.util.LinkedList.FingerStack;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+
+public class LinkedListV2Test {
+
+    private final LinkedListV2<Integer> list = new LinkedListV2<>();
+    
+    @Before
+    public void setUp() {
+        list.clear();
+    }
+    
 //    @Test
 //    public void constructAdd() {
 //        List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
@@ -947,33 +947,33 @@
 //        assertEquals(Integer.valueOf(10), list.get(3));
 //    }
 //
-//    @Test // checked!
-//    public void addCollectionOneElementToEmptyList() {
-//        List<Integer> c = new ArrayList<>();
-//        c.add(100);
-//
-//        list.addAll(c);
-//
-//        assertFalse(list.isEmpty());
-//        assertEquals(1, list.size());
-//        assertEquals(Integer.valueOf(100), list.get(0));
-//    }
-//
-//    @Test // checked!
-//    public void addCollectionThreeElementsToEmptyList() {
-//        assertTrue(list.isEmpty());
-//        assertEquals(0, list.size());
-//
-//        List<Integer> c = Arrays.asList(1, 2, 3);
-//
-//        list.addAll(c);
-//        assertFalse(list.isEmpty());
-//        assertEquals(3, list.size());
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            assertEquals(Integer.valueOf(i + 1), list.get(i));
-//        }
-//    }
+    @Test
+    public void addCollectionOneElementToEmptyList() {
+        List<Integer> c = new ArrayList<>();
+        c.add(100);
+
+        list.addAll(c);
+
+        assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(100), list.get(0));
+    }
+
+    @Test
+    public void addCollectionThreeElementsToEmptyList() {
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+
+        List<Integer> c = Arrays.asList(1, 2, 3);
+
+        list.addAll(c);
+        assertFalse(list.isEmpty());
+        assertEquals(3, list.size());
+
+        for (int i = 0; i < list.size(); i++) {
+            assertEquals(Integer.valueOf(i + 1), list.get(i));
+        }
+    }
 //
 //    @Test // checked!
 //    public void addCollectionAtIndex() {
@@ -1957,4 +1957,4 @@
 //
 //        return list;
 //    }
-//}
+}

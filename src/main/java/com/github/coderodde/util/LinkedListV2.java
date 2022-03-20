@@ -35,7 +35,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             return size;
         }
 
-        int getFingerIndex(int elementIndex) {
+        private int getFingerIndexImpl(int elementIndex) {
             int count = size + 1; // + 1 for the end sentinel.
             int it;
             int idx = 0;
@@ -53,14 +53,22 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 }
             }
             
-            return normalize(idx, elementIndex);
+            return idx;
+        }
+        
+        int getFingerIndex(int elementIndex) {
+            return normalize(getFingerIndexImpl(elementIndex), elementIndex);
+        }
+        
+        int getNextFingerIndex(int elementIndex) {
+            return getFingerIndexImpl(elementIndex);
         }
         
         void setFinger(int index, Finger<E> finger) {
             fingerArray[index] = finger;
         }
         
-        void makeRoomAtIndex(int fingerIndex, int roomSize) {
+        void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
             size += roomSize;
             enlargeFingerArrayIfNeeded();
             System.arraycopy(fingerArray, 
@@ -68,6 +76,8 @@ public class LinkedListV2<E> extends LinkedList<E> {
                              fingerArray, 
                              fingerIndex + roomSize,
                              roomSize);
+            
+            fingerArray[size].index += numberOfNodes;
         }
         
         private int normalize(int fingerIndex, int elementIndex) {
@@ -280,10 +290,52 @@ public class LinkedListV2<E> extends LinkedList<E> {
         
         return true;
     }
+    
+    /**
+     * Returns the element at the specified position in this list.
+     *
+     * @param index index of the element to return.
+     * @return the element at the specified position in this list.
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    @Override
+    public E get(int index) {
+        checkElementIndex(index);
+        return node(index).item;
+    }
+    
+    /**
+     * {@inheritDoc } 
+     */
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    /**
+     * Returns the number of elements in this list.
+     *
+     * @return the number of elements in this list.
+     */
+    @Override
+    public int size() {
+        return size;
+    }
 
 
     
     
+    
+
+    /***************************************************************************
+    Checks the element index. In the case of non-empty list, valid indices are
+    '{ 0, 1, ..., size - 1 }'.
+    ***************************************************************************/
+    private void checkElementIndex(int index) {
+        if (!isElementIndex(index)) {
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
+    }
     
    /***************************************************************************
     Checks that the input index is a valid position index for add operation or
@@ -301,6 +353,20 @@ public class LinkedListV2<E> extends LinkedList<E> {
     ***************************************************************************/
     private String getOutOfBoundsMessage(int index) {
         return "Index: " + index + ", Size: " + size;
+    }
+
+    /***************************************************************************
+    Computes the recommended number of fingers.
+    ***************************************************************************/
+    private int getRecommendedNumberOfFingers() {
+        return (int) Math.ceil(Math.sqrt(size) / 10.0);
+    }
+
+    /***************************************************************************
+    Tells if the argument is the index of an existing element.
+    ***************************************************************************/
+    private boolean isElementIndex(int index) {
+        return index >= 0 && index < size;
     }
 
     /***************************************************************************
@@ -370,7 +436,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             Collection<? extends E> c,
             Node<E> succ,
             int succIndex) {
-
+        int fingerIndex = fingerList.getNextFingerIndex(succIndex);
         Node<E> pred = succ.prev;
         Node<E> prev = pred;
 
@@ -500,12 +566,19 @@ public class LinkedListV2<E> extends LinkedList<E> {
         int startOffset = distanceBetweenFingers / 2;
         int index = indexOfInsertedRangeHead + startOffset;
         Node<E> node = headNodeOfInsertedRange;
-
+        
         for (int i = 0; i < startOffset; i++) {
            node = node.next;
         }
 
-        fingerList.insertFinger(new Finger<>(node, index));
+        int startFingerIndex =
+                fingerList.getNextFingerIndex(indexOfInsertedRangeHead);
+        
+        fingerList.makeRoomAtIndex(startFingerIndex, 
+                                   numberOfNewFingers, 
+                                   collectionSize);
+        
+        fingerList.setFinger(startFingerIndex, new Finger<>(node, index));
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
@@ -514,9 +587,13 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 node = node.next;
             }
 
-            fingerList.insertFinger(new Finger<>(node, index));
+            fingerList.setFinger(startFingerIndex + i, 
+                                 new Finger<>(node, index));
         }
+        
+        return startFingerIndex + numberOfNewFingers;
     }
+    
     /***************************************************************************
     Adds fingers after prepending a collection to this list.
     ***************************************************************************/
@@ -538,7 +615,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
 
         fingerList.shiftFingersToRight(0, collectionSize);
-        fingerList.makeRoomAtIndex(0, collectionSize);
+        fingerList.makeRoomAtIndex(0, numberOfNewFingers, collectionSize);
         
         int fingerIndex = 0;
         
@@ -551,14 +628,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 node = node.next;
             }
 
-            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
+            fingerList.setFinger(fingerIndex++, new Finger<>(node, index)); 
         }
     }
     
     /***************************************************************************
     Adds fingers after setting a collection as a list.
     ***************************************************************************/
-    protected void addFingersAfterSetAll() {
+    private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
 
         if (numberOfNewFingers == 0) {
@@ -568,13 +645,17 @@ public class LinkedListV2<E> extends LinkedList<E> {
         int distance = size / numberOfNewFingers;
         int startIndex = distance / 2;
         int index = startIndex;
+        fingerList.makeRoomAtIndex(0,
+                                   numberOfNewFingers, 
+                                   collectionSize);
+        
         Node<E> node = first;
 
         for (int i = 0; i < startIndex; i++) {
             node = node.next;
         }
 
-        appendFinger(node, startIndex);
+        fingerList.setFinger(0, new Finger<>(node, startIndex));
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
@@ -583,9 +664,10 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 node = node.next;
             }
 
-            appendFinger(node, index);
+            fingerList.setFinger(i, new Finger<>(node, index));
         }
     }
+    
     /***************************************************************************
     Prepends the input collection to the head of this list.
     ***************************************************************************/
@@ -621,6 +703,29 @@ public class LinkedListV2<E> extends LinkedList<E> {
     protected void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
+    }
+    
+    /***************************************************************************
+    Sets the input collection as a list.
+    ***************************************************************************/
+    private void setAll(Collection<? extends E> c) {
+        Iterator<? extends E> iterator = c.iterator();
+
+        first = new Node<>(iterator.next());
+        Node<E> prevNode = first;
+
+        for (int i = 1, sz = c.size(); i < sz; i++) {
+            Node<E> newNode = new Node<>(iterator.next());
+            prevNode.next = newNode;
+            newNode.prev = prevNode;
+            prevNode = newNode;
+        }
+
+        last = prevNode;
+        size = c.size();
+        modCount++;
+
+        addFingersAfterSetAll(c.size());
     }
     
     /***************************************************************************
