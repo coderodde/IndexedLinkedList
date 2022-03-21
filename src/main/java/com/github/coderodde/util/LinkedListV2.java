@@ -491,7 +491,9 @@ public class LinkedListV2<E> extends LinkedList<E> {
         size += sz;
         
         // Add fingers:
-        addFingersAfterInsertAll(pred.next, succIndex, sz);
+        addFingersAfterInsertAll(pred.next, 
+                                 succIndex,
+                                 sz);
     }
     
     /***************************************************************************
@@ -575,14 +577,18 @@ public class LinkedListV2<E> extends LinkedList<E> {
     /***************************************************************************
     Adds fingers after inserting a collection in this list.
     ***************************************************************************/
-    private int addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
-                                         int indexOfInsertedRangeHead,
-                                         int collectionSize) {
+    private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
+                                          int indexOfInsertedRangeHead,
+                                          int collectionSize) {
         int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
-            return -1;
+            int fingerIndex = 
+                    fingerList.getNextFingerIndex(indexOfInsertedRangeHead);
+            
+            fingerList.shiftFingersToRight(fingerIndex, collectionSize);
+            return;
         }
 
         int distanceBetweenFingers = collectionSize / numberOfNewFingers;
@@ -613,8 +619,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
             fingerList.setFinger(startFingerIndex + i, 
                                  new Finger<>(node, index));
         }
-        
-        return startFingerIndex + numberOfNewFingers;
     }
     
     /***************************************************************************
