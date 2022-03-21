@@ -69,15 +69,15 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
         
         void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
+            shiftFingersToRight(fingerIndex, numberOfNodes);
             size += roomSize;
             enlargeFingerArrayIfNeeded();
+            
             System.arraycopy(fingerArray, 
                              fingerIndex, 
                              fingerArray, 
                              fingerIndex + roomSize,
-                             roomSize);
-            
-            fingerArray[size].index += numberOfNodes;
+                             size - fingerIndex);
         }
         
         private int normalize(int fingerIndex, int elementIndex) {
@@ -121,8 +121,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
 
         // Inserts the input finger into the finger list such that the entire
         // finger list is sorted by indices:
-        void insertFingerAndShiftOnceToRight(
-                com.github.coderodde.util.Finger<E> finger) {
+        void insertFingerAndShiftOnceToRight(Finger<E> finger) {
             
             enlargeFingerArrayIfNeeded();
             int beforeFingerIndex = getFingerIndex(finger.index);
@@ -142,16 +141,32 @@ public class LinkedListV2<E> extends LinkedList<E> {
             size++;
         }
         
-        private void shiftFingersToRightOnce(int startIndex) {
+        /***********************************************************************
+        For each finger with the index at least 'startIndex', decrease the index
+        by one. This method updates the index of the end-of-list sentinel too.
+        ***********************************************************************/
+        private void shiftFingersToLeft(int startIndex) {
             for (int i = startIndex; i <= size; ++i) {
                 fingerArray[i].index++;
             }
         }
         
+        /***********************************************************************
+        For each finger with the index at least 'startIndex', add 'steps' to the 
+        index. This method updates the index of the end-of-list sentinel too.
+        ***********************************************************************/
         private void shiftFingersToRight(int startIndex, int shiftLength) {
             for (int i = startIndex; i <= size; ++i) {
                 fingerArray[i].index += shiftLength;
             }
+        }
+    
+        /***********************************************************************
+        For each finger with the index at least 'startIndex', incremnt the index
+        by one. This method updates the index of the end-of-list sentinel too.
+        ***********************************************************************/
+        private void shiftFingersToRightOnce(int startIndex) {
+            shiftFingersToRight(startIndex, 1);
         }
 
         void removeFinger() {
@@ -174,7 +189,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
 
         // Makes sure that the next finger fits in this finger stack:
-        void enlargeFingerArrayIfNeeded() {
+        private void enlargeFingerArrayIfNeeded() {
             // If the finger array is full, double the capacity:
             if (size + 1 == fingerArray.length) {
                 int nextCapacity = 2 * fingerArray.length;
@@ -322,7 +337,28 @@ public class LinkedListV2<E> extends LinkedList<E> {
         return size;
     }
 
+    /***************************************************************************
+    Appends the input collection to the tail of this list.
+    ***************************************************************************/
+    
+    private void appendAll(Collection<? extends E> c) {
+        Node<E> prev = last;
+        Node<E> oldLast = last;
 
+        for (E item : c) {
+            Node<E> newNode = new Node<>(item);
+            newNode.item = item;
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+
+        last = prev;
+        int sz = c.size();
+        size += sz;
+        modCount++;
+        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
+    }
     
     
     
@@ -359,7 +395,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size) / 10.0);
+        return (int) Math.ceil(Math.sqrt(size));
     }
 
     /***************************************************************************
@@ -453,10 +489,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
         int sz = c.size();
         modCount++;
         size += sz;
-
-        // Shift all the fingers positions past the 'succ' on the right 'sz'
-        // positions to the right:
-        shiftIndicesToRight(succIndex, sz);
         
         // Add fingers:
         addFingersAfterInsertAll(pred.next, succIndex, sz);
@@ -468,7 +500,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     private boolean mustAddFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
-        return fingerStack.size() != getRecommendedNumberOfFingers();
+        return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
     protected Node<E> node(int elementIndex) {
@@ -491,24 +523,9 @@ public class LinkedListV2<E> extends LinkedList<E> {
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
     ***************************************************************************/
-    protected void shiftIndicesToLeft(int startingFingerIndex, int steps) {
-        for (int i = startingFingerIndex, sz = fingerStack.size(); 
-                i < sz;
-                i++) {
-            
-            Finger<E> finger = fingerStack.get(i);
-            int nextIndex = finger.index - steps;
-            finger.updateIndex = nextIndex;
-            fingerStack.fingerIndexSet.remove(finger.index);
-        }
-        
-        for (int i = startingFingerIndex, sz = fingerStack.size();
-                i < sz; 
-                i++) {
-
-            Finger<E> finger = fingerStack.get(i);
-            finger.index = finger.updateIndex;
-            fingerStack.fingerIndexSet.add(finger.index);
+    protected void shiftIndicesToLeftOnce(int startFingerIndex) {
+        for (int sz = fingerList.size(), i = startFingerIndex; i <= sz; ++i) {
+            fingerList.get(i).index--;
         }
     }
     
@@ -520,7 +537,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             int firstIndex,
             int collectionSize) {
         int numberOfNewFingers = 
-                getRecommendedNumberOfFingers() - fingerStack.size();
+                getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
             return;
@@ -534,8 +551,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
         for (int i = 0; i < nodesToSkip; i++) {
             node = node.next;
         }
+        
+        int fingerIndex = fingerList.size();
+        
+        fingerList.makeRoomAtIndex(fingerList.size(), 
+                                   numberOfNewFingers, 
+                                   collectionSize);
 
-        appendFinger(node, index);
+        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
@@ -544,7 +567,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 node = node.next;
             }
 
-            appendFinger(node, index);
+            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         }
     }
     
@@ -556,7 +579,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
                                          int indexOfInsertedRangeHead,
                                          int collectionSize) {
         int numberOfNewFingers =
-                getRecommendedNumberOfFingers() - fingerStack.size();
+                getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
             return -1;
@@ -599,11 +622,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
     ***************************************************************************/
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
         int numberOfNewFingers =
-                getRecommendedNumberOfFingers() - fingerStack.size();
+                getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
+            fingerList.shiftFingersToRight(0, collectionSize);
             return;
         }
+        
+        fingerList.makeRoomAtIndex(0, numberOfNewFingers, collectionSize);
 
         int distance = collectionSize / numberOfNewFingers;
         int startIndex = distance / 2;
@@ -613,9 +639,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
         for (int i = 0; i < startIndex; i++) {
             node = node.next;
         }
-
-        fingerList.shiftFingersToRight(0, collectionSize);
-        fingerList.makeRoomAtIndex(0, numberOfNewFingers, collectionSize);
         
         int fingerIndex = 0;
         
@@ -692,10 +715,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
         modCount++;
         size += sz;
 
-        // Prior to adding new (possible) fingers, we need to shift all the
-        // current fingers 'c.size()' nodes to the larger index values:
-        shiftIndicesToRight(0, sz);
-
         // Now, add the missing fingers:
         addFingersAfterPrependAll(first, sz);
     }
@@ -726,38 +745,5 @@ public class LinkedListV2<E> extends LinkedList<E> {
         modCount++;
 
         addFingersAfterSetAll(c.size());
-    }
-    
-    /***************************************************************************
-    Shifts all the indices at least 'startingIndex' one position towards smaller
-    index values.
-    ***************************************************************************/
-    private void shiftIndicesToLeftOnce(int startingIndex) {
-        shiftIndicesToLeft(startingIndex, 1);
-    }
-    
-    /***************************************************************************
-    For each finger with the index at least 'startIndex', add 'steps' to the 
-    index.
-    ***************************************************************************/
-    private void shiftIndicesToRight(int startIndex, int steps) {
-        for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            
-            if (finger.index >= startIndex) {
-                int nextIndex = finger.index + steps;
-                finger.updateIndex = nextIndex;
-                fingerStack.fingerIndexSet.remove(finger.index);
-            }
-        }
-        
-        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            
-            if (finger.index >= startIndex) {
-                finger.index = finger.updateIndex;
-                fingerStack.fingerIndexSet.add(finger.index);
-            }
-        }
     }
 }

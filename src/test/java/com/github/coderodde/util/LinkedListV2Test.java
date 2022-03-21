@@ -974,23 +974,23 @@ public class LinkedListV2Test {
             assertEquals(Integer.valueOf(i + 1), list.get(i));
         }
     }
-//
-//    @Test // checked!
-//    public void addCollectionAtIndex() {
-//        list.addAll(0, Arrays.asList(2, 3)); // setAll
-//        list.checkInvariant();
-//        list.addAll(0, Arrays.asList(0, 1)); // prependAll
-//        list.checkInvariant();
-//        list.addAll(4, Arrays.asList(6, 7)); // appendAll
-//        list.checkInvariant();
-//        list.addAll(4, Arrays.asList(4, 5)); // insertAll
-//        list.checkInvariant();
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            assertEquals(Integer.valueOf(i), list.get(i));
-//        }
-//    }
-//
+
+    @Test
+    public void addCollectionAtIndex() {
+        list.addAll(0, Arrays.asList(2, 3)); // setAll
+        list.checkInvariant();
+        list.addAll(0, Arrays.asList(0, 1)); // prependAll
+        list.checkInvariant();
+        list.addAll(4, Arrays.asList(6, 7)); // appendAll
+        list.checkInvariant();
+        list.addAll(4, Arrays.asList(4, 5)); // insertAll
+        list.checkInvariant();
+
+        for (int i = 0; i < list.size(); i++) {
+            assertEquals(Integer.valueOf(i), list.get(i));
+        }
+    }
+
 //    @Test // shadowed
 //    public void removeInt() {
 //        list.addAll(Arrays.asList(0, 1, 2, 3, 4));

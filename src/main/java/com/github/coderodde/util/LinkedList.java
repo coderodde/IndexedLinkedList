@@ -951,7 +951,7 @@ public class LinkedList<E>
     /***************************************************************************
     Appends the input collection to the tail of this list.
     ***************************************************************************/
-    protected void appendAll(Collection<? extends E> c) {
+    private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         Node<E> oldLast = last;
 
