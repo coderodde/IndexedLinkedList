@@ -991,23 +991,23 @@ public class LinkedListV2Test {
         }
     }
 
-//    @Test // shadowed
-//    public void removeInt() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//
-//        // [0, 1, 2, 3, 4]
-//        assertEquals(Integer.valueOf(0), list.remove(0));
-//        // [1, 2, 3, 4]
-//        assertEquals(Integer.valueOf(4), list.remove(3));
-//        // [1, 2, 3]
-//        assertEquals(Integer.valueOf(2), list.remove(1));
-//        // [1, 3]
-//        assertEquals(Integer.valueOf(1), list.remove(0));
-//        // [3]
-//        assertEquals(Integer.valueOf(3), list.remove(0));
-//        // []
-//    }
-//
+    @Test
+    public void removeInt() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+
+        // [0, 1, 2, 3, 4]
+        assertEquals(Integer.valueOf(0), list.remove(0));
+        // [1, 2, 3, 4]
+        assertEquals(Integer.valueOf(4), list.remove(3));
+        // [1, 2, 3]
+        assertEquals(Integer.valueOf(2), list.remove(1));
+        // [1, 3]
+        assertEquals(Integer.valueOf(1), list.remove(0));
+        // [3]
+        assertEquals(Integer.valueOf(3), list.remove(0));
+        // []
+    }
+
 //    @Test // shadowed
 //    public void basicIteratorUsage() {
 //        for (int i = 0; i < 1000; i++) {

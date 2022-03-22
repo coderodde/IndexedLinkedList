@@ -146,10 +146,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
         For each finger with the index at least 'startIndex', decrease the index
         by one. This method updates the index of the end-of-list sentinel too.
         ***********************************************************************/
-        private void shiftFingersToLeft(int startIndex) {
+        private void shiftFingersToLeftOnce(int startIndex) {
             for (int i = startIndex; i <= size; ++i) {
                 fingerArray[i].index++;
             }
+        }
+        
+        private void shiftAllFingersToLeftOnce() {
+            shiftFingersToLeftOnce(1);
         }
         
         /***********************************************************************
@@ -593,25 +597,53 @@ public class LinkedListV2<E> extends LinkedList<E> {
             // same:
             fingerList.removeFinger();
         }
+
+        if (fingerList.size() == 1) {
+            Finger<E> fngr = fingerList.get(0);
             
-        for (int i = fingerIndex; i > 0; --i) {
-            Finger<E> fingerRight = fingerList.get(i);
-            Finger<E> fingerLeft  = fingerList.get(i - 1);
-
-            if (fingerLeft.index < fingerRight.index - 1) {
-                fingerRight.index--;
-                fingerRight.rewindLeft(1);
-                return;
+            if (fngr.index != 0) {
+                fngr.index = 0;
+                fngr.node = first;
+            } else {
+                fngr.index++;
+                fngr.rewindRight(1);
             }
+            
+            return;
         }
-
+        
+        if (fingerIndex == 0) {
+            fingerList.shiftAllFingersToLeftOnce();
+            return;
+        }
+        
         for (int i = fingerIndex; i < fingerList.size() - 1; ++i) {
-            Finger<E> fingerLeft = fingerList.get(i);
+            Finger<E> fingerLeft  = fingerList.get(i);
             Finger<E> fingerRight = fingerList.get(i + 1);
 
             if (fingerLeft.index < fingerRight.index - 1) {
-                fingerLeft.index++;
-                fingerLeft.rewindRight(1);
+                
+                for (int j = i; j >= fingerIndex; --j) {
+                    Finger<E> fngr = fingerList.get(j);
+                    fngr.index++;
+                    fngr.rewindRight(1);
+                }
+                
+                return;
+            }
+        }
+            
+        for (int i = fingerIndex; i > 0; --i) {
+            Finger<E> fingerLeft  = fingerList.get(i - 1);
+            Finger<E> fingerRight = fingerList.get(i);
+
+            if (fingerLeft.index < fingerRight.index - 1) {
+                for (int j = i; j <= fingerIndex; ++j) {
+                    Finger<E> fngr = fingerList.get(j);
+                    fngr.index--;
+                    fngr.rewindLeft(1);
+                }
+                
                 return;
             }
         }
