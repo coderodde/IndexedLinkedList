@@ -3,6 +3,7 @@ package com.github.coderodde.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * 
@@ -77,7 +78,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
                              fingerIndex, 
                              fingerArray, 
                              fingerIndex + roomSize,
-                             size - fingerIndex);
+                             size - roomSize - fingerIndex + 1);
         }
         
         private int normalize(int fingerIndex, int elementIndex) {
@@ -191,8 +192,13 @@ public class LinkedListV2<E> extends LinkedList<E> {
         // Makes sure that the next finger fits in this finger stack:
         private void enlargeFingerArrayIfNeeded() {
             // If the finger array is full, double the capacity:
-            if (size + 1 == fingerArray.length) {
+            if (size + 1 > fingerArray.length) {
                 int nextCapacity = 2 * fingerArray.length;
+                
+                while (nextCapacity < size + 1) {
+                    nextCapacity *= 2;
+                }
+                
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
@@ -307,6 +313,19 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
+     * Returns {@code true} if this list contains the specified element. More 
+     * formally, returns {@code true} if and only if this list contains at least 
+     * one element {@code e} such that {@code Objects.equals(o, e)}.
+     *
+     * @param o element whose presence in this list is to be tested.
+     * @return {@code true} if this list contains the specified element.
+     */
+    @Override
+    public boolean contains(Object o) {
+        return indexOf(o) >= 0;
+    }
+    
+    /**
      * Returns the element at the specified position in this list.
      *
      * @param index index of the element to return.
@@ -320,11 +339,70 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
+     * Returns the smallest index of the input object, or -1, if the object does
+     * not appear in this list.
+     * 
+     * @param o the object whose index to return.
+     * @return the index of {@code o}, or -1, if none is present.
+     */
+    @Override
+    public int indexOf(Object o) {
+        int index = 0;
+        
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                return index;
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
      * {@inheritDoc } 
      */
     @Override
     public boolean isEmpty() {
         return size == 0;
+    }
+    
+    
+    /**
+     * Removes the element residing at the given index.
+     * 
+     * @param index the index of the element to remove.
+     * @return the removed element. (The one that resided at the index 
+     *         {@code index}.)
+    */
+    @Override
+    public E remove(int index) {
+        checkElementIndex(index);
+        
+        int closestFingerIndex = fingerList.getFingerIndex(index);
+        Finger<E> closestFinger = fingerList.get(closestFingerIndex);
+        
+        E returnValue;
+        Node<E> nodeToRemove;
+        
+        if (closestFinger.index == index) {
+            nodeToRemove = closestFinger.node;
+            moveFingerOutOfRemovalLocation(closestFinger, closestFingerIndex);    
+        } else {
+            // Keep the fingers at their original position.
+            // Find the target node:
+            nodeToRemove = rewind(closestFinger, closestFinger.index - index);
+        }
+        
+        returnValue = nodeToRemove.item;
+        unlink(nodeToRemove);
+        decreaseSize();
+
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+
+        shiftIndicesToLeftOnce(fingerList.getNextFingerIndex(index + 1));
+        return returnValue;
     }
 
     /**
@@ -383,6 +461,11 @@ public class LinkedListV2<E> extends LinkedList<E> {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
+    
+    private void decreaseSize() {
+        size--;
+        modCount++;
+    }
 
     /***************************************************************************
     Constructs an IndexOutOfBoundsException detail message.
@@ -396,6 +479,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size));
+    }
+    
+    /***************************************************************************
+    Increases the size of the list and its modification count.
+    ***************************************************************************/
+    private void increaseSize() {
+        ++size;
+        ++modCount;
     }
 
     /***************************************************************************
@@ -460,11 +551,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
     }
     
-    private void increaseSize() {
-        ++size;
-        ++modCount;
-    }
-    
     /***************************************************************************
     Inserts the input collection right before the node 'succ'.
     ***************************************************************************/
@@ -497,12 +583,56 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /***************************************************************************
+    Returns a finger that does not point to the element to remove. We need this
+    in order to make sure that after removal, all the fingers point to valid
+    nodes.
+    ***************************************************************************/
+    void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
+        if (fingerList.size() == size()) {
+            // Here, fingerList.size() is 1 or 2 and the size of the list is the
+            // same:
+            fingerList.removeFinger();
+        }
+            
+        for (int i = fingerIndex; i > 0; --i) {
+            Finger<E> fingerRight = fingerList.get(i);
+            Finger<E> fingerLeft  = fingerList.get(i - 1);
+
+            if (fingerLeft.index < fingerRight.index - 1) {
+                fingerRight.index--;
+                fingerRight.rewindLeft(1);
+                return;
+            }
+        }
+
+        for (int i = fingerIndex; i < fingerList.size() - 1; ++i) {
+            Finger<E> fingerLeft = fingerList.get(i);
+            Finger<E> fingerRight = fingerList.get(i + 1);
+
+            if (fingerLeft.index < fingerRight.index - 1) {
+                fingerLeft.index++;
+                fingerLeft.rewindRight(1);
+                return;
+            }
+        }
+    }
+    
+    /***************************************************************************
     Returns true only if this list requires more fingers.
     ***************************************************************************/
     private boolean mustAddFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerList.size() != getRecommendedNumberOfFingers();
+    }
+    
+    /***************************************************************************
+    Returns true only if this list requires less fingers.
+    ***************************************************************************/
+    private boolean mustRemoveFinger() {
+        // Here, fingerStack.size() == getRecommendedFingerCount(), or,
+        // fingerStack.size() == getRecommendedFingerCount() + 1
+        return fingerStack.size() != getRecommendedNumberOfFingers();
     }
     
     protected Node<E> node(int elementIndex) {
@@ -556,7 +686,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         
         int fingerIndex = fingerList.size();
         
-        fingerList.makeRoomAtIndex(fingerList.size(), 
+        fingerList.makeRoomAtIndex(fingerIndex, 
                                    numberOfNewFingers, 
                                    collectionSize);
 
@@ -723,6 +853,27 @@ public class LinkedListV2<E> extends LinkedList<E> {
         addFingersAfterPrependAll(first, sz);
     }
     
+    /***************************************************************************
+    If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.
+    ***************************************************************************/
+    private Node<E> rewind(Finger<E> finger, int steps) {
+        Node<E> node = finger.node;
+        
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                node = node.prev;
+            }
+        } else {
+            steps = -steps;
+            
+            for (int i = 0; i < steps; i++) {
+                node = node.next;
+            }
+        }
+        
+        return node;
+    }
+    
     protected void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
@@ -749,5 +900,27 @@ public class LinkedListV2<E> extends LinkedList<E> {
         modCount++;
 
         addFingersAfterSetAll(c.size());
+    }
+    
+    /***************************************************************************
+    Unlinks the input node from the actual doubly-linked list.
+    ***************************************************************************/
+    private void unlink(Node<E> x) {
+        Node<E> next = x.next;
+        Node<E> prev = x.prev;
+
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+            x.prev = null;
+        }
+
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+            x.next = null;
+        }
     }
 }

@@ -42,36 +42,36 @@ public class LinkedListV2Test {
         list.clear();
     }
     
-//    @Test
-//    public void constructAdd() {
-//        List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
-//        
-//        assertEquals(3, l.size());
-//        
-//        assertEquals("a", l.get(0));
-//        assertEquals("b", l.get(1));
-//        assertEquals("c", l.get(2));
-//    }
-//
-//    @Test
-//    public void contains() {
-//        assertFalse(list.contains(Integer.valueOf(1)));
-//        assertFalse(list.contains(Integer.valueOf(2)));
-//        assertFalse(list.contains(Integer.valueOf(3)));
-//        
-//        assertEquals(0, list.size());
-//        assertTrue(list.isEmpty());
-//        
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        assertEquals(3, list.size());
-//        assertFalse(list.isEmpty());
-//        
-//        assertTrue(list.contains(Integer.valueOf(1)));
-//        assertTrue(list.contains(Integer.valueOf(2)));
-//        assertTrue(list.contains(Integer.valueOf(3)));
-//    }
-//    
+    @Test
+    public void constructAdd() {
+        List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
+        
+        assertEquals(3, l.size());
+        
+        assertEquals("a", l.get(0));
+        assertEquals("b", l.get(1));
+        assertEquals("c", l.get(2));
+    }
+
+    @Test
+    public void contains() {
+        assertFalse(list.contains(Integer.valueOf(1)));
+        assertFalse(list.contains(Integer.valueOf(2)));
+        assertFalse(list.contains(Integer.valueOf(3)));
+        
+        assertEquals(0, list.size());
+        assertTrue(list.isEmpty());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(3, list.size());
+        assertFalse(list.isEmpty());
+        
+        assertTrue(list.contains(Integer.valueOf(1)));
+        assertTrue(list.contains(Integer.valueOf(2)));
+        assertTrue(list.contains(Integer.valueOf(3)));
+    }
+    
 //    @Test
 //    public void descendingIterator() {
 //        list.addAll(Arrays.asList(1, 2, 3));
@@ -417,24 +417,24 @@ public class LinkedListV2Test {
 //        
 //        assertFalse(list.removeLastOccurrence(null));
 //    }
-//    
-//    @Test
-//    public void appendAll() {
-//        list.addAll(Arrays.asList(0, 1, 2));
-//        
-//        List<Integer> arrayList = new ArrayList<>();
-//        
-//        for (int i = 3; i < 20_000; i++) {
-//            arrayList.add(i);
-//        }
-//        
-//        list.addAll(arrayList);
-//        
-//        for (int i = 0; i < 20_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(i));
-//        }
-//    }
-//    
+    
+    @Test
+    public void appendAll() {
+        list.addAll(Arrays.asList(0, 1, 2));
+        
+        List<Integer> arrayList = new ArrayList<>();
+        
+        for (int i = 3; i < 20_000; i++) {
+            arrayList.add(i);
+        }
+        
+        list.addAll(arrayList);
+        
+        for (int i = 0; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(i));
+        }
+    }
+    
 //    @Test
 //    public void prependAll() {
 //        List<Integer> l = new ArrayList<>();
