@@ -406,7 +406,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
             removeFinger();
         }
 
-        shiftIndicesToLeftOnce(fingerList.getNextFingerIndex(index + 1));
         return returnValue;
     }
 
@@ -606,7 +605,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 fngr.index = 0;
                 fngr.node = first;
             } else {
-                fngr.rewindRight(1);
+                fngr.node = fngr.node.next;
             }
             
             return;
@@ -619,7 +618,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             if (fingerLeft.index + 1 < fingerRight.index) {
                 for (int i = f; i >= fingerIndex; --i) {
                     Finger<E> fngr = fingerList.get(i);
-                    fngr.index++;
+//                    fngr.index++;
                     fngr.node = fngr.node.next;
                 }
                 
@@ -658,7 +657,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     private boolean mustRemoveFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() + 1
-        return fingerStack.size() != getRecommendedNumberOfFingers();
+        return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
     protected Node<E> node(int elementIndex) {
