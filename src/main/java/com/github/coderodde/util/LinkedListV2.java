@@ -390,7 +390,8 @@ public class LinkedListV2<E> extends LinkedList<E> {
         
         if (closestFinger.index == index) {
             nodeToRemove = closestFinger.node;
-            moveFingerOutOfRemovalLocation(closestFinger, closestFingerIndex);    
+            moveFingerOutOfRemovalLocation(closestFinger, 
+                                           closestFingerIndex);    
         } else {
             // Keep the fingers at their original position.
             // Find the target node:
@@ -605,43 +606,36 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 fngr.index = 0;
                 fngr.node = first;
             } else {
-                fngr.index++;
                 fngr.rewindRight(1);
             }
             
             return;
         }
         
-        if (fingerIndex == 0) {
-            fingerList.shiftAllFingersToLeftOnce();
-            return;
-        }
-        
-        for (int i = fingerIndex; i < fingerList.size() - 1; ++i) {
-            Finger<E> fingerLeft  = fingerList.get(i);
-            Finger<E> fingerRight = fingerList.get(i + 1);
-
-            if (fingerLeft.index < fingerRight.index - 1) {
-                
-                for (int j = i; j >= fingerIndex; --j) {
-                    Finger<E> fngr = fingerList.get(j);
+        for (int f = fingerIndex; f < fingerList.size(); ++f) {
+            Finger<E> fingerLeft  = fingerList.get(f);
+            Finger<E> fingerRight = fingerList.get(f + 1);
+            
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = f; i >= fingerIndex; --i) {
+                    Finger<E> fngr = fingerList.get(i);
                     fngr.index++;
-                    fngr.rewindRight(1);
+                    fngr.node = fngr.node.next;
                 }
                 
                 return;
             }
         }
+        
+        for (int f = fingerIndex; f > 0; --f) {
+            Finger<E> fingerLeft  = fingerList.get(f - 1);
+            Finger<E> fingerRight = fingerList.get(f);
             
-        for (int i = fingerIndex; i > 0; --i) {
-            Finger<E> fingerLeft  = fingerList.get(i - 1);
-            Finger<E> fingerRight = fingerList.get(i);
-
-            if (fingerLeft.index < fingerRight.index - 1) {
-                for (int j = i; j <= fingerIndex; ++j) {
-                    Finger<E> fngr = fingerList.get(j);
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = f; i <= fingerIndex; ++i) {
+                    Finger<E> fngr = fingerList.get(i);
                     fngr.index--;
-                    fngr.rewindLeft(1);
+                    fngr.node = fngr.node.next;
                 }
                 
                 return;
@@ -886,7 +880,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /***************************************************************************
-    If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.
+    If steps &lt; 0, rewind to the right. Otherwise, rewind to the right.
     ***************************************************************************/
     private Node<E> rewind(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
