@@ -2,8 +2,12 @@ package com.github.coderodde.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * 
@@ -364,6 +368,60 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
+     * Returns {@code true} only if the input object is a {@link List}, has the
+     * same size, and whose iterator returns the elements in the same order as
+     * this list.
+     *
+     * @param o the query object.
+     * @return {@code true} only if this list and the input list represent the
+     * same element sequence.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (o == this) {
+            return true;
+        }
+        
+        if (!(o instanceof List)) {
+            return false;
+        }
+        
+        List<?> otherList = (List<?>) o;
+
+        if (size != otherList.size()) {
+            return false;
+        }
+
+        Iterator<?> iterator1 = iterator();
+        Iterator<?> iterator2 = otherList.iterator();
+
+        while (iterator1.hasNext() && iterator2.hasNext()) {
+            Object object1 = iterator1.next();
+            Object object2 = iterator2.next();
+
+            if (!Objects.equals(object1, object2)) {
+                return false;
+            }
+        }
+
+        boolean iterator1HasMore = iterator1.hasNext();
+        boolean iterator2HasMore = iterator2.hasNext();
+
+        if (iterator1HasMore || iterator2HasMore) {
+            throw new IllegalStateException(
+                    iterator1HasMore ?
+                            "This list has more elements to offer" :
+                            "Argument list has more elements to offer");
+        }
+
+        return true;
+    }
+    
+    /**
      * Returns the element at the specified position in this list.
      *
      * @param index index of the element to return.
@@ -403,7 +461,17 @@ public class LinkedListV2<E> extends LinkedList<E> {
     public boolean isEmpty() {
         return size == 0;
     }
-    
+
+    /**
+     * Returns the basic iterator over this list supporting only traversal and
+     * removal.
+     *
+     * @return the basic iterator.
+     */
+    @Override
+    public Iterator<E> iterator() {
+        return new BasicIterator();
+    }
     
     /**
      * Removes the element residing at the given index.
@@ -477,8 +545,70 @@ public class LinkedListV2<E> extends LinkedList<E> {
         addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
     
-    
-    
+    /***************************************************************************
+    This class implements a basic iterator over this list.
+    ***************************************************************************/
+    final class BasicIterator implements Iterator<E> {
+
+        private Node<E> lastReturned;
+        private Node<E> next = first;
+        private int nextIndex;
+        int expectedModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+
+        @Override
+        public E next() {
+            checkForComodification();
+            
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.item;
+        }
+
+        @Override
+        public void remove() {
+            checkForComodification();
+            
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
+            nextIndex--;
+            lastReturned = null;
+            expectedModCount++;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            
+            while (modCount == expectedModCount && nextIndex < size) {
+                action.accept(next.item);
+                lastReturned = next;
+                next = next.next;
+                nextIndex++;
+            }
+            
+            checkForComodification();
+        }
+
+        private void checkForComodification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
 
     /***************************************************************************
     Checks the element index. In the case of non-empty list, valid indices are

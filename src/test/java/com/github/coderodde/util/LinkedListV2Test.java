@@ -1274,14 +1274,22 @@ public class LinkedListV2Test {
     @Test
     public void removeAtIndex1() {
         list.addAll(getIntegerList(10));
+        // TODO: remove 'getIntegerList()'!
+        List<Integer> referenceList = new ArrayList<>(getIntegerList(10));
         int[] indices = { 9, 3, 3, 3, 1, 0 };
         
         for (int i = 0; i < indices.length; i++) {
+            assertEquals(referenceList, list);
+            
             int index = indices[i];
             list.checkInvariant();
             list.remove(index);
             list.checkInvariant();
+            
+            referenceList.remove((int) index);
         }
+        
+        assertEquals(referenceList, list);
     }
 
 //    @Test
