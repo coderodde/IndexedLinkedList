@@ -1215,8 +1215,8 @@ public class LinkedListV2Test {
 //        assertFalse(iter.hasNext());
 //        assertTrue(iter.hasPrevious());
 //    }
-//    
-//    // Used to find a failing removal sequence:
+    
+    // Used to find a failing removal sequence:
 //    @Test // shadowed
 //    public void removeAtFindFailing() {
 //        
@@ -1248,42 +1248,42 @@ public class LinkedListV2Test {
 //            }
 //        }
 //    }
-//    
-//    @Test
-//    public void bugTinyRemoveInt() {
-//        list.addAll(getIntegerList(5));
-//        
-//        list.checkInvariant();
-//        list.remove(4);
-//        
-//        list.checkInvariant();
-//        list.remove(0);
-//        
-//        list.checkInvariant();
-//        list.remove(2);
-//        
-//        list.checkInvariant();
-//        list.remove(0);
-//        
-//        list.checkInvariant();
-//        list.remove(0);
-//        
-//        list.checkInvariant();      
-//    }
-//    
-//    @Test
-//    public void removeAtIndex1() {
-//        list.addAll(getIntegerList(10));
-//        int[] indices = { 9, 3, 3, 3, 1, 0 };
-//        
-//        for (int i = 0; i < indices.length; i++) {
-//            int index = indices[i];
-//            list.checkInvariant();
-//            list.remove(index);
-//            list.checkInvariant();
-//        }
-//    }
-//
+    
+    @Test
+    public void bugTinyRemoveInt() {
+        list.addAll(getIntegerList(5));
+        
+        list.checkInvariant();
+        list.remove(4);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();
+        list.remove(2);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();
+        list.remove(0);
+        
+        list.checkInvariant();      
+    }
+    
+    @Test
+    public void removeAtIndex1() {
+        list.addAll(getIntegerList(10));
+        int[] indices = { 9, 3, 3, 3, 1, 0 };
+        
+        for (int i = 0; i < indices.length; i++) {
+            int index = indices[i];
+            list.checkInvariant();
+            list.remove(index);
+            list.checkInvariant();
+        }
+    }
+
 //    @Test
 //    public void enhancedIteratorAddition() {
 //        list.addAll(Arrays.asList(1, 2, 3));
@@ -1947,14 +1947,14 @@ public class LinkedListV2Test {
 //    private static List<Integer> getIntegerList() {
 //        return getIntegerList(100);
 //    }
-//
-//    private static List<Integer> getIntegerList(int length) {
-//        List<Integer> list = new ArrayList<>(length);
-//
-//        for (int i = 0; i < length; i++) {
-//            list.add(i);
-//        }
-//
-//        return list;
-//    }
+
+    private static List<Integer> getIntegerList(int length) {
+        List<Integer> list = new ArrayList<>(length);
+
+        for (int i = 0; i < length; i++) {
+            list.add(i);
+        }
+
+        return list;
+    }
 }

@@ -316,6 +316,40 @@ public class LinkedListV2<E> extends LinkedList<E> {
         return true;
     }
     
+
+    /***************************************************************************
+    Used previously for debugging. Ignore.
+    ***************************************************************************/
+    public void checkInvariant() {
+        if (fingerStack.size() < 2) {
+            return;
+        }
+        
+        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
+            Finger<E> finger = fingerStack.get(i);
+            
+            assert finger.node.prev != null || finger.node.next != null :
+                    "checkInvariant() failed: finger " + finger + " has " +
+                    "null siblings.";
+            
+            assert fingerStack.fingerIndexSet.contains(finger.index) :
+                    "checkInvariant() failed: Set does not contain " + finger;
+            
+            int onLeftNodes = countLeft(finger);
+            int onRightNodes = countRight(finger);
+            
+            assert this.size == onLeftNodes + 1 + onRightNodes :
+                    "checkInvariant() failed at finger (" + finger +
+                    "), prefix/suffix error";
+            
+            Node<E> node = getNodeRaw(finger.index);
+
+            assert finger.node == node : 
+                    "checkInvariant() failed: finger/node mismatch: " + 
+                    "(finger = " + finger + ", node = " + node + ")";
+        }
+    }
+    
     /**
      * Returns {@code true} if this list contains the specified element. More 
      * formally, returns {@code true} if and only if this list contains at least 
@@ -467,10 +501,49 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
     }
     
+    // Used for checkInvariant()
+    private static <E> int countLeft(Finger<E> finger) {
+        Node<E> node = finger.node.prev;
+        int count = 0;
+        
+        while (node != null) {
+            node = node.prev;
+            count++;
+        }
+        
+        return count;
+    }
+    
+    // Used for checkInvariant()
+    private static <E> int countRight(Finger<E> finger) {
+        Node<E> node = finger.node.next;
+        int count = 0;
+        
+        while (node != null) {
+            node = node.next;
+            count++;
+        }
+        
+        return count;
+    }
+    
     private void decreaseSize() {
         size--;
         modCount++;
-    }
+    }   
+    
+    /***************************************************************************
+    Used previously for debugging. Ignore.
+    ***************************************************************************/
+    private Node<E> getNodeRaw(int index) {
+        Node<E> node = first;
+
+        for (int i = 0; i < index; i++) {
+            node = node.next;
+        }
+
+        return node;
+    }   
 
     /***************************************************************************
     Constructs an IndexOutOfBoundsException detail message.
