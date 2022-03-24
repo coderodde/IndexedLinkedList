@@ -1091,30 +1091,30 @@ public class LinkedListV2Test {
 //            }
 //        }
 //    }
-//
-//    @Test // checked!
-//    public void removeAtIndex() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//        list.checkInvariant();
-//        
-//        // [0, 1, 2, 3, 4]
-//        assertEquals(Integer.valueOf(2), list.remove(2));
-//        list.checkInvariant();
-//        // [0, 1, 3, 4]
-//        assertEquals(Integer.valueOf(0), list.remove(0));
-//        list.checkInvariant();
-//        // [1, 3, 4]
-//        assertEquals(Integer.valueOf(4), list.remove(2));
-//        list.checkInvariant();
-//        // [1, 3]
-//        assertEquals(Integer.valueOf(3), list.remove(1));
-//        list.checkInvariant();
-//        // [1]
-//        assertEquals(Integer.valueOf(1), list.remove(0));
-//        list.checkInvariant();
-//        // []
-//    }
-//
+
+    @Test
+    public void removeAtIndex() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        list.checkInvariant();
+        
+        // [0, 1, 2, 3, 4]
+        assertEquals(Integer.valueOf(2), list.remove(2));
+        list.checkInvariant();
+        // [0, 1, 3, 4]
+        assertEquals(Integer.valueOf(0), list.remove(0));
+        list.checkInvariant();
+        // [1, 3, 4]
+        assertEquals(Integer.valueOf(4), list.remove(2));
+        list.checkInvariant();
+        // [1, 3]
+        assertEquals(Integer.valueOf(3), list.remove(1));
+        list.checkInvariant();
+        // [1]
+        assertEquals(Integer.valueOf(1), list.remove(0));
+        list.checkInvariant();
+        // []
+    }
+
 //    @Test // checked
 //    public void removeObject() {
 //        list.addAll(Arrays.asList(0, 1, 2, 3, 4));

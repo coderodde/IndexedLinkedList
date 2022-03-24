@@ -401,6 +401,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         returnValue = nodeToRemove.item;
         unlink(nodeToRemove);
         decreaseSize();
+        fingerList.get(fingerList.size()).index--;
 
         if (mustRemoveFinger()) {
             removeFinger();
@@ -595,7 +596,31 @@ public class LinkedListV2<E> extends LinkedList<E> {
         if (fingerList.size() == size()) {
             // Here, fingerList.size() is 1 or 2 and the size of the list is the
             // same:
-            fingerList.removeFinger();
+            if (fingerList.size() == 1) {
+                // The only finger will be removed in 'remove(int)'. Return:
+                return;
+            }
+            
+            // Once here, 'fingerList.size() == 2'!
+            switch (fingerIndex) {
+                case 0:
+                    // Shift 2nd and the sentinal fingers one position to the
+                    // left:
+                    fingerList.setFinger(0, fingerList.get(1));
+                    fingerList.get(0).index = 0;
+                    fingerList.setFinger(1, fingerList.get(2));
+                    fingerList.get(1).index = 1;
+                    fingerList.setFinger(2, null);
+                    fingerList.size = 1;
+                    break;
+                    
+                case 1:
+                    // Just remove the (last) finger:
+                    fingerList.removeFinger();
+                    break;
+            }
+            
+            return;
         }
 
         if (fingerList.size() == 1) {
@@ -611,6 +636,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             return;
         }
         
+        // Try push the fingers to the right:
         for (int f = fingerIndex; f < fingerList.size(); ++f) {
             Finger<E> fingerLeft  = fingerList.get(f);
             Finger<E> fingerRight = fingerList.get(f + 1);
@@ -618,7 +644,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
             if (fingerLeft.index + 1 < fingerRight.index) {
                 for (int i = f; i >= fingerIndex; --i) {
                     Finger<E> fngr = fingerList.get(i);
-//                    fngr.index++;
                     fngr.node = fngr.node.next;
                 }
                 
@@ -626,6 +651,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             }
         }
         
+        // Could not push the fingers to the right. Push to the left:
         for (int f = fingerIndex; f > 0; --f) {
             Finger<E> fingerLeft  = fingerList.get(f - 1);
             Finger<E> fingerRight = fingerList.get(f);
