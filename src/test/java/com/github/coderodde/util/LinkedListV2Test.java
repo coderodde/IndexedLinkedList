@@ -435,6 +435,20 @@ public class LinkedListV2Test {
         }
     }
     
+    @Test
+    public void smallListRemoveFirstFinger() {
+        list.add(0);
+        list.add(1);
+        list.remove(0);
+    }
+    
+    @Test
+    public void smallListRemoveSecondFinger() {
+        list.add(0);
+        list.add(1);
+        list.remove(1);
+    }
+    
 //    @Test
 //    public void prependAll() {
 //        List<Integer> l = new ArrayList<>();
@@ -1216,38 +1230,58 @@ public class LinkedListV2Test {
 //        assertTrue(iter.hasPrevious());
 //    }
     
+    @Test
+    public void removeAt() {
+        list.addAll(getIntegerList(10));
+        List<Integer> referenceList = new ArrayList<>(list);
+        int[] indices = {9, 1, 5, 4, 4, 2};
+        Random random = new Random(100L);
+        
+        for (int i = 0; i < indices.length; ++i) {
+            int removalIndex = random.nextInt(list.size());
+            Integer referenceInteger = referenceList.remove(removalIndex);
+            Integer listInteger = list.remove(removalIndex);
+            assertEquals(referenceInteger, listInteger);
+            assertEquals(referenceList, list);
+        }
+    }
+    
     // Used to find a failing removal sequence:
-//    @Test // shadowed
-//    public void removeAtFindFailing() {
-//        
-//        Random random = new Random(200L);
-//        int yeah = 0;
-//        while (true) {
-//            yeah++;
-//            
-//            list.clear();
-//            list.addAll(getIntegerList(45));
-//            
-//            List<Integer> indices = new ArrayList<>();
-//            
-//            if (yeah == 100) {
-//                return;
-//            }
-//            
-//            while (!list.isEmpty()) {
-//                int index = random.nextInt(list.size());
-//                indices.add(index);
-//                
-//                try {
-//                    list.checkInvariant();
-//                    list.remove(index);
-//                    list.checkInvariant();
-//                } catch (AssertionError ae) {
-//                    return;
-//                }
-//            }
-//        }
-//    }
+    @Test
+    public void removeAtFindFailing() {
+        
+        Random random = new Random(200L);
+        int iteration = 0;
+        while (true) {
+            iteration++;
+            
+            list.clear();
+            list.addAll(getIntegerList(10));
+            
+            List<Integer> indices = new ArrayList<>();
+            
+            if (iteration == 100) {
+                return;
+            }
+            
+            while (!list.isEmpty()) {
+                int index = random.nextInt(list.size());
+                indices.add(index);
+                
+                try {
+                    list.checkInvariant();
+                    list.remove(index);
+                    list.checkInvariant();
+                } catch (NullPointerException ex) {
+                    // Should not get here. Ever.
+                    System.out.println("Failing indices: " + indices);
+                    return;
+                }catch (AssertionError ae) {
+                    return;
+                }
+            }
+        }
+    }
     
     @Test
     public void bugTinyRemoveInt() {

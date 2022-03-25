@@ -503,7 +503,6 @@ public class LinkedListV2<E> extends LinkedList<E> {
         returnValue = nodeToRemove.item;
         unlink(nodeToRemove);
         decreaseSize();
-        fingerList.get(fingerList.size()).index--;
 
         if (mustRemoveFinger()) {
             removeFinger();
@@ -791,6 +790,18 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /***************************************************************************
+    Makes sure that the input node is not being pointed to by a finger.
+    ***************************************************************************/
+    private void makeSureNoFingerPointsTo(Node<E> node, int index) {
+        throw new UnsupportedOperationException();
+//        Finger<E> finger = getClosestFinger(index);
+//        
+//        if (finger.node == node) {
+//            moveFingerOutOfRemovalLocation(finger);
+//        }
+    }
+    
+    /***************************************************************************
     Returns a finger that does not point to the element to remove. We need this
     in order to make sure that after removal, all the fingers point to valid
     nodes.
@@ -820,20 +831,8 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 case 1:
                     // Just remove the (last) finger:
                     fingerList.removeFinger();
+                    fingerList.get(1).index = 1;
                     break;
-            }
-            
-            return;
-        }
-
-        if (fingerList.size() == 1) {
-            Finger<E> fngr = fingerList.get(0);
-            
-            if (fngr.index != 0) {
-                fngr.index = 0;
-                fngr.node = first;
-            } else {
-                fngr.node = fngr.node.next;
             }
             
             return;
@@ -905,6 +904,21 @@ public class LinkedListV2<E> extends LinkedList<E> {
         fingerList.removeFinger();
     }
     
+    /***************************************************************************
+    Implements the node removal. 
+    ***************************************************************************/
+    private void removeObjectImpl(Node<E> node, int index) {
+        // Make sure no finger is pointing to 'node':
+        makeSureNoFingerPointsTo(node, index);
+        unlink(node);
+        decreaseSize();
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+        
+        shiftIndicesToLeftOnce(index + 1);
+    }
     
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
