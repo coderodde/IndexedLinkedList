@@ -1234,10 +1234,9 @@ public class LinkedListV2Test {
     public void removeAt() {
         list.addAll(getIntegerList(10));
         List<Integer> referenceList = new ArrayList<>(list);
-        int[] indices = {9, 1, 5, 4, 4, 2};
         Random random = new Random(100L);
         
-        for (int i = 0; i < indices.length; ++i) {
+        while (!referenceList.isEmpty()) {
             int removalIndex = random.nextInt(list.size());
             Integer referenceInteger = referenceList.remove(removalIndex);
             Integer listInteger = list.remove(removalIndex);

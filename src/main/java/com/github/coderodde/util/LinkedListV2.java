@@ -497,7 +497,18 @@ public class LinkedListV2<E> extends LinkedList<E> {
         } else {
             // Keep the fingers at their original position.
             // Find the target node:
-            nodeToRemove = rewind(closestFinger, closestFinger.index - index);
+            int steps = closestFinger.index - index;
+            
+            nodeToRemove =
+                    traverseLinkedListBackwards(
+                            closestFinger,
+                            steps);
+            
+            for (int i = closestFingerIndex + 1;
+                    i <= fingerList.size(); 
+                    i++) {
+                fingerList.get(i).index--;
+            }
         }
         
         returnValue = nodeToRemove.item;
@@ -849,25 +860,47 @@ public class LinkedListV2<E> extends LinkedList<E> {
                     fngr.node = fngr.node.next;
                 }
                 
-                return;
-            }
-        }
-        
-        // Could not push the fingers to the right. Push to the left:
-        for (int f = fingerIndex; f > 0; --f) {
-            Finger<E> fingerLeft  = fingerList.get(f - 1);
-            Finger<E> fingerRight = fingerList.get(f);
-            
-            if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = f; i <= fingerIndex; ++i) {
-                    Finger<E> fngr = fingerList.get(i);
-                    fngr.index--;
-                    fngr.node = fngr.node.next;
+                for (int j = f + 1; j <= fingerList.size(); ++j) {
+                    fingerList.get(j).index--;
                 }
                 
                 return;
             }
         }
+        
+        // Could not push the fingers to the right. Push to the left. Since the
+        // number of fingers here is smaller than the list size, there must be
+        // a spot to move to some fingers:
+        for (int f = fingerIndex; f > 0; --f) {
+            Finger<E> fingerLeft  = fingerList.get(f - 1);
+            Finger<E> fingerRight = fingerList.get(f);
+            
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = fingerIndex; i > 0; --i) {
+                    Finger<E> fngr = fingerList.get(i);
+                    fngr.node = fngr.node.prev;
+                    fngr.index--;
+                }
+                
+                for (int i = fingerIndex + 1; i <= fingerList.size(); ++i) {
+                    fingerList.get(i).index--;
+                }
+                
+                return;
+            }
+        }
+        
+        // Once here, the only free spots are at the very beginning of the
+        // finger list:
+        for (int i = 0; i < fingerList.size(); ++i) {
+            Finger<E> fngr = fingerList.get(i);
+            fngr.index--;
+            fngr.node = fngr.node.prev;
+        }
+        
+        // The end-of-finger-list node has no Finger<E>.node defined. Take it 
+        // outside of the above loop and decrement its index manually:
+        fingerList.get(fingerList.size()).index--;
     }
     
     /***************************************************************************
@@ -1124,7 +1157,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     /***************************************************************************
     If steps &lt; 0, rewind to the right. Otherwise, rewind to the right.
     ***************************************************************************/
-    private Node<E> rewind(Finger<E> finger, int steps) {
+    private Node<E> traverseLinkedListBackwards(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
         if (steps > 0) {
