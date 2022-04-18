@@ -1248,8 +1248,9 @@ public class LinkedListV2Test {
     // Used to find a failing removal sequence:
     @Test
     public void removeAtFindFailing() {
-        
-        Random random = new Random(200L);
+        long seed = 101L;
+        System.out.println("removeAtFindFailing: seed = " + seed);
+        Random random = new Random(seed);
         int iteration = 0;
         while (true) {
             iteration++;
@@ -1274,6 +1275,7 @@ public class LinkedListV2Test {
                 } catch (NullPointerException ex) {
                     // Should not get here. Ever.
                     System.out.println("Failing indices: " + indices);
+                    fail("Failing indices: "+  indices);
                     return;
                 }catch (AssertionError ae) {
                     return;

@@ -509,6 +509,10 @@ public class LinkedListV2<E> extends LinkedList<E> {
                     i++) {
                 fingerList.get(i).index--;
             }
+            
+            if (steps > 0) {
+                fingerList.get(closestFingerIndex).index--;
+            }
         }
         
         returnValue = nodeToRemove.item;
@@ -899,7 +903,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
         
         // The end-of-finger-list node has no Finger<E>.node defined. Take it 
-        // outside of the above loop and decrement its index manually:
+        // outside of the above loop and decrement its index manually:cd 
         fingerList.get(fingerList.size()).index--;
     }
     
