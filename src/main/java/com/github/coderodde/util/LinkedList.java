@@ -1385,6 +1385,7 @@ public class LinkedList<E>
     private void removeObjectImpl(Node<E> node, int index) {
         // Make sure no finger is pointing to 'node':
         makeSureNoFingerPointsTo(node, index);
+        
         unlink(node);
         decreaseSize();
         

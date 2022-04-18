@@ -485,6 +485,31 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
+     * Returns a list-iterator of the elements in this list (in proper
+     * sequence), starting at the specified position in the list.
+     * Obeys the general contract of {@code List.listIterator(int)}.<p>
+     *
+     * The list iterator is <i>fail-fast</i>: if the list is structurally
+     * modified at any time after the Iterator is created, in any way except
+     * through the list iterator's own {@code remove} or {@code add} methods,
+     * the list-iterator will throw a {@code ConcurrentModificationException}.  
+     * Thus, in the face of concurrent modification, the iterator fails quickly 
+     * and cleanly, rather than risking arbitrary, non-deterministic behavior at
+     * an undetermined time in the future.
+     *
+     * @param index index of the first element to be returned from the
+     *              list iterator (by a call to {@code next}).
+     * @return a ListIterator of the elements in this list (in proper
+     *         sequence), starting at the specified position in the list.
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @see List#listIterator(int)
+     */
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        return new EnhancedIterator(index);
+    }
+    
+    /**
      * Removes the element residing at the given index.
      * 
      * @param index the index of the element to remove.
@@ -783,13 +808,12 @@ public class LinkedListV2<E> extends LinkedList<E> {
             }
             
             Node<E> lastNext = lastReturned.next;
-            int removalIndex = nextIndex - 1;
-            removeObjectImpl(lastReturned, removalIndex);
+            removeObjectImpl(lastReturned, nextIndex);
             
             if (next == lastReturned) {
                 next = lastNext;
             } else {
-                nextIndex = removalIndex;
+                nextIndex--;
             }
             
             lastReturned = null;
