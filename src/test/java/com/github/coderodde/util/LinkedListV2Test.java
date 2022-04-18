@@ -72,72 +72,70 @@ public class LinkedListV2Test {
         assertTrue(list.contains(Integer.valueOf(3)));
     }
     
-//    @Test
-//    public void descendingIterator() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        Iterator<Integer> iterator = list.descendingIterator();
-//        
-//        assertTrue(iterator.hasNext());
-//        assertEquals(Integer.valueOf(3), iterator.next());
-//        
-//        assertTrue(iterator.hasNext());
-//        assertEquals(Integer.valueOf(2), iterator.next());
-//        
-//        assertTrue(iterator.hasNext());
-//        assertEquals(Integer.valueOf(1), iterator.next());
-//        
-//        assertFalse(iterator.hasNext());
-//    }
-//    
-//    @Test
-//    public void descendingIteratorRemove1() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        Iterator<Integer> iterator = list.descendingIterator();
-//        
-//        iterator.next();
-//        iterator.remove();
-//        
-//        assertEquals(2, list.size());
-//        
-//        assertTrue(iterator.hasNext());
-//        assertEquals(Integer.valueOf(2), iterator.next());
-//        
-//        assertTrue(iterator.hasNext());
-//        assertEquals(Integer.valueOf(1), iterator.next());
-//        
-//        assertFalse(iterator.hasNext());
-//    }
-//    
-//    @Test
-//    public void descendingIteratorRemove2() {
-//        list.addAll(Arrays.asList(1, 2, 3, 4, 5));
-//        
-//        Iterator<Integer> iter = list.descendingIterator();
-//        
-//        iter.next();
-//        iter.remove();
-//        
-//        assertEquals(Integer.valueOf(4), iter.next());
-//        iter.remove();
-//        
-//        assertEquals(3, list.size());
-//        
-//        assertEquals(Integer.valueOf(3), iter.next());
-//        iter.remove();
-//        
-//        assertEquals(2, list.size());
-//        
-//        iter.next();
-//        iter.next();
-//        
-//        iter.remove();
-//        
-//        assertEquals(1, list.size());
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//    }
-//    
-//    
-//    
+    @Test
+    public void descendingIterator() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> iterator = list.descendingIterator();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(3), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(1), iterator.next());
+        
+        assertFalse(iterator.hasNext());
+    }
+    
+    @Test
+    public void descendingIteratorRemove1() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> iterator = list.descendingIterator();
+        
+        iterator.next();
+        iterator.remove();
+        
+        assertEquals(2, list.size());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(1), iterator.next());
+        
+        assertFalse(iterator.hasNext());
+    }
+    
+    @Test
+    public void descendingIteratorRemove2() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        
+        Iterator<Integer> iter = list.descendingIterator();
+        
+        iter.next();
+        iter.remove();
+        
+        assertEquals(Integer.valueOf(4), iter.next());
+        iter.remove();
+        
+        assertEquals(3, list.size());
+        
+        assertEquals(Integer.valueOf(3), iter.next());
+        iter.remove();
+        
+        assertEquals(2, list.size());
+        
+        iter.next();
+        iter.next();
+        
+        iter.remove();
+        
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(2), list.get(0));
+    }
+    
 //    @Test(expected = NoSuchElementException.class)
 //    public void elementThrowsOnEmptyList() {
 //        list.element();

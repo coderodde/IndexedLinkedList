@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -366,6 +367,16 @@ public class LinkedListV2<E> extends LinkedList<E> {
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
     }
+
+    /**
+     * Returns a basic, descending iterator over this list.
+     * 
+     * @return the descending iterator.
+     */
+    @Override
+    public Iterator<E> descendingIterator() {
+        return new DescendingIterator();
+    }
     
     /**
      * Returns {@code true} only if the input object is a {@link List}, has the
@@ -677,6 +688,162 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }   
     
     /***************************************************************************
+    Implements the descending list iterator over this list.                    
+    ***************************************************************************/
+    private final class DescendingIterator implements Iterator<E> {
+
+        private final ListIterator<E> iterator = new EnhancedIterator(size());
+        
+        @Override
+        public boolean hasNext() {
+            return iterator.hasPrevious();
+        }
+
+        @Override
+        public E next() {
+            return iterator.previous();
+        }
+
+        @Override
+        public void remove() {
+            iterator.remove();
+        }
+    }
+    
+    /***************************************************************************
+    Implements the enhanced list iterator over this list.
+    ***************************************************************************/
+    final class EnhancedIterator implements ListIterator<E> {
+
+        private Node<E> lastReturned;
+        private Node<E> next;
+        private int nextIndex;
+        
+        // Package-private for the sake of unit testing:
+        int expectedModCount = modCount;
+        
+        EnhancedIterator(int index) {
+            next = (index == size) ? null : node(index);
+            nextIndex = index;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+        
+        @Override
+        public E next() {
+            checkForComdification();
+            
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.item;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return nextIndex > 0;
+        }
+
+        @Override
+        public E previous() {
+            checkForComdification();
+            
+            if (!hasPrevious()) {
+                throw new NoSuchElementException();
+            }
+            
+            lastReturned = next = (next == null) ? last : next.prev;
+            nextIndex--;
+            return lastReturned.item;
+        }
+
+        @Override
+        public int nextIndex() {
+            return nextIndex;
+        }
+
+        @Override
+        public int previousIndex() {
+            return nextIndex - 1;
+        }
+
+        @Override
+        public void remove() {
+            checkForComdification();
+            
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            Node<E> lastNext = lastReturned.next;
+            int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
+            
+            if (next == lastReturned) {
+                next = lastNext;
+            } else {
+                nextIndex = removalIndex;
+            }
+            
+            lastReturned = null;
+            expectedModCount++;
+        }
+
+        @Override
+        public void set(E e) {
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            checkForComdification();
+            lastReturned.item = e;
+        }
+
+        @Override
+        public void add(E e) {
+            checkForComdification();
+            
+            lastReturned = null;
+            
+            if (next == null) {
+                linkLast(e);
+            } else {
+                linkBefore(e, next, nextIndex);
+            }
+            
+            nextIndex++;
+            expectedModCount++;
+        }
+        
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            
+            while (modCount == expectedModCount && nextIndex < size) {
+                action.accept(next.item);
+                lastReturned = next;
+                next = next.next;
+                nextIndex++;
+            }
+            
+            checkForComdification();
+        }
+        
+        private void checkForComdification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+    
+    /***************************************************************************
     Used previously for debugging. Ignore.
     ***************************************************************************/
     private Node<E> getNodeRaw(int index) {
@@ -808,12 +975,12 @@ public class LinkedListV2<E> extends LinkedList<E> {
     Makes sure that the input node is not being pointed to by a finger.
     ***************************************************************************/
     private void makeSureNoFingerPointsTo(Node<E> node, int index) {
-        throw new UnsupportedOperationException();
-//        Finger<E> finger = getClosestFinger(index);
-//        
-//        if (finger.node == node) {
-//            moveFingerOutOfRemovalLocation(finger);
-//        }
+        int fingerIndex = fingerList.getFingerIndex(index);
+        Finger<E> finger = fingerList.get(fingerIndex);
+        
+        if (finger.node == node) {
+            moveFingerOutOfRemovalLocation(finger, fingerIndex);
+        }
     }
     
     /***************************************************************************
@@ -947,6 +1114,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     private void removeObjectImpl(Node<E> node, int index) {
         // Make sure no finger is pointing to 'node':
         makeSureNoFingerPointsTo(node, index);
+        
         unlink(node);
         decreaseSize();
         
@@ -960,7 +1128,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     /***************************************************************************
     Subtracts 'steps' positions from each index at least 'startingIndex'.
     ***************************************************************************/
-    protected void shiftIndicesToLeftOnce(int startFingerIndex) {
+    private void shiftIndicesToLeftOnce(int startFingerIndex) {
         for (int sz = fingerList.size(), i = startFingerIndex; i <= sz; ++i) {
             fingerList.get(i).index--;
         }
