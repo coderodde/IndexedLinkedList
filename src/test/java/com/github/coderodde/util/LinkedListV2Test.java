@@ -44,7 +44,7 @@ public class LinkedListV2Test {
     
     @Test
     public void constructAdd() {
-        List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
+        List<String> l = new LinkedListV2<>(Arrays.asList("a", "b", "c"));
         
         assertEquals(3, l.size());
         
@@ -136,23 +136,23 @@ public class LinkedListV2Test {
         assertEquals(Integer.valueOf(2), list.get(0));
     }
     
-//    @Test(expected = NoSuchElementException.class)
-//    public void elementThrowsOnEmptyList() {
-//        list.element();
-//    }
-//
-//    @Test
-//    public void element() {
-//        list.add(1);
-//        list.add(2);
-//        
-//        assertEquals(Integer.valueOf(1), list.element());
-//        
-//        list.remove();
-//        
-//        assertEquals(Integer.valueOf(2), list.element());
-//    }
-//    
+    @Test(expected = NoSuchElementException.class)
+    public void elementThrowsOnEmptyList() {
+        list.element();
+    }
+
+    @Test
+    public void element() {
+        list.add(1);
+        list.add(2);
+        
+        assertEquals(Integer.valueOf(1), list.element());
+        
+        list.remove();
+        
+        assertEquals(Integer.valueOf(2), list.element());
+    }
+    
 //    @Test
 //    public void listEquals() {
 //        list.addAll(Arrays.asList(1, 2, 3, 4));

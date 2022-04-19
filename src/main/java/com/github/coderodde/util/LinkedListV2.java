@@ -1,8 +1,10 @@
 package com.github.coderodde.util;
 
+import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -17,7 +19,9 @@ import java.util.function.Consumer;
  * @version 1.61 (Sep 26, 2021)
  * @since 1.6 (Sep 1, 2021)
  */
-public class LinkedListV2<E> extends LinkedList<E> {
+public class LinkedListV2<E> 
+        extends AbstractSequentialList<E>
+        implements List<E>, Deque<E>, Cloneable, java.io.Serializable {
     
     class FingerList<E> {
 
@@ -230,7 +234,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     int size;
     transient Node<E> first;
     transient Node<E> last;
-    final transient FingerList<E> fingerList = new FingerList<>();
+    transient FingerList<E> fingerList = new FingerList<>();
     
     public LinkedListV2() {
         
@@ -343,33 +347,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     Used previously for debugging. Ignore.
     ***************************************************************************/
     public void checkInvariant() {
-        if (fingerStack.size() < 2) {
-            return;
-        }
-        
-        for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
-            Finger<E> finger = fingerStack.get(i);
-            
-            assert finger.node.prev != null || finger.node.next != null :
-                    "checkInvariant() failed: finger " + finger + " has " +
-                    "null siblings.";
-            
-            assert fingerStack.fingerIndexSet.contains(finger.index) :
-                    "checkInvariant() failed: Set does not contain " + finger;
-            
-            int onLeftNodes = countLeft(finger);
-            int onRightNodes = countRight(finger);
-            
-            assert this.size == onLeftNodes + 1 + onRightNodes :
-                    "checkInvariant() failed at finger (" + finger +
-                    "), prefix/suffix error";
-            
-            Node<E> node = getNodeRaw(finger.index);
-
-            assert finger.node == node : 
-                    "checkInvariant() failed: finger/node mismatch: " + 
-                    "(finger = " + finger + ", node = " + node + ")";
-        }
+       
     }
     
     /**
@@ -1157,14 +1135,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.sqrt(size);
+        return (int) Math.ceil(Math.sqrt(size));
     }
     
     /***************************************************************************
     Computes the recommended number of fingers for 'size' elements.
     ***************************************************************************/
     private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.sqrt(size);
+        return (int) Math.ceil(Math.sqrt(size));
     }
     
     /***************************************************************************
@@ -1438,7 +1416,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
 
         int size = s.readInt();
         this.size = size;
-        this.fingerStack = new FingerStack<>();
+        this.fingerList = new FingerList<>();
 
         switch (size) {
             case 0:

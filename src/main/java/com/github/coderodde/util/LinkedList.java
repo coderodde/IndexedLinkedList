@@ -1099,14 +1099,14 @@ public class LinkedList<E>
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int)(Math.sqrt(size) / 10.0);
+        return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
     /***************************************************************************
     Computes the recommended number of fingers for 'size' elements.
     ***************************************************************************/
     private static int getRecommendedNumberOfFingers(int size) {
-        return (int)(Math.sqrt(size) / 10.0);
+        return (int) Math.ceil(Math.sqrt(size) / 10.0);
     }
     
     private void increaseSize() {
