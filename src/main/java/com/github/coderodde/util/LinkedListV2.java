@@ -1516,12 +1516,24 @@ public class LinkedListV2<E>
     Implements the node removal. 
     ***************************************************************************/
     private void removeObjectImpl(Node<E> node, int index) {
-        // Make sure no finger is pointing to 'node':
         int closestFingerIndex = fingerList.getFingerIndex(index);
         Finger<E> closestFinger = fingerList.get(closestFingerIndex);
         
         if (closestFinger.index == index) {
+            // Make sure no finger is pointing to 'node':
             moveFingerOutOfRemovalLocation(closestFinger, closestFingerIndex);
+        } else {
+            for (int i = closestFingerIndex + 1;
+                    i <= fingerList.size();
+                    i++) {
+                fingerList.get(i).index--;
+            }
+            
+            int steps = closestFinger.index - index;
+            
+            if (steps > 0) {
+                fingerList.get(closestFingerIndex).index--;
+            }
         }
         
         unlink(node);
@@ -1529,12 +1541,6 @@ public class LinkedListV2<E>
         
         if (mustRemoveFinger()) {
             removeFinger();
-        }
-        
-        if (closestFinger.index < index) {
-            shiftIndicesToLeftOnce(closestFingerIndex + 1);
-        } else {
-            shiftIndicesToLeftOnce(closestFingerIndex);
         }
     }
     
