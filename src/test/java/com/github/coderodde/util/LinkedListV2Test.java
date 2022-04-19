@@ -800,38 +800,38 @@ public class LinkedListV2Test {
 //        
 //        iter.next();
 //    }
-//    
-//    @Test(expected = NoSuchElementException.class) 
-//    public void enhancedIteratorPrevioiusThrowsOnNoPrevious() {
-//        list.addAll(getIntegerList(20));
-//        
-//        ListIterator<Integer> iter = list.listIterator(1);
-//        
-//        try {
-//            iter.previous();
-//        } catch (Exception ex) {
-//            fail("Should not get here.");
-//        }
-//        
-//        iter.previous();
-//    }
-//    
-//    @Test(expected = IllegalStateException.class)
-//    public void enhancedIteratorThrowsOnDoubleRemove() {
-//        list.add(1);
-//        
-//        ListIterator<Integer> iter = list.listIterator();
-//        
-//        try {
-//            iter.next();
-//            iter.remove();
-//        } catch (Exception ex) {
-//            fail("Should not get here.");
-//        }
-//        
-//        iter.remove();
-//    }
-//    
+    
+    @Test(expected = NoSuchElementException.class) 
+    public void enhancedIteratorPrevioiusThrowsOnNoPrevious() {
+        list.addAll(getIntegerList(20));
+        
+        ListIterator<Integer> iter = list.listIterator(1);
+        
+        try {
+            iter.previous();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.previous();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void enhancedIteratorThrowsOnDoubleRemove() {
+        list.add(1);
+        
+        ListIterator<Integer> iter = list.listIterator();
+        
+        try {
+            iter.next();
+            iter.remove();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.remove();
+    }
+    
 //    @Test(expected = NoSuchElementException.class)
 //    public void getLastThrowsOnEmptyList() {
 //        list.getLast();

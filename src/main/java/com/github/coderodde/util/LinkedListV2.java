@@ -75,7 +75,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
         }
         
         void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
-            shiftFingersToRight(fingerIndex, numberOfNodes);
+            shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
             size += roomSize;
             enlargeFingerArrayIfNeeded();
             
@@ -140,7 +140,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             
             // Shift fingerArray[beforeFingerIndex ... size] one position to the
             // right (towards larger index values:
-            shiftFingersToRightOnce(beforeFingerIndex);
+            shiftFingerIndicesToRightOnce(beforeFingerIndex);
 
             fingerArray[beforeFingerIndex] = finger;
             fingerArray[size].index = LinkedListV2.this.size;
@@ -165,7 +165,8 @@ public class LinkedListV2<E> extends LinkedList<E> {
         For each finger with the index at least 'startIndex', add 'steps' to the 
         index. This method updates the index of the end-of-list sentinel too.
         ***********************************************************************/
-        private void shiftFingersToRight(int startIndex, int shiftLength) {
+        private void shiftFingerIndicesToRight(int startIndex,      
+                                               int shiftLength) {
             for (int i = startIndex; i <= size; ++i) {
                 fingerArray[i].index += shiftLength;
             }
@@ -175,8 +176,10 @@ public class LinkedListV2<E> extends LinkedList<E> {
         For each finger with the index at least 'startIndex', incremnt the index
         by one. This method updates the index of the end-of-list sentinel too.
         ***********************************************************************/
-        private void shiftFingersToRightOnce(int startIndex) {
-            shiftFingersToRight(startIndex, 1);
+        private void shiftFingerIndicesToRightOnce(int startIndex) {
+            for (int i = startIndex; i <= size; ++i) {
+                fingerArray[i].index++;
+            }
         }
 
         void removeFinger() {
@@ -321,6 +324,19 @@ public class LinkedListV2<E> extends LinkedList<E> {
         return true;
     }
     
+    /**
+     * {@inheritDoc }
+     */
+    public void addFirst(E e) {
+        linkFirst(e);
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    public void addLast(E e) {
+        linkLast(e);
+    }
 
     /***************************************************************************
     Used previously for debugging. Ignore.
@@ -356,12 +372,28 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
-     * Returns {@code true} if this list contains the specified element. More 
-     * formally, returns {@code true} if and only if this list contains at least 
-     * one element {@code e} such that {@code Objects.equals(o, e)}.
-     *
-     * @param o element whose presence in this list is to be tested.
-     * @return {@code true} if this list contains the specified element.
+     * {@inheritDoc }
+     */
+    @Override
+    public void clear() {
+        fingerList.clear();
+        size = 0;
+        
+        // Help GC:
+        for (Node<E> node = first; node != null;) {
+            node.prev = null;
+            node.item = null;
+            Node<E> next = node.next;
+            node.next = null;
+            node = next;
+        }
+
+        first = last = null;
+        modCount++;
+    }
+    
+    /**
+     * {@inheritDoc }
      */
     @Override
     public boolean contains(Object o) {
@@ -369,9 +401,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
 
     /**
-     * Returns a basic, descending iterator over this list.
-     * 
-     * @return the descending iterator.
+     * {@inheritDoc }
      */
     @Override
     public Iterator<E> descendingIterator() {
@@ -379,13 +409,15 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
-     * Returns {@code true} only if the input object is a {@link List}, has the
-     * same size, and whose iterator returns the elements in the same order as
-     * this list.
-     *
-     * @param o the query object.
-     * @return {@code true} only if this list and the input list represent the
-     * same element sequence.
+     * {@inheritDoc }
+     */
+    @Override
+    public E element() {
+        return getFirst();
+    }
+    
+    /**
+     * {@inheritDoc }
      */
     @Override
     public boolean equals(Object o) {
@@ -433,11 +465,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
-     * Returns the element at the specified position in this list.
-     *
-     * @param index index of the element to return.
-     * @return the element at the specified position in this list.
-     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * {@inheritDoc }
      */
     @Override
     public E get(int index) {
@@ -446,11 +474,33 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
-     * Returns the smallest index of the input object, or -1, if the object does
-     * not appear in this list.
-     * 
-     * @param o the object whose index to return.
-     * @return the index of {@code o}, or -1, if none is present.
+     * {@inheritDoc }
+     */
+    @Override
+    public E getFirst() {
+        if (first == null) {
+            throw new NoSuchElementException(
+                    "Getting the head element from an empty list.");
+        }
+        
+        return first.item;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E getLast() {
+        if (last == null) {
+            throw new NoSuchElementException(
+                    "Getting the tail element from an empty list.");
+        }
+        
+        return last.item;
+    }
+    
+    /**
+     * {@inheritDoc }
      */
     @Override
     public int indexOf(Object o) {
@@ -474,39 +524,95 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
 
     /**
-     * Returns the basic iterator over this list supporting only traversal and
-     * removal.
-     *
-     * @return the basic iterator.
+     * {@inheritDoc }
      */
     @Override
     public Iterator<E> iterator() {
         return new BasicIterator();
     }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public int lastIndexOf(Object o) {
+        int index = size;
+        
+        for (Node<E> x = last; x != null; x = x.prev) {
+            index--;
+
+            if (Objects.equals(o, x.item)) {
+                return index;
+            }
+        }
+        
+        return -1;
+    }
     
     /**
-     * Returns a list-iterator of the elements in this list (in proper
-     * sequence), starting at the specified position in the list.
-     * Obeys the general contract of {@code List.listIterator(int)}.<p>
-     *
-     * The list iterator is <i>fail-fast</i>: if the list is structurally
-     * modified at any time after the Iterator is created, in any way except
-     * through the list iterator's own {@code remove} or {@code add} methods,
-     * the list-iterator will throw a {@code ConcurrentModificationException}.  
-     * Thus, in the face of concurrent modification, the iterator fails quickly 
-     * and cleanly, rather than risking arbitrary, non-deterministic behavior at
-     * an undetermined time in the future.
-     *
-     * @param index index of the first element to be returned from the
-     *              list iterator (by a call to {@code next}).
-     * @return a ListIterator of the elements in this list (in proper
-     *         sequence), starting at the specified position in the list.
-     * @throws IndexOutOfBoundsException {@inheritDoc}
-     * @see List#listIterator(int)
+     * {@inheritDoc }
      */
     @Override
     public ListIterator<E> listIterator(int index) {
         return new EnhancedIterator(index);
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean offer(E e) {
+        return add(e);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean offerFirst(E e) {
+        addFirst(e);
+        return true;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean offerLast(E e) {
+        addLast(e);
+        return true;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public E peek() {
+        return first == null ? null : first.item;
+    }
+
+    /**
+     * Retrieves, but does not remove, the first element of this list,
+     * or returns {@code null} if this list is empty.
+     *
+     * @return the first element of this list, or {@code null} if this list is 
+     *         empty.
+     */
+    @Override
+    public E peekFirst() {
+        return first == null ? null : first.item;
+    }
+
+    /**
+     * Retrieves, but does not remove, the last element of this list,
+     * or returns {@code null} if this list is empty.
+     *
+     * @return the last element of this list, or {@code null} if this list is 
+     *         empty.
+     */
+    @Override
+    public E peekLast() {
+        return last == null ? null : last.item;
     }
     
     /**
@@ -943,6 +1049,31 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /***************************************************************************
+    Prepends the input element to the head of this list.
+    ***************************************************************************/
+    private void linkFirst(E e) {
+        Node<E> f = first;
+        Node<E> newNode = new Node<>(e);
+        newNode.next = f;
+        first = newNode;
+
+        if (f == null) {
+            last = newNode;
+        } else {
+            f.prev = newNode;
+        }
+
+        increaseSize();
+
+        if (mustAddFinger()) {
+            fingerList.insertFingerAndShiftOnceToRight(
+                    new Finger<>(newNode, 0));
+        } else {
+            fingerList.shiftFingerIndicesToRightOnce(0);
+        }
+    }
+    
+    /***************************************************************************
     Appends the input element to the tail of this list.
     ***************************************************************************/
     private void linkLast(E e) {
@@ -1214,7 +1345,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
             int fingerIndex = 
                     fingerList.getNextFingerIndex(indexOfInsertedRangeHead);
             
-            fingerList.shiftFingersToRight(fingerIndex, collectionSize);
+            fingerList.shiftFingerIndicesToRight(fingerIndex, collectionSize);
             return;
         }
 
@@ -1256,7 +1387,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
                 getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
-            fingerList.shiftFingersToRight(0, collectionSize);
+            fingerList.shiftFingerIndicesToRight(0, collectionSize);
             return;
         }
         
