@@ -153,257 +153,252 @@ public class LinkedListV2Test {
         assertEquals(Integer.valueOf(2), list.element());
     }
     
-//    @Test
-//    public void listEquals() {
-//        list.addAll(Arrays.asList(1, 2, 3, 4));
-//        List<Integer> otherList = Arrays.asList(1, 2, 3, 4);
-//        
-//        assertTrue(list.equals(otherList));
-//        
-//        list.remove(Integer.valueOf(3));
-//        
-//        assertFalse(list.equals(otherList));
-//        
-//        assertFalse(list.equals(null));
-//        assertTrue(list.equals(list));
-//        
-//        Set<Integer> set = new HashSet<>(list);
-//        
-//        assertFalse(list.equals(set));
-//        
-//        list.clear();
-//        list.addAll(Arrays.asList(0, 1, 2, 3));
-//        otherList = Arrays.asList(0, 1, 4, 3);
-//        
-//        assertFalse(list.equals(otherList));
-//    }
-//    
-//    class DummyList extends ArrayList<Integer> {
-//        private final class DummyIterator implements Iterator<Integer> {
-//
-//            @Override
-//            public boolean hasNext() {
-//                return true;
-//            }
-//
-//            @Override
-//            public Integer next() {
-//                return Integer.valueOf(0);
-//            }
-//        }
-//        
-//        public Iterator<Integer> iterator()  {
-//            return new DummyIterator();
-//        }
-//        
-//        public int size() {
-//            return 2;
-//        }
-//    }
-//    
-//    @Test(expected = IllegalStateException.class) 
-//    public void listEqualsThrowsOnBadIterator() {
-//        DummyList dummyList = new DummyList();
-//        list.addAll(Arrays.asList(0, 0));
-//        list.equals(dummyList);
-//    }
-//    
-//    @Test
-//    public void offer() {
-//        assertTrue(list.equals(Arrays.asList()));
-//        
-//        list.offer(1);
-//        
-//        assertTrue(list.equals(Arrays.asList(1)));
-//        
-//        list.offer(2);
-//        
-//        assertTrue(list.equals(Arrays.asList(1, 2)));
-//    }
-//    
-//    @Test
-//    public void offerFirst() {
-//        assertTrue(list.equals(Arrays.asList()));
-//        
-//        list.offerFirst(1);
-//        
-//        assertTrue(list.equals(Arrays.asList(1)));
-//        
-//        list.offerFirst(2);
-//        
-//        assertTrue(list.equals(Arrays.asList(2, 1)));
-//    }
-//    
-//    @Test
-//    public void offerLast() {
-//        assertTrue(list.equals(Arrays.asList()));
-//        
-//        list.offerLast(1);
-//        
-//        assertTrue(list.equals(Arrays.asList(1)));
-//        
-//        list.offerLast(2);
-//        
-//        assertTrue(list.equals(Arrays.asList(1, 2)));
-//    }
-//    
-//    @Test
-//    public void peek() {
-//        assertNull(list.peek());
-//        
-//        list.addLast(0);
-//        
-//        assertEquals(Integer.valueOf(0), list.peek());
-//        
-//        list.addLast(1);
-//        
-//        assertEquals(Integer.valueOf(0), list.peek());
-//    
-//        list.addFirst(Integer.valueOf(-1));
-//
-//        assertEquals(Integer.valueOf(-1), list.peek());
-//    }
-//    
-//    @Test
-//    public void peekFirst() {
-//        assertNull(list.peek());
-//        
-//        list.addLast(0);
-//        
-//        assertEquals(Integer.valueOf(0), list.peekFirst());
-//        
-//        list.addFirst(1);
-//        
-//        assertEquals(Integer.valueOf(1), list.peekFirst());
-//    
-//        list.addFirst(Integer.valueOf(-1));
-//
-//        assertEquals(Integer.valueOf(-1), list.peekFirst());
-//    }
-//    
-//    @Test
-//    public void peekLast() {
-//        assertNull(list.peek());
-//        
-//        list.addLast(0);
-//        
-//        assertEquals(Integer.valueOf(0), list.peekLast());
-//        
-//        list.addLast(1);
-//        
-//        assertEquals(Integer.valueOf(1), list.peekLast());
-//    
-//        list.addLast(2);
-//
-//        assertEquals(Integer.valueOf(2), list.peekLast());
-//    }
-//    
-//    @Test
-//    public void poll() {
-//        assertNull(list.poll());
-//        
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        assertEquals(Integer.valueOf(1), list.poll());
-//        assertEquals(Integer.valueOf(2), list.poll());
-//        assertEquals(Integer.valueOf(3), list.poll());
-//    }
-//    
-//    @Test
-//    public void pollFirst() {
-//        assertNull(list.pollFirst());
-//        
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        assertEquals(Integer.valueOf(1), list.pollFirst());
-//        assertEquals(Integer.valueOf(2), list.pollFirst());
-//        assertEquals(Integer.valueOf(3), list.pollFirst());
-//    }
-//    
-//    @Test
-//    public void pollLast() {
-//        assertNull(list.pollLast());
-//        
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        assertEquals(Integer.valueOf(3), list.pollLast());
-//        assertEquals(Integer.valueOf(2), list.pollLast());
-//        assertEquals(Integer.valueOf(1), list.pollLast());
-//    }
-//    
-//    @Test(expected = NoSuchElementException.class)
-//    public void removeFirstThrowsOnEmptyList() {
-//        list.removeFirst();
-//    }
-//    
-//    @Test
-//    public void pop() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        assertEquals(Integer.valueOf(1), list.pop());
-//        assertEquals(Integer.valueOf(2), list.pop());
-//        assertEquals(Integer.valueOf(3), list.pop());
-//    }
-//    
-//    @Test
-//    public void push() {
-//        list.push(1);
-//        list.push(2);
-//        list.push(3);
-//        
-//        assertTrue(list.equals(Arrays.asList(3, 2, 1)));
-//    }
-//    
-//    @Test(expected = NoSuchElementException.class)
-//    public void removeThrowsOnEmptyList() {
-//        list.remove();
-//    }
-//    
-//    class BadList extends com.github.coderodde.util.LinkedList<Integer> {
-//        
-//        class BadListIterator implements Iterator<Integer> {
-//
-//            @Override
-//            public boolean hasNext() {
-//                return true;
-//            }
-//
-//            @Override
-//            public Integer next() {
-//                return Integer.valueOf(3);
-//            }
-//        }
-//        
-//        @Override
-//        public Iterator<Integer> iterator() {
-//            return new BadListIterator();
-//        };
-//        
-//        public int size() {
-//            return 2;
-//        }
-//    }
-//    
-//    @Test(expected = IllegalStateException.class) 
-//    public void badThisIterator() {
-//        List<Integer> arrayList = Arrays.asList(3, 3);
-//        BadList badList = new BadList();
-//        badList.addAll(Arrays.asList(3, 3));
-//        badList.equals(arrayList);
-//    }
-//    
-//    @Test
-//    public void removeFirstOccurrenceOfNull() {
-//        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
-//        
-//        assertTrue(list.removeFirstOccurrence(null));
-//        
-//        // Remove the last null value:
-//        list.set(3, 10);
-//        
-//        assertFalse(list.removeFirstOccurrence(null));
-//    }
-//    
+    @Test
+    public void listEquals() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        List<Integer> otherList = Arrays.asList(1, 2, 3, 4);
+        
+        assertTrue(list.equals(otherList));
+        
+        list.remove(Integer.valueOf(3));
+        
+        assertFalse(list.equals(otherList));
+        
+        assertFalse(list.equals(null));
+        assertTrue(list.equals(list));
+        
+        Set<Integer> set = new HashSet<>(list);
+        
+        assertFalse(list.equals(set));
+        
+        list.clear();
+        list.addAll(Arrays.asList(0, 1, 2, 3));
+        otherList = Arrays.asList(0, 1, 4, 3);
+        
+        assertFalse(list.equals(otherList));
+    }
+    
+    class DummyList extends ArrayList<Integer> {
+        private final class DummyIterator implements Iterator<Integer> {
+
+            @Override
+            public boolean hasNext() {
+                return true;
+            }
+
+            @Override
+            public Integer next() {
+                return Integer.valueOf(0);
+            }
+        }
+        
+        public Iterator<Integer> iterator()  {
+            return new DummyIterator();
+        }
+        
+        public int size() {
+            return 2;
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void listEqualsThrowsOnBadIterator() {
+        DummyList dummyList = new DummyList();
+        list.addAll(Arrays.asList(0, 0));
+        list.equals(dummyList);
+    }
+    
+    @Test
+    public void offer() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offer(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offer(2);
+        
+        assertTrue(list.equals(Arrays.asList(1, 2)));
+    }
+    
+    @Test
+    public void offerFirst() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offerFirst(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offerFirst(2);
+        
+        assertTrue(list.equals(Arrays.asList(2, 1)));
+    }
+    
+    @Test
+    public void offerLast() {
+        assertTrue(list.equals(Arrays.asList()));
+        
+        list.offerLast(1);
+        
+        assertTrue(list.equals(Arrays.asList(1)));
+        
+        list.offerLast(2);
+        
+        assertTrue(list.equals(Arrays.asList(1, 2)));
+    }
+    
+    @Test
+    public void peek() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peek());
+        
+        list.addLast(1);
+        
+        assertEquals(Integer.valueOf(0), list.peek());
+    
+        list.addFirst(Integer.valueOf(-1));
+
+        assertEquals(Integer.valueOf(-1), list.peek());
+    }
+    
+    @Test
+    public void peekFirst() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peekFirst());
+        
+        list.addFirst(1);
+        
+        assertEquals(Integer.valueOf(1), list.peekFirst());
+    
+        list.addFirst(Integer.valueOf(-1));
+
+        assertEquals(Integer.valueOf(-1), list.peekFirst());
+    }
+    
+    @Test
+    public void peekLast() {
+        assertNull(list.peek());
+        
+        list.addLast(0);
+        
+        assertEquals(Integer.valueOf(0), list.peekLast());
+        
+        list.addLast(1);
+        
+        assertEquals(Integer.valueOf(1), list.peekLast());
+    
+        list.addLast(2);
+
+        assertEquals(Integer.valueOf(2), list.peekLast());
+    }
+    
+    @Test
+    public void poll() {
+        assertNull(list.poll());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.poll());
+        assertEquals(Integer.valueOf(2), list.poll());
+        assertEquals(Integer.valueOf(3), list.poll());
+    }
+    
+    @Test
+    public void pollFirst() {
+        assertNull(list.pollFirst());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.pollFirst());
+        assertEquals(Integer.valueOf(2), list.pollFirst());
+        assertEquals(Integer.valueOf(3), list.pollFirst());
+    }
+    
+    @Test
+    public void pollLast() {
+        assertNull(list.pollLast());
+        
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(3), list.pollLast());
+        assertEquals(Integer.valueOf(2), list.pollLast());
+        assertEquals(Integer.valueOf(1), list.pollLast());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void removeFirstThrowsOnEmptyList() {
+        list.removeFirst();
+    }
+    
+    @Test
+    public void pop() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        assertEquals(Integer.valueOf(1), list.pop());
+        assertEquals(Integer.valueOf(2), list.pop());
+        assertEquals(Integer.valueOf(3), list.pop());
+    }
+    
+    @Test
+    public void push() {
+        list.push(1);
+        list.push(2);
+        list.push(3);
+        
+        assertTrue(list.equals(Arrays.asList(3, 2, 1)));
+    }
+    
+    class BadList extends com.github.coderodde.util.LinkedList<Integer> {
+        
+        class BadListIterator implements Iterator<Integer> {
+
+            @Override
+            public boolean hasNext() {
+                return true;
+            }
+
+            @Override
+            public Integer next() {
+                return Integer.valueOf(3);
+            }
+        }
+        
+        @Override
+        public Iterator<Integer> iterator() {
+            return new BadListIterator();
+        };
+        
+        public int size() {
+            return 2;
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void badThisIterator() {
+        List<Integer> arrayList = Arrays.asList(3, 3);
+        BadList badList = new BadList();
+        badList.addAll(Arrays.asList(3, 3));
+        badList.equals(arrayList);
+    }
+    
+    @Test
+    public void removeFirstOccurrenceOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
+        
+        assertTrue(list.removeFirstOccurrence(null));
+        
+        // Remove the last null value:
+        list.set(3, 10);
+        
+        assertFalse(list.removeFirstOccurrence(null));
+    }
+    
 //    @Test
 //    public void removeLastOccurrenceOfNull() {
 //        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
