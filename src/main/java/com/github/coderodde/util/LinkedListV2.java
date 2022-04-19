@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
@@ -584,7 +585,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
     
     /**
-     * 
+     * {@inheritDoc }
      */
     @Override
     public E peek() {
@@ -592,11 +593,7 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
 
     /**
-     * Retrieves, but does not remove, the first element of this list,
-     * or returns {@code null} if this list is empty.
-     *
-     * @return the first element of this list, or {@code null} if this list is 
-     *         empty.
+     * {@inheritDoc }
      */
     @Override
     public E peekFirst() {
@@ -604,15 +601,80 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
 
     /**
-     * Retrieves, but does not remove, the last element of this list,
-     * or returns {@code null} if this list is empty.
-     *
-     * @return the last element of this list, or {@code null} if this list is 
-     *         empty.
+     * {@inheritDoc }
      */
     @Override
     public E peekLast() {
         return last == null ? null : last.item;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E poll() {
+        return first == null ? null : removeFirst();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E pollFirst() {
+        return first == null ? null : removeFirst();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E pollLast() {
+        return last == null ? null : removeLast();
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E pop() {
+        return removeFirst();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void push(E e) {
+        addFirst(e);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E remove() {
+        if (size == 0) {
+            throw new NoSuchElementException("remove() from empty LinkedList.");
+        }
+        
+        return removeFirst();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean remove(Object o) {
+        int index = 0;
+
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
+            }
+        }
+
+        return false;
     }
     
     /**
@@ -669,19 +731,117 @@ public class LinkedListV2<E> extends LinkedList<E> {
     }
 
     /**
-     * Returns the number of elements in this list.
-     *
-     * @return the number of elements in this list.
+     * {@inheritDoc }
+     */
+    @Override
+    public E removeFirst() {
+        if (size == 0) {
+            throw new NoSuchElementException(
+                    "removeFirst from an empty LinkedList");
+        }
+        
+        E returnValue = first.item;
+        decreaseSize();
+        
+        first = first.next;
+        
+        if (first == null) {
+            last = null;
+        } else {
+            first.prev = null;
+        }
+
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+        
+        shiftIndicesToLeftOnce(1);
+        return returnValue;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean removeFirstOccurrence(Object o) {
+        int index = 0;
+        
+        for (Node<E> x = first; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public E removeLast() {
+        if (size == 0) {
+            throw new NoSuchElementException("removeLast on empty LinkedList");
+        }
+        
+        E returnValue = last.item;
+        decreaseSize();
+        
+        last = last.prev;
+        
+        if (last == null) {
+            first = null;
+        } else {
+            last.next = null;
+        }
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+        
+        return returnValue;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean removeLastOccurrence(Object o) {
+        int index = size - 1;
+
+        for (Node<E> x = last; x != null; x = x.prev, index--) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc }
      */
     @Override
     public int size() {
         return size;
     }
-
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Spliterator<E> spliterator() {
+        return new LinkedListSpliterator<>(this, first, size, 0, modCount);
+    }
+    
+    @java.io.Serial
+    private static final long serialVersionUID = -1L;
+    
     /***************************************************************************
     Appends the input collection to the tail of this list.
     ***************************************************************************/
-    
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         Node<E> oldLast = last;
@@ -997,7 +1157,14 @@ public class LinkedListV2<E> extends LinkedList<E> {
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size));
+        return (int) Math.sqrt(size);
+    }
+    
+    /***************************************************************************
+    Computes the recommended number of fingers for 'size' elements.
+    ***************************************************************************/
+    private static int getRecommendedNumberOfFingers(int size) {
+        return (int) Math.sqrt(size);
     }
     
     /***************************************************************************
@@ -1257,6 +1424,77 @@ public class LinkedListV2<E> extends LinkedList<E> {
     
     protected void insertFinger(Finger<E> finger) {
         //fingerList.insertFinger(finger);
+    }
+    
+    /**
+     * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
+     * deserializes it).
+     */
+    @java.io.Serial
+    private void readObject(java.io.ObjectInputStream s) 
+            throws java.io.IOException, ClassNotFoundException {
+        // Read in any hidden serialization magic
+        s.defaultReadObject();
+
+        int size = s.readInt();
+        this.size = size;
+        this.fingerStack = new FingerStack<>();
+
+        switch (size) {
+            case 0:
+                return;
+                
+            case 1:
+                Node<E> newNode = new Node<>((E) s.readObject());
+                first = last = newNode;
+                fingerList.appendFinger(new Finger<>(newNode, 0));
+                return;
+        }
+        
+        Node<E> rightmostNode = new Node<>((E) s.readObject());
+        first = rightmostNode;
+        
+        int numberOfRequestedFingers = getRecommendedNumberOfFingers(size);
+        int distance = size / numberOfRequestedFingers;
+        int startOffset = distance / 2;
+        
+        // Read in all elements in the proper order.
+        for (int i = 1; i < size; i++) {
+            Node<E> node = new Node<>((E) s.readObject());
+            
+            if ((i - startOffset) % distance == 0) {
+                fingerList.appendFinger(new Finger<>(node, i));
+            }
+            
+            rightmostNode.next = node;
+            node.prev = rightmostNode;
+            rightmostNode = node;
+        }
+        
+        last = rightmostNode;
+    }
+    
+    /**
+     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
+     * serializes it).
+     *
+     * @serialData The size of the list (the number of elements it
+     *             contains) is emitted (int), followed by all of its
+     *             elements (each an Object) in the proper order.
+     */
+    @java.io.Serial
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        // Write out any hidden serialization magic
+        s.defaultWriteObject();
+
+        // Write out size
+        s.writeInt(size);
+
+        // Write out all elements in the proper order.
+        for (Node<E> x = first; x != null; x = x.next) {
+            s.writeObject(x.item);
+        }
     }
     
     protected void removeFinger() {
@@ -1549,6 +1787,133 @@ public class LinkedListV2<E> extends LinkedList<E> {
         } else {
             next.prev = prev;
             x.next = null;
+        }
+    }
+    
+    static final class LinkedListSpliterator<E> implements Spliterator<E> {
+        
+        static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
+        
+        private final LinkedListV2<E> list;
+        private Node<E> node;
+        private long lengthOfSpliterator;
+        private long numberOfProcessedElements;
+        private long offsetOfSpliterator;
+        private final int expectedModCount;
+        
+        private LinkedListSpliterator(LinkedListV2<E> list,
+                                      Node<E> node,
+                                      long lengthOfSpliterator,
+                                      long offsetOfSpliterator,
+                                      int expectedModCount) {
+            this.list = list;
+            this.node = node;
+            this.lengthOfSpliterator = lengthOfSpliterator;
+            this.offsetOfSpliterator = offsetOfSpliterator;
+            this.expectedModCount = expectedModCount;
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super E> action) {
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            
+            if (numberOfProcessedElements == lengthOfSpliterator) {
+                return false;
+            }
+            
+            numberOfProcessedElements++;
+            E item = node.item;
+            action.accept(item);
+            node = node.next;
+            
+            if (list.modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+                
+            return true;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            
+            for (long i = numberOfProcessedElements; 
+                 i < lengthOfSpliterator; 
+                 i++) {
+                E item = node.item;
+                action.accept(item);
+                node = node.next;
+            }
+            
+            numberOfProcessedElements = lengthOfSpliterator;
+            
+            if (list.modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+        
+        @Override
+        public Spliterator<E> trySplit() {
+            long sizeLeft = estimateSize();
+            
+            if (sizeLeft == 0) {
+                return null;
+            }
+                
+            long thisSpliteratorNewLength = sizeLeft / 2L;
+            
+            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE) {
+                return null;
+            }
+            
+            long newSpliteratorLength = sizeLeft - thisSpliteratorNewLength;
+            long newSpliteratorOffset = this.offsetOfSpliterator;
+            
+            this.offsetOfSpliterator += newSpliteratorLength;
+            this.lengthOfSpliterator -= newSpliteratorLength;
+            
+            Node<E> newSpliteratorNode = this.node;
+            
+            this.node = list.node((int) this.offsetOfSpliterator);
+            
+            return new LinkedListSpliterator<>(
+                    list,
+                    newSpliteratorNode,
+                    newSpliteratorLength, // length
+                    newSpliteratorOffset, // offset
+                    expectedModCount);
+        }
+
+        @Override
+        public long estimateSize() {
+            return (long)(lengthOfSpliterator - numberOfProcessedElements);
+        }
+
+        @Override
+        public long getExactSizeIfKnown() {
+            return estimateSize();
+        }
+
+        @Override
+        public int characteristics() {
+            return Spliterator.ORDERED | 
+                   Spliterator.SUBSIZED |
+                   Spliterator.SIZED;
+        }
+        
+        @Override
+        public boolean hasCharacteristics(int characteristics) {
+            return switch (characteristics) {
+                case Spliterator.ORDERED, 
+                     Spliterator.SIZED, 
+                     Spliterator.SUBSIZED -> true;
+                    
+                default -> false;
+            };
         }
     }
 }

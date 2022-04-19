@@ -672,9 +672,7 @@ public class LinkedList<E>
             throw new NoSuchElementException(
                     "removeFirst from an empty LinkedList");
         }
-        
-        checkElementIndex(0);
-        
+         
         E returnValue = first.item;
         decreaseSize();
         
@@ -727,8 +725,6 @@ public class LinkedList<E>
         if (size == 0) {
             throw new NoSuchElementException("removeLast on empty LinkedList");
         }
-        
-        checkElementIndex(size - 1);
         
         E returnValue = last.item;
         decreaseSize();
@@ -1103,14 +1099,14 @@ public class LinkedList<E>
     Computes the recommended number of fingers.
     ***************************************************************************/
     private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size) / 10.0);
+        return (int)(Math.sqrt(size) / 10.0);
     }
     
     /***************************************************************************
     Computes the recommended number of fingers for 'size' elements.
     ***************************************************************************/
     private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.ceil(Math.sqrt(size) / 10.0);
+        return (int)(Math.sqrt(size) / 10.0);
     }
     
     private void increaseSize() {
