@@ -961,21 +961,53 @@ public class LinkedListV2<E>
     ***************************************************************************/
     private final class DescendingIterator implements Iterator<E> {
 
-        private final ListIterator<E> iterator = new EnhancedIterator(size());
+        private Node<E> lastReturned;
+        private Node<E> nextToIterate = last;
+        private int nextIndex = LinkedListV2.this.size - 1;
+        int expectedModCount = LinkedListV2.this.modCount;
         
         @Override
         public boolean hasNext() {
-            return iterator.hasPrevious();
+            return nextIndex > -1;
         }
-
+        
         @Override
         public E next() {
-            return iterator.previous();
+            checkForComodification();
+            
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            
+            lastReturned = nextToIterate;
+            nextToIterate = nextToIterate.prev;
+            nextIndex--;
+            return lastReturned.item;
         }
-
+        
         @Override
         public void remove() {
-            iterator.remove();
+            checkForComodification();
+            
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            removeObjectImpl(lastReturned, nextIndex + 1);
+//            nextInde
+            lastReturned = null;
+            expectedModCount++;
+        }
+        
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            
+        }
+        
+        private void checkForComodification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
         }
     }
     
@@ -1052,12 +1084,13 @@ public class LinkedListV2<E>
             }
             
             Node<E> lastNext = lastReturned.next;
-            removeObjectImpl(lastReturned, nextIndex);
+            int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
             
             if (next == lastReturned) {
                 next = lastNext;
             } else {
-                nextIndex--;
+                nextIndex = removalIndex;
             }
             
             lastReturned = null;
@@ -1484,7 +1517,12 @@ public class LinkedListV2<E>
     ***************************************************************************/
     private void removeObjectImpl(Node<E> node, int index) {
         // Make sure no finger is pointing to 'node':
-        makeSureNoFingerPointsTo(node, index);
+        int closestFingerIndex = fingerList.getFingerIndex(index);
+        Finger<E> closestFinger = fingerList.get(closestFingerIndex);
+        
+        if (closestFinger.index == index) {
+            moveFingerOutOfRemovalLocation(closestFinger, closestFingerIndex);
+        }
         
         unlink(node);
         decreaseSize();
@@ -1493,7 +1531,11 @@ public class LinkedListV2<E>
             removeFinger();
         }
         
-        shiftIndicesToLeftOnce(index + 1);
+        if (closestFinger.index < index) {
+            shiftIndicesToLeftOnce(closestFingerIndex + 1);
+        } else {
+            shiftIndicesToLeftOnce(closestFingerIndex);
+        }
     }
     
     /***************************************************************************
