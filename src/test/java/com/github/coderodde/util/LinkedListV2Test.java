@@ -1,9 +1,7 @@
 package com.github.coderodde.util;
 
-import com.github.coderodde.util.LinkedList.BasicIterator;
-import com.github.coderodde.util.LinkedList.EnhancedIterator;
-import com.github.coderodde.util.LinkedList.FingerStack;
-import com.github.coderodde.util.LinkedListV2.FingerList;
+import com.github.coderodde.util.LinkedListV2.BasicIterator;
+import com.github.coderodde.util.LinkedListV2.EnhancedIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -604,28 +602,28 @@ public class LinkedListV2Test {
         iter.remove();
         iter.set(10);
     }
-//    
-//    @Test(expected = ConcurrentModificationException.class)
-//    public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
-//        list.addAll(getIntegerList(1_000_000));
-//        
-//        BasicIterator iter =(BasicIterator) list.iterator();
-//        iter.expectedModCount = -1000;
-//        
-//        iter.forEachRemaining((e) -> {});
-//    }
     
-//    @Test(expected = ConcurrentModificationException.class)
-//    public void 
-//        enhancedIteratorForEachRemainingThrowsOnConcurrentModification() {
-//            
-//        list.addAll(getIntegerList(1_000_000));
-//        
-//        EnhancedIterator iter = (EnhancedIterator) list.listIterator();
-//        iter.expectedModCount = -1;
-//        
-//        iter.forEachRemaining((e) -> {});
-//    }
+    @Test(expected = ConcurrentModificationException.class)
+    public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
+        list.addAll(getIntegerList(1_000_000));
+        
+        BasicIterator iter =(BasicIterator) list.iterator();
+        iter.expectedModCount = -1000;
+        
+        iter.forEachRemaining((e) -> {});
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void 
+        enhancedIteratorForEachRemainingThrowsOnConcurrentModification() {
+            
+        list.addAll(getIntegerList(1_000_000));
+        
+        EnhancedIterator iter = (EnhancedIterator) list.listIterator();
+        iter.expectedModCount = -1;
+        
+        iter.forEachRemaining((e) -> {});
+    }
         
     @Test(expected = ConcurrentModificationException.class)
     public void spliteratorThrowsOnConcurrentModification() {
@@ -1862,57 +1860,26 @@ public class LinkedListV2Test {
         }
     }
     
-//    @Test
-//    public void bugRemoveLast() {
-//        list.addAll(getIntegerList(10));
-//        
-//        assertEquals(10, list.size());
-//        
-//        for (int i = 0; i < 5; i++) {
-//            list.removeLast();
-//        }
-//        
-//        Random random = new Random(600L);
-//        List<Integer> referenceList = new ArrayList<>(list);
-//        
-//        while (!list.isEmpty()) {
-//            int index = random.nextInt(list.size());
-//            list.remove(index);
-//            referenceList.remove(index);
-//            assertTrue(listsEqual(list, referenceList));
-//        }
-//    }
-//
-//    private static boolean listsEqual(
-//            com.github.coderodde.util.LinkedList<Integer> list1, 
-//            java.util.List<Integer> list2) {
-//
-//        if (list1.size() != list2.size()) {
-//            return false;
-//        }
-//
-//        Iterator<Integer> iter1 = list1.iterator();
-//        Iterator<Integer> iter2 = list2.iterator();
-//
-//        while (iter1.hasNext() && iter2.hasNext()) {
-//            Integer int1 = iter1.next();
-//            Integer int2 = iter2.next();
-//
-//            if (!int1.equals(int2)) {
-//                return false;
-//            }
-//        }
-//
-//        if (iter1.hasNext() || iter2.hasNext()) {
-//            throw new IllegalStateException();
-//        }
-//
-//        return true;
-//    }   
-//
-//    private static List<Integer> getIntegerList() {
-//        return getIntegerList(100);
-//    }
+    @Test
+    public void bugRemoveLast() {
+        list.addAll(getIntegerList(10));
+        
+        assertEquals(10, list.size());
+        
+        for (int i = 0; i < 5; i++) {
+            list.removeLast();
+        }
+        
+        Random random = new Random(600L);
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        while (!list.isEmpty()) {
+            int index = random.nextInt(list.size());
+            list.remove(index);
+            referenceList.remove(index);
+            assertTrue(listsEqual(list, referenceList));
+        }
+    }
 
     private static List<Integer> getIntegerList(int length) {
         List<Integer> list = new ArrayList<>(length);
