@@ -87,8 +87,8 @@ public class LinkedListV2<E>
         void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
             shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
             size += roomSize;
-            enlargeFingerArrayIfNeeded(size);
-            
+            enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
+                                                  // sentinel.
             System.arraycopy(fingerArray, 
                              fingerIndex, 
                              fingerArray, 
@@ -131,7 +131,7 @@ public class LinkedListV2<E>
         // Appends the input finger to the tail of the finger list:
         void appendFinger(com.github.coderodde.util.Finger<E> finger) {
             size++;
-            enlargeFingerArrayIfNeeded(size);
+            enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
             fingerArray[size].index = LinkedListV2.this.size;
@@ -140,7 +140,7 @@ public class LinkedListV2<E>
         // Inserts the input finger into the finger list such that the entire
         // finger list is sorted by indices:
         void insertFingerAndShiftOnceToRight(Finger<E> finger) {
-            enlargeFingerArrayIfNeeded(size + 1);
+            enlargeFingerArrayIfNeeded(size + 2);
             int beforeFingerIndex = getFingerIndex(finger.index);
             System.arraycopy(
                     fingerArray, 
@@ -213,7 +213,7 @@ public class LinkedListV2<E>
         // Makes sure that the next finger fits in this finger stack:
         private void enlargeFingerArrayIfNeeded(int requestedSize) {
             // If the finger array is full, double the capacity:
-            if (size + 1 > fingerArray.length) {
+            if (requestedSize > fingerArray.length) {
                 int nextCapacity = 2 * fingerArray.length;
                 
                 while (nextCapacity < size + 1) {
@@ -1732,7 +1732,7 @@ public class LinkedListV2<E>
         for (int i = 0; i < startIndex; i++) {
             node = node.next;
         }
-
+        
         fingerList.setFinger(0, new Finger<>(node, startIndex));
 
         for (int i = 1; i < numberOfNewFingers; i++) {

@@ -42,6 +42,18 @@ public class LinkedListV2Test {
     }
     
     @Test
+    public void addFirstLarge() {
+        List<Integer> l = getIntegerList(1000);
+        
+        for (int i = 0; i < l.size(); i++) {
+            list.addFirst(l.get(i));
+        }
+        
+        Collections.reverse(l);
+        assertTrue(listsEqual(list, l));
+    }
+    
+    @Test
     public void constructAdd() {
         List<String> l = new LinkedListV2<>(Arrays.asList("a", "b", "c"));
         
@@ -1019,7 +1031,6 @@ public class LinkedListV2Test {
         for (int op = 0; op < 100; op++) {
             int index = random.nextInt(list.size());
             Collection<Integer> coll = getIntegerList(random.nextInt(40));
-
             referenceList.addAll(index, coll);
             list.addAll(index, coll);
 
