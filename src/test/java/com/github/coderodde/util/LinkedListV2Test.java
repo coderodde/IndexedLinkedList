@@ -1276,63 +1276,62 @@ public class LinkedListV2Test {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
 
-//    @Test
-//    public void findFailingIterator() {
-//        list.addAll(getIntegerList(3850));
-//        Iterator<Integer> iterator = list.iterator();
-//        int counter = 0;
-//
-//        while (iterator.hasNext()) {
-//            assertEquals(Integer.valueOf(counter), iterator.next());
-//            
-//            // Remove every 10th element:
-//            if (counter % 10 == 0) {
-//                iterator.remove();
-//            }
-//
-//            counter++;
-//        }
-//    }
-//
-//    @Test
-//    public void bruteForceIteratorRemove() throws Exception {
-//        list.addAll(getIntegerList(1000));
-// 
-//        int counter = 1;
-//        List<Integer> arrayList = new ArrayList<>(list);
-//        Iterator<Integer> iter = list.iterator();
-//        Iterator<Integer> arrayListIter = arrayList.iterator();
-//        int totalIterations = 0;
-//
-//        while (iter.hasNext()) {
-//            
-//            iter.next();
-//            arrayListIter.next();
-//            list.checkInvariant();
-//            
-//            if (counter % 10 == 0) {
-//
-//                try {
-//                    iter.remove();
-//                } catch (IllegalStateException ex) {
-//                    throw new Exception(ex);
-//                }
-//
-//                arrayListIter.remove();
-//                counter = 0;
-//            } else {
-//                counter++;
-//            }
-//
-//            if (!listsEqual(list, arrayList)) {
-//                throw new IllegalStateException(
-//                        "totalIterations = " + totalIterations);
-//            }
-//
-//            totalIterations++;
-//        }
-//    }
-//
+    @Test
+    public void findFailingIterator() {
+        list.addAll(getIntegerList(3850));
+        Iterator<Integer> iterator = list.iterator();
+        int counter = 0;
+
+        while (iterator.hasNext()) {
+            assertEquals(Integer.valueOf(counter), iterator.next());
+            
+            // Remove every 10th element:
+            if (counter % 10 == 0) {
+                iterator.remove();
+            }
+
+            counter++;
+        }
+    }
+
+    @Test
+    public void bruteForceIteratorRemove() throws Exception {
+        list.addAll(getIntegerList(1000));
+ 
+        int counter = 1;
+        List<Integer> arrayList = new ArrayList<>(list);
+        Iterator<Integer> iter = list.iterator();
+        Iterator<Integer> arrayListIter = arrayList.iterator();
+        int totalIterations = 0;
+
+        while (iter.hasNext()) {
+            iter.next();
+            arrayListIter.next();
+            list.checkInvariant();
+            
+            if (counter % 10 == 0) {
+
+                try {
+                    iter.remove();
+                } catch (IllegalStateException ex) {
+                    throw new Exception(ex);
+                }
+
+                arrayListIter.remove();
+                counter = 1;
+            } else {
+                counter++;
+            }
+
+            if (!listsEqual(list, arrayList)) {
+                throw new IllegalStateException(
+                        "totalIterations = " + totalIterations);
+            }
+
+            totalIterations++;
+        }
+    }
+
 //    @Test
 //    public void findFailingRemoveObject() {
 //        java.util.LinkedList<Integer> referenceList = 
