@@ -1778,90 +1778,90 @@ public class LinkedListV2Test {
         } 
     }
     
-//    @Test
-//    public void bruteForceRemoveAt2() {
-//        long seed = 1630487847317L;
-//        Random random = new Random(seed);
-//        
-//        for (int i = 0; i < 100; i++) {
-//            list.addAll(getIntegerList(10));
-//            List<Integer> indices = new ArrayList<>(list.size());
-//            
-//            while (!list.isEmpty()) {
-//                int index = random.nextInt(list.size());
-//                indices.add(index);
-//                
-//                try {
-//                    list.remove(index);
-//                } catch (AssertionError ae) {
-//                    System.out.println(
-//                            "Message: " + ae.getMessage() + ", indices: " + 
-//                                    indices.toString());
-//                    return;
-//                }
-//            }
-//            
-//            indices.clear();
-//        }
-//    }
-//    
-//    @Test
-//    public void bugRemoveAt2() {
-//        list.addAll(getIntegerList(10));
-//        final int[] indices = { 7, 7, 4, 1, 2, 1, 3, 1, 1, 0 };
-//        
-//        for (int i = 0; i < indices.length; i++) {
-//            final int index = indices[i];
-//            list.checkInvariant();
-//            list.remove(index);
-//            list.checkInvariant();
-//        }
-//    }
-//    
-//    @Test
-//    public void bugRemoveAt() {
-//        list.addAll(getIntegerList(10));
-//        
-//        list.checkInvariant();
-//        assertEquals(Integer.valueOf(5), list.remove(5));
-//        
-//        list.checkInvariant();
-//        assertEquals(Integer.valueOf(3), list.remove(3));
-//        
-//        list.checkInvariant();
-//        assertEquals(Integer.valueOf(2), list.remove(2));
-//        
-//        list.checkInvariant();
-//        assertEquals(Integer.valueOf(1), list.remove(1));
-//        
-//        list.checkInvariant();
-//        // list = [0, 4, 5, 7, 8, 8]
-//        assertEquals(Integer.valueOf(8), list.remove(4));
-//        
-//        list.checkInvariant();
-//    }
-//    
-//    @Test
-//    public void bugRemoveFirst() {
-//        list.addAll(getIntegerList(5));
-//        
-//        assertEquals(5, list.size());
-//        
-//        for (int i = 0; i < 2; i++) {
-//            list.removeFirst();
-//        }
-//        
-//        Random random = new Random(500L);
-//        List<Integer> referenceList = new ArrayList<>(list);
-//        
-//        while (!list.isEmpty()) {
-//            int index = random.nextInt(list.size());
-//            list.remove(index);
-//            referenceList.remove(index);
-//            assertTrue(listsEqual(list, referenceList));
-//        }
-//    }
-//    
+    @Test
+    public void bruteForceRemoveAt2() {
+        long seed = 1630487847317L;
+        Random random = new Random(seed);
+        
+        for (int i = 0; i < 100; i++) {
+            list.addAll(getIntegerList(10));
+            List<Integer> indices = new ArrayList<>(list.size());
+            
+            while (!list.isEmpty()) {
+                int index = random.nextInt(list.size());
+                indices.add(index);
+                
+                try {
+                    list.remove(index);
+                } catch (AssertionError ae) {
+                    System.out.println(
+                            "Message: " + ae.getMessage() + ", indices: " + 
+                                    indices.toString());
+                    return;
+                }
+            }
+            
+            indices.clear();
+        }
+    }
+    
+    @Test
+    public void bugRemoveAt2() {
+        list.addAll(getIntegerList(10));
+        final int[] indices = { 7, 7, 4, 1, 2, 1, 3, 1, 1, 0 };
+        
+        for (int i = 0; i < indices.length; i++) {
+            final int index = indices[i];
+            list.checkInvariant();
+            list.remove(index);
+            list.checkInvariant();
+        }
+    }
+    
+    @Test
+    public void bugRemoveAt() {
+        list.addAll(getIntegerList(10));
+        
+        list.checkInvariant();
+        assertEquals(Integer.valueOf(5), list.remove(5));
+        
+        list.checkInvariant();
+        assertEquals(Integer.valueOf(3), list.remove(3));
+        
+        list.checkInvariant();
+        assertEquals(Integer.valueOf(2), list.remove(2));
+        
+        list.checkInvariant();
+        assertEquals(Integer.valueOf(1), list.remove(1));
+        
+        list.checkInvariant();
+        // list = [0, 4, 5, 7, 8, 8]
+        assertEquals(Integer.valueOf(8), list.remove(4));
+        
+        list.checkInvariant();
+    }
+    
+    @Test
+    public void bugRemoveFirst() {
+        list.addAll(getIntegerList(5));
+        
+        assertEquals(5, list.size());
+        
+        for (int i = 0; i < 2; i++) {
+            list.removeFirst();
+        }
+        
+        Random random = new Random(500L);
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        while (!list.isEmpty()) {
+            int index = random.nextInt(list.size());
+            list.remove(index);
+            referenceList.remove(index);
+            assertTrue(listsEqual(list, referenceList));
+        }
+    }
+    
 //    @Test
 //    public void bugRemoveLast() {
 //        list.addAll(getIntegerList(10));

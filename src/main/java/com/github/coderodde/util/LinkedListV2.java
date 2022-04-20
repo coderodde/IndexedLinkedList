@@ -234,6 +234,25 @@ public class LinkedListV2<E>
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
             }
         }
+        
+        private void adjustOnRemoveFirst() {
+            int lastPrefixIndex = Integer.MAX_VALUE;
+            
+            for (int i = 0; i < size; ++i) {
+                Finger<E> finger = fingerArray[i];
+                
+                if (finger.index != i) {
+                    lastPrefixIndex = i;
+                    break;
+                } else {
+                    finger.node = finger.node.next;
+                }
+            }
+            
+            for (int i = lastPrefixIndex; i <= size; ++i) {
+                fingerArray[i].index--;
+            }
+        }
     }
      
     int size;
@@ -738,7 +757,7 @@ public class LinkedListV2<E>
             removeFinger();
         }
         
-        shiftIndicesToLeftOnce(1);
+        fingerList.adjustOnRemoveFirst();
         return returnValue;
     }
     
