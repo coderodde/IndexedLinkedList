@@ -842,7 +842,7 @@ public class LinkedListV2<E>
     /***************************************************************************
     This class implements a basic iterator over this list.
     ***************************************************************************/
-    final class BasicIterator implements Iterator<E> {
+    public final class BasicIterator implements Iterator<E> {
 
         private Node<E> lastReturned;
         private Node<E> next = first;

@@ -3,6 +3,7 @@ package com.github.coderodde.util;
 import com.github.coderodde.util.LinkedList.BasicIterator;
 import com.github.coderodde.util.LinkedList.EnhancedIterator;
 import com.github.coderodde.util.LinkedList.FingerStack;
+import com.github.coderodde.util.LinkedListV2.FingerList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -500,189 +501,120 @@ public class LinkedListV2Test {
         }
     }
 
-//    @Test(expected = IndexOutOfBoundsException.class)
-//    public void checkPositionIndexThrowsOnNegativeIndex() {
-//        list.add(-1, Integer.valueOf(0));
-//    }
-//    
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void checkPositionIndxThrowsOnTooLargeIndex() {
-//        list.add(Integer.valueOf(0));
-//        
-//        list.add(2, Integer.valueOf(1));
-//    }
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkPositionIndexThrowsOnNegativeIndex() {
+        list.add(-1, Integer.valueOf(0));
+    }
     
-//    @Test(expected = NoSuchElementException.class)
-//    public void removeLastThrowsOnEmptyList() {
-//        list.removeLast();
-//    }
-//    
-//    @Test(expected = NoSuchElementException.class)
-//    public void getFirstThrowsOnEmptyList() {
-//        list.getFirst();
-//    }
-//    
-//    @Test
-//    public void getFirst() {
-//        list.addAll(Arrays.asList(10, 20));
-//        assertEquals(Integer.valueOf(10), list.getFirst());
-//        
-//        list.removeFirst();
-//        
-//        assertEquals(Integer.valueOf(20), list.getFirst());
-//    }
-//    
-//    @Test(expected = IllegalStateException.class)
-//    public void moveFingerOutOfRemovalLocation() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        list.fingerStack.fingerArray[0] = new Finger<>(list.node(0), 0);
-//        list.fingerStack.fingerArray[1] = new Finger<>(list.node(1), 1);
-//        list.fingerStack.fingerArray[2] = new Finger<>(list.node(2), 2);
-//        
-//        list.fingerStack.fingerIndexSet.add(0);
-//        list.fingerStack.fingerIndexSet.add(1);
-//        list.fingerStack.fingerIndexSet.add(2);
-//        
-//        list.fingerStack.size = 3;
-//        list.moveFingerOutOfRemovalLocation(list.fingerStack.fingerArray[1]);
-//    }
-//    
-//    @Test
-//    public void nodeToString() {
-//        Node<String> node = new Node<>("hello");
-//        assertEquals("[Node; item = hello]", node.toString());
-//    }
-//    
-//    @Test
-//    public void fingerToString() {
-//        Node<String> node = new Node<>("World");
-//        Finger<String> finger = new Finger<>(node, 1);
-//        assertEquals("[Finger; index = 1, item = World]", finger.toString());
-//    }
-//    
-//    @Test
-//    public void fingerStackToString() {
-//        FingerStack<String> fingerStack = new FingerStack<>();
-//        
-//        Node<String> node1 = new Node<>(null);
-//        Node<String> node2 = new Node<>(null);
-//        Node<String> node3 = new Node<>(null);
-//        
-//        Finger<String> finger1 = new Finger<>(node1, 1);
-//        Finger<String> finger2 = new Finger<>(node2, 2);
-//        Finger<String> finger3 = new Finger<>(node3, 2);
-//        
-//        fingerStack.push(finger1);
-//        fingerStack.push(finger2);
-//        
-//        assertEquals("size = 2", fingerStack.toString());
-//        
-//        fingerStack.push(finger3);
-//        
-//        assertEquals("size = 3", fingerStack.toString());
-//    }
-//    
-//    @Test
-//    public void contractFingerStack() {
-//        FingerStack<Integer> fingerStack = new FingerStack<>();
-//        
-//        for (int i = 0; i < 100; i++) {
-//            Node<Integer> node = new Node<>(i);
-//            Finger<Integer> finger = new Finger<>(node, i);
-//            fingerStack.push(finger);
-//        }
-//        
-//        while (fingerStack.size() > 0) {
-//            fingerStack.pop();
-//        }
-//        
-//        assertEquals(FingerStack.INITIAL_CAPACITY, 
-//                     fingerStack.fingerArray.length);
-//    }   
-//    
-//    @Test(expected = NoSuchElementException.class)
-//    public void basicIteratorNextThrowsOnNoNext() {
-//        list.add(1);
-//        
-//        Iterator<Integer> iter = list.iterator();
-//        
-//        try {
-//            iter.next();
-//        } catch (Exception ex) {
-//            fail("Should not get here.");
-//        }
-//        
-//        iter.next();
-//    }
-//    
-//    @Test(expected = IllegalStateException.class)
-//    public void basicIteratorThrowsOnDoubleRemove() {
-//        list.add(1);
-//        
-//        Iterator<Integer> iter = list.iterator();
-//        
-//        try {
-//            iter.next();
-//            iter.remove();
-//        } catch (Exception ex) {
-//            fail("Should not get here.");
-//        }
-//        
-//        iter.remove();
-//    }
-//    
-//    @Test
-//    public void basicIteratorRemove1() {
-//        list.add(1);
-//        list.add(2);
-//        
-//        Iterator<Integer> iter = list.iterator();
-//        
-//        iter.next();
-//        iter.remove();
-//        iter.next();
-//        iter.remove();
-//        
-//        assertEquals(0, list.size());
-//        assertFalse(iter.hasNext());
-//    }
-//    
-//    @Test
-//    public void basicIteratorRemove2() {
-//        list.add(1);
-//        list.add(2);
-//        list.add(3);
-//        
-//        Iterator<Integer> iter = list.iterator();
-//        
-//        iter.next();
-//        iter.remove();
-//        iter.next();
-//        iter.next();
-//    }
-//    
-//    @Test(expected = IllegalStateException.class) 
-//    public void enhancedIteratorThrowsOnSetAfterRemove() {
-//        list.addAll(Arrays.asList(1, 2, 3, 4));
-//        
-//        ListIterator<Integer> iter = list.listIterator(1);
-//        
-//        iter.next();
-//        iter.remove();
-//        iter.set(10);
-//    }
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void checkPositionIndxThrowsOnTooLargeIndex() {
+        list.add(Integer.valueOf(0));
+        
+        list.add(2, Integer.valueOf(1));
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void removeLastThrowsOnEmptyList() {
+        list.removeLast();
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void getFirstThrowsOnEmptyList() {
+        list.getFirst();
+    }
+    
+    @Test
+    public void getFirst() {
+        list.addAll(Arrays.asList(10, 20));
+        assertEquals(Integer.valueOf(10), list.getFirst());
+        
+        list.removeFirst();
+        
+        assertEquals(Integer.valueOf(20), list.getFirst());
+    }
+      
+    @Test(expected = NoSuchElementException.class)
+    public void basicIteratorNextThrowsOnNoNext() {
+        list.add(1);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        try {
+            iter.next();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.next();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void basicIteratorThrowsOnDoubleRemove() {
+        list.add(1);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        try {
+            iter.next();
+            iter.remove();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.remove();
+    }
+    
+    @Test
+    public void basicIteratorRemove1() {
+        list.add(1);
+        list.add(2);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        iter.next();
+        iter.remove();
+        iter.next();
+        iter.remove();
+        
+        assertEquals(0, list.size());
+        assertFalse(iter.hasNext());
+    }
+    
+    @Test
+    public void basicIteratorRemove2() {
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        
+        Iterator<Integer> iter = list.iterator();
+        
+        iter.next();
+        iter.remove();
+        iter.next();
+        iter.next();
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void enhancedIteratorThrowsOnSetAfterRemove() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        
+        ListIterator<Integer> iter = list.listIterator(1);
+        
+        iter.next();
+        iter.remove();
+        iter.set(10);
+    }
 //    
 //    @Test(expected = ConcurrentModificationException.class)
 //    public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
 //        list.addAll(getIntegerList(1_000_000));
 //        
-//        BasicIterator iter = (BasicIterator) list.iterator();
+//        BasicIterator iter =(BasicIterator) list.iterator();
 //        iter.expectedModCount = -1000;
 //        
 //        iter.forEachRemaining((e) -> {});
 //    }
-//    
+    
 //    @Test(expected = ConcurrentModificationException.class)
 //    public void 
 //        enhancedIteratorForEachRemainingThrowsOnConcurrentModification() {
@@ -694,52 +626,52 @@ public class LinkedListV2Test {
 //        
 //        iter.forEachRemaining((e) -> {});
 //    }
-//        
-//    @Test(expected = ConcurrentModificationException.class)
-//    public void spliteratorThrowsOnConcurrentModification() {
-//        list.addAll(getIntegerList(50_000));
-//        
-//        Spliterator<Integer> spliterator = list.spliterator();
-//        list.add(50_000);
-//        
-//        spliterator.tryAdvance((e) -> {});
-//    }
-//    
-//    @Test
-//    public void spliteratorTrySplitReturnsNullOnEmptyList() {
-//        Spliterator<Integer> spliterator = list.spliterator();
-//        
-//        assertNull(spliterator.trySplit());
-//    }
-//    
-//    @Test
-//    public void spliteratorTrySplitReturnsNullOnTooSmallList() {
-//        list.addAll(
-//                getIntegerList(
-//                        (int)
-//                        (LinkedList
-//                                .LinkedListSpliterator
-//                                .MINIMUM_BATCH_SIZE - 1L)));
-//        
-//        Spliterator<Integer> spliterator = list.spliterator();
-//        
-//        assertNull(spliterator.trySplit());
-//    }
-//    
-//    @Test
-//    public void spliteratorHasCharasteristics() {
-//        Spliterator<Integer> spliterator = list.spliterator();
-//        
-//        assertTrue(spliterator.hasCharacteristics(Spliterator.ORDERED));
-//        assertTrue(spliterator.hasCharacteristics(Spliterator.SIZED));
-//        assertTrue(spliterator.hasCharacteristics(Spliterator.SUBSIZED));
-//        
-//        assertFalse(spliterator.hasCharacteristics(Spliterator.CONCURRENT));
-//        assertFalse(spliterator.hasCharacteristics(Spliterator.DISTINCT));
-//        assertFalse(spliterator.hasCharacteristics(Spliterator.IMMUTABLE));
-//        assertFalse(spliterator.hasCharacteristics(Spliterator.NONNULL));
-//        assertFalse(spliterator.hasCharacteristics(Spliterator.SORTED));
-//    }
+        
+    @Test(expected = ConcurrentModificationException.class)
+    public void spliteratorThrowsOnConcurrentModification() {
+        list.addAll(getIntegerList(50_000));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        list.add(50_000);
+        
+        spliterator.tryAdvance((e) -> {});
+    }
+    
+    @Test
+    public void spliteratorTrySplitReturnsNullOnEmptyList() {
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertNull(spliterator.trySplit());
+    }
+    
+    @Test
+    public void spliteratorTrySplitReturnsNullOnTooSmallList() {
+        list.addAll(
+                getIntegerList(
+                        (int)
+                        (LinkedList
+                                .LinkedListSpliterator
+                                .MINIMUM_BATCH_SIZE - 1L)));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertNull(spliterator.trySplit());
+    }
+    
+    @Test
+    public void spliteratorHasCharasteristics() {
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        assertTrue(spliterator.hasCharacteristics(Spliterator.ORDERED));
+        assertTrue(spliterator.hasCharacteristics(Spliterator.SIZED));
+        assertTrue(spliterator.hasCharacteristics(Spliterator.SUBSIZED));
+        
+        assertFalse(spliterator.hasCharacteristics(Spliterator.CONCURRENT));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.DISTINCT));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.IMMUTABLE));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.NONNULL));
+        assertFalse(spliterator.hasCharacteristics(Spliterator.SORTED));
+    }
     
     @Test
     public void enhancedListIteratorForEachRemaining() {
@@ -757,44 +689,44 @@ public class LinkedListV2Test {
         storageList.equals(Arrays.asList(2, 3, 4));
     }
     
-//    @Test(expected = NullPointerException.class)
-//    public void 
-//        spliteratorTryAdvanceThrowsNullPointerExceptionOnNullConsumer() {
-//        list.spliterator().tryAdvance(null);
-//    }
-//    
-//    @Test(expected = NullPointerException.class)
-//    public void 
-//        spliteratorForEachRemainingThrowsNullPointerExceptionOnNullConsumer() {
-//        list.spliterator().forEachRemaining(null);
-//    }
-//        
-//    @Test(expected = ConcurrentModificationException.class)
-//    public void 
-//    spliteratorThrowsConcurrentModificationExceptionOnConcurrentModification() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        
-//        Spliterator<Integer> spliterator = list.spliterator();
-//        
-//        list.add(4);
-//        spliterator.forEachRemaining((e) -> {});
-//        list.forEach((e) -> {});
-//    }
-//    
-//    @Test(expected = NoSuchElementException.class) 
-//    public void enhancedIteratorNextThrowsOnNoNext() {
-//        list.addAll(getIntegerList(20));
-//        
-//        ListIterator<Integer> iter = list.listIterator(19);
-//        
-//        try {
-//            iter.next();
-//        } catch (Exception ex) {
-//            fail("Should not get here.");
-//        }
-//        
-//        iter.next();
-//    }
+    @Test(expected = NullPointerException.class)
+    public void 
+        spliteratorTryAdvanceThrowsNullPointerExceptionOnNullConsumer() {
+        list.spliterator().tryAdvance(null);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void 
+        spliteratorForEachRemainingThrowsNullPointerExceptionOnNullConsumer() {
+        list.spliterator().forEachRemaining(null);
+    }
+        
+    @Test(expected = ConcurrentModificationException.class)
+    public void 
+    spliteratorThrowsConcurrentModificationExceptionOnConcurrentModification() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        
+        Spliterator<Integer> spliterator = list.spliterator();
+        
+        list.add(4);
+        spliterator.forEachRemaining((e) -> {});
+        list.forEach((e) -> {});
+    }
+    
+    @Test(expected = NoSuchElementException.class) 
+    public void enhancedIteratorNextThrowsOnNoNext() {
+        list.addAll(getIntegerList(20));
+        
+        ListIterator<Integer> iter = list.listIterator(19);
+        
+        try {
+            iter.next();
+        } catch (Exception ex) {
+            fail("Should not get here.");
+        }
+        
+        iter.next();
+    }
     
     @Test(expected = NoSuchElementException.class) 
     public void enhancedIteratorPrevioiusThrowsOnNoPrevious() {
