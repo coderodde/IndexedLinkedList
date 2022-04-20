@@ -947,89 +947,89 @@ public class LinkedListV2Test {
         // []
     }
 
-//    @Test // shadowed
-//    public void basicIteratorUsage() {
-//        for (int i = 0; i < 1000; i++) {
-//            list.add(i);
-//        }
-//
-//        Iterator<Integer> iterator = list.iterator();
-//
-//        for (int i = 0; i < 1000; i++) {
-//            assertTrue(iterator.hasNext());
-//            assertEquals(Integer.valueOf(i), iterator.next());
-//        }
-//
-//        assertFalse(iterator.hasNext());
-//    }
-//    
-//    @Test
-//    public void removeFirstLast() {
-//        list.addAll(getIntegerList(5));
-//        
-//        List<Integer> referenceList = new ArrayList<>(list);
-//        
-//        list.removeFirst();
-//        referenceList.remove(0);
-//        
-//        assertTrue(listsEqual(list, referenceList));
-//        
-//        list.removeFirst();
-//        referenceList.remove(0);
-//        
-//        assertTrue(listsEqual(list, referenceList));
-//        
-//        list.removeLast();
-//        referenceList.remove(referenceList.size() - 1);
-//        
-//        assertTrue(listsEqual(list, referenceList));
-//        
-//        list.removeLast();
-//        referenceList.remove(referenceList.size() - 1);
-//        
-//        assertTrue(listsEqual(list, referenceList));
-//    }
-//    
-//    @Test
-//    public void removeFirstLastOccurrence() {
-//        com.github.coderodde.util.LinkedList<Integer> l =
-//                new LinkedList<>();
-//        
-//        list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
-//        l.addAll(list);
-//        
-//        list.removeFirstOccurrence(2);
-//        l.removeFirstOccurrence(2);
-//        
-//        assertTrue(listsEqual(list, l));
-//        
-//        list.removeLastOccurrence(3);
-//        l.removeLastOccurrence(3);
-//        
-//        assertTrue(listsEqual(list, l));
-//    }
-//
-//    @Test // checked!
-//    public void bruteForceAddCollectionAtIndex() {
-//        Random random = new Random(100L);
-//
-//        list.addAll(getIntegerList());
-//
-//        java.util.LinkedList<Integer> referenceList = 
-//                new java.util.LinkedList<>(list);
-//
-//        for (int op = 0; op < 100; op++) {
-//            int index = random.nextInt(list.size());
-//            Collection<Integer> coll = getIntegerList(random.nextInt(40));
-//
-//            referenceList.addAll(index, coll);
-//            list.addAll(index, coll);
-//
-//            if (!listsEqual(list, referenceList)) {
-//                fail("Lists not equal!");
-//            }
-//        }
-//    }
+    @Test // shadowed
+    public void basicIteratorUsage() {
+        for (int i = 0; i < 1000; i++) {
+            list.add(i);
+        }
+
+        Iterator<Integer> iterator = list.iterator();
+
+        for (int i = 0; i < 1000; i++) {
+            assertTrue(iterator.hasNext());
+            assertEquals(Integer.valueOf(i), iterator.next());
+        }
+
+        assertFalse(iterator.hasNext());
+    }
+    
+    @Test
+    public void removeFirstLast() {
+        list.addAll(getIntegerList(5));
+        
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        list.removeFirst();
+        referenceList.remove(0);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeFirst();
+        referenceList.remove(0);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeLast();
+        referenceList.remove(referenceList.size() - 1);
+        
+        assertTrue(listsEqual(list, referenceList));
+        
+        list.removeLast();
+        referenceList.remove(referenceList.size() - 1);
+        
+        assertTrue(listsEqual(list, referenceList));
+    }
+    
+    @Test
+    public void removeFirstLastOccurrence() {
+        com.github.coderodde.util.LinkedList<Integer> l =
+                new LinkedList<>();
+        
+        list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
+        l.addAll(list);
+        
+        list.removeFirstOccurrence(2);
+        l.removeFirstOccurrence(2);
+        
+        assertTrue(listsEqual(list, l));
+        
+        list.removeLastOccurrence(3);
+        l.removeLastOccurrence(3);
+        
+        assertTrue(listsEqual(list, l));
+    }
+
+    @Test 
+    public void bruteForceAddCollectionAtIndex() {
+        Random random = new Random(100L);
+
+        list.addAll(getIntegerList());
+
+        java.util.LinkedList<Integer> referenceList = 
+                new java.util.LinkedList<>(list);
+
+        for (int op = 0; op < 100; op++) {
+            int index = random.nextInt(list.size());
+            Collection<Integer> coll = getIntegerList(random.nextInt(40));
+
+            referenceList.addAll(index, coll);
+            list.addAll(index, coll);
+
+            if (!listsEqual(list, referenceList)) {
+                fail("Lists not equal!");
+            }
+        }
+    }
 
     @Test
     public void removeAtIndex() {
@@ -1054,106 +1054,106 @@ public class LinkedListV2Test {
         // []
     }
 
-//    @Test // checked
-//    public void removeObject() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//
-//        assertFalse(list.remove(Integer.valueOf(10)));
-//        assertFalse(list.remove(null));
-//
-//        list.add(3, null);
-//
-//        assertTrue(list.remove(null));
-//
-//        assertTrue(list.remove(Integer.valueOf(4)));
-//        assertTrue(list.remove(Integer.valueOf(0)));
-//        assertTrue(list.remove(Integer.valueOf(2)));
-//        assertFalse(list.remove(Integer.valueOf(2)));
-//    }
-//
-//    @Test // checked
-//    public void basicIteratorTraversal() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//
-//        Iterator<Integer> iter = list.iterator();
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            assertTrue(iter.hasNext());
-//            assertEquals(Integer.valueOf(i), iter.next());
-//        }
-//
-//        iter = list.iterator();
-//
-//        class MyConsumer implements Consumer<Integer> {
-//
-//            int total;
-//
-//            @Override
-//            public void accept(Integer t) {
-//                total += t;
-//            }
-//        }
-//
-//        MyConsumer myConsumer = new MyConsumer();
-//
-//        list.iterator().forEachRemaining(myConsumer);
-//        assertEquals(10, myConsumer.total);
-//    }
-//
-//    @Test // checked
-//    public void basicIteratorRemoval() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//        Iterator<Integer> iter = list.iterator();
-//
-//        iter.next();
-//        iter.next();
-//        iter.remove();
-//
-//        assertEquals(4, list.size());
-//
-//        iter = list.iterator();
-//        iter.next();
-//        iter.remove();
-//
-//        assertEquals(3, list.size());
-//
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(3), list.get(1));
-//        assertEquals(Integer.valueOf(4), list.get(2));
-//    }
-//
-//    @Test // checked
-//    public void enhancedIteratorTraversal() {
-//        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-//        ListIterator<Integer> iter = list.listIterator();
-//
-//        assertFalse(iter.hasPrevious());
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            assertTrue(iter.hasNext());
-//            assertEquals(Integer.valueOf(i), iter.next());
-//        }
-//
-//        assertFalse(iter.hasNext());
-//
-//        for (int i = 4; i >= 0; i--) {
-//            assertTrue(iter.hasPrevious());
-//            assertEquals(Integer.valueOf(i), iter.previous());
-//        }
-//
-//        iter = list.listIterator(2);
-//
-//        assertEquals(Integer.valueOf(2), iter.next());
-//        assertEquals(Integer.valueOf(2), iter.previous());
-//
-//        iter = list.listIterator(3);
-//
-//        assertEquals(Integer.valueOf(3), iter.next());
-//        assertEquals(Integer.valueOf(4), iter.next());
-//
-//        assertFalse(iter.hasNext());
-//        assertTrue(iter.hasPrevious());
-//    }
+    @Test
+    public void removeObject() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+
+        assertFalse(list.remove(Integer.valueOf(10)));
+        assertFalse(list.remove(null));
+
+        list.add(3, null);
+
+        assertTrue(list.remove(null));
+
+        assertTrue(list.remove(Integer.valueOf(4)));
+        assertTrue(list.remove(Integer.valueOf(0)));
+        assertTrue(list.remove(Integer.valueOf(2)));
+        assertFalse(list.remove(Integer.valueOf(2)));
+    }
+
+    @Test
+    public void basicIteratorTraversal() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+
+        Iterator<Integer> iter = list.iterator();
+
+        for (int i = 0; i < list.size(); i++) {
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+
+        iter = list.iterator();
+
+        class MyConsumer implements Consumer<Integer> {
+
+            int total;
+
+            @Override
+            public void accept(Integer t) {
+                total += t;
+            }
+        }
+
+        MyConsumer myConsumer = new MyConsumer();
+
+        list.iterator().forEachRemaining(myConsumer);
+        assertEquals(10, myConsumer.total);
+    }
+
+    @Test
+    public void basicIteratorRemoval() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        Iterator<Integer> iter = list.iterator();
+
+        iter.next();
+        iter.next();
+        iter.remove();
+
+        assertEquals(4, list.size());
+
+        iter = list.iterator();
+        iter.next();
+        iter.remove();
+
+        assertEquals(3, list.size());
+
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(3), list.get(1));
+        assertEquals(Integer.valueOf(4), list.get(2));
+    }
+
+    @Test
+    public void enhancedIteratorTraversal() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        ListIterator<Integer> iter = list.listIterator();
+
+        assertFalse(iter.hasPrevious());
+
+        for (int i = 0; i < list.size(); i++) {
+            assertTrue(iter.hasNext());
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+
+        assertFalse(iter.hasNext());
+
+        for (int i = 4; i >= 0; i--) {
+            assertTrue(iter.hasPrevious());
+            assertEquals(Integer.valueOf(i), iter.previous());
+        }
+
+        iter = list.listIterator(2);
+
+        assertEquals(Integer.valueOf(2), iter.next());
+        assertEquals(Integer.valueOf(2), iter.previous());
+
+        iter = list.listIterator(3);
+
+        assertEquals(Integer.valueOf(3), iter.next());
+        assertEquals(Integer.valueOf(4), iter.next());
+
+        assertFalse(iter.hasNext());
+        assertTrue(iter.hasPrevious());
+    }
     
     @Test
     public void removeAt() {
@@ -1252,30 +1252,30 @@ public class LinkedListV2Test {
         assertEquals(referenceList, list);
     }
 
-//    @Test
-//    public void enhancedIteratorAddition() {
-//        list.addAll(Arrays.asList(1, 2, 3));
-//        ListIterator<Integer> iter = list.listIterator();
-//
-//        iter.add(0);
-//
-//        while (iter.hasNext()) {
-//            iter.next();
-//        }
-//
-//        iter.add(4);
-//        iter = list.listIterator();
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            assertEquals(Integer.valueOf(i), iter.next());
-//        }
-//
-//        iter = list.listIterator(2);
-//        iter.add(10);
-//
-//        assertEquals(Integer.valueOf(10), list.get(2));
-//    }
-//
+    @Test
+    public void enhancedIteratorAddition() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        ListIterator<Integer> iter = list.listIterator();
+
+        iter.add(0);
+
+        while (iter.hasNext()) {
+            iter.next();
+        }
+
+        iter.add(4);
+        iter = list.listIterator();
+
+        for (int i = 0; i < list.size(); i++) {
+            assertEquals(Integer.valueOf(i), iter.next());
+        }
+
+        iter = list.listIterator(2);
+        iter.add(10);
+
+        assertEquals(Integer.valueOf(10), list.get(2));
+    }
+
 //    @Test
 //    public void findFailingIterator() {
 //        list.addAll(getIntegerList(3850));
@@ -1924,5 +1924,36 @@ public class LinkedListV2Test {
         }
 
         return list;
+    }   
+
+    private static List<Integer> getIntegerList() {
+        return getIntegerList(100);
     }
+    
+    private static boolean listsEqual(
+            com.github.coderodde.util.LinkedListV2<Integer> list1, 
+            java.util.List<Integer> list2) {
+
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+
+        Iterator<Integer> iter1 = list1.iterator();
+        Iterator<Integer> iter2 = list2.iterator();
+
+        while (iter1.hasNext() && iter2.hasNext()) {
+            Integer int1 = iter1.next();
+            Integer int2 = iter2.next();
+
+            if (!int1.equals(int2)) {
+                return false;
+            }
+        }
+
+        if (iter1.hasNext() || iter2.hasNext()) {
+            throw new IllegalStateException();
+        }
+
+        return true;
+    }   
 }
