@@ -82,7 +82,7 @@ public class LinkedListV2<E>
         void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
             shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
             size += roomSize;
-            enlargeFingerArrayIfNeeded();
+            enlargeFingerArrayIfNeeded(size);
             
             System.arraycopy(fingerArray, 
                              fingerIndex, 
@@ -120,11 +120,13 @@ public class LinkedListV2<E>
 
             return finger.node;
         }
+        
+        // TODO: node(int) returns a rewinded finger?
 
         // Appends the input finger to the tail of the finger list:
         void appendFinger(com.github.coderodde.util.Finger<E> finger) {
             size++;
-            enlargeFingerArrayIfNeeded();
+            enlargeFingerArrayIfNeeded(size);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
             fingerArray[size].index = LinkedListV2.this.size;
@@ -133,8 +135,7 @@ public class LinkedListV2<E>
         // Inserts the input finger into the finger list such that the entire
         // finger list is sorted by indices:
         void insertFingerAndShiftOnceToRight(Finger<E> finger) {
-            
-            enlargeFingerArrayIfNeeded();
+            enlargeFingerArrayIfNeeded(size + 1);
             int beforeFingerIndex = getFingerIndex(finger.index);
             System.arraycopy(
                     fingerArray, 
@@ -145,11 +146,10 @@ public class LinkedListV2<E>
             
             // Shift fingerArray[beforeFingerIndex ... size] one position to the
             // right (towards larger index values:
-            shiftFingerIndicesToRightOnce(beforeFingerIndex);
+            shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
 
             fingerArray[beforeFingerIndex] = finger;
-            fingerArray[size].index = LinkedListV2.this.size;
-            size++;
+            fingerArray[++size].index = LinkedListV2.this.size;
         }
         
         /***********************************************************************
@@ -207,7 +207,7 @@ public class LinkedListV2<E>
         }
 
         // Makes sure that the next finger fits in this finger stack:
-        private void enlargeFingerArrayIfNeeded() {
+        private void enlargeFingerArrayIfNeeded(int requestedSize) {
             // If the finger array is full, double the capacity:
             if (size + 1 > fingerArray.length) {
                 int nextCapacity = 2 * fingerArray.length;
@@ -1223,6 +1223,9 @@ public class LinkedListV2<E>
         if (mustAddFinger()) {
             fingerList.insertFingerAndShiftOnceToRight(
                     new Finger<>(newNode, index));
+        } else {
+            int fingerIndex = fingerList.getFingerIndex(index);
+            fingerList.shiftFingerIndicesToRightOnce(fingerIndex);
         }
     }
     

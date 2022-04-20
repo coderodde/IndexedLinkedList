@@ -759,133 +759,133 @@ public class LinkedListV2Test {
         iter.remove();
     }
     
-//    @Test(expected = NoSuchElementException.class)
-//    public void getLastThrowsOnEmptyList() {
-//        list.getLast();
-//    }
-//    
-//    @Test
-//    public void getLast() {
-//        list.addAll(Arrays.asList(10, 20));
-//        assertEquals(Integer.valueOf(20), list.getLast());
-//        
-//        list.removeLast();
-//        
-//        assertEquals(Integer.valueOf(10), list.getLast());
-//    }
-//    
-//    @Test
-//    public void indexOfNull() {
-//        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
-//        
-//        assertEquals(2, list.indexOf(null));
-//        
-//        list.set(2, 5);
-//        list.set(4, 10);
-//        
-//        assertEquals(-1, list.indexOf(null));
-//    }
-//    
-//    @Test
-//    public void lastIndexOfNull() {
-//        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
-//        
-//        assertEquals(4, list.lastIndexOf(null));
-//        
-//        list.set(2, 5);
-//        list.set(4, 10);
-//        
-//        assertEquals(-1, list.lastIndexOf(null));
-//    }
-//    
-//    @Test // checked!
-//    public void add() {
-//        assertTrue(list.isEmpty());
-//        assertEquals(0, list.size());
-//
-//        list.add(1);
-//
-//        assertEquals(1, list.size());
-//        assertFalse(list.isEmpty());
-//
-//        assertEquals(Integer.valueOf(1), list.get(0));
-//
-//        list.add(2);
-//
-//        assertEquals(2, list.size());
-//        assertFalse(list.isEmpty());
-//
-//        assertEquals(Integer.valueOf(1), list.get(0));
-//        assertEquals(Integer.valueOf(2), list.get(1));
-//    }
-//
-//    @Test // checked!
-//    public void addFirst() {
-//        assertTrue(list.isEmpty());
-//        assertEquals(0, list.size());
-//
-//        list.addFirst(1);
-//
-//        assertEquals(1, list.size());
-//        assertFalse(list.isEmpty());
-//
-//        assertEquals(Integer.valueOf(1), list.get(0));
-//
-//        list.addFirst(2);
-//
-//        assertEquals(2, list.size());
-//        assertFalse(list.isEmpty());
-//
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class)
-//    public void throwsOnAccessingEmptyList() {
-//        list.get(0);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnNegativeIndexInEmptyList() {
-//        list.get(-1);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnNegativeIndexInNonEmptyList() {
-//        list.addFirst(10);
-//        list.get(-1);
-//    }
-//
-//    @Test(expected = IndexOutOfBoundsException.class) 
-//    public void throwsOnTooLargeIndex() {
-//        list.addFirst(10);
-//        list.addLast(20);
-//        list.get(2);
-//    }
-//
-//    @Test // checked!
-//    public void addIndexAndElement() {
-//        list.add(0, 1);
-//        assertEquals(Integer.valueOf(1), list.get(0));
-//
-//        list.add(0, 2);
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
-//
-//        list.add(2, 10);
-//
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
-//        assertEquals(Integer.valueOf(10), list.get(2));
-//
-//        list.add(2, 100);
-//
-//        assertEquals(Integer.valueOf(2), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
-//        assertEquals(Integer.valueOf(100), list.get(2));
-//        assertEquals(Integer.valueOf(10), list.get(3));
-//    }
-//
+    @Test(expected = NoSuchElementException.class)
+    public void getLastThrowsOnEmptyList() {
+        list.getLast();
+    }
+    
+    @Test
+    public void getLast() {
+        list.addAll(Arrays.asList(10, 20));
+        assertEquals(Integer.valueOf(20), list.getLast());
+        
+        list.removeLast();
+        
+        assertEquals(Integer.valueOf(10), list.getLast());
+    }
+    
+    @Test
+    public void indexOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
+        
+        assertEquals(2, list.indexOf(null));
+        
+        list.set(2, 5);
+        list.set(4, 10);
+        
+        assertEquals(-1, list.indexOf(null));
+    }
+    
+    @Test
+    public void lastIndexOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 3, null, 4));
+        
+        assertEquals(4, list.lastIndexOf(null));
+        
+        list.set(2, 5);
+        list.set(4, 10);
+        
+        assertEquals(-1, list.lastIndexOf(null));
+    }
+    
+    @Test
+    public void add() {
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+
+        list.add(1);
+
+        assertEquals(1, list.size());
+        assertFalse(list.isEmpty());
+
+        assertEquals(Integer.valueOf(1), list.get(0));
+
+        list.add(2);
+
+        assertEquals(2, list.size());
+        assertFalse(list.isEmpty());
+
+        assertEquals(Integer.valueOf(1), list.get(0));
+        assertEquals(Integer.valueOf(2), list.get(1));
+    }
+
+    @Test
+    public void addFirst() {
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+
+        list.addFirst(1);
+
+        assertEquals(1, list.size());
+        assertFalse(list.isEmpty());
+
+        assertEquals(Integer.valueOf(1), list.get(0));
+
+        list.addFirst(2);
+
+        assertEquals(2, list.size());
+        assertFalse(list.isEmpty());
+
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void throwsOnAccessingEmptyList() {
+        list.get(0);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnNegativeIndexInEmptyList() {
+        list.get(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnNegativeIndexInNonEmptyList() {
+        list.addFirst(10);
+        list.get(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class) 
+    public void throwsOnTooLargeIndex() {
+        list.addFirst(10);
+        list.addLast(20);
+        list.get(2);
+    }
+
+    @Test
+    public void addIndexAndElement() {
+        list.add(0, 1);
+        assertEquals(Integer.valueOf(1), list.get(0));
+
+        list.add(0, 2);
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+
+        list.add(2, 10);
+
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(10), list.get(2));
+
+        list.add(2, 100);
+
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(100), list.get(2));
+        assertEquals(Integer.valueOf(10), list.get(3));
+    }
+
     @Test
     public void addCollectionOneElementToEmptyList() {
         List<Integer> c = new ArrayList<>();
