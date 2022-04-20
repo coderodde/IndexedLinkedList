@@ -399,17 +399,17 @@ public class LinkedListV2Test {
         assertFalse(list.removeFirstOccurrence(null));
     }
     
-//    @Test
-//    public void removeLastOccurrenceOfNull() {
-//        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
-//        
-//        assertTrue(list.removeLastOccurrence(null));
-//        
-//        // Remove the last null value:
-//        list.set(2, 10);
-//        
-//        assertFalse(list.removeLastOccurrence(null));
-//    }
+    @Test
+    public void removeLastOccurrenceOfNull() {
+        list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
+        
+        assertTrue(list.removeLastOccurrence(null));
+        
+        // Remove the last null value:
+        list.set(2, 10);
+        
+        assertFalse(list.removeLastOccurrence(null));
+    }
     
     @Test
     public void appendAll() {
@@ -442,64 +442,64 @@ public class LinkedListV2Test {
         list.remove(1);
     }
     
-//    @Test
-//    public void prependAll() {
-//        List<Integer> l = new ArrayList<>();
-//        
-//        for (int i = 0; i < 10_000; i++) {
-//            l.add(i);
-//        }
-//        
-//        list.addAll(l);
-//        
-//        l = new ArrayList<>();
-//        
-//        for (int i = 10_000; i < 20_000; i++) {
-//            l.add(i);
-//        }
-//        
-//        list.addAll(0, l);
-//        
-//        int index = 0;
-//        
-//        for (int i = 10_000; i < 20_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(index++));
-//        }
-//        
-//        for (int i = 0; i < 10_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(index++));
-//        }
-//    }
-//    
-//    @Test
-//    public void insertAll() {
-//        for (int i = 0; i < 20_000; i++) {
-//            list.add(i);
-//        }
-//        
-//        List<Integer> arrayList = new ArrayList<>(10_000);
-//        
-//        for (int i = 20_000; i < 30_000; i++) {
-//            arrayList.add(i);
-//        }
-//        
-//        list.addAll(10_000, arrayList);
-//        
-//        int index = 0;
-//        
-//        for (int i = 0; i < 10_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(index++));
-//        }
-//        
-//        for (int i = 20_000; i < 30_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(index++));
-//        }
-//        
-//        for (int i = 10_000; i < 20_000; i++) {
-//            assertEquals(Integer.valueOf(i), list.get(index++));    
-//        }
-//    }
-//
+    @Test
+    public void prependAll() {
+        List<Integer> l = new ArrayList<>();
+        
+        for (int i = 0; i < 10_000; i++) {
+            l.add(i);
+        }
+        
+        list.addAll(l);
+        
+        l = new ArrayList<>();
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            l.add(i);
+        }
+        
+        list.addAll(0, l);
+        
+        int index = 0;
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+    }
+    
+    @Test
+    public void insertAll() {
+        for (int i = 0; i < 20_000; i++) {
+            list.add(i);
+        }
+        
+        List<Integer> arrayList = new ArrayList<>(10_000);
+        
+        for (int i = 20_000; i < 30_000; i++) {
+            arrayList.add(i);
+        }
+        
+        list.addAll(10_000, arrayList);
+        
+        int index = 0;
+        
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 20_000; i < 30_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));
+        }
+        
+        for (int i = 10_000; i < 20_000; i++) {
+            assertEquals(Integer.valueOf(i), list.get(index++));    
+        }
+    }
+
 //    @Test(expected = IndexOutOfBoundsException.class)
 //    public void checkPositionIndexThrowsOnNegativeIndex() {
 //        list.add(-1, Integer.valueOf(0));
@@ -511,7 +511,7 @@ public class LinkedListV2Test {
 //        
 //        list.add(2, Integer.valueOf(1));
 //    }
-//    
+    
 //    @Test(expected = NoSuchElementException.class)
 //    public void removeLastThrowsOnEmptyList() {
 //        list.removeLast();

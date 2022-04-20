@@ -123,11 +123,11 @@ public class LinkedListV2<E>
 
         // Appends the input finger to the tail of the finger list:
         void appendFinger(com.github.coderodde.util.Finger<E> finger) {
-            enlargeFingerArrayIfNeeded();
-            fingerArray[size + 1] = fingerArray[size];
-            fingerArray[size] = finger;
-            fingerArray[size + 1].index = LinkedListV2.this.size;
             size++;
+            enlargeFingerArrayIfNeeded();
+            fingerArray[size] = fingerArray[size - 1];
+            fingerArray[size - 1] = finger;
+            fingerArray[size].index = LinkedListV2.this.size;
         }
 
         // Inserts the input finger into the finger list such that the entire
@@ -1270,6 +1270,8 @@ public class LinkedListV2<E>
         
         if (mustAddFinger()) {
             appendFinger(newNode, size - 1);
+        } else {
+            fingerList.get(fingerList.size()).index++;
         }
     }
     
