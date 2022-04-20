@@ -1332,278 +1332,278 @@ public class LinkedListV2Test {
         }
     }
 
-//    @Test
-//    public void findFailingRemoveObject() {
-//        java.util.LinkedList<Integer> referenceList = 
-//                new java.util.LinkedList<>();
-//
-//        list.addAll(getIntegerList(10));
-//        referenceList.addAll(list);
-//
-//        Integer probe = list.get(1);
-//
-//        list.remove(probe);
-//        referenceList.remove(probe);
-//
-//        Iterator<Integer> iterator1 = list.iterator();
-//        Iterator<Integer> iterator2 = referenceList.iterator();
-//
-//        Random random = new Random(100L);
-//
-//        while (!list.isEmpty()) {
-//            if (!iterator1.hasNext()) {
-//
-//                if (iterator2.hasNext()) {
-//                    throw new IllegalStateException();
-//                }
-//
-//                iterator1 = list.iterator();
-//                iterator2 = referenceList.iterator();
-//                continue;
-//            }
-//
-//            iterator1.next();
-//            iterator2.next();
-//
-//            if (random.nextBoolean()) {
-//                iterator1.remove();
-//                iterator2.remove();
-//                assertTrue(listsEqual(list, referenceList));
-//            }
-//        }
-//
-//        assertTrue(listsEqual(list, referenceList));
-//    }
-//
-//    @Test
-//    public void iteratorAdd() {
-//        list.addAll(getIntegerList(4));
-//
-//        ListIterator<Integer> iterator = list.listIterator(1);
-//
-//        assertEquals(1, iterator.nextIndex());
-//        assertEquals(0, iterator.previousIndex());
-//
-//        iterator.next();
-//
-//        assertEquals(2, iterator.nextIndex());
-//        assertEquals(1, iterator.previousIndex());
-//
-//        iterator.add(Integer.valueOf(100));
-//
-//        assertEquals(Integer.valueOf(0), list.get(0));
-//        assertEquals(Integer.valueOf(1), list.get(1));
-//        assertEquals(Integer.valueOf(100), list.get(2));
-//        assertEquals(Integer.valueOf(2), list.get(3));
-//        assertEquals(Integer.valueOf(3), list.get(4));
-//    }
-//
-//    @Test
-//    public void bruteForceIteratorTest() {
-//        list.addAll(getIntegerList(100));
-//        List<Integer> referenceList = new java.util.LinkedList<>(list);
-//
-//        ListIterator<Integer> iterator1 = list.listIterator(2);
-//        ListIterator<Integer> iterator2 = referenceList.listIterator(2);
-//        Random random = new Random(300L);
-//
-//        while (iterator1.hasNext()) {
-//            if (!iterator2.hasNext()) {
-//                fail("Iterator mismatch on hasNext().");
-//            }
-//
-//            iterator1.next();
-//            iterator2.next();
-//
-//            int choice = random.nextInt(10);
-//
-//            if (choice < 2) {
-//                Integer integer = Integer.valueOf(random.nextInt(100));
-//                iterator1.add(integer);
-//                iterator2.add(integer);
-//                assertTrue(listsEqual(list, referenceList));
-//            } else if (choice == 2) {
-//                iterator1.remove();
-//                iterator2.remove();
-//                assertTrue(listsEqual(list, referenceList));
-//            } else if (choice < 6) {
-//                if (iterator1.hasPrevious()) {
-//                    iterator1.previous();
-//                }
-//
-//                if (iterator2.hasPrevious()) {
-//                    iterator2.previous();
-//                }
-//            } else {
-//                if (iterator1.hasNext()) {
-//                    iterator1.next();
-//                }
-//
-//                if (iterator2.hasNext()) {
-//                    iterator2.next();
-//                }
-//            }
-//        }
-//
-//        if (iterator2.hasNext()) {
-//            fail("Java List iterator has more to offer.");
-//        }
-//    }
-//
-//    @Test
-//    public void indexOf() {
-//        list.add(1);
-//        list.add(2);
-//        list.add(3);
-//
-//        list.add(3);
-//        list.add(2);
-//        list.add(1);
-//
-//        assertEquals(0, list.indexOf(1));
-//        assertEquals(1, list.indexOf(2));
-//        assertEquals(2, list.indexOf(3));
-//
-//        assertEquals(3, list.lastIndexOf(3));
-//        assertEquals(4, list.lastIndexOf(2));
-//        assertEquals(5, list.lastIndexOf(1));
-//    }
-//
-//    class MyIntegerConsumer implements Consumer<Integer> {
-//
-//        List<Integer> ints = new ArrayList<>();
-//
-//        @Override
-//        public void accept(Integer t) {
-//            ints.add(t);
-//        }
-//    }
-//
-//    @Test
-//    @SuppressWarnings("empty-statement")
-//    public void basicSpliteratorUsage() {
-//        list.addAll(getIntegerList(10_000));
-//
-//        Spliterator<Integer> spliterator1 = list.spliterator();
-//        Spliterator<Integer> spliterator2 = spliterator1.trySplit();
-//
-//        //// spliterator 2 : spliterator 1
-//
-//        assertEquals(5000, spliterator1.getExactSizeIfKnown());
-//        assertEquals(5000, spliterator2.getExactSizeIfKnown());
-//
-//
-//        assertTrue(spliterator2.tryAdvance(
-//                i -> assertEquals(list.get(0), Integer.valueOf(0))));
-//
-//        assertTrue(spliterator2.tryAdvance(
-//                i -> assertEquals(list.get(1), Integer.valueOf(1))));
-//
-//        assertTrue(spliterator2.tryAdvance(
-//                i -> assertEquals(list.get(2), Integer.valueOf(2))));
-//
-//
-//
-//        assertTrue(spliterator1.tryAdvance(
-//                i -> assertEquals(list.get(5000), Integer.valueOf(5000))));
-//
-//        assertTrue(spliterator1.tryAdvance(
-//                i -> assertEquals(list.get(5001), Integer.valueOf(5001))));
-//
-//        assertTrue(spliterator1.tryAdvance(
-//                i -> assertEquals(list.get(5002), Integer.valueOf(5002))));
-//
-//        //// spliterator 3 : spliterator 2 : splitereator 1
-//
-//        Spliterator<Integer> spliterator3 = spliterator2.trySplit();
-//
-//        assertEquals(4997, spliterator1.getExactSizeIfKnown());
-//
-//        assertTrue(spliterator3.tryAdvance(
-//                i -> assertEquals(list.get(3), Integer.valueOf(3))));
-//
-//        assertTrue(spliterator3.tryAdvance(
-//                i -> assertEquals(list.get(4), Integer.valueOf(4))));
-//
-//        assertTrue(spliterator3.tryAdvance(
-//                i -> assertEquals(list.get(5), Integer.valueOf(5))));
-//
-//        //// 
-//
-//        MyIntegerConsumer consumer = new MyIntegerConsumer();
-//
-//        while (spliterator1.tryAdvance(consumer));
-//
-//        for (int i = 0; i < consumer.ints.size(); i++) {
-//            Integer actualInteger = consumer.ints.get(i);
-//            Integer expectedInteger = 5003 + i;
-//            assertEquals(expectedInteger, actualInteger);
-//        }
-//    }
-//
-//    @Test // checked
-//    public void spliteratorForEachRemaining() {
-//        list.addAll(getIntegerList(10_000));
-//        Spliterator<Integer> split = list.spliterator();
-//        MyIntegerConsumer consumer = new MyIntegerConsumer();
-//
-//        split.forEachRemaining(consumer);
-//
-//        for (int i = 0; i < 10_000; i++) {
-//            assertEquals(Integer.valueOf(i), consumer.ints.get(i));
-//        }
-//    }
-//
-//    @Test // checked
-//    public void spliteratorForEachRemainingTwoSpliterators() {
-//        list.addAll(getIntegerList(10_000));
-//        Spliterator<Integer> splitRight = list.spliterator();
-//        Spliterator<Integer> splitLeft = splitRight.trySplit();
-//
-//        MyIntegerConsumer consumerRight = new MyIntegerConsumer();
-//        MyIntegerConsumer consumerLeft = new MyIntegerConsumer();
-//
-//        splitRight.forEachRemaining(consumerRight);
-//        splitLeft.forEachRemaining(consumerLeft);
-//
-//        for (int i = 0; i < 5_000; i++) {
-//            assertEquals(Integer.valueOf(i), consumerLeft.ints.get(i));
-//        }
-//
-//        for (int i = 5_000; i < 10_000; i++) {
-//            assertEquals(Integer.valueOf(i), consumerRight.ints.get(i - 5_000));
-//        }
-//    }
-//
-//    @Test // checked
-//    public void spliteratorForEachRemainingWithAdvance() {
-//        list.addAll(getIntegerList(10_000));
-//        Spliterator<Integer> rightSpliterator = list.spliterator();
-//
-//        assertTrue(
-//                rightSpliterator.tryAdvance(
-//                        i -> assertEquals(Integer.valueOf(0), i)));
-//
-//        Spliterator<Integer> leftSpliterator = rightSpliterator.trySplit();
-//
-//        assertEquals(4_999, rightSpliterator.getExactSizeIfKnown());
-//        assertEquals(5_000, leftSpliterator.getExactSizeIfKnown());
-//
-//        // Check two leftmost elements of the left spliterator:
-//        assertTrue(leftSpliterator.tryAdvance(
-//                i -> assertEquals(Integer.valueOf(1), i)));
-//
-//        assertTrue(leftSpliterator.tryAdvance(
-//                i -> assertEquals(Integer.valueOf(2), i)));
-//
-//        // Check two leftmost elements of the right splliterator:
-//        assertTrue(rightSpliterator.tryAdvance(
-//                i -> assertEquals(Integer.valueOf(5_000), i)));
-//
-//        assertTrue(rightSpliterator.tryAdvance(
-//                i -> assertEquals(Integer.valueOf(5_001), i)));
-//    }
-//
+    @Test
+    public void findFailingRemoveObject() {
+        java.util.LinkedList<Integer> referenceList = 
+                new java.util.LinkedList<>();
+
+        list.addAll(getIntegerList(10));
+        referenceList.addAll(list);
+
+        Integer probe = list.get(1);
+
+        list.remove(probe);
+        referenceList.remove(probe);
+
+        Iterator<Integer> iterator1 = list.iterator();
+        Iterator<Integer> iterator2 = referenceList.iterator();
+
+        Random random = new Random(100L);
+
+        while (!list.isEmpty()) {
+            if (!iterator1.hasNext()) {
+
+                if (iterator2.hasNext()) {
+                    throw new IllegalStateException();
+                }
+
+                iterator1 = list.iterator();
+                iterator2 = referenceList.iterator();
+                continue;
+            }
+
+            iterator1.next();
+            iterator2.next();
+
+            if (random.nextBoolean()) {
+                iterator1.remove();
+                iterator2.remove();
+                assertTrue(listsEqual(list, referenceList));
+            }
+        }
+
+        assertTrue(listsEqual(list, referenceList));
+    }
+
+    @Test
+    public void iteratorAdd() {
+        list.addAll(getIntegerList(4));
+
+        ListIterator<Integer> iterator = list.listIterator(1);
+
+        assertEquals(1, iterator.nextIndex());
+        assertEquals(0, iterator.previousIndex());
+
+        iterator.next();
+
+        assertEquals(2, iterator.nextIndex());
+        assertEquals(1, iterator.previousIndex());
+
+        iterator.add(Integer.valueOf(100));
+
+        assertEquals(Integer.valueOf(0), list.get(0));
+        assertEquals(Integer.valueOf(1), list.get(1));
+        assertEquals(Integer.valueOf(100), list.get(2));
+        assertEquals(Integer.valueOf(2), list.get(3));
+        assertEquals(Integer.valueOf(3), list.get(4));
+    }
+
+    @Test
+    public void bruteForceIteratorTest() {
+        list.addAll(getIntegerList(100));
+        List<Integer> referenceList = new java.util.LinkedList<>(list);
+
+        ListIterator<Integer> iterator1 = list.listIterator(2);
+        ListIterator<Integer> iterator2 = referenceList.listIterator(2);
+        Random random = new Random(300L);
+
+        while (iterator1.hasNext()) {
+            if (!iterator2.hasNext()) {
+                fail("Iterator mismatch on hasNext().");
+            }
+
+            iterator1.next();
+            iterator2.next();
+
+            int choice = random.nextInt(10);
+
+            if (choice < 2) {
+                Integer integer = Integer.valueOf(random.nextInt(100));
+                iterator1.add(integer);
+                iterator2.add(integer);
+                assertTrue(listsEqual(list, referenceList));
+            } else if (choice == 2) {
+                iterator1.remove();
+                iterator2.remove();
+                assertTrue(listsEqual(list, referenceList));
+            } else if (choice < 6) {
+                if (iterator1.hasPrevious()) {
+                    iterator1.previous();
+                }
+
+                if (iterator2.hasPrevious()) {
+                    iterator2.previous();
+                }
+            } else {
+                if (iterator1.hasNext()) {
+                    iterator1.next();
+                }
+
+                if (iterator2.hasNext()) {
+                    iterator2.next();
+                }
+            }
+        }
+
+        if (iterator2.hasNext()) {
+            fail("Java List iterator has more to offer.");
+        }
+    }
+
+    @Test
+    public void indexOf() {
+        list.add(1);
+        list.add(2);
+        list.add(3);
+
+        list.add(3);
+        list.add(2);
+        list.add(1);
+
+        assertEquals(0, list.indexOf(1));
+        assertEquals(1, list.indexOf(2));
+        assertEquals(2, list.indexOf(3));
+
+        assertEquals(3, list.lastIndexOf(3));
+        assertEquals(4, list.lastIndexOf(2));
+        assertEquals(5, list.lastIndexOf(1));
+    }
+
+    class MyIntegerConsumer implements Consumer<Integer> {
+
+        List<Integer> ints = new ArrayList<>();
+
+        @Override
+        public void accept(Integer t) {
+            ints.add(t);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("empty-statement")
+    public void basicSpliteratorUsage() {
+        list.addAll(getIntegerList(10_000));
+
+        Spliterator<Integer> spliterator1 = list.spliterator();
+        Spliterator<Integer> spliterator2 = spliterator1.trySplit();
+
+        //// spliterator 2 : spliterator 1
+
+        assertEquals(5000, spliterator1.getExactSizeIfKnown());
+        assertEquals(5000, spliterator2.getExactSizeIfKnown());
+
+
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(0), Integer.valueOf(0))));
+
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(1), Integer.valueOf(1))));
+
+        assertTrue(spliterator2.tryAdvance(
+                i -> assertEquals(list.get(2), Integer.valueOf(2))));
+
+
+
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5000), Integer.valueOf(5000))));
+
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5001), Integer.valueOf(5001))));
+
+        assertTrue(spliterator1.tryAdvance(
+                i -> assertEquals(list.get(5002), Integer.valueOf(5002))));
+
+        //// spliterator 3 : spliterator 2 : splitereator 1
+
+        Spliterator<Integer> spliterator3 = spliterator2.trySplit();
+
+        assertEquals(4997, spliterator1.getExactSizeIfKnown());
+
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(3), Integer.valueOf(3))));
+
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(4), Integer.valueOf(4))));
+
+        assertTrue(spliterator3.tryAdvance(
+                i -> assertEquals(list.get(5), Integer.valueOf(5))));
+
+        //// 
+
+        MyIntegerConsumer consumer = new MyIntegerConsumer();
+
+        while (spliterator1.tryAdvance(consumer));
+
+        for (int i = 0; i < consumer.ints.size(); i++) {
+            Integer actualInteger = consumer.ints.get(i);
+            Integer expectedInteger = 5003 + i;
+            assertEquals(expectedInteger, actualInteger);
+        }
+    }
+
+    @Test
+    public void spliteratorForEachRemaining() {
+        list.addAll(getIntegerList(10_000));
+        Spliterator<Integer> split = list.spliterator();
+        MyIntegerConsumer consumer = new MyIntegerConsumer();
+
+        split.forEachRemaining(consumer);
+
+        for (int i = 0; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), consumer.ints.get(i));
+        }
+    }
+
+    @Test
+    public void spliteratorForEachRemainingTwoSpliterators() {
+        list.addAll(getIntegerList(10_000));
+        Spliterator<Integer> splitRight = list.spliterator();
+        Spliterator<Integer> splitLeft = splitRight.trySplit();
+
+        MyIntegerConsumer consumerRight = new MyIntegerConsumer();
+        MyIntegerConsumer consumerLeft = new MyIntegerConsumer();
+
+        splitRight.forEachRemaining(consumerRight);
+        splitLeft.forEachRemaining(consumerLeft);
+
+        for (int i = 0; i < 5_000; i++) {
+            assertEquals(Integer.valueOf(i), consumerLeft.ints.get(i));
+        }
+
+        for (int i = 5_000; i < 10_000; i++) {
+            assertEquals(Integer.valueOf(i), consumerRight.ints.get(i - 5_000));
+        }
+    }
+
+    @Test
+    public void spliteratorForEachRemainingWithAdvance() {
+        list.addAll(getIntegerList(10_000));
+        Spliterator<Integer> rightSpliterator = list.spliterator();
+
+        assertTrue(
+                rightSpliterator.tryAdvance(
+                        i -> assertEquals(Integer.valueOf(0), i)));
+
+        Spliterator<Integer> leftSpliterator = rightSpliterator.trySplit();
+
+        assertEquals(4_999, rightSpliterator.getExactSizeIfKnown());
+        assertEquals(5_000, leftSpliterator.getExactSizeIfKnown());
+
+        // Check two leftmost elements of the left spliterator:
+        assertTrue(leftSpliterator.tryAdvance(
+                i -> assertEquals(Integer.valueOf(1), i)));
+
+        assertTrue(leftSpliterator.tryAdvance(
+                i -> assertEquals(Integer.valueOf(2), i)));
+
+        // Check two leftmost elements of the right splliterator:
+        assertTrue(rightSpliterator.tryAdvance(
+                i -> assertEquals(Integer.valueOf(5_000), i)));
+
+        assertTrue(rightSpliterator.tryAdvance(
+                i -> assertEquals(Integer.valueOf(5_001), i)));
+    }
+
 //    @Test // checked
 //    public void spliterator() {
 //        list.addAll(getIntegerList(6_000));
