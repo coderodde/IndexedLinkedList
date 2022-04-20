@@ -1604,181 +1604,180 @@ public class LinkedListV2Test {
                 i -> assertEquals(Integer.valueOf(5_001), i)));
     }
 
-//    @Test // checked
-//    public void spliterator() {
-//        list.addAll(getIntegerList(6_000));
-//        Spliterator split = list.spliterator();
-//
-//        assertEquals(6_000L, split.getExactSizeIfKnown());
-//        assertEquals(6_000L, split.estimateSize());
-//
-//        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
-//        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
-//
-//        assertEquals(5998, split.getExactSizeIfKnown());
-//
-//        // 5998 elements left / 2 = 2999 per spliterator:
-//        Spliterator leftSpliterator = split.trySplit();
-//
-//        assertNotNull(leftSpliterator);
-//        assertEquals(2999, split.getExactSizeIfKnown());
-//        assertEquals(2999, leftSpliterator.getExactSizeIfKnown());
-//
-//        //// leftSpliterator = [1, 2999]
-//
-//        for (int i = 2; i < 3000; i++) {
-//            Integer integer = list.get(i);
-//            assertTrue(
-//                    leftSpliterator.tryAdvance(
-//                            (j) -> assertEquals(integer, j)));
-//        }
-//
-//        //// split = [3001, 5999]
-//
-//        assertTrue(split.tryAdvance(i -> assertEquals(2999, i)));
-//        assertTrue(split.tryAdvance(i -> assertEquals(3000, i)));
-//        assertTrue(split.tryAdvance(i -> assertEquals(3001, i)));
-//
-//        while (split.getExactSizeIfKnown() > 0) {
-//            split.tryAdvance(i -> {});
-//        }
-//
-//        assertFalse(split.tryAdvance(i -> {}));
-//    }
-//
-//    @Test // checked
-//    public void bruteforceSpliterator() {
-//        list.addAll(getIntegerList(1_000_000));
-//        Collections.<Integer>shuffle(list);
-//
-//        List<Integer> newList = 
-//               list.parallelStream()
-//                   .map(i -> 2 * i)
-//                   .collect(Collectors.toList());
-//
-//        assertEquals(newList.size(), list.size());
-//
-//        for (int i = 0; i < list.size(); i++) {
-//            Integer integer1 = 2 * list.get(i);
-//            Integer integer2 = newList.get(i);
-//            assertEquals(integer1, integer2);
-//        }
-//    }
-//
-//    private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
-//
-//    @Test
-//    public void serialization() {
-//        list.add(10);
-//        list.add(13);
-//        list.add(12);
-//
-//        try {
-//            File file = new File(SERIALIZATION_FILE_NAME);
-//
-//            FileOutputStream fos = new FileOutputStream(file);
-//            ObjectOutputStream oos = new ObjectOutputStream(fos);
-//
-//            oos.writeObject(list);
-//            oos.flush();
-//            oos.close();
-//
-//            FileInputStream fis = new FileInputStream(file);
-//            ObjectInputStream ois = new ObjectInputStream(fis);
-//
-//            com.github.coderodde.util.LinkedList<Integer> ll =    
-//                    (com.github.coderodde.util.LinkedList<Integer>)
-//                    ois.readObject();
-//
-//            ois.close();
-//            boolean equal = listsEqual(list, ll);
-//            assertTrue(equal);
-//
-//            if (!file.delete()) {
-//                file.deleteOnExit();
-//            }
-//
-//        } catch (IOException | ClassNotFoundException ex) {
-//            fail(ex.getMessage());
-//        }   
-//    }
-//
-//    @Test
-//    public void bruteforceSerialization() {
-//        for (int i = 0; i < 20; i++) {
-//            list.addAll(getIntegerList(i));
-//
-//            try {
-//                File file = new File(SERIALIZATION_FILE_NAME);
-//
-//                FileOutputStream fos = new FileOutputStream(file);
-//                ObjectOutputStream oos = new ObjectOutputStream(fos);
-//
-//                oos.writeObject(list);
-//                oos.flush();
-//                oos.close();
-//
-//                FileInputStream fis = new FileInputStream(file);
-//                ObjectInputStream ois = new ObjectInputStream(fis);
-//
-//                com.github.coderodde.util.LinkedList<Integer> ll =    
-//                        (com.github.coderodde.util.LinkedList<Integer>)
-//                        ois.readObject();
-//
-//                ois.close();
-//                boolean equal = listsEqual(list, ll);
-//                assertTrue(equal);
-//
-//                if (!file.delete()) {
-//                    file.deleteOnExit();
-//                }
-//
-//            } catch (IOException | ClassNotFoundException ex) {
-//                fail(ex.getMessage());
-//            }   
-//
-//            list.clear();
-//        }
-//    }
-//    
-//    @Test // checked
-//    public void bugCheckInvariantAfterRemoval() {
-//        for (int i = 0; i < 4; i++) {
-//            list.add(i);
-//        }
-//        
-//        list.remove(Integer.valueOf(3));
-//        list.remove(1);
-//        assertEquals(list.size(), 2);
-//        assertEquals(Integer.valueOf(0), list.get(0));
-//        assertEquals(Integer.valueOf(2), list.get(1));
-//    }
-//    
-//    @Test
-//    public void bruteForceRemoveAt1() {
-//        Random random = new Random(400L);
-//        
-//        list.addAll(getIntegerList(1000));
-//        List<Integer> referenceList = new ArrayList<>(list);
-//        
-//        Integer probe = Integer.valueOf(3);
-//        
-//        list.remove(probe);
-//        referenceList.remove(probe);
-//        
-//        int iters = 0;
-//        
-//        while (!list.isEmpty()) {
-//            iters++;
-//            
-//            int index = random.nextInt(list.size());
-//            list.remove(index);
-//            referenceList.remove(index);
-//            
-//            listsEqual(list, referenceList);
-//        } 
-//    }
-//    
+    @Test
+    public void spliterator() {
+        list.addAll(getIntegerList(6_000));
+        Spliterator split = list.spliterator();
+
+        assertEquals(6_000L, split.getExactSizeIfKnown());
+        assertEquals(6_000L, split.estimateSize());
+
+        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
+        assertTrue(split.tryAdvance((i) -> assertEquals(list.get((int) i), i)));
+
+        assertEquals(5998, split.getExactSizeIfKnown());
+
+        // 5998 elements left / 2 = 2999 per spliterator:
+        Spliterator leftSpliterator = split.trySplit();
+
+        assertNotNull(leftSpliterator);
+        assertEquals(2999, split.getExactSizeIfKnown());
+        assertEquals(2999, leftSpliterator.getExactSizeIfKnown());
+
+        //// leftSpliterator = [1, 2999]
+
+        for (int i = 2; i < 3000; i++) {
+            Integer integer = list.get(i);
+            assertTrue(
+                    leftSpliterator.tryAdvance(
+                            (j) -> assertEquals(integer, j)));
+        }
+
+        //// split = [3001, 5999]
+
+        assertTrue(split.tryAdvance(i -> assertEquals(2999, i)));
+        assertTrue(split.tryAdvance(i -> assertEquals(3000, i)));
+        assertTrue(split.tryAdvance(i -> assertEquals(3001, i)));
+
+        while (split.getExactSizeIfKnown() > 0) {
+            split.tryAdvance(i -> {});
+        }
+
+        assertFalse(split.tryAdvance(i -> {}));
+    }
+
+    @Test
+    public void bruteforceSpliterator() {
+        list.addAll(getIntegerList(1_000_000));
+        Collections.<Integer>shuffle(list);
+
+        List<Integer> newList = 
+               list.parallelStream()
+                   .map(i -> 2 * i)
+                   .collect(Collectors.toList());
+
+        assertEquals(newList.size(), list.size());
+
+        for (int i = 0; i < list.size(); i++) {
+            Integer integer1 = 2 * list.get(i);
+            Integer integer2 = newList.get(i);
+            assertEquals(integer1, integer2);
+        }
+    }
+
+    private static final String SERIALIZATION_FILE_NAME = "LinkedList.ser";
+
+    @Test
+    public void serialization() {
+        list.add(10);
+        list.add(13);
+        list.add(12);
+
+        try {
+            File file = new File(SERIALIZATION_FILE_NAME);
+
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(list);
+            oos.flush();
+            oos.close();
+
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            com.github.coderodde.util.LinkedListV2<Integer> ll =    
+                    (com.github.coderodde.util.LinkedListV2<Integer>)
+                    ois.readObject();
+
+            ois.close();
+            boolean equal = listsEqual(list, ll);
+            assertTrue(equal);
+
+            if (!file.delete()) {
+                file.deleteOnExit();
+            }
+
+        } catch (IOException | ClassNotFoundException ex) {
+            fail(ex.getMessage());
+        }   
+    }
+
+    @Test
+    public void bruteforceSerialization() {
+        for (int i = 0; i < 20; i++) {
+            list.addAll(getIntegerList(i));
+
+            try {
+                File file = new File(SERIALIZATION_FILE_NAME);
+
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+                oos.writeObject(list);
+                oos.flush();
+                oos.close();
+
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                com.github.coderodde.util.LinkedListV2<Integer> ll =    
+                        (com.github.coderodde.util.LinkedListV2<Integer>)
+                        ois.readObject();
+
+                ois.close();
+                boolean equal = listsEqual(list, ll);
+                assertTrue(equal);
+
+                if (!file.delete()) {
+                    file.deleteOnExit();
+                }
+
+            } catch (IOException | ClassNotFoundException ex) {
+                fail(ex.getMessage());
+            }   
+
+            list.clear();
+        }
+    }
+    
+    @Test
+    public void bugCheckInvariantAfterRemoval() {
+        for (int i = 0; i < 4; i++) {
+            list.add(i);
+        }
+        
+        list.remove(Integer.valueOf(3));
+        list.remove(1);
+        assertEquals(list.size(), 2);
+        assertEquals(Integer.valueOf(0), list.get(0));
+        assertEquals(Integer.valueOf(2), list.get(1));
+    }
+    
+    @Test
+    public void bruteForceRemoveAt1() {
+        Random random = new Random(400L);
+        
+        list.addAll(getIntegerList(1000));
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        Integer probe = Integer.valueOf(3);
+        
+        list.remove(probe);
+        referenceList.remove(probe);
+        
+        int iters = 0;
+        
+        while (!list.isEmpty()) {
+            iters++;
+            int index = random.nextInt(list.size());
+            list.remove(index);
+            referenceList.remove(index);
+            
+            listsEqual(list, referenceList);
+        } 
+    }
+    
 //    @Test
 //    public void bruteForceRemoveAt2() {
 //        long seed = 1630487847317L;

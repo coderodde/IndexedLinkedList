@@ -33,6 +33,11 @@ public class LinkedListV2<E>
         // The number of fingers stored in the list. This field does not count
         // the end-of-list sentinel finger 'F' for which 'F.index = size'.
         private int size;
+        
+        @Override
+        public String toString() {
+            return "[FingerList, size = " + size + "]";
+        }
 
         FingerList() {
             fingerArray[0] = new Finger<>(null, 0);
@@ -188,8 +193,7 @@ public class LinkedListV2<E>
         }
 
         void removeFinger() {
-            --size;
-            contractFingerArrayIfNeeded();
+            contractFingerArrayIfNeeded(--size);
             fingerArray[size] = fingerArray[size + 1];
             fingerArray[size + 1] = null;
             fingerArray[size].index = LinkedListV2.this.size;
@@ -221,9 +225,10 @@ public class LinkedListV2<E>
         }
 
         // We can save some space while keeping the finger array operations 
-        // amortized O(1):
-        private void contractFingerArrayIfNeeded() {
-            if (size * 4 <= fingerArray.length 
+        // amortized O(1). The 'nextSize' defines the requested finger array 
+        // size not counting the end-of-finger-list sentinel finger:
+        private void contractFingerArrayIfNeeded(int nextSize) {
+            if ((nextSize + 1) * 4 < fingerArray.length 
                     && fingerArray.length > 2 * INITIAL_CAPACITY) {
                 int nextCapacity = fingerArray.length / 4;
                 fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
