@@ -54,6 +54,23 @@ public class LinkedListV2Test {
     }
     
     @Test
+    public void addAllAtIndexLarge() {
+        System.out.println("BEGIN");
+        Random random = new Random(1002L);
+        List<Integer> referenceList = new ArrayList<>();
+        
+        for (int i = 0; i < 100; ++i) {
+            int index = random.nextInt(list.size() + 1);
+            List<Integer> coll = getIntegerList(20);
+            list.addAll(index, coll);
+            referenceList.addAll(index, coll);
+        }
+        
+        assertTrue(listsEqual(list, referenceList));
+        System.out.println("END");
+    }
+    
+    @Test
     public void constructAdd() {
         List<String> l = new LinkedListV2<>(Arrays.asList("a", "b", "c"));
         

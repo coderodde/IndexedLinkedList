@@ -108,6 +108,10 @@ public class LinkedListV2<E>
             Finger finger1 = fingerArray[fingerIndex - 1];
             Finger finger2 = fingerArray[fingerIndex];
             
+            if (finger2 == null) {
+                System.out.println("yeah");
+            }
+            
             int distance1 = Math.abs(elementIndex - finger1.index);
             int distance2 = Math.abs(elementIndex - finger2.index);
             return distance1 < distance2 ? fingerIndex - 1 : fingerIndex;
