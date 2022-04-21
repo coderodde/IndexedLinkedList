@@ -55,7 +55,6 @@ public class LinkedListV2Test {
     
     @Test
     public void addAllAtIndexLarge() {
-        System.out.println("BEGIN");
         Random random = new Random(1003L);
         List<Integer> referenceList = new ArrayList<>();
         
@@ -67,7 +66,6 @@ public class LinkedListV2Test {
         }
         
         assertTrue(listsEqual(list, referenceList));
-        System.out.println("END");
     }
     
     @Test

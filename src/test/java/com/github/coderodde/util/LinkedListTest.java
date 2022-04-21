@@ -43,6 +43,49 @@ public class LinkedListTest {
     }
     
     @Test
+    public void removeFirst() {
+        List<Integer> referenceList = new ArrayList<>();
+        
+        for (int i = 0; i < 200; ++i) {
+            referenceList.add(i);
+            list.add(i);
+        }
+        
+        for (int i = 0; i < 100; ++i) {
+            referenceList.remove(0);
+            list.removeFirst();
+            assertTrue(listsEqual(list, referenceList));
+        }
+    }
+    
+    @Test
+    public void addFirstLarge() {
+        List<Integer> l = getIntegerList(1000);
+        
+        for (int i = 0; i < l.size(); i++) {
+            list.addFirst(l.get(i));
+        }
+        
+        Collections.reverse(l);
+        assertTrue(listsEqual(list, l));
+    }
+    
+    @Test
+    public void addAllAtIndexLarge() {
+        Random random = new Random(1003L);
+        List<Integer> referenceList = new ArrayList<>();
+        
+        for (int i = 0; i < 100; ++i) {
+            int index = random.nextInt(list.size() + 1);
+            List<Integer> coll = getIntegerList(random.nextInt(100));
+            list.addAll(index, coll);
+            referenceList.addAll(index, coll);
+        }
+        
+        assertTrue(listsEqual(list, referenceList));
+    }
+    
+    @Test
     public void constructAdd() {
         List<String> l = new LinkedList<>(Arrays.asList("a", "b", "c"));
         

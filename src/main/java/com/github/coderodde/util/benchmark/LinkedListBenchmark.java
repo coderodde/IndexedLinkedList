@@ -51,7 +51,7 @@ final class LinkedListBenchmark {
     private long totalMillisArrayList   = 0L;
     private long totalMillisTreeList    = 0L;
     
-    private final List<Integer>[] getLists = new ArrayList[4];
+    private final List<Integer>[] getLists = new ArrayList[5];
 
     LinkedListBenchmark(long seed) {
         this.seed = seed;
@@ -149,13 +149,13 @@ final class LinkedListBenchmark {
         profileAppendCollection();
         profileAddCollection();
         profileGet();
-        profileRemoveFirst();
-        profileRemoveLast();
-        profileRemoveViaIndex();
-        profileRemoveObject();
-        profileListIteratorAddition();
-        profileListIteratorRemoval();
-        profileStream();
+//        profileRemoveFirst();
+//        profileRemoveLast();
+//        profileRemoveViaIndex();
+//        profileRemoveObject();
+//        profileListIteratorAddition();
+//        profileListIteratorRemoval();
+//        profileStream();
         profileParallelStream();
 
         printTotalDurations();
@@ -232,7 +232,6 @@ final class LinkedListBenchmark {
         profileGetTreeList();
         
         listsEqual();
-        listsEqual(getLists);
         
         System.out.println();
     }
@@ -334,6 +333,7 @@ final class LinkedListBenchmark {
 
         Collections.sort(treeList);
         Collections.sort(roddeList);
+        Collections.sort(roddeListV2);
         Collections.sort(arrayList);
         Collections.sort(linkedList);
 
@@ -347,6 +347,11 @@ final class LinkedListBenchmark {
                 roddeList.getClass().getName() + 
                         " in (ms): " + 
                         totalMillisRoddeList);
+
+        System.out.println(
+                roddeListV2.getClass().getName() + 
+                        " in (ms): " + 
+                        totalMillisRoddeListV2);
 
         System.out.println(
                 linkedList.getClass().getName() + 
@@ -498,8 +503,6 @@ final class LinkedListBenchmark {
     }
     
     private long profileRemoveFirst(List<Integer> list) {
-        assert list.size() == REMOVE_FIRST_OPERATIONS;
-        
         long startMillis = System.currentTimeMillis();
         
         if (!list.getClass().equals(Deque.class)) {
@@ -524,8 +527,6 @@ final class LinkedListBenchmark {
     }
     
     private long profileRemoveLast(List<Integer> list) {
-        assert list.size() == REMOVE_FIRST_OPERATIONS;
-        
         long startMillis = System.currentTimeMillis();
         
         if (!list.getClass().equals(Deque.class)) {
