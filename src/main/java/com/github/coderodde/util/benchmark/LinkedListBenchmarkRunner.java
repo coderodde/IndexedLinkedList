@@ -4,7 +4,6 @@ public class LinkedListBenchmarkRunner {
 
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
-        seed = 1650459295746L;
 
         System.out.println("<<< Benchmark seed = " + seed + " >>>");
         System.out.println();

@@ -149,13 +149,13 @@ final class LinkedListBenchmark {
         profileAppendCollection();
         profileAddCollection();
         profileGet();
-//        profileRemoveFirst();
-//        profileRemoveLast();
-//        profileRemoveViaIndex();
-//        profileRemoveObject();
-//        profileListIteratorAddition();
-//        profileListIteratorRemoval();
-//        profileStream();
+        profileRemoveFirst();
+        profileRemoveLast();
+        profileRemoveViaIndex();
+        profileRemoveObject();
+        profileListIteratorAddition();
+        profileListIteratorRemoval();
+        profileStream();
         profileParallelStream();
 
         printTotalDurations();
