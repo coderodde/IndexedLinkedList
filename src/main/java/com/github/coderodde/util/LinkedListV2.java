@@ -1597,6 +1597,7 @@ public class LinkedListV2<E>
                 getRecommendedNumberOfFingers() - fingerList.size();
 
         if (numberOfNewFingers == 0) {
+            fingerList.get(fingerList.size()).index += collectionSize;
             return;
         }
 

@@ -56,12 +56,12 @@ public class LinkedListV2Test {
     @Test
     public void addAllAtIndexLarge() {
         System.out.println("BEGIN");
-        Random random = new Random(1002L);
+        Random random = new Random(1003L);
         List<Integer> referenceList = new ArrayList<>();
         
         for (int i = 0; i < 100; ++i) {
             int index = random.nextInt(list.size() + 1);
-            List<Integer> coll = getIntegerList(20);
+            List<Integer> coll = getIntegerList(random.nextInt(100));
             list.addAll(index, coll);
             referenceList.addAll(index, coll);
         }
