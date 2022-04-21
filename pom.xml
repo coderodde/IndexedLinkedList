@@ -73,10 +73,10 @@
             </plugin> 
             
             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-source-plugin</artifactId>
-                 <version>3.2.1</version>
-                 <executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
@@ -85,6 +85,25 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>main-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <release>11</release>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

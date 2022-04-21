@@ -239,6 +239,9 @@ public class EnhancedLinkedList<E>
         }
     }
      
+    /**
+     * The cached number of elements in this list.
+     */
     private int size;
     private transient Node<E> first;
     private transient Node<E> last;
@@ -1455,6 +1458,15 @@ public class EnhancedLinkedList<E>
     /**
      * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
      * deserializes it).
+     * 
+     * @param s the object input stream.
+     * 
+     * @serialData first, the size of the list is read. Then all the node items
+     *             are read and stored in the deserialization order, that is the
+     *             same order as in serialization.
+     * 
+     * @throws java.io.IOException if I/O fails.
+     * @throws ClassNotFoundException if the class is not found.
      */
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
@@ -1503,10 +1515,14 @@ public class EnhancedLinkedList<E>
     /**
      * Saves the state of this {@code LinkedList} instance to a stream (that is, 
      * serializes it).
+     * 
+     * @param s the object output stream.
      *
      * @serialData The size of the list (the number of elements it
      *             contains) is emitted (int), followed by all of its
      *             elements (each an Object) in the proper order.
+     * 
+     * @throws java.io.IOException if the I/O fails.
      */
     @java.io.Serial
     private void writeObject(java.io.ObjectOutputStream s)

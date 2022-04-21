@@ -1,5 +1,6 @@
 package com.github.coderodde.util;
 
+import java.io.IOException;
 import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -389,7 +390,7 @@ public class LinkedList<E>
     }
     
     /**
-     * {@inheritDoc } 
+     * fdsfs fdds
      */
     @Override
     public boolean isEmpty() {
@@ -397,10 +398,7 @@ public class LinkedList<E>
     }
 
     /**
-     * Returns the basic iterator over this list supporting only traversal and
-     * removal.
-     *
-     * @return the basic iterator.
+     * aaa aaaa
      */
     @Override
     public Iterator<E> iterator() {
@@ -1523,10 +1521,19 @@ public class LinkedList<E>
         }
     }
     
-    ////////////////////////////////////////////////////////////////////////////
-    // Reconstitutes this {@code LinkedList} instance from a stream (that is, 
-    // deserializes it).
-    ////////////////////////////////////////////////////////////////////////////
+    /** 
+     * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
+     * deserializes it).
+     * 
+     * @param s the object input stream.
+     * 
+     * @throws java.io.IOException if the I/O fails.
+     * @throws ClassNotFoundException if the class is not found.
+     * 
+     * @serialData first, the size of the list is read. Then, the elements are
+     *             read and placed to this list in the same order as they 
+     *             appeared in the list upon serialization.
+     */
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
             throws java.io.IOException, ClassNotFoundException {
@@ -1571,10 +1578,17 @@ public class LinkedList<E>
         last = rightmostNode;
     }
     
-    ////////////////////////////////////////////////////////////////////////////
-    // Saves the state of this {@code LinkedList} instance to a stream (that is, 
-    // serializes it).
-    ////////////////////////////////////////////////////////////////////////////
+    /**
+     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
+     * serializes it).
+     * 
+     * @param s the object output stream.
+     * 
+     * @throws java.io.IOException if the I/O fails.
+     * 
+     * @serialData  first, the size of this list is written. Then, all the 
+     *              elements are stored in the order they appear in this list.
+     */
     @java.io.Serial
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
