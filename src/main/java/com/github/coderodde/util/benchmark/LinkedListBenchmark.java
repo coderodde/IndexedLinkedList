@@ -38,8 +38,8 @@ final class LinkedListBenchmark {
     private com.github.coderodde.util.LinkedList<Integer> roddeList = 
             new com.github.coderodde.util.LinkedList<>();
 
-    private com.github.coderodde.util.LinkedListV2<Integer> roddeListV2 = 
-            new com.github.coderodde.util.LinkedListV2<>();
+    private com.github.coderodde.util.EnhancedLinkedList<Integer> roddeListV2 = 
+            new com.github.coderodde.util.EnhancedLinkedList<>();
 
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
@@ -174,7 +174,7 @@ final class LinkedListBenchmark {
 
     private void resetLists() {
         roddeList   = new com.github.coderodde.util.LinkedList<>();
-        roddeListV2 = new com.github.coderodde.util.LinkedListV2<>();
+        roddeListV2 = new com.github.coderodde.util.EnhancedLinkedList<>();
         linkedList  = new java.util.LinkedList<>();
         arrayList   = new ArrayList<>();
         treeList    = new TreeList<>();

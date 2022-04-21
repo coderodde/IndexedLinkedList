@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * @version 1.61 (Sep 26, 2021)
  * @since 1.6 (Sep 1, 2021)
  */
-public class LinkedListV2<E> 
+public class EnhancedLinkedList<E> 
         extends AbstractSequentialList<E>
         implements List<E>, Deque<E>, Cloneable, java.io.Serializable {
     
@@ -39,7 +39,7 @@ public class LinkedListV2<E>
             return "[FingerList, size = " + size + "]";
         }
 
-        FingerList() {
+        private FingerList() {
             fingerArray[0] = new Finger<>(null, 0);
         }
 
@@ -108,10 +108,6 @@ public class LinkedListV2<E>
             Finger finger1 = fingerArray[fingerIndex - 1];
             Finger finger2 = fingerArray[fingerIndex];
             
-            if (finger2 == null) {
-                System.out.println("yeah");
-            }
-            
             int distance1 = Math.abs(elementIndex - finger1.index);
             int distance2 = Math.abs(elementIndex - finger2.index);
             return distance1 < distance2 ? fingerIndex - 1 : fingerIndex;
@@ -130,15 +126,13 @@ public class LinkedListV2<E>
             return finger.node;
         }
         
-        // TODO: node(int) returns a rewinded finger?
-
         // Appends the input finger to the tail of the finger list:
         void appendFinger(com.github.coderodde.util.Finger<E> finger) {
             size++;
             enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
-            fingerArray[size].index = LinkedListV2.this.size;
+            fingerArray[size].index = EnhancedLinkedList.this.size;
         }
 
         // Inserts the input finger into the finger list such that the entire
@@ -158,21 +152,7 @@ public class LinkedListV2<E>
             shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
 
             fingerArray[beforeFingerIndex] = finger;
-            fingerArray[++size].index = LinkedListV2.this.size;
-        }
-        
-        /***********************************************************************
-        For each finger with the index at least 'startIndex', decrease the index
-        by one. This method updates the index of the end-of-list sentinel too.
-        ***********************************************************************/
-        private void shiftFingersToLeftOnce(int startIndex) {
-            for (int i = startIndex; i <= size; ++i) {
-                fingerArray[i].index++;
-            }
-        }
-        
-        private void shiftAllFingersToLeftOnce() {
-            shiftFingersToLeftOnce(1);
+            fingerArray[++size].index = EnhancedLinkedList.this.size;
         }
         
         /***********************************************************************
@@ -200,7 +180,7 @@ public class LinkedListV2<E>
             contractFingerArrayIfNeeded(--size);
             fingerArray[size] = fingerArray[size + 1];
             fingerArray[size + 1] = null;
-            fingerArray[size].index = LinkedListV2.this.size;
+            fingerArray[size].index = EnhancedLinkedList.this.size;
         }
 
         void clear() {
@@ -259,16 +239,26 @@ public class LinkedListV2<E>
         }
     }
      
-    int size;
-    transient Node<E> first;
-    transient Node<E> last;
+    private int size;
+    private transient Node<E> first;
+    private transient Node<E> last;
+    
+    // Without 'private' since it is accessed in unit tests.
     transient FingerList<E> fingerList = new FingerList<>();
     
-    public LinkedListV2() {
+    /**
+     * Constructs an empty list.
+     */
+    public EnhancedLinkedList() {
         
     }
     
-    public LinkedListV2(Collection<? extends E> c) {
+    /**
+     * Constructs a new list and copies the data in {@code c} to it.
+     * 
+     * @param c the collection to copy. 
+     */
+    public EnhancedLinkedList(Collection<? extends E> c) {
         this();
         addAll(c);
     }
@@ -991,8 +981,8 @@ public class LinkedListV2<E>
 
         private Node<E> lastReturned;
         private Node<E> nextToIterate = last;
-        private int nextIndex = LinkedListV2.this.size - 1;
-        int expectedModCount = LinkedListV2.this.modCount;
+        private int nextIndex = EnhancedLinkedList.this.size - 1;
+        int expectedModCount = EnhancedLinkedList.this.modCount;
         
         @Override
         public boolean hasNext() {
@@ -1458,16 +1448,8 @@ public class LinkedListV2<E>
         return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
-    protected Node<E> node(int elementIndex) {
+    private Node<E> node(int elementIndex) {
          return fingerList.node(elementIndex);
-    }
-    
-    protected void appendFinger(Finger<E> finger) {
-        fingerList.appendFinger(finger);
-    }
-    
-    protected void insertFinger(Finger<E> finger) {
-        //fingerList.insertFinger(finger);
     }
     
     /**
@@ -1541,7 +1523,7 @@ public class LinkedListV2<E>
         }
     }
     
-    protected void removeFinger() {
+    private void removeFinger() {
         fingerList.removeFinger();
     }
     
@@ -1800,7 +1782,7 @@ public class LinkedListV2<E>
         return node;
     }
     
-    protected void appendFinger(Node<E> node, int index) {
+    private void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
     }
@@ -1854,14 +1836,14 @@ public class LinkedListV2<E>
         
         static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
         
-        private final LinkedListV2<E> list;
+        private final EnhancedLinkedList<E> list;
         private Node<E> node;
         private long lengthOfSpliterator;
         private long numberOfProcessedElements;
         private long offsetOfSpliterator;
         private final int expectedModCount;
         
-        private LinkedListSpliterator(LinkedListV2<E> list,
+        private LinkedListSpliterator(EnhancedLinkedList<E> list,
                                       Node<E> node,
                                       long lengthOfSpliterator,
                                       long offsetOfSpliterator,

@@ -32,10 +32,10 @@ import java.util.function.Consumer;
  * encapsulates the list.
  *
  * If no such object exists, the list should be "wrapped" using the
- * {@link Collections#synchronizedList Collections.synchronizedList}
- * method.  This is best done at creation time, to prevent accidental
- * unsynchronized access to the list:<pre>
- *   List list = Collections.synchronizedList(new LinkedList(...));</pre>
+ * {@link java.util.Collections#synchronizedList(java.util.List) } method. This
+ * is best done at creation time, to prevent accidental unsynchronized access to 
+ * the list:
+ * <pre>List list = Collections.synchronizedList(new LinkedList(...));</pre>
  *
  * <p>The iterators returned by this class's {@code iterator} and
  * {@code listIterator} methods are <i>fail-fast</i>: if the list is
@@ -457,7 +457,7 @@ public class LinkedList<E>
      * Adds the specified element as the tail of this list.
      *
      * @param e the element to add.
-     * @return {@code true} (as specified by {@link Queue#offer}).
+     * @return {@code true} (as specified by {@link java.util.Queue#offer}).
      */
     @Override
     public boolean offer(E e) {
@@ -785,7 +785,6 @@ public class LinkedList<E>
      * {@link Spliterator#ORDERED}.  Overriding implementations should document
      * the reporting of additional characteristic values.
      *
-     * @implNote
      * The {@code Spliterator} additionally reports {@link Spliterator#SUBSIZED}
      * and implements {@code trySplit} to permit limited parallelism.
      *
@@ -1321,10 +1320,10 @@ public class LinkedList<E>
         return fingerStack.size() != getRecommendedNumberOfFingers();
     }
 
-    /***************************************************************************
-    Returns the node at index 'index'. Moves the closest finger to the node.
-    ***************************************************************************/
-    protected Node<E> node(int index) {
+    ////////////////////////////////////////////////////////////////////////////
+    // Returns the node at index 'index'. Moves the closest finger to the node.
+    ////////////////////////////////////////////////////////////////////////////
+    Node<E> node(int index) {
         Finger<E> finger = getClosestFinger(index);
         int distance = finger.index - index;
 
@@ -1336,9 +1335,9 @@ public class LinkedList<E>
         return finger.node;
     }
     
-    /***************************************************************************
-    Prepends the input collection to the head of this list.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Prepends the input collection to the head of this list.
+    ////////////////////////////////////////////////////////////////////////////
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
         Node<E> oldFirst = first;
@@ -1367,17 +1366,17 @@ public class LinkedList<E>
         // Now, add the missing fingers:
         addFingersAfterPrependAll(first, sz);
     }
-
-    /***************************************************************************
-    Removes a finger from the finger stack.
-    ***************************************************************************/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Removes a finger from the finger stack.
+    ////////////////////////////////////////////////////////////////////////////
     private void removeFinger() {
         fingerStack.pop();
     }
     
-    /***************************************************************************
-    Implements the node removal. 
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Implements the node removal. 
+    ////////////////////////////////////////////////////////////////////////////
     private void removeObjectImpl(Node<E> node, int index) {
         // Make sure no finger is pointing to 'node':
         makeSureNoFingerPointsTo(node, index);
@@ -1392,9 +1391,9 @@ public class LinkedList<E>
         shiftIndicesToLeftOnce(index + 1);
     }
     
-    /***************************************************************************
-    If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.
+    ////////////////////////////////////////////////////////////////////////////
     private Node<E> rewind(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
@@ -1413,9 +1412,9 @@ public class LinkedList<E>
         return node;
     }
     
-    /***************************************************************************
-    Sets the input collection as a list.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Sets the input collection as a list.
+    ////////////////////////////////////////////////////////////////////////////
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
@@ -1437,10 +1436,10 @@ public class LinkedList<E>
         addFingersAfterSetAll();
     }
 
-    /***************************************************************************
-    Subtracts 'steps' positions from each index at least 'startingIndex'.
-    ***************************************************************************/
-    protected void shiftIndicesToLeft(int startingIndex, int steps) {
+    ////////////////////////////////////////////////////////////////////////////
+    // Subtracts 'steps' positions from each index at least 'startingIndex'.
+    ////////////////////////////////////////////////////////////////////////////
+    private void shiftIndicesToLeft(int startingIndex, int steps) {
         for (int i = 0, sz = fingerStack.size(); i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
             
@@ -1461,18 +1460,18 @@ public class LinkedList<E>
         }
     }
 
-    /***************************************************************************
-    Shifts all the indices at least 'startingIndex' one position towards smaller
-    index values.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Shifts all the indices at least 'startingIndex' one position towards 
+    // smaller index values.
+    ////////////////////////////////////////////////////////////////////////////
     private void shiftIndicesToLeftOnce(int startingIndex) {
         shiftIndicesToLeft(startingIndex, 1);
     }
     
-    /***************************************************************************
-    For each finger with the index at least 'startIndex', add 'steps' to the 
-    index.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // For each finger with the index at least 'startIndex', add 'steps' to the 
+    // index.
+    ////////////////////////////////////////////////////////////////////////////
     private void shiftIndicesToRight(int startIndex, int steps) {
         for (int sz = fingerStack.size(), i = 0; i < sz; i++) {
             Finger<E> finger = fingerStack.get(i);
@@ -1494,17 +1493,17 @@ public class LinkedList<E>
         }
     }
 
-    /***************************************************************************
-    Shifts all the indices at least 'startingIndex' one position towards larger
-    index values.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Shifts all the indices at least 'startingIndex' one position towards 
+    // larger index values.
+    ////////////////////////////////////////////////////////////////////////////
     private void shiftIndicesToRightOnce(int startingIndex) {
         shiftIndicesToRight(startingIndex, 1);
     }
 
-    /***************************************************************************
-    Unlinks the input node from the actual doubly-linked list.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Unlinks the input node from the actual doubly-linked list.
+    ////////////////////////////////////////////////////////////////////////////
     private void unlink(Node<E> x) {
         Node<E> next = x.next;
         Node<E> prev = x.prev;
@@ -1524,10 +1523,10 @@ public class LinkedList<E>
         }
     }
     
-    /**
-     * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
-     * deserializes it).
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // Reconstitutes this {@code LinkedList} instance from a stream (that is, 
+    // deserializes it).
+    ////////////////////////////////////////////////////////////////////////////
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
             throws java.io.IOException, ClassNotFoundException {
@@ -1572,14 +1571,10 @@ public class LinkedList<E>
         last = rightmostNode;
     }
     
-    /**
-     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
-     * serializes it).
-     *
-     * @serialData The size of the list (the number of elements it
-     *             contains) is emitted (int), followed by all of its
-     *             elements (each an Object) in the proper order.
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // Saves the state of this {@code LinkedList} instance to a stream (that is, 
+    // serializes it).
+    ////////////////////////////////////////////////////////////////////////////
     @java.io.Serial
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
@@ -1595,10 +1590,10 @@ public class LinkedList<E>
         }
     }
     
-    /***************************************************************************
-    Implements a simple, array-based stack for storing the node fingers for
-    items of type 'E'.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Implements a simple, array-based stack for storing the node fingers for
+    // items of type 'E'.
+    ////////////////////////////////////////////////////////////////////////////
     static class FingerStack<E> {
         static final int INITIAL_CAPACITY = 8;
 
@@ -1665,10 +1660,10 @@ public class LinkedList<E>
             }
         }
     }
-
-    /***************************************************************************
-    This class implements a basic iterator over this list.
-    ***************************************************************************/
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // This class implements a basic iterator over this list.
+    ////////////////////////////////////////////////////////////////////////////
     final class BasicIterator implements Iterator<E> {
 
         private Node<E> lastReturned;
@@ -1731,9 +1726,9 @@ public class LinkedList<E>
         }
     }
     
-    /***************************************************************************
-    Implements the enhanced list iterator over this list.
-    ***************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////
+    // Implements the enhanced list iterator over this list.
+    ////////////////////////////////////////////////////////////////////////////
     final class EnhancedIterator implements ListIterator<E> {
 
         private Node<E> lastReturned;
@@ -1864,6 +1859,10 @@ public class LinkedList<E>
         }
     }
     
+    ////////////////////////////////////////////////////////////////////////////
+    // This class implements the descending iterator proceeding from the tail 
+    // node towards the head node.
+    ////////////////////////////////////////////////////////////////////////////
     private final class DescendingIterator implements Iterator<E> {
 
         private final ListIterator<E> iterator = new EnhancedIterator(size());
@@ -1884,6 +1883,9 @@ public class LinkedList<E>
         }
     }
     
+    ////////////////////////////////////////////////////////////////////////////
+    // This class implements a spliterator of the list.
+    ////////////////////////////////////////////////////////////////////////////
     static final class LinkedListSpliterator<E> implements Spliterator<E> {
         
         static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items

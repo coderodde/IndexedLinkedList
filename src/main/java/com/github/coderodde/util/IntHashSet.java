@@ -13,7 +13,7 @@ import java.util.Set;
  * @version 1.6 (Aug 29, 2021)
  * @since 1.6 (Aug 29, 2021)
  */
-public class IntHashSet {
+final class IntHashSet {
 
     private static final int INITIAL_CAPACITY = 8;
 

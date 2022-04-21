@@ -1,7 +1,7 @@
 package com.github.coderodde.util;
 
-import com.github.coderodde.util.LinkedListV2.BasicIterator;
-import com.github.coderodde.util.LinkedListV2.EnhancedIterator;
+import com.github.coderodde.util.EnhancedLinkedList.BasicIterator;
+import com.github.coderodde.util.EnhancedLinkedList.EnhancedIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,9 +32,9 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LinkedListV2Test {
+public class EnhancedLinkedListTest {
 
-    private final LinkedListV2<Integer> list = new LinkedListV2<>();
+    private final EnhancedLinkedList<Integer> list = new EnhancedLinkedList<>();
     
     @Before
     public void setUp() {
@@ -70,7 +70,7 @@ public class LinkedListV2Test {
     
     @Test
     public void constructAdd() {
-        List<String> l = new LinkedListV2<>(Arrays.asList("a", "b", "c"));
+        List<String> l = new EnhancedLinkedList<>(Arrays.asList("a", "b", "c"));
         
         assertEquals(3, l.size());
         
@@ -1710,8 +1710,8 @@ public class LinkedListV2Test {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
 
-            com.github.coderodde.util.LinkedListV2<Integer> ll =    
-                    (com.github.coderodde.util.LinkedListV2<Integer>)
+            com.github.coderodde.util.EnhancedLinkedList<Integer> ll =    
+                    (com.github.coderodde.util.EnhancedLinkedList<Integer>)
                     ois.readObject();
 
             ois.close();
@@ -1745,8 +1745,8 @@ public class LinkedListV2Test {
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis);
 
-                com.github.coderodde.util.LinkedListV2<Integer> ll =    
-                        (com.github.coderodde.util.LinkedListV2<Integer>)
+                com.github.coderodde.util.EnhancedLinkedList<Integer> ll =    
+                        (com.github.coderodde.util.EnhancedLinkedList<Integer>)
                         ois.readObject();
 
                 ois.close();
@@ -1922,7 +1922,7 @@ public class LinkedListV2Test {
     }
     
     private static boolean listsEqual(
-            com.github.coderodde.util.LinkedListV2<Integer> list1, 
+            com.github.coderodde.util.EnhancedLinkedList<Integer> list1, 
             java.util.List<Integer> list2) {
 
         if (list1.size() != list2.size()) {

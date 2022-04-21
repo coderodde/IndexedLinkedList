@@ -1,7 +1,19 @@
 package com.github.coderodde.util.benchmark;
 
-public class LinkedListBenchmarkRunner {
+/**
+ * This class provides the entry point to the benchmark.
+ * 
+ * @author Rodion "rodde" Efremov
+ * @version 1.6
+ * @since 1.6
+ */
+public final class LinkedListBenchmarkRunner {
 
+    /**
+     * Runs the benchmark.
+     * 
+     * @param args the command line arguments. Ignored. 
+     */
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
 
