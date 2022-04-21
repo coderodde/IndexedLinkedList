@@ -1,6 +1,5 @@
 package com.github.coderodde.util;
 
-import java.io.IOException;
 import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,21 +15,30 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
- * Doubly-linked list implementation of the {@code List} and {@code Deque}
- * interfaces.  Implements all optional list operations, and permits all
- * elements (including {@code null}).
+ * Doubly-linked list implementation of the {@link java.util.List} and 
+ * {@code java.util.Deque} interfaces. Implements all optional list operations,
+ * and permits all elements (including {@code null}).
  *
- * <p>This implementation maintains <code>ceil(sqrt(n/2)/10)</code> fingers, 
- * which allows faster operations in methods requesting an integer index.
+ * <p>This implementation maintains <code>ceil(sqrt(n) / 10)</code> fingers, 
+ * which allows faster operations in methods requesting an integer index. When
+ * accessing a list node, first, all the fingers are consulted in order to find
+ * a finger that is closest to the target node. That runs in {@code sqrt(n)} 
+ * time. Then, the list is traversed towards the target list. Assuming that the 
+ * fingers are distributed evenly, the entire access runs in {@code sqrt(n)} 
+ * time. Consult the following post describing the access in greater detail: 
+ * <a href="Finger List">http://coderodde.github.io/weblog/#eill</a>. Also, this
+ * list "learns": upon access, the closest finger will be moved to point to the
+ * target node. Thus, if the access is random, this list will mimic more or less
+ * even distribution. Finally, we need to consult all the fingers since the 
+ * fingers are not sorted by their indices. 
  * 
- * <p><strong>Note that this implementation is not synchronized.</strong>
- * If multiple threads access a linked list concurrently, and at least
- * one of the threads modifies the list structurally, it <i>must</i> be
- * synchronized externally.  (A structural modification is any operation
- * that adds or deletes one or more elements; merely setting the value of
- * an element is not a structural modification.)  This is typically
- * accomplished by synchronizing on some object that naturally
- * encapsulates the list.
+ * <p><strong>Note that this implementation is not synchronized.</strong> If
+ * multiple threads access a linked list concurrently, and at least one of the
+ * threads modifies the list structurally, it <i>must</i> be synchronized 
+ * externally. (A structural modification is any operation that adds or deletes 
+ * one or more elements; merely setting the value of an element is not a 
+ * structural modification.) This is typically accomplished by synchronizing on
+ * some object that naturally encapsulates the list.
  *
  * If no such object exists, the list should be "wrapped" using the
  * {@link java.util.Collections#synchronizedList(java.util.List) } method. This
@@ -38,27 +46,28 @@ import java.util.function.Consumer;
  * the list:
  * <pre>List list = Collections.synchronizedList(new LinkedList(...));</pre>
  *
- * <p>The iterators returned by this class's {@code iterator} and
- * {@code listIterator} methods are <i>fail-fast</i>: if the list is
- * structurally modified at any time after the iterator is created, in
- * any way except through the Iterator's own {@code remove} or
- * {@code add} methods, the iterator will throw a {@link
- * ConcurrentModificationException}.  Thus, in the face of concurrent
- * modification, the iterator fails quickly and cleanly, rather than
- * risking arbitrary, non-deterministic behavior at an undetermined
+ * <p>The iterators returned by this class's {@code iterator},
+ * {@code descendingIterator} and {@code listIterator} methods are 
+ * <i>fail-fast</i>: if the list is
+ * structurally modified at any time after the iterator is created, in any way
+ * except through the Iterator's own {@code remove} or {@code add} methods, the
+ * iterator will throw a {@link ConcurrentModificationException}. Thus, in the 
+ * face of concurrent modification, the iterator fails quickly and cleanly, 
+ * rather than risking arbitrary, non-deterministic behavior at an undetermined
  * time in the future.
  *
- * <p>Note that the fail-fast behavior of an iterator cannot be guaranteed
- * as it is, generally speaking, impossible to make any hard guarantees in the
+ * <p>Note that the fail-fast behavior of an iterator cannot be guaranteed as it
+ * is, generally speaking, impossible to make any hard guarantees in the
  * presence of unsynchronized concurrent modification.  Fail-fast iterators
  * throw {@code ConcurrentModificationException} on a best-effort basis.
- * Therefore, it would be wrong to write a program that depended on this
- * exception for its correctness:   <i>the fail-fast behavior of iterators
+ * Therefore, it would be wrong to write a program that depended on this 
+ * exception for its correctness: <i>the fail-fast behavior of iterators
  * should be used only to detect bugs.</i>
  *
  * @author  Rodion "coderodde" Efremov
  * @see     List
  * @see     ArrayList
+ * @see     java.util.LinkedList
  * @version 1.6 (Sep 1, 2021)
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the type of elements held in this collection
@@ -269,60 +278,6 @@ public class LinkedList<E>
     }
 
     /**
-     * Returns {@code true} only if the input object is a {@link List}, has the
-     * same size, and whose iterator returns the elements in the same order as
-     * this list.
-     *
-     * @param o the query object.
-     * @return {@code true} only if this list and the input list represent the
-     * same element sequence.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-
-        if (o == this) {
-            return true;
-        }
-        
-        if (!(o instanceof List)) {
-            return false;
-        }
-        
-        List<?> otherList = (List<?>) o;
-
-        if (size != otherList.size()) {
-            return false;
-        }
-
-        Iterator<?> iterator1 = iterator();
-        Iterator<?> iterator2 = otherList.iterator();
-
-        while (iterator1.hasNext() && iterator2.hasNext()) {
-            Object object1 = iterator1.next();
-            Object object2 = iterator2.next();
-
-            if (!Objects.equals(object1, object2)) {
-                return false;
-            }
-        }
-
-        boolean iterator1HasMore = iterator1.hasNext();
-        boolean iterator2HasMore = iterator2.hasNext();
-
-        if (iterator1HasMore || iterator2HasMore) {
-            throw new IllegalStateException(
-                    iterator1HasMore ?
-                            "This list has more elements to offer" :
-                            "Argument list has more elements to offer");
-        }
-
-        return true;
-    }
-
-    /**
      * Returns the element at the specified position in this list.
      *
      * @param index index of the element to return.
@@ -390,7 +345,8 @@ public class LinkedList<E>
     }
     
     /**
-     * fdsfs fdds
+     * Returns {@code true} if this list is empty. Returns {@code false} 
+     * otherwise.
      */
     @Override
     public boolean isEmpty() {
@@ -398,7 +354,7 @@ public class LinkedList<E>
     }
 
     /**
-     * aaa aaaa
+     * Returns the basic iterator.
      */
     @Override
     public Iterator<E> iterator() {
@@ -765,6 +721,23 @@ public class LinkedList<E>
     }
 
     /**
+     * Sets the element at index {@code index} to {@code element} and returns
+     * the old element.
+     * 
+     * @param index   the target index.
+     * @param element the element to set.
+     * @return the previous element at the given index.
+     */
+    @Override
+    public E set(int index, E element) {
+        checkElementIndex(index);
+        Node<E> node = node(index);
+        E oldElement = node.item;
+        node.item = element;
+        return oldElement;
+    }
+    
+    /**
      * Returns the number of elements in this list.
      *
      * @return the number of elements in this list.
@@ -792,7 +765,56 @@ public class LinkedList<E>
     public Spliterator<E> spliterator() {
         return new LinkedListSpliterator<>(this, first, size, 0, modCount);
     }
+    
+    /**
+     * Returns a sublist view over this list starting from index 
+     * {@code fromIndex} (inclusive), and {@
+     * @param fromIndex
+     * @param toIndex
+     * @return 
+     */
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return null;
+    }
+    
+    /**
+     * Returns the entire contents of this list as an array. The order is 
+     * preserved.
+     * 
+     * @return the contents of this list as an array.
+     */
+    @Override
+    public Object[] toArray() {
+        Object[] array = new Object[size];
+        int index = 0;
+        
+        for (Node<E> node = first; node != null; node = node.next) {
+            array[index++] = node.item;
+        }
+        
+        return array;
+    }
 
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        int sz = size;
+        
+        T[] array = 
+                a.length >= sz ? 
+                a : 
+                (T[]) java.lang.reflect.Array.newInstance(
+                        a.getClass().getComponentType(), sz);
+        
+        int index = 0;
+        
+        for (Node<E> node = first; node != null; node = node.next) {
+            array[index++] = (T) node.item;
+        }
+        
+        return array;
+    }
+    
     @java.io.Serial
     private static final long serialVersionUID = -8812077630522402934L;
     
@@ -1388,6 +1410,8 @@ public class LinkedList<E>
         
         shiftIndicesToLeftOnce(index + 1);
     }
+    
+//    private void removeRange()
     
     ////////////////////////////////////////////////////////////////////////////
     // If steps &lt; 0, rewind to the left. Otherwise, rewind to the right.

@@ -42,6 +42,8 @@ public class LinkedListTest {
         list.clear();
     }
     
+    
+    
     @Test
     public void removeFirst() {
         List<Integer> referenceList = new ArrayList<>();

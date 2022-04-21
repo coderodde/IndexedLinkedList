@@ -818,6 +818,23 @@ public class EnhancedLinkedList<E>
 
         return false;
     }
+
+    /**
+     * Sets the element at index {@code index} to {@code element} and returns
+     * the old element.
+     * 
+     * @param index   the target index.
+     * @param element the element to set.
+     * @return the previous element at the given index.
+     */
+    @Override
+    public E set(int index, E element) {
+        checkElementIndex(index);
+        Node<E> node = node(index);
+        E oldElement = node.item;
+        node.item = element;
+        return oldElement;
+    }
     
     /**
      * {@inheritDoc }
