@@ -5,6 +5,7 @@ import java.util.AbstractList;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 /**
  * 
@@ -441,10 +443,6 @@ public class EnhancedLinkedList<E>
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-
         if (o == this) {
             return true;
         }
@@ -453,35 +451,13 @@ public class EnhancedLinkedList<E>
             return false;
         }
         
+        int expectedModCount = modCount;
+        
         List<?> otherList = (List<?>) o;
-
-        if (size != otherList.size()) {
-            return false;
-        }
-
-        Iterator<?> iterator1 = iterator();
-        Iterator<?> iterator2 = otherList.iterator();
-
-        while (iterator1.hasNext() && iterator2.hasNext()) {
-            Object object1 = iterator1.next();
-            Object object2 = iterator2.next();
-
-            if (!Objects.equals(object1, object2)) {
-                return false;
-            }
-        }
-
-        boolean iterator1HasMore = iterator1.hasNext();
-        boolean iterator2HasMore = iterator2.hasNext();
-
-        if (iterator1HasMore || iterator2HasMore) {
-            throw new IllegalStateException(
-                    iterator1HasMore ?
-                            "This list has more elements to offer" :
-                            "Argument list has more elements to offer");
-        }
-
-        return true;
+        boolean equal = equalsRange(otherList, 0, size);
+        
+        checkForComodification(expectedModCount);
+        return equal;
     }
     
     /**
@@ -828,6 +804,12 @@ public class EnhancedLinkedList<E>
         return false;
     }
 
+    @Override
+    public void replaceAll(UnaryOperator<E> operator) {
+        replaceAllRange(operator, 0, size);
+        modCount++;
+    }
+    
     /**
      * Sets the element at index {@code index} to {@code element} and returns
      * the old element.
@@ -1204,7 +1186,16 @@ public class EnhancedLinkedList<E>
     }
     
     boolean equalsRange(List<?> other, int from, int to) {
+        Iterator<?> otherIterator = other.iterator();
         
+        for (Node<E> node = node(from); from < to; from++, node = node.next) {
+            if (!otherIterator.hasNext() || 
+                    !Objects.equals(node.item, otherIterator.next())) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     int hashCodeRange(int from, int to) {
@@ -1424,18 +1415,6 @@ public class EnhancedLinkedList<E>
         addFingersAfterInsertAll(pred.next, 
                                  succIndex,
                                  sz);
-    }
-    
-    /***************************************************************************
-    Makes sure that the input node is not being pointed to by a finger.
-    ***************************************************************************/
-    private void makeSureNoFingerPointsTo(Node<E> node, int index) {
-        int fingerIndex = fingerList.getFingerIndex(index);
-        Finger<E> finger = fingerList.get(fingerIndex);
-        
-        if (finger.node == node) {
-            moveFingerOutOfRemovalLocation(finger, fingerIndex);
-        }
     }
     
     /***************************************************************************
@@ -1681,6 +1660,21 @@ public class EnhancedLinkedList<E>
         fingerList.removeTrailingFingers(numberOfFingersToRemove);
         
         
+    }
+    
+    private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
+        Objects.requireNonNull(operator);
+        int expectedModCount = modCount;
+        Node<E> node = node(i);
+        
+        while (modCount == expectedModCount && i < end) {
+            node.item = operator.apply(node.item);
+            i++;
+        }
+        
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
     }
     
     /***************************************************************************
@@ -2079,7 +2073,7 @@ public class EnhancedLinkedList<E>
         private final EnhancedLinkedList<E> root;
         private final SubList<E> parent;
         private final int offset;
-        protected int size;
+        private int size;
         
         public SubList(EnhancedLinkedList<E> root, int fromIndex, int toIndex) {
             this.root = root;
@@ -2089,7 +2083,7 @@ public class EnhancedLinkedList<E>
             this.modCount = root.modCount;
         }
         
-        public SubList(SubList<E> parent, int fromIndex, int toIndex) {
+        private SubList(SubList<E> parent, int fromIndex, int toIndex) {
             this.root = parent.root;
             this.parent = parent;
             this.offset = parent.offset + fromIndex;
@@ -2105,7 +2099,7 @@ public class EnhancedLinkedList<E>
         }
         
         public boolean addAll(Collection<? extends E> c) {
-            return addAll(size, c);
+            return addAll(this.size, c);
         }
         
         public boolean addAll(int index, Collection<? extends E> collection) {
@@ -2196,6 +2190,10 @@ public class EnhancedLinkedList<E>
             return result;
         }
         
+        public void replaceAll(UnaryOperator<E> operator) {
+            root.replaceAllRange(operator, offset, offset + size);
+        }
+        
         public E set(int index, E element) {
             Objects.checkIndex(index, size);
             checkForComodification();
@@ -2205,6 +2203,20 @@ public class EnhancedLinkedList<E>
         public int size() {
             checkForComodification();
             return size;
+        }
+        
+        @Override
+        @SuppressWarnings("unchecked")
+        public void sort(Comparator<? super E> c) {
+            int expectedModCount = modCount;
+            Object[] arr = this.toArray();
+            Arrays.sort((E[]) arr, 0, size, c);
+            
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+            
+            modCount++;
         }
         
         public List<E> subList(int fromIndex, int toIndex) {
