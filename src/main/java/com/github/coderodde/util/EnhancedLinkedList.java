@@ -379,13 +379,6 @@ public class EnhancedLinkedList<E>
     public void addLast(E e) {
         linkLast(e);
     }
-
-    /***************************************************************************
-    Used previously for debugging. Ignore.
-    ***************************************************************************/
-    public void checkInvariant() {
-       
-    }
     
     /**
      * {@inheritDoc }

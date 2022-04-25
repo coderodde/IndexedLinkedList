@@ -1010,7 +1010,6 @@ final class LinkedListBenchmark {
                         roddeListV2, 
                         REMOVE_OBJECT_OPERATIONS, 
                         randomRoddeListV2);
-        roddeListV2.checkInvariant();
     }
 
     private void profileRemoveObjectLinkedList() {    

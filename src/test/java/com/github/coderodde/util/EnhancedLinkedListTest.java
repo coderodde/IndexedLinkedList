@@ -943,13 +943,9 @@ public class EnhancedLinkedListTest {
     @Test
     public void addCollectionAtIndex() {
         list.addAll(0, Arrays.asList(2, 3)); // setAll
-        list.checkInvariant();
         list.addAll(0, Arrays.asList(0, 1)); // prependAll
-        list.checkInvariant();
         list.addAll(4, Arrays.asList(6, 7)); // appendAll
-        list.checkInvariant();
         list.addAll(4, Arrays.asList(4, 5)); // insertAll
-        list.checkInvariant();
 
         for (int i = 0; i < list.size(); i++) {
             assertEquals(Integer.valueOf(i), list.get(i));
@@ -1059,23 +1055,17 @@ public class EnhancedLinkedListTest {
     @Test
     public void removeAtIndex() {
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-        list.checkInvariant();
         
         // [0, 1, 2, 3, 4]
         assertEquals(Integer.valueOf(2), list.remove(2));
-        list.checkInvariant();
         // [0, 1, 3, 4]
         assertEquals(Integer.valueOf(0), list.remove(0));
-        list.checkInvariant();
         // [1, 3, 4]
         assertEquals(Integer.valueOf(4), list.remove(2));
-        list.checkInvariant();
         // [1, 3]
         assertEquals(Integer.valueOf(3), list.remove(1));
-        list.checkInvariant();
         // [1]
         assertEquals(Integer.valueOf(1), list.remove(0));
-        list.checkInvariant();
         // []
     }
 
@@ -1219,9 +1209,7 @@ public class EnhancedLinkedListTest {
                 indices.add(index);
                 
                 try {
-                    list.checkInvariant();
                     list.remove(index);
-                    list.checkInvariant();
                 } catch (NullPointerException ex) {
                     // Should not get here. Ever.
                     System.out.println("Failing indices: " + indices);
@@ -1238,22 +1226,11 @@ public class EnhancedLinkedListTest {
     public void bugTinyRemoveInt() {
         list.addAll(getIntegerList(5));
         
-        list.checkInvariant();
-        list.remove(4);
-        
-        list.checkInvariant();
-        list.remove(0);
-        
-        list.checkInvariant();
-        list.remove(2);
-        
-        list.checkInvariant();
-        list.remove(0);
-        
-        list.checkInvariant();
-        list.remove(0);
-        
-        list.checkInvariant();      
+        list.remove(4);    
+        list.remove(0);    
+        list.remove(2);    
+        list.remove(0);    
+        list.remove(0);    
     }
     
     @Test
@@ -1267,10 +1244,7 @@ public class EnhancedLinkedListTest {
             assertEquals(referenceList, list);
             
             int index = indices[i];
-            list.checkInvariant();
             list.remove(index);
-            list.checkInvariant();
-            
             referenceList.remove((int) index);
         }
         
@@ -1332,7 +1306,6 @@ public class EnhancedLinkedListTest {
         while (iter.hasNext()) {
             iter.next();
             arrayListIter.next();
-            list.checkInvariant();
             
             if (counter % 10 == 0) {
 
@@ -1837,9 +1810,7 @@ public class EnhancedLinkedListTest {
         
         for (int i = 0; i < indices.length; i++) {
             final int index = indices[i];
-            list.checkInvariant();
             list.remove(index);
-            list.checkInvariant();
         }
     }
     
@@ -1847,23 +1818,16 @@ public class EnhancedLinkedListTest {
     public void bugRemoveAt() {
         list.addAll(getIntegerList(10));
         
-        list.checkInvariant();
         assertEquals(Integer.valueOf(5), list.remove(5));
         
-        list.checkInvariant();
         assertEquals(Integer.valueOf(3), list.remove(3));
         
-        list.checkInvariant();
         assertEquals(Integer.valueOf(2), list.remove(2));
         
-        list.checkInvariant();
         assertEquals(Integer.valueOf(1), list.remove(1));
         
-        list.checkInvariant();
         // list = [0, 4, 5, 7, 8, 8]
-        assertEquals(Integer.valueOf(8), list.remove(4));
-        
-        list.checkInvariant();
+        assertEquals(Integer.valueOf(8), list.remove(4));    
     }
     
     @Test
