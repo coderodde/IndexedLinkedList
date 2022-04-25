@@ -1,5 +1,6 @@
 package com.github.coderodde.util;
 
+import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.AbstractSequentialList;
 import java.util.Arrays;
@@ -134,7 +135,8 @@ public class EnhancedLinkedList<E>
             Arrays.fill(fingerArray, size - numberOfFingers, size, null);
             fingerArray[size - numberOfFingers] = fingerArray[size];
             fingerArray[size] = null;
-            fingerArray[size].index -= numberOfFingers;
+            size -= numberOfFingers;
+            fingerArray[size].index = EnhancedLinkedList.this.size;
             contractFingerArrayIfNeeded(size);
         }
         
@@ -404,6 +406,12 @@ public class EnhancedLinkedList<E>
         modCount++;
     }
     
+    @Override
+    public Object clone() {
+        EnhancedLinkedList<E> list = new EnhancedLinkedList<>(this);
+        return list;
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -511,20 +519,19 @@ public class EnhancedLinkedList<E>
         return last.item;
     }
     
+    public int hashCode() {
+        int expectedModCount = modCount;
+        int hash = hashCodeRange(0, size);
+        checkForComodification(expectedModCount);
+        return hash;
+    }
+    
     /**
      * {@inheritDoc }
      */
     @Override
-    public int indexOf(Object o) {
-        int index = 0;
-        
-        for (Node<E> x = first; x != null; x = x.next, index++) {
-            if (Objects.equals(o, x.item)) {
-                return index;
-            }
-        }
-        
-        return -1;
+    public int indexOf(Object obj) {
+        return indexOfRange(obj, 0, size);
     }
     
     /**
@@ -547,18 +554,8 @@ public class EnhancedLinkedList<E>
      * {@inheritDoc }
      */
     @Override
-    public int lastIndexOf(Object o) {
-        int index = size;
-        
-        for (Node<E> x = last; x != null; x = x.prev) {
-            index--;
-
-            if (Objects.equals(o, x.item)) {
-                return index;
-            }
-        }
-        
-        return -1;
+    public int lastIndexOf(Object obj) {
+        return lastIndexOfRange(obj, 0, size);
     }
     
     /**
@@ -864,6 +861,37 @@ public class EnhancedLinkedList<E>
         return new LinkedListSpliterator<>(this, first, size, 0, modCount);
     }
     
+    @Override
+    public Object[] toArray() {
+        Object[] arr = new Object[size];
+        int index = 0;
+        
+        for (Node<E> node = first; node != null; node = node.next) {
+            arr[index++] = node.item;
+        }
+        
+        return arr;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        if (a.length < size) {
+            a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+        }
+        
+        int index = 0;
+        
+        for (Node<E> node = first; node != null; node = node.next) {
+            a[index++] = (T) node.item;
+        }
+        
+        if (a.length > size) {
+            a[size] = null;
+        }
+        
+        return a;
+    }
+    
     @java.io.Serial
     private static final long serialVersionUID = -1L;
     
@@ -951,6 +979,12 @@ public class EnhancedLinkedList<E>
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
+        }
+    }
+    
+    private void checkForComodification(int expectedModCount) {
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
         }
     }
 
@@ -1169,19 +1203,26 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    /***************************************************************************
-    Used previously for debugging. Ignore.
-    ***************************************************************************/
-    private Node<E> getNodeRaw(int index) {
-        Node<E> node = first;
+    boolean equalsRange(List<?> other, int from, int to) {
+        
+    }
 
-        for (int i = 0; i < index; i++) {
+    int hashCodeRange(int from, int to) {
+        int hashCode = 1;
+        
+        Node<E> node = node(from);
+        
+        while (from++ < to) {
+            hashCode =
+                    31 * hashCode + 
+                    (node.item == null ? 0 : node.item.hashCode());
+            
             node = node.next;
         }
-
-        return node;
-    }   
-
+        
+        return hashCode;
+    }
+    
     /***************************************************************************
     Constructs an IndexOutOfBoundsException detail message.
     ***************************************************************************/
@@ -1210,6 +1251,30 @@ public class EnhancedLinkedList<E>
         ++size;
         ++modCount;
     }
+    
+    int indexOfRange(Object o, int start, int end) {
+        int index = start;
+        
+        if (o == null) {
+            for (Node<E> node = node(start);
+                    index < end; 
+                    index++, node = node.next) {
+                if (node.item == null) {
+                    return index;
+                }
+            }
+        } else {
+            for (Node<E> node = node(start);
+                    index < end;
+                    index++, node = node.next) {
+                if (o.equals(node.item)) {
+                    return index;
+                }
+            }
+        }
+        
+        return -1;
+    }
 
     /***************************************************************************
     Tells if the argument is the index of an existing element.
@@ -1224,6 +1289,33 @@ public class EnhancedLinkedList<E>
     ***************************************************************************/
     private boolean isPositionIndex(int index) {
         return index >= 0 && index <= size;
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Returns the last appearance index of 'obj'.
+    ////////////////////////////////////////////////////////////////////////////
+    int lastIndexOfRange(Object o, int start, int end) {
+        int index = end - 1;
+        
+        if (o == null) {
+            for (Node<E> node = node(index);
+                    index >= start; 
+                    index--, node = node.prev) {
+                if (node.item == null) {
+                    return index;
+                }
+            }
+        } else {
+            for (Node<E> node = node(index);
+                    index >= start;
+                    index--, node = node.prev) {
+                if (o.equals(node.item)) {
+                    return index;
+                }
+            }
+        }
+        
+        return -1;
     }
     
     /***************************************************************************
@@ -1585,8 +1677,10 @@ public class EnhancedLinkedList<E>
     protected void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
+        int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
+        fingerList.removeTrailingFingers(numberOfFingersToRemove);
         
-        fingerList.removeTrailingFingers(fingerList.size() - nextFingerCount);
+        
     }
     
     /***************************************************************************
