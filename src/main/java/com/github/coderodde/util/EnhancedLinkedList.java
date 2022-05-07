@@ -1678,9 +1678,51 @@ public class EnhancedLinkedList<E>
         int removalSize = toIndex - fromIndex;
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
         int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
+        
         fingerList.removeTrailingFingers(numberOfFingersToRemove);
         
+        int numberOfDanglingFingers = 
+                computeNumberOfDanglingFingers(fromIndex, toIndex);
         
+        int leftListSize  = fromIndex;
+        int rightListSize = size - toIndex;
+        
+        int leftListFingersSize = fingerList.getNextFingerIndex(fromIndex);
+        int rightListFingersSize = fingerList.size() -
+                                   fingerList.getNextFingerIndex(toIndex);
+                                    
+        float leftListFingerLoadFactor = 
+                ((float) leftListFingersSize) / leftListSize;
+        
+        float rightListFingerLoadFactor = 
+                ((float) rightListFingersSize) / rightListSize;
+        
+        float totalLeftLoadFactor =  
+                leftListFingerLoadFactor
+                / 
+                (leftListFingerLoadFactor + rightListFingerLoadFactor);
+        
+        int fingersOnLeft = 
+                (int)(numberOfDanglingFingers * totalLeftLoadFactor);
+        
+        int fingersOnRight = numberOfDanglingFingers - fingersOnLeft;
+        
+        moveDanglingFingersToLeft (fingersOnLeft);
+        moveDanglingFingersToRight(fingersOnRight);
+    }
+    
+    private void moveDanglingFingersToLeft(int numberOfFingers) {
+        
+    }
+    
+    private void moveDanglingFingersToRight(int numberOfFingers) {
+        
+    }
+    
+    private int computeNumberOfDanglingFingers(int fromIndex, int toIndex) {
+        int fromIndexFingerIndex = fingerList.getNextFingerIndex(fromIndex);
+        int toIndexFingerIndex   = fingerList.getNextFingerIndex(toIndex);
+        return toIndexFingerIndex - fromIndexFingerIndex;
     }
     
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
