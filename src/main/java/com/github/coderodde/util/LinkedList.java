@@ -26,11 +26,11 @@ import java.util.function.Consumer;
  * time. Then, the list is traversed towards the target list. Assuming that the 
  * fingers are distributed evenly, the entire access runs in {@code sqrt(n)} 
  * time. Consult the following post describing the access in greater detail: 
- * <a href="Finger List">http://coderodde.github.io/weblog/#eill</a>. Also, this
- * list "learns": upon access, the closest finger will be moved to point to the
- * target node. Thus, if the access is random, this list will mimic more or less
- * even distribution. Finally, we need to consult all the fingers since the 
- * fingers are not sorted by their indices. 
+ * <a href="http://coderodde.github.io/weblog/#eill">Efficient indexed linked list</a>. 
+ * Also, this list "learns": upon access, the closest finger will be moved to 
+ * point to the target node. Thus, if the access is random, this list will mimic 
+ * more or less even distribution. Finally, we need to consult all the fingers 
+ * since the fingers are not sorted by their indices. 
  * 
  * <p><strong>Note that this implementation is not synchronized.</strong> If
  * multiple threads access a linked list concurrently, and at least one of the
@@ -768,10 +768,10 @@ public class LinkedList<E>
     
     /**
      * Returns a sublist view over this list starting from index 
-     * {@code fromIndex} (inclusive), and {@
-     * @param fromIndex
-     * @param toIndex
-     * @return 
+     * {@code fromIndex} (inclusive), and {@code toIndex} (exclusive).
+     * @param fromIndex the starting index.
+     * @param toIndex   the ending index.
+     * @return the sublist view.
      */
     @Override
     public List<E> subList(int fromIndex, int toIndex) {

@@ -957,6 +957,30 @@ public class EnhancedLinkedList<E>
         }
     }
     
+    boolean batchRemove(Collection<?> c,
+                        boolean complement,
+                        int from,
+                        int end) {
+        Objects.requireNonNull(c);
+        
+        if (c.isEmpty()) {
+            return false;
+        }
+        
+        boolean modified = false;
+        
+        for (Node<E> node = node(from); from < end; from++) {
+            if (c.contains(node.item) == complement) {
+                modified = true;
+                Node<E> nextNode = node.next;
+                this.removeNode(node);
+                node = nextNode;
+            }
+        }
+        
+        return modified;
+    }
+    
     private void checkForComodification(int expectedModCount) {
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
@@ -1609,6 +1633,10 @@ public class EnhancedLinkedList<E>
     
     private void removeFinger() {
         fingerList.removeFinger();
+    }
+    
+    private void removeNode(Node<E> node) {
+        
     }
     
     /***************************************************************************
