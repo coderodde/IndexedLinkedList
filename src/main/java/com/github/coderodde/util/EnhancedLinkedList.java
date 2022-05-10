@@ -25,7 +25,7 @@ import java.util.function.UnaryOperator;
  */
 public class EnhancedLinkedList<E> 
         extends AbstractSequentialList<E>
-        implements List<E>, Deque<E>, Cloneable, java.io.Serializable {
+        implements Deque<E>, Cloneable, java.io.Serializable {
     
     class FingerList<E> {
 
@@ -1676,8 +1676,27 @@ public class EnhancedLinkedList<E>
     ////////////////////////////////////////////////////////////////////////////
     protected void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
+        
+        if (removalSize == 0) {
+            return;
+        }
+        
+        if (removalSize == size) {
+            clear();
+            modCount++;
+            return;
+        }
+        
+        Node<E> firstNodeToRemove = node(fromIndex);
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
         int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
+        
+        if (numberOfFingersToRemove == 0) {
+            fingerList.shiftFingerIndicesToRight(
+                    fingerList.getNextFingerIndex(toIndex), 
+                    removalSize);
+            return;
+        }
         
         fingerList.removeTrailingFingers(numberOfFingersToRemove);
         
@@ -1709,6 +1728,9 @@ public class EnhancedLinkedList<E>
         
         moveDanglingFingersToLeft (fingersOnLeft);
         moveDanglingFingersToRight(fingersOnRight);
+        System.out.println("yes");
+        
+        removeRangeNodes(firstNodeToRemove, removalSize);
     }
     
     private void moveDanglingFingersToLeft(int numberOfFingers) {
@@ -1717,6 +1739,37 @@ public class EnhancedLinkedList<E>
     
     private void moveDanglingFingersToRight(int numberOfFingers) {
         
+    }
+    
+    private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
+        Node<E> prefixLastNode = node.prev;
+        Node<E> nextNode = null;
+        
+        for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
+            nextNode = node.next;
+            node.next = null;
+            node.prev = null;
+            node.item = null;
+            node = nextNode;
+        }
+        
+        Node suffixFirstNode = nextNode.next;
+        nextNode.next = null;
+        nextNode.prev = null;
+        nextNode.item = null;
+        
+        if (prefixLastNode != null) {
+            if (suffixFirstNode == null) {
+                prefixLastNode.next = null;
+                last = prefixLastNode;
+            } else {
+                prefixLastNode.next = suffixFirstNode;
+                suffixFirstNode.prev = prefixLastNode;
+            }
+        } else {
+            suffixFirstNode.prev = null;
+            first = suffixFirstNode;
+        }
     }
     
     private int computeNumberOfDanglingFingers(int fromIndex, int toIndex) {
@@ -2131,14 +2184,14 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    private static class SubList<E> extends AbstractList<E> {
+    private static class EnhancedSubList<E> extends AbstractList<E> {
         
         private final EnhancedLinkedList<E> root;
-        private final SubList<E> parent;
+        private final EnhancedSubList<E> parent;
         private final int offset;
         private int size;
         
-        public SubList(EnhancedLinkedList<E> root, int fromIndex, int toIndex) {
+        public EnhancedSubList(EnhancedLinkedList<E> root, int fromIndex, int toIndex) {
             this.root = root;
             this.parent = null;
             this.offset = fromIndex;
@@ -2146,7 +2199,7 @@ public class EnhancedLinkedList<E>
             this.modCount = root.modCount;
         }
         
-        private SubList(SubList<E> parent, int fromIndex, int toIndex) {
+        private EnhancedSubList(EnhancedSubList<E> parent, int fromIndex, int toIndex) {
             this.root = parent.root;
             this.parent = parent;
             this.offset = parent.offset + fromIndex;
@@ -2177,6 +2230,12 @@ public class EnhancedLinkedList<E>
             root.addAll(offset + index, collection);
             updateSizeAndModCount(collectionSize);
             return true;
+        }
+        
+        public void clear() {
+            checkForComodification();
+            parent.removeRange(offset, offset + size);
+            updateSizeAndModCount(-size);
         }
         
         public E get(int index) {
@@ -2282,9 +2341,9 @@ public class EnhancedLinkedList<E>
             modCount++;
         }
         
-        public List<E> subList(int fromIndex, int toIndex) {
+        public EnhancedSubList<E> subList(int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new SubList<>(this, fromIndex, toIndex);
+            return new EnhancedSubList<>(this, fromIndex, toIndex);
         }
         
         protected void removeRange(int fromIndex, int toIndex) {
@@ -2326,7 +2385,7 @@ public class EnhancedLinkedList<E>
         }
         
         private void updateSizeAndModCount(int sizeDelta) {
-            SubList<E> subList = this;
+            EnhancedSubList<E> subList = this;
             
             do {
                 subList.size += sizeDelta;

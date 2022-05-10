@@ -227,6 +227,16 @@ public class EnhancedLinkedListTest {
         }
     }
     
+    @Test
+    public void sublistClear1() {
+        list.addAll(getIntegerList(100));
+        List<Integer> sublist = list.subList(49, 51);
+        assertEquals(2, sublist.size());
+        sublist.clear();
+        assertEquals(98, list.size());
+        assertEquals(0, sublist.size());
+    }
+    
 //    @Test(expected = IllegalStateException.class) 
     public void listEqualsThrowsOnBadIterator() {
         DummyList dummyList = new DummyList();
