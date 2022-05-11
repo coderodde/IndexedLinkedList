@@ -605,6 +605,8 @@ public class EnhancedLinkedList<E>
             
             index += nodesPerFinger;
         }
+        
+        fingerList.get(fingerList.size()).index = size;
     }
     
     /**
@@ -1762,8 +1764,6 @@ public class EnhancedLinkedList<E>
         modCount++;
         
         Node<E> fromIndexNode = node(fromIndex);
-        int firstToRemoveFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
-        
         removeRangeNodes(fromIndexNode, removalSize);
         
         int newNumberOfFingers = 
@@ -1771,13 +1771,10 @@ public class EnhancedLinkedList<E>
         
         int numberOfFingersToRemove = fingerList.size() - newNumberOfFingers;
         
-        if (numberOfFingersToRemove == 0) {
-            fingerList.shiftFingerIndicesToRight(firstToRemoveFingerIndex,
-                                                 -removalSize);
-            return;
+        if (numberOfFingersToRemove != 0) {
+            fingerList.removeTrailingFingers(numberOfFingersToRemove);
         }
         
-        fingerList.removeTrailingFingers(numberOfFingersToRemove);
         optimize();
 //        
 //        fingerList.removeTrailingFingers(numberOfFingersToRemove);
@@ -1883,6 +1880,8 @@ public class EnhancedLinkedList<E>
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
+//        int fingerCount = 0;
+//        Finger<E> finger = figner
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
             nextNode = node.next;
@@ -1909,6 +1908,8 @@ public class EnhancedLinkedList<E>
             suffixFirstNode.prev = null;
             first = suffixFirstNode;
         }
+        
+        size -= numberOfNodesToRemove;
     }
     
     private int computeNumberOfDanglingFingers(int fromIndex, int toIndex) {
