@@ -1671,10 +1671,64 @@ public class EnhancedLinkedList<E>
         }
     }
     
+    protected void removeRange(int fromIndex, int toIndex) {
+        int removalSize = toIndex - fromIndex;
+        
+        if (removalSize == 0) {
+            return;
+        }
+        
+        if (removalSize == size) {
+            clear();
+            return;
+        }
+        
+        modCount++;
+        
+        Node<E> fromIndexNode = node(fromIndex);
+        int firstToRemoveFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
+        
+        removeRangeNodes(fromIndexNode, removalSize);
+        
+        int newNumberOfFingers = 
+                getRecommendedNumberOfFingers(size - removalSize);
+        
+        int numberOfFingersToRemove = fingerList.size() - newNumberOfFingers;;
+        
+        fingerList.removeTrailingFingers(numberOfFingersToRemove);
+        
+        int newSize = size - removalSize;
+        int nodesPerFinger = newSize / newNumberOfFingers;
+        int startOffset = nodesPerFinger / 2;
+        int fingerIndex = firstToRemoveFingerIndex + 1;
+        int index = 0;
+        Node<E> node = first;
+        
+        for (int i = 0; i < startOffset; ++i) {
+            node = node.next;
+        }
+        
+        for (int i = 0; i < newNumberOfFingers - 1; ++i) {
+            Finger<E> finger = fingerList.get(fingerIndex);
+            finger.node = node;
+            finger.index = index;
+            
+            for (int j = 0; j < nodesPerFinger; ++j) {
+                node = node.next;
+            }
+            
+            index += nodesPerFinger;
+        }
+        
+        Finger<E> finger = fingerList.get(fingerList.size() - 1);
+        finger.index = index;
+        finger.node = node;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // Removes a range from this list.
     ////////////////////////////////////////////////////////////////////////////
-    protected void removeRange(int fromIndex, int toIndex) {
+    protected void removeRangeOld(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
         if (removalSize == 0) {
@@ -1743,7 +1797,7 @@ public class EnhancedLinkedList<E>
     
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
-        Node<E> nextNode = null;
+        Node<E> nextNode = node;
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
             nextNode = node.next;
