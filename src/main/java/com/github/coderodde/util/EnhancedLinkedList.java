@@ -578,6 +578,36 @@ public class EnhancedLinkedList<E>
     }
     
     /**
+     * Moves all the fingers such that they are evenly distributed.
+     */
+    public void optimize() {
+        if (size == 0) {
+            return;
+        }
+        
+        int nodesPerFinger = size / fingerList.size();
+        int startOffset = nodesPerFinger / 2;
+        int index = startOffset;
+        Node<E> node = first;
+        
+        for (int i = 0; i < startOffset; ++i) {
+            node = node.next;
+        }
+        
+        for (int i = 0; i < fingerList.size(); ++i) {
+            Finger<E> finger = fingerList.get(i);
+            finger.node = node;
+            finger.index = index;
+            
+            for (int j = 0; j < nodesPerFinger; ++j) {
+                node = node.next;
+            }
+            
+            index += nodesPerFinger;
+        }
+    }
+    
+    /**
      * {@inheritDoc }
      */
     @Override
@@ -1739,36 +1769,45 @@ public class EnhancedLinkedList<E>
         int newNumberOfFingers = 
                 getRecommendedNumberOfFingers(size - removalSize);
         
-        int numberOfFingersToRemove = fingerList.size() - newNumberOfFingers;;
+        int numberOfFingersToRemove = fingerList.size() - newNumberOfFingers;
+        
+        if (numberOfFingersToRemove == 0) {
+            fingerList.shiftFingerIndicesToRight(firstToRemoveFingerIndex,
+                                                 -removalSize);
+            return;
+        }
         
         fingerList.removeTrailingFingers(numberOfFingersToRemove);
-        
-        int newSize = size - removalSize;
-        int nodesPerFinger = newSize / newNumberOfFingers;
-        int startOffset = nodesPerFinger / 2;
-        int fingerIndex = firstToRemoveFingerIndex + 1;
-        int index = 0;
-        Node<E> node = first;
-        
-        for (int i = 0; i < startOffset; ++i) {
-            node = node.next;
-        }
-        
-        for (int i = 0; i < newNumberOfFingers - 1; ++i) {
-            Finger<E> finger = fingerList.get(fingerIndex);
-            finger.node = node;
-            finger.index = index;
-            
-            for (int j = 0; j < nodesPerFinger; ++j) {
-                node = node.next;
-            }
-            
-            index += nodesPerFinger;
-        }
-        
-        Finger<E> finger = fingerList.get(fingerList.size() - 1);
-        finger.index = index;
-        finger.node = node;
+        optimize();
+//        
+//        fingerList.removeTrailingFingers(numberOfFingersToRemove);
+//        
+//        int newSize = size - removalSize;
+//        int nodesPerFinger = newSize / newNumberOfFingers;
+//        int startOffset = nodesPerFinger / 2;
+//        int fingerIndex = firstToRemoveFingerIndex + 1;
+//        int index = 0;
+//        Node<E> node = first;
+//        
+//        for (int i = 0; i < startOffset; ++i) {
+//            node = node.next;
+//        }
+//        
+//        for (int i = 0; i < newNumberOfFingers - 1; ++i) {
+//            Finger<E> finger = fingerList.get(fingerIndex);
+//            finger.node = node;
+//            finger.index = index;
+//            
+//            for (int j = 0; j < nodesPerFinger; ++j) {
+//                node = node.next;
+//            }
+//            
+//            index += nodesPerFinger;
+//        }
+//        
+//        Finger<E> finger = fingerList.get(newNumberOfFingers - 1);
+//        finger.index = size;
+//        finger.node = null;
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -2334,7 +2373,7 @@ public class EnhancedLinkedList<E>
         
         public void clear() {
             checkForComodification();
-            parent.removeRange(offset, offset + size);
+            root.removeRange(offset, offset + size);
             updateSizeAndModCount(-size);
         }
         
