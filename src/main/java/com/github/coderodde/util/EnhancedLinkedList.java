@@ -600,7 +600,7 @@ public class EnhancedLinkedList<E>
             node = node.next;
         }
         
-        for (int i = 0; i < fingerList.size(); ++i) {
+        for (int i = 0; i < fingerList.size() - 1; ++i) {
             Finger<E> finger = fingerList.get(i);
             finger.node = node;
             finger.index = index;
@@ -612,6 +612,9 @@ public class EnhancedLinkedList<E>
             index += nodesPerFinger;
         }
         
+        Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
+        lastFinger.node = node;
+        lastFinger.index = index;
         fingerList.get(fingerList.size()).index = size;
     }
     

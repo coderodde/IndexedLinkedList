@@ -239,11 +239,9 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void bruteForceSublistClear() {
-        Random random = new Random(1L);
+        Random random = new Random(2L);
         
         for (int i = 0; i < 100; ++i) {
-            System.out.println("i == " + i);
-            
             int size = 1 + random.nextInt(100);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
