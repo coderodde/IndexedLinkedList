@@ -237,6 +237,28 @@ public class EnhancedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
+    @Test
+    public void bruteForceSublistClear() {
+        Random random = new Random(1L);
+        
+        for (int i = 0; i < 100; ++i) {
+            System.out.println("i == " + i);
+            
+            int size = 1 + random.nextInt(100);
+            List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
+            list.clear();
+            list.addAll(referenceList);
+            
+            int fromIndex = random.nextInt(size);
+            int toIndex = Math.min(size, fromIndex + random.nextInt(size));
+            
+            list.subList(fromIndex, toIndex).clear();
+            referenceList.subList(fromIndex, toIndex).clear();
+            
+            assertEquals(referenceList, list);
+        }
+    }
+    
 //    @Test(expected = IllegalStateException.class) 
     public void listEqualsThrowsOnBadIterator() {
         DummyList dummyList = new DummyList();
@@ -1784,6 +1806,14 @@ public class EnhancedLinkedListTest {
             
             listsEqual(list, referenceList);
         } 
+    }
+    
+    @Test
+    public void contractAdaptsToMinimumCapacity() {
+        System.out.println("contractAdaptsToMinimumCapacity, begin");
+        list.addAll(getIntegerList(1000_000));
+        list.subList(10, 1000_000 - 10).clear();
+        System.out.println("contractAdaptsToMinimumCapacity, end");
     }
     
     @Test
