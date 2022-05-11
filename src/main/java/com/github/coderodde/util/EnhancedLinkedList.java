@@ -24,8 +24,7 @@ import java.util.function.UnaryOperator;
  * @since 1.6 (Sep 1, 2021)
  */
 public class EnhancedLinkedList<E> 
-        extends AbstractSequentialList<E>
-        implements Deque<E>, Cloneable, java.io.Serializable {
+        implements Deque<E>, List<E>, Cloneable, java.io.Serializable {
     
     class FingerList<E> {
 
@@ -259,6 +258,7 @@ public class EnhancedLinkedList<E>
      * The cached number of elements in this list.
      */
     private int size;
+    private int modCount;
     private transient Node<E> first;
     private transient Node<E> last;
     
@@ -414,6 +414,17 @@ public class EnhancedLinkedList<E>
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
     }
+    
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object o : c) {
+            if (!contains(o)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     /**
      * {@inheritDoc }
@@ -525,6 +536,11 @@ public class EnhancedLinkedList<E>
     @Override
     public int lastIndexOf(Object obj) {
         return lastIndexOfRange(obj, 0, size);
+    }
+    
+    @Override
+    public ListIterator<E> listIterator() {
+        return new EnhancedIterator(0);
     }
     
     /**
@@ -706,6 +722,10 @@ public class EnhancedLinkedList<E>
 
         return returnValue;
     }
+    
+    public boolean removeAll(Collection<?> c) {
+        return batchRemove(c, true, 0, size);
+    }
 
     /**
      * {@inheritDoc }
@@ -803,6 +823,11 @@ public class EnhancedLinkedList<E>
         modCount++;
     }
     
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return batchRemove(c, false, 0, size);
+    }
+    
     /**
      * Sets the element at index {@code index} to {@code element} and returns
      * the old element.
@@ -836,6 +861,11 @@ public class EnhancedLinkedList<E>
         return new LinkedListSpliterator<>(this, first, size, 0, modCount);
     }
     
+    public List<E> subList(int fromIndex, int toIndex) {
+        subListRangeCheck(fromIndex, toIndex, size);
+        return new EnhancedSubList(this, fromIndex, toIndex);
+    }
+    
     @Override
     public Object[] toArray() {
         Object[] arr = new Object[size];
@@ -865,6 +895,22 @@ public class EnhancedLinkedList<E>
         }
         
         return a;
+    }
+    
+    static void subListRangeCheck(int fromIndex, int toIndex, int size) {
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+        }
+
+        if (toIndex > size){
+            throw new IndexOutOfBoundsException(
+                    "toIndex(" + toIndex + ") > size(" + size + ")");
+        }
+
+        if (fromIndex > toIndex)
+            throw new IllegalArgumentException(
+                    "fromIndex(" + fromIndex + ") > toIndex(" 
+                            + toIndex + ")");
     }
     
     @java.io.Serial
@@ -2395,7 +2441,7 @@ public class EnhancedLinkedList<E>
             modCount++;
         }
         
-        public EnhancedSubList<E> subList(int fromIndex, int toIndex) {
+        public List<E> subList(int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
             return new EnhancedSubList<>(this, fromIndex, toIndex);
         }
@@ -2420,22 +2466,6 @@ public class EnhancedLinkedList<E>
                 throw new IndexOutOfBoundsException(
                         "index(" + index + ") > size(" + size + ")");
             }
-        }
-        
-        static void subListRangeCheck(int fromIndex, int toIndex, int size) {
-            if (fromIndex < 0) {
-                throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
-            }
-            
-            if (toIndex > size){
-                throw new IndexOutOfBoundsException(
-                        "toIndex(" + toIndex + ") > size(" + size + ")");
-            }
-                
-            if (fromIndex > toIndex)
-                throw new IllegalArgumentException(
-                        "fromIndex(" + fromIndex + ") > toIndex(" 
-                                + toIndex + ")");
         }
         
         private void updateSizeAndModCount(int sizeDelta) {
