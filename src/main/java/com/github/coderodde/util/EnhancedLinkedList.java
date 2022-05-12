@@ -2,7 +2,6 @@ package com.github.coderodde.util;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
-import java.util.AbstractSequentialList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -168,6 +167,26 @@ public class EnhancedLinkedList<E>
 
             fingerArray[beforeFingerIndex] = finger;
             fingerArray[++size].index = EnhancedLinkedList.this.size;
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        // Removes the finger range [startFingerIndex, endFingerIndex).
+        ////////////////////////////////////////////////////////////////////////
+        void removeRange(int startFingerIndex, int endFingerIndex) {
+            int size = endFingerIndex - startFingerIndex;
+            
+            System.arraycopy(fingerArray, 
+                             startFingerIndex, 
+                             fingerArray, 
+                             endFingerIndex, 
+                             this.size - endFingerIndex);
+            
+            contractFingerArrayIfNeeded(this.size -= size);
+            
+            Arrays.fill(fingerArray, 
+                        this.size + 1,
+                        fingerArray.length, 
+                        null);
         }
         
         /***********************************************************************
@@ -1758,7 +1777,7 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    protected void removeRange(int fromIndex, int toIndex) {
+    protected void removeRangeOld(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
         if (removalSize == 0) {
@@ -1790,7 +1809,7 @@ public class EnhancedLinkedList<E>
     ////////////////////////////////////////////////////////////////////////////
     // Removes a range from this list.
     ////////////////////////////////////////////////////////////////////////////
-    protected void removeRangeOld(int fromIndex, int toIndex) {
+    protected void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
         if (removalSize == 0) {
@@ -1799,68 +1818,61 @@ public class EnhancedLinkedList<E>
         
         if (removalSize == size) {
             clear();
-            modCount++;
             return;
         }
         
         Node<E> firstNodeToRemove = node(fromIndex);
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
         int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
-        
-        if (numberOfFingersToRemove == 0) {
-            fingerList.shiftFingerIndicesToRight(
-                    fingerList.getNextFingerIndex(toIndex), 
-                    removalSize);
-            return;
-        }
-        
-        fingerList.removeTrailingFingers(numberOfFingersToRemove);
-        
         int numberOfDanglingFingers = 
-                computeNumberOfDanglingFingers(fromIndex, toIndex);
-        
+                computeNumberOfDanglingFingers(fromIndex, 
+                                               toIndex);
         int leftListSize  = fromIndex;
         int rightListSize = size - toIndex;
-        
+        int listSizeSum = leftListSize + rightListSize;
         int leftListFingersSize = fingerList.getNextFingerIndex(fromIndex);
-        int rightListFingersSize = fingerList.size() -
-                                   fingerList.getNextFingerIndex(toIndex);
-                                    
-        float leftListFingerLoadFactor = 
-                ((float) leftListFingersSize) / leftListSize;
         
-        float rightListFingerLoadFactor = 
-                ((float) rightListFingersSize) / rightListSize;
-        
-        float totalLeftLoadFactor =  
-                leftListFingerLoadFactor
-                / 
-                (leftListFingerLoadFactor + rightListFingerLoadFactor);
+        float totalLeftLoadFactor = 
+                ((float)(leftListSize - leftListFingersSize)) / listSizeSum;
         
         int fingersOnLeft = 
-                (int)(numberOfDanglingFingers * totalLeftLoadFactor);
+                (int)(nextFingerCount * totalLeftLoadFactor);
         
-        int fingersOnRight = numberOfDanglingFingers - fingersOnLeft;
+        int fingersOnRight = nextFingerCount - fingersOnLeft;
         
-        moveDanglingFingersToLeft (fingersOnLeft);
+        fingerList.removeRange(fingersOnLeft,
+                               fingerList.size() - fingersOnRight);
+        
+        moveDanglingFingersToLeft(
+                fingersOnLeft, 
+                fingerList.getFingerIndexImpl(fromIndex));
+        
         moveDanglingFingersToRight(fingersOnRight);
         
         removeRangeNodes(firstNodeToRemove, removalSize);
+        
     }
     
-    private void moveDanglingFingersToLeft(int numberOfFingers) {
+    private void moveDanglingFingersToLeft(int numberOfFingers,
+                                           int fingerListIndex) {
+        if (numberOfFingers == 0) {
+            return;
+        }
+        
         
     }
     
     private void moveDanglingFingersToRight(int numberOfFingers) {
+        if (numberOfFingers == 0) {
+            return;
+        }
+        
         
     }
     
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
-//        int fingerCount = 0;
-//        Finger<E> finger = figner
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
             nextNode = node.next;
