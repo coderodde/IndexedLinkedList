@@ -1844,6 +1844,7 @@ public class EnhancedLinkedList<E>
                                fingerList.size() - fingersOnRight);
         
         moveDanglingFingersToLeft(
+                fromIndex,
                 fingersOnLeft, 
                 fingerList.getFingerIndexImpl(fromIndex));
         
@@ -1853,13 +1854,19 @@ public class EnhancedLinkedList<E>
         
     }
     
-    private void moveDanglingFingersToLeft(int numberOfFingers,
+    private void moveDanglingFingersToLeft(int fromIndex,
+                                           int numberOfFingers,
                                            int fingerListIndex) {
-        if (numberOfFingers == 0) {
-            return;
+        int rewindAmount = numberOfFingers - 1;
+
+        for (int fingerIndex = 0; 
+                 fingerIndex < numberOfFingers; 
+                 fingerIndex++) {
+            Finger<E> finger = fingerList.get(fromIndex + fingerIndex);
+            finger.rewindLeft(rewindAmount);
+            finger.index -= rewindAmount;
+            rewindAmount--;
         }
-        
-        
     }
     
     private void moveDanglingFingersToRight(int numberOfFingers) {
