@@ -209,6 +209,60 @@ public class EnhancedLinkedList<E>
                 fingerArray[i].index++;
             }
         }
+        
+        void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
+            if (numberOfFingers == 0) {
+                System.out.println("A");
+                return;
+            }
+            
+            int fromFingerIndex = getFingerIndex(fromIndex);
+            
+            if (fromFingerIndex == 0) {
+                int toMove = fingerArray[0].index - fromIndex + numberOfFingers;
+                
+                for (int i = 0; i < toMove; ++i) {
+                    fingerArray[0].node = fingerArray[0].node.prev;
+                }
+                
+                fingerArray[0].index -= toMove;
+                
+                for (int i = 1; i < numberOfFingers; ++i) {
+                    Finger<E> previousFinger = fingerArray[i - 1];
+                    Finger<E> currentFinger = fingerArray[i];
+                    currentFinger.node = previousFinger.node.next;
+                    currentFinger.index = previousFinger.index + 1;
+                }
+                
+                return;
+            }
+            
+            int i;
+            Finger<E> previousFinger = null;
+            
+            for (i = fromFingerIndex - 1; i >= 0; --i) {
+                Finger<E> finger = fingerArray[i];
+                
+                if (finger.index + numberOfFingers <= fromIndex) {
+                    previousFinger = finger;
+                    break;
+                }
+            }
+            
+            for (int j = i + 1; j < numberOfFingers; ++j) {
+                Finger<E> currentFinger = fingerArray[j];
+                currentFinger.index = previousFinger.index + 1;
+                currentFinger.node = previousFinger.node.next;
+                previousFinger = currentFinger;
+            }
+        }
+        
+        void moveFingersToSuffix(int toIndex, int numberOfFingers) {
+            if (numberOfFingers == 0) {
+                System.out.println("B = 0");
+                return;
+            }
+        }
 
         void removeFinger() {
             contractFingerArrayIfNeeded(--size);
@@ -1823,10 +1877,10 @@ public class EnhancedLinkedList<E>
         
         Node<E> firstNodeToRemove = node(fromIndex);
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
-        int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
-        int numberOfDanglingFingers = 
-                computeNumberOfDanglingFingers(fromIndex, 
-                                               toIndex);
+//        int numberOfFingersToRemove = fingerList.size() - nextFingerCount;
+//        int numberOfDanglingFingers = 
+//                computeNumberOfDanglingFingers(fromIndex, 
+//                                               toIndex);
         int leftListSize  = fromIndex;
         int rightListSize = size - toIndex;
         int listSizeSum = leftListSize + rightListSize;
@@ -1843,20 +1897,14 @@ public class EnhancedLinkedList<E>
         fingerList.removeRange(fingersOnLeft,
                                fingerList.size() - fingersOnRight);
         
-        moveDanglingFingersToLeft(
-                fromIndex,
-                fingersOnLeft, 
-                fingerList.getFingerIndexImpl(fromIndex));
-        
-        moveDanglingFingersToRight(fingersOnRight);
-        
+        fingerList.moveFingersToPrefix(fromIndex, fingersOnLeft);
+//        moveDanglingFingersToLeft(fromIndex, fingersOnLeft);
+//        moveDanglingFingersToRight(fingersOnRight);
         removeRangeNodes(firstNodeToRemove, removalSize);
-        
     }
     
     private void moveDanglingFingersToLeft(int fromIndex,
-                                           int numberOfFingers,
-                                           int fingerListIndex) {
+                                           int numberOfFingers) {
         int rewindAmount = numberOfFingers - 1;
 
         for (int fingerIndex = 0; 
