@@ -243,7 +243,7 @@ public class EnhancedLinkedListTest {
         list.subList(10, 990).clear();
     }
     
-    @Test
+//    @Test
     public void sublistClear3() {
         list.addAll(getIntegerList(1000));
         list.subList(70, 1000).clear();
