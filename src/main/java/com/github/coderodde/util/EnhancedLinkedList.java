@@ -293,6 +293,17 @@ public class EnhancedLinkedList<E>
             
             int i;
             Finger<E> nextFinger = null;
+            
+            for (i = toFingerIndex; i < size; ++i) {
+                Finger<E> finger = fingerArray[i];
+                
+                if (finger.index + numberOfFingers <= size) {
+                    nextFinger = finger;
+                    break;
+                }
+            }
+            
+            
         }
 
         void removeFinger() {
