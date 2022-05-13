@@ -237,7 +237,7 @@ public class EnhancedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
-    @Test
+//    @Test
     public void sublistClear2() {
         list.addAll(getIntegerList(1000));
         list.subList(10, 990).clear();
@@ -245,6 +245,18 @@ public class EnhancedLinkedListTest {
     
 //    @Test
     public void sublistClear3() {
+        list.addAll(getIntegerList(1_000_000));
+        list.subList(10, 999990).clear();
+    }
+    
+    @Test
+    public void sublistClear4() {
+        list.addAll(getIntegerList(1_000));
+        list.subList(10, 500).clear();
+    }
+    
+//    @Test
+    public void sublistClear5() {
         list.addAll(getIntegerList(1000));
         list.subList(70, 1000).clear();
     }
