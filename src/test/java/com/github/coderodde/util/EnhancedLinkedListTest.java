@@ -255,8 +255,39 @@ public class EnhancedLinkedListTest {
         list.subList(10, 500).clear();
     }
     
-//    @Test
+    @Test
     public void sublistClear5() {
+        list.addAll(getIntegerList(100));
+        List<Integer> referenceList = new ArrayList<>(list);
+        list.subList(10, 90).clear();
+        referenceList.subList(10, 90).clear();
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void sublistClearLeftOfSmall() {
+        list.add(1);
+        list.add(2);
+        
+        list.subList(0, 1).clear();
+        
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(2), list.get(0));
+    }
+    
+    @Test
+    public void sublistClearRightOfSmall() {
+        list.add(1);
+        list.add(2);
+        
+        list.subList(1, 2).clear();
+        
+        assertEquals(1, list.size());
+        assertEquals(Integer.valueOf(1), list.get(0));
+    }
+    
+//    @Test
+    public void sublistClear6() {
         list.addAll(getIntegerList(1000));
         list.subList(70, 1000).clear();
     }
