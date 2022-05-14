@@ -249,13 +249,13 @@ public class EnhancedLinkedListTest {
         list.subList(10, 999990).clear();
     }
     
-    @Test
+//    @Test
     public void sublistClear4() {
         list.addAll(getIntegerList(1_000));
         list.subList(10, 500).clear();
     }
     
-    @Test
+//    @Test
     public void sublistClear5() {
         list.addAll(getIntegerList(100));
         List<Integer> referenceList = new ArrayList<>(list);
@@ -275,7 +275,7 @@ public class EnhancedLinkedListTest {
         assertEquals(Integer.valueOf(2), list.get(0));
     }
     
-    @Test
+//    @Test
     public void sublistClearRightOfSmall() {
         list.add(1);
         list.add(2);
@@ -1861,7 +1861,7 @@ public class EnhancedLinkedListTest {
         } 
     }
     
-    @Test
+//    @Test
     public void contractAdaptsToMinimumCapacity() {
         System.out.println("contractAdaptsToMinimumCapacity, begin");
         list.addAll(getIntegerList(1000_000));

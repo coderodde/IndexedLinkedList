@@ -175,27 +175,24 @@ public class EnhancedLinkedList<E>
         void removeRange(int startFingerIndex, 
                          int endFingerIndex,
                          int removalSize) {
-            // +1 for the end-of-finger-list sentinel finger::
-            int sz = endFingerIndex - startFingerIndex;
+            shiftFingerIndicesToLeft(endFingerIndex, removalSize);
+            
+            int fingersToRemove = endFingerIndex - startFingerIndex;
             
             System.arraycopy(fingerArray, 
                              endFingerIndex, 
                              fingerArray,
                              startFingerIndex, 
-                             size - sz + 1);
+                             size - endFingerIndex + 1);
             
-            contractFingerArrayIfNeeded(size -= sz);
+            contractFingerArrayIfNeeded(size - fingersToRemove);
             
             Arrays.fill(fingerArray, 
+                        size - fingersToRemove + 1,
                         size + 1,
-                        fingerArray.length, 
                         null);
             
-            shiftFingerIndicesToLeft(endFingerIndex, removalSize);
-            
-            Finger<E> finger = fingerArray[size];
-            finger.index = EnhancedLinkedList.this.size - sz;
-            finger.node = null;
+            size -= fingersToRemove;
         }
         
         private void shiftFingerIndicesToLeft(int startIndex,      
@@ -1894,35 +1891,6 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    protected void removeRangeOld(int fromIndex, int toIndex) {
-        int removalSize = toIndex - fromIndex;
-        
-        if (removalSize == 0) {
-            return;
-        }
-        
-        if (removalSize == size) {
-            clear();
-            return;
-        }
-        
-        modCount++;
-        int saveSize = size;
-        Node<E> fromIndexNode = node(fromIndex);
-        removeRangeNodes(fromIndexNode, removalSize);
-        
-        int newNumberOfFingers = 
-                getRecommendedNumberOfFingers(saveSize - removalSize);
-        
-        int numberOfFingersToRemove = fingerList.size() - newNumberOfFingers;
-        
-        if (numberOfFingersToRemove != 0) {
-            fingerList.removeTrailingFingers(numberOfFingersToRemove);
-        }
-        
-        optimize();
-    }
-    
     ////////////////////////////////////////////////////////////////////////////
     // Removes a range from this list.
     ////////////////////////////////////////////////////////////////////////////
@@ -1990,8 +1958,6 @@ public class EnhancedLinkedList<E>
             suffixFirstNode.prev = null;
             first = suffixFirstNode;
         }
-        
-        size -= numberOfNodesToRemove;
     }
     
     private int computeNumberOfDanglingFingers(int fromIndex, int toIndex) {
