@@ -1927,6 +1927,7 @@ public class EnhancedLinkedList<E>
         fingerList.removeRange(fingersOnLeft, fingersToRemove, removalSize);
         removeRangeNodes(firstNodeToRemove, removalSize);
         modCount++;
+        size -= removalSize;
     }
     
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
