@@ -275,7 +275,7 @@ public class EnhancedLinkedListTest {
         assertEquals(Integer.valueOf(2), list.get(0));
     }
     
-//    @Test
+    @Test
     public void sublistClearRightOfSmall() {
         list.add(1);
         list.add(2);
@@ -286,7 +286,7 @@ public class EnhancedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(0));
     }
     
-    @Test
+//    @Test
     public void sublistClearRightOfSmall2() {
         List<Integer> referenceList = new ArrayList<>(getIntegerList(20));
         list.addAll(referenceList);

@@ -188,7 +188,7 @@ public class EnhancedLinkedList<E>
             contractFingerArrayIfNeeded(size - fingersToRemove);
             
             Arrays.fill(fingerArray, 
-                        size - fingersToRemove + 1,
+                        size + 1 - fingersToRemove,
                         size + 1,
                         null);
             
@@ -262,6 +262,21 @@ public class EnhancedLinkedList<E>
                 }
             }
             
+            if (previousFinger == null) {
+                System.out.println("previousFinger == null");
+                
+                int toMove = fromIndex - numberOfFingers;
+                Finger<E> finger = fingerArray[0];
+                
+                for (int j = 0; j < toMove; ++j) {
+                    finger.node = finger.node.prev;
+                }
+                
+                finger.index -= toMove;
+                i = 0;
+                previousFinger = finger;
+            }
+            
             for (int j = i + 1; j < numberOfFingers; ++j) {
                 Finger<E> currentFinger = fingerArray[j];
                 currentFinger.index = previousFinger.index + 1;
@@ -295,7 +310,7 @@ public class EnhancedLinkedList<E>
                 finger.index += toMove;
                 
                 for (int i = 1; i < numberOfFingers; ++i) {
-                    Finger<E> predecessorFinger = fingerArray[size - 1 - i];
+                    Finger<E> predecessorFinger = fingerArray[size - i - 1];
                     Finger<E> currentFinger = fingerArray[size - i];
                     predecessorFinger.index = currentFinger.index - 1;
                     predecessorFinger.node = currentFinger.node.prev;
@@ -304,21 +319,30 @@ public class EnhancedLinkedList<E>
                 return;
             }
             
-            Finger<E> storeToFinger = fingerArray[toFingerIndex];
+            int i;
+            Finger<E> targetFinger = null;
             
-            // Move the fingers to suffix;
-            System.arraycopy(fingerArray,
-                             size - numberOfFingers, 
-                             fingerArray, 
-                             toFingerIndex, 
-                             numberOfFingers);
+            for (i = toFingerIndex; i < size; ++i) {
+                Finger<E> finger = fingerArray[i];
+                
+                if (finger.index + numberOfFingers 
+                        < EnhancedLinkedList.this.size) {
+                    
+                    targetFinger = finger;
+                    break;
+                }
+            }
             
-            fingerArray[toFingerIndex + numberOfFingers - 1] = storeToFinger;
+            if (targetFinger == null) {
+                System.out.println("targetFinger == null");
+                
+                
+            }
             
             // Set the suffix fingers:
-            for (int i = toFingerIndex + numberOfFingers; i < size; ++i) {
-                Finger<E> predecessorFinger = fingerArray[i - 1];
-                Finger<E> currentFinger = fingerArray[i];
+            for (int j = toFingerIndex + numberOfFingers; j < size; ++j) {
+                Finger<E> predecessorFinger = fingerArray[j - 1];
+                Finger<E> currentFinger = fingerArray[j];
                 currentFinger.index = predecessorFinger.index + 1;
                 currentFinger.node = predecessorFinger.node.next;
             }
@@ -1907,25 +1931,44 @@ public class EnhancedLinkedList<E>
         }
         
         Node<E> firstNodeToRemove = node(fromIndex);
+        
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
-        int leftListSize  = fromIndex;
-        int rightListSize = size - toIndex;
-        int listSizeSum = leftListSize + rightListSize;
-        int leftListFingersSize = fingerList.getNextFingerIndex(fromIndex);
+        int prefixSize = fromIndex;
+        int suffixSize = size - toIndex;
+        int prefixAndSuffixSize = prefixSize + suffixSize;
+        int prefixFingersSize = fingerList.getFingerIndexImpl(fromIndex);
+        int suffixFingersSize = fingerList.size - 
+                                fingerList.getFingerIndexImpl(toIndex);
         
-        float totalLeftLoadFactor = 
-                ((float)(leftListSize - leftListFingersSize)) / listSizeSum;
+        prefixAndSuffixSize -= prefixFingersSize + suffixFingersSize;
         
-        int fingersOnLeft = 
-                (int)(nextFingerCount * totalLeftLoadFactor);
+        int prefixFreeSpotCount = prefixSize - prefixFingersSize;
+        int suffixFreeSpotCount = suffixSize - suffixFingersSize;
         
-        int fingersOnRight = nextFingerCount - fingersOnLeft;
-        int fingersToRemove = fingerList.size - fingersOnLeft - fingersOnRight;
+        float totalPrefixLoadFactor;
+        int prefixFingerCount;
+        int suffixFingerCount;
+        int fingersToRemove;
         
-        fingerList.moveFingersToPrefix(fromIndex, fingersOnLeft);
-        fingerList.moveFingersToSuffix(toIndex, fingersOnRight, removalSize);
-        fingerList.removeRange(fingersOnLeft, fingersToRemove, removalSize);
+        if (prefixAndSuffixSize < 1) {
+            
+        } else {
+            totalPrefixLoadFactor = ((float)(prefixSize)) / prefixAndSuffixSize;
+            prefixFingerCount = (int)(nextFingerCount * totalPrefixLoadFactor);
+            suffixFingerCount = nextFingerCount - prefixFingerCount;
+            fingersToRemove = fingerList.size 
+                            - prefixFingerCount
+                            - suffixFingerCount;
+        }
+        
+        fingerList.moveFingersToPrefix(fromIndex, prefixFingerCount);
+        fingerList.moveFingersToSuffix(toIndex, suffixFingerCount, removalSize);
+        fingerList.removeRange(prefixFingerCount,
+                               suffixFingerCount, 
+                               removalSize);
+        
         removeRangeNodes(firstNodeToRemove, removalSize);
+        
         modCount++;
         size -= removalSize;
     }
