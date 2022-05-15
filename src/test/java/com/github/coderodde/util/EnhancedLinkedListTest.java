@@ -301,6 +301,13 @@ public class EnhancedLinkedListTest {
     public void debugClear1() {
         list.addAll(getIntegerList(12));
         list.subList(4, 9).clear();
+        assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
+    }
+    
+//    @Test
+    public void subListClear2Fingers3Nodes_1() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        list.subList(0, 1).clear();
     }
     
 //    @Test
