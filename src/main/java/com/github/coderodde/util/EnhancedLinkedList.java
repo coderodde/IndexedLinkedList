@@ -556,6 +556,79 @@ public class EnhancedLinkedList<E>
     }
     
     /**
+     * Checks the data structure invariant. Throws 
+     * {@link java.lang.IllegalStateException} on invalid invariant. The 
+     * invariant is valid if:
+     * <ol>
+     * <li>All the fingers in the finger list are sorted by indices.</li>
+     * <li>The index of the leftmost finger is no less than zero.</li>
+     * <li>There must be an end-of-list sentinel finger {@code F}, such that 
+     * {@code F.index = } <i>size of linked list</i> and {@code F.node} is 
+     * {@code null}.
+     * </li>
+     * <li>Each finger {@code F} points to the {@code i}th linked list node,
+     * where {@code i = F.index}</li>
+     * </ol>
+     */
+    public void checkInvarant() {
+        for (int i = 0; i < fingerList.size() - 1; ++i) {
+            Finger<E> left = fingerList.get(i);
+            Finger<E> right = fingerList.get(i + 1);
+            
+            if (left.index >= right.index) {
+                throw new IllegalStateException(
+                        "FingerList failed: fingerList[" 
+                                + i
+                                + "].index = " 
+                                + left.index 
+                                + " >= " 
+                                + right.index 
+                                + " = fingerList[" 
+                                + (i + 1) 
+                                + "]");
+            }
+        }
+        
+        Finger<E> sentinelFinger = fingerList.get(fingerList.size());
+        
+        if (sentinelFinger.index != this.size || sentinelFinger.node != null) {
+            throw new IllegalStateException(
+                    "Invalid end-of-list sentinel: " + sentinelFinger);
+        }
+        
+        Finger<E> finger = fingerList.get(0);
+        Node<E> node = first;
+        int fingerIndex = 0;
+        int tentativeSize = 0;
+        
+        while (node != null) {
+            tentativeSize++;
+            
+            if (finger.node == node) {
+                finger = fingerList.get(++fingerIndex);
+            }
+            
+            node = node.next;
+        }
+        
+        if (size != tentativeSize) {
+            throw new IllegalStateException(
+                    "Number of nodes mismatch: size = " 
+                            + size 
+                            + ", tentativeSiz = " 
+                            + tentativeSize);
+        }
+        
+        if (fingerList.size() != fingerIndex) {
+            throw new IllegalStateException(
+                    "Number of fingers mismatch: fingerList.size() = " 
+                            + fingerList.size() 
+                            + ", fingerIndex = " 
+                            + fingerIndex);
+        }
+    }
+    
+    /**
      * {@inheritDoc }
      */
     @Override

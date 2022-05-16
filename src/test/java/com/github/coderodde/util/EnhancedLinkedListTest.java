@@ -262,6 +262,7 @@ public class EnhancedLinkedListTest {
         list.subList(10, 90).clear();
         referenceList.subList(10, 90).clear();
         assertEquals(referenceList, list);
+        list.checkInvarant();
     }
     
     @Test
@@ -273,6 +274,7 @@ public class EnhancedLinkedListTest {
         
         assertEquals(1, list.size());
         assertEquals(Integer.valueOf(2), list.get(0));
+        list.checkInvarant();
     }
     
     @Test
@@ -284,6 +286,7 @@ public class EnhancedLinkedListTest {
         
         assertEquals(1, list.size());
         assertEquals(Integer.valueOf(1), list.get(0));
+        list.checkInvarant();
     }
     
     @Test
@@ -295,6 +298,7 @@ public class EnhancedLinkedListTest {
         referenceList.subList(0, 5).clear();
         
         assertEquals(referenceList, list);
+        list.checkInvarant();
     }
     
     @Test
