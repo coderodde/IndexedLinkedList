@@ -331,11 +331,12 @@ public class EnhancedLinkedList<E>
             
             int i;
             Finger<E> targetFinger = null;
+            int omittedFingers = 1;
             
-            for (i = toFingerIndex; i < size; ++i) {
+            for (i = toFingerIndex; i < size; ++i, omittedFingers++) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingers + 1 >= toIndex) {
+                if (finger.index - omittedFingers >= toIndex) {
                     targetFinger = finger;
                     break;
                 }
@@ -352,11 +353,11 @@ public class EnhancedLinkedList<E>
                 f.index += toMove;
             }
             
-            for (int j = i - 1, k = 0; k < numberOfFingers - 1; --j, ++k) {
-                Finger<E> precedingFinger = fingerArray[j];
-                Finger<E> currentFinger = fingerArray[j + 1];
-                precedingFinger.index = currentFinger.index - 1;
-                precedingFinger.node = currentFinger.node.prev;
+            for (int j = i + 1; j < size; ++j) {
+                Finger<E> predecessorFinger = fingerArray[j - 1];
+                Finger<E> currentFinger = fingerArray[j];
+                currentFinger.index = predecessorFinger.index + 1;
+                currentFinger.node = predecessorFinger.node.next;
             }
         }
 
@@ -561,6 +562,7 @@ public class EnhancedLinkedList<E>
      * invariant is valid if:
      * <ol>
      * <li>All the fingers in the finger list are sorted by indices.</li>
+     * <li>There is no duplicate indices.</li>
      * <li>The index of the leftmost finger is no less than zero.</li>
      * <li>There must be an end-of-list sentinel finger {@code F}, such that 
      * {@code F.index = } <i>size of linked list</i> and {@code F.node} is 

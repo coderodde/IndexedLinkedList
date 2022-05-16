@@ -308,6 +308,14 @@ public class EnhancedLinkedListTest {
         assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
     }
     
+    @Test
+    public void debugClear2() {
+        list.addAll(getIntegerList(10));
+        list.subList(0, 4).clear();
+        assertEquals(Arrays.asList(4, 5, 6, 7, 8, 9), list);
+        list.checkInvarant();
+    }
+    
 //    @Test
     public void subListClear2Fingers3Nodes_1() {
         list.addAll(Arrays.asList(1, 2, 3));
