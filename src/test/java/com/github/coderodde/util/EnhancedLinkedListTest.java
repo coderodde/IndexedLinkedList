@@ -255,7 +255,7 @@ public class EnhancedLinkedListTest {
         list.subList(10, 500).clear();
     }
     
-//    @Test
+    @Test
     public void sublistClear5() {
         list.addAll(getIntegerList(100));
         List<Integer> referenceList = new ArrayList<>(list);
