@@ -267,13 +267,14 @@ public class EnhancedLinkedList<E>
         
         void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
             if (numberOfFingers == 0) {
-                System.out.println("A");
+                System.out.println("Prefix.0");
                 return;
             }
             
             int fromFingerIndex = getFingerIndex(fromIndex);
             
             if (fromFingerIndex == 0) {
+                System.out.println("Prefix.1");
                 moveFingersToPrefixOnEmptyPrefix(fromIndex, numberOfFingers);
                 return;
             }
@@ -291,8 +292,7 @@ public class EnhancedLinkedList<E>
             }
             
             if (previousFinger == null) {
-                System.out.println("previousFinger == null");
-                
+                System.out.println("Prefix.2");
                 int toMove = fromIndex - numberOfFingers;
                 Finger<E> finger = fingerArray[0];
                 
@@ -317,41 +317,44 @@ public class EnhancedLinkedList<E>
                                  int numberOfFingers,
                                  int removalSize) {
             if (numberOfFingers == 0) {
-                System.out.println("B = 0");
+                System.out.println("Suffix.0");
                 return;
             }
             
             int toFingerIndex = getFingerIndexImpl(toIndex);
             
             if (toFingerIndex == fingerList.size) {
-                System.out.println("B = 1");
+                System.out.println("Suffix.1");
                 moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingers);
                 return;
             }
             
             int i;
             Finger<E> targetFinger = null;
-            int omittedFingers = 1;
             
-            for (i = toFingerIndex; i < size; ++i, omittedFingers++) {
+            for (i = toFingerIndex; i < size; ++i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - omittedFingers >= toIndex) {
+                if (finger.index - numberOfFingers + 1 >= toIndex) {
                     targetFinger = finger;
                     break;
                 }
             }
             
             if (targetFinger == null) {
+                System.out.println("Suffix.2");
                 Finger<E> f = fingerArray[size - 1];
-                int toMove = 0;
+                int toMove = toIndex + numberOfFingers - 1 - f.index;
                 
                 for (int j = 0; j < toMove; ++j) {
                     f.node = f.node.next;
                 }
                 
                 f.index += toMove;
+                i = size - 1;
             }
+            
+            for (int j = )
             
             for (int j = i + 1; j < size; ++j) {
                 Finger<E> predecessorFinger = fingerArray[j - 1];
