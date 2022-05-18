@@ -177,7 +177,7 @@ public class EnhancedLinkedList<E>
                          int removalSize) {
             shiftFingerIndicesToLeft(endFingerIndex, removalSize);
             
-            int fingersToRemove = endFingerIndex - startFingerIndex;
+            int fingersToRemove = size - endFingerIndex - startFingerIndex;
             
             System.arraycopy(fingerArray, 
                              endFingerIndex, 
@@ -293,7 +293,7 @@ public class EnhancedLinkedList<E>
             
             if (previousFinger == null) {
                 System.out.println("Prefix.2");
-                int toMove = fromIndex - numberOfFingers;
+                int toMove = fingerArray[0].index + numberOfFingers - fromIndex;
                 Finger<E> finger = fingerArray[0];
                 
                 for (int j = 0; j < toMove; ++j) {
@@ -354,13 +354,11 @@ public class EnhancedLinkedList<E>
                 i = size - 1;
             }
             
-            for (int j = )
-            
-            for (int j = i + 1; j < size; ++j) {
-                Finger<E> predecessorFinger = fingerArray[j - 1];
-                Finger<E> currentFinger = fingerArray[j];
-                currentFinger.index = predecessorFinger.index + 1;
-                currentFinger.node = predecessorFinger.node.next;
+            for (int j = i - 1; j >= toFingerIndex; --j) {
+                Finger<E> predecessorFinger = fingerArray[j];
+                Finger<E> currentFinger = fingerArray[j + 1];
+                predecessorFinger.index = currentFinger.index - 1;
+                predecessorFinger.node = currentFinger.node.prev;
             }
         }
 
