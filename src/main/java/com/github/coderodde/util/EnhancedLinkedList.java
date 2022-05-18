@@ -182,7 +182,8 @@ public class EnhancedLinkedList<E>
                              size - suffixSize, 
                              fingerArray,
                              prefixSize, 
-                             fingersToRemove);
+                             fingersToRemove + 1); // +1 for the end-of-finger
+                                                   // sentinel finger.
             
             contractFingerArrayIfNeeded(size - fingersToRemove);
             

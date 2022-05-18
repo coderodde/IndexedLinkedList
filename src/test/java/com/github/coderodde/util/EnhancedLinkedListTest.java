@@ -328,15 +328,16 @@ public class EnhancedLinkedListTest {
         list.subList(70, 1000).clear();
     }
     
-//    @Test
+    @Test
     public void bruteForceSublistClear() {
         Random random = new Random(2L);
         
         for (int i = 0; i < 100; ++i) {
-            int size = 1 + random.nextInt(100);
+            System.out.println("i == " + i);
+            int size = 1 + random.nextInt(15);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
-            list.addAll(referenceList);
+            list.addAll(referenceList); 
             
             int fromIndex = random.nextInt(size);
             int toIndex = Math.min(size, fromIndex + random.nextInt(size));
@@ -344,6 +345,7 @@ public class EnhancedLinkedListTest {
             list.subList(fromIndex, toIndex).clear();
             referenceList.subList(fromIndex, toIndex).clear();
             
+            list.checkInvarant();
             assertEquals(referenceList, list);
         }
     }
