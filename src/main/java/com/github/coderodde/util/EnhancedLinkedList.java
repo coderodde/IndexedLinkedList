@@ -172,18 +172,17 @@ public class EnhancedLinkedList<E>
         ////////////////////////////////////////////////////////////////////////
         // Removes the finger range [startFingerIndex, endFingerIndex).
         ////////////////////////////////////////////////////////////////////////
-        void removeRange(int startFingerIndex, 
-                         int endFingerIndex,
-                         int removalSize) {
-            shiftFingerIndicesToLeft(endFingerIndex, removalSize);
-            
-            int fingersToRemove = size - endFingerIndex - startFingerIndex;
+        void removeRange(int prefixSize, 
+                         int suffixSize,
+                         int nodesToRemove) {
+            shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
+            int fingersToRemove = size - suffixSize - prefixSize;
             
             System.arraycopy(fingerArray, 
-                             endFingerIndex, 
+                             size - suffixSize, 
                              fingerArray,
-                             startFingerIndex, 
-                             size - endFingerIndex + 1);
+                             prefixSize, 
+                             fingersToRemove);
             
             contractFingerArrayIfNeeded(size - fingersToRemove);
             
@@ -285,7 +284,7 @@ public class EnhancedLinkedList<E>
             for (i = fromFingerIndex - 1; i >= 0; --i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index + numberOfFingers <= fromIndex) {
+                if (finger.index + numberOfFingers - 1 + i < fromIndex) {
                     previousFinger = finger;
                     break;
                 }
@@ -293,6 +292,7 @@ public class EnhancedLinkedList<E>
             
             if (previousFinger == null) {
                 System.out.println("Prefix.2");
+                
                 int toMove = fingerArray[0].index + numberOfFingers - fromIndex;
                 Finger<E> finger = fingerArray[0];
                 
@@ -353,8 +353,10 @@ public class EnhancedLinkedList<E>
                 f.index += toMove;
                 i = size - 1;
             }
+
+            int stopIndex = numberOfFingers - (size - i);
             
-            for (int j = i - 1; j >= toFingerIndex; --j) {
+            for (int j = i - 1, k = 0; k < stopIndex; ++k, --j) {
                 Finger<E> predecessorFinger = fingerArray[j];
                 Finger<E> currentFinger = fingerArray[j + 1];
                 predecessorFinger.index = currentFinger.index - 1;

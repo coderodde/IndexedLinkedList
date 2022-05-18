@@ -289,7 +289,7 @@ public class EnhancedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test
+//    @Test
     public void sublistClearRightOfSmall2() {
         List<Integer> referenceList = new ArrayList<>(getIntegerList(20));
         list.addAll(referenceList);
@@ -308,7 +308,7 @@ public class EnhancedLinkedListTest {
         assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
     }
     
-    @Test
+//    @Test
     public void debugClear2() {
         list.addAll(getIntegerList(10));
         list.subList(0, 4).clear();
