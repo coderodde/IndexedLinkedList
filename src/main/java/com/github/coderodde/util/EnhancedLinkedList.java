@@ -175,24 +175,29 @@ public class EnhancedLinkedList<E>
         void removeRange(int prefixSize, 
                          int suffixSize,
                          int nodesToRemove) {
-            shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             int fingersToRemove = size - suffixSize - prefixSize;
             
             System.arraycopy(fingerArray, 
                              size - suffixSize, 
-                             fingerArray,
+                             fingerArray, 
                              prefixSize, 
-                             fingersToRemove + 1); // +1 for the end-of-finger
-                                                   // sentinel finger.
-            
-            contractFingerArrayIfNeeded(size - fingersToRemove);
-            
-            Arrays.fill(fingerArray, 
-                        size + 1 - fingersToRemove,
-                        size + 1,
-                        null);
+                             fingersToRemove + 1);
             
             size -= fingersToRemove;
+            
+            shiftFingerIndicesToLeft(prefixSize, nodesToRemove);
+            
+            contractFingerArrayIfNeeded(size);
+            
+            int fillStartIndex = size + 1;
+            int fillEndIndex = size + 1 + fingersToRemove;
+            
+            if (fillStartIndex < fillEndIndex) {
+                Arrays.fill(fingerArray,
+                            fillStartIndex,
+                            fillEndIndex,
+                            null);
+            }
         }
         
         private void shiftFingerIndicesToLeft(int startIndex,      
