@@ -183,7 +183,7 @@ public class EnhancedLinkedList<E>
                              size - suffixSize, 
                              fingerArray, 
                              prefixSize,
-                             size - prefixSize);
+                             suffixSize + 1);
             
             size -= fingersToRemove;
             contractFingerArrayIfNeeded(size);
@@ -430,6 +430,16 @@ public class EnhancedLinkedList<E>
             for (int i = lastPrefixIndex; i <= size; ++i) {
                 fingerArray[i].index--;
             }
+        }
+    
+        void removeRangeNoPrefixNoSuffix(int removalSize) {
+            int nextListSize = EnhancedLinkedList.this.size - removalSize;
+            int nextFingerListSize =
+                    getRecommendedNumberOfFingers(nextListSize);
+            
+            int fingersToRemove = size - nextFingerListSize;
+            
+            removeTrailingFingers(fingersToRemove);
         }
     }
      
@@ -2080,9 +2090,13 @@ public class EnhancedLinkedList<E>
                                        numberOfFingersOnRight, 
                                        removalSize);
         
-        fingerList.removeRange(numberOfFingersOnLeft,
-                               numberOfFingersOnRight, 
-                               removalSize);
+        if (numberOfFingersOnLeft == 0 && numberOfFingersOnRight == 0) {
+            fingerList.removeRangeNoPrefixNoSuffix(removalSize);
+        } else {
+            fingerList.removeRange(numberOfFingersOnLeft,
+                                   numberOfFingersOnRight, 
+                                   removalSize);
+        }
         
         removeRangeNodes(firstNodeToRemove, removalSize);
         
