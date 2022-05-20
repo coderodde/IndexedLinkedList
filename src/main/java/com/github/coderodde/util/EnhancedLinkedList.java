@@ -432,20 +432,8 @@ public class EnhancedLinkedList<E>
                 fingerArray[i].index--;
             }
         }
-    
-        void removeRangeNoPrefixNoSuffix(int removalSize) {
-            int nextListSize = EnhancedLinkedList.this.size - removalSize;
-            int nextFingerListSize =
-                    getRecommendedNumberOfFingers(nextListSize);
-            
-            int fingersToRemove = size - nextFingerListSize;
-            
-            removeTrailingFingers(fingersToRemove);
-            shiftFingerIndicesToLeft(size + 1 - fingersToRemove, removalSize);
-            contractFingerArrayIfNeeded(size - fingersToRemove);
-        }
     }
-     
+    
     /**
      * The cached number of elements in this list.
      */
@@ -2081,7 +2069,9 @@ public class EnhancedLinkedList<E>
         int suffixFreeSpotCount = suffixSize - suffixFingersSize;
 
         if (prefixFreeSpotCount == 0 && suffixFreeSpotCount == 0) {
-            fingerList.removeRangeNoPrefixNoSuffix(removalSize);
+            removeRangeNoPrefixNoSuffix(firstNodeToRemove,
+                                        fromIndex, 
+                                        removalSize);
             
         } else {
             int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
@@ -2112,6 +2102,63 @@ public class EnhancedLinkedList<E>
         size -= removalSize;
     }
     
+    void removeRangeNoPrefixNoSuffix(Node<E> node,
+                                     int fromIndex, 
+                                     int removalSize) {
+
+        int nextListSize = EnhancedLinkedList.this.size - removalSize;
+        int nextFingerListSize =
+                getRecommendedNumberOfFingers(nextListSize);
+
+        int fingersToRemove = fingerList.size() - nextFingerListSize;
+        int firstFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
+        int fingerCount = 0;
+        
+        Finger<E> finger = fingerList.get(firstFingerIndex);
+        Node<E> prefixLastNode = node.prev;
+        Node<E> nextNode = node;
+
+        for (int i = 0; i < removalSize - 1; ++i) {
+            Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
+            
+            if (finger == f) {
+                if (fingersToRemove != 0) {
+                    fingersToRemove--;
+                    fingerCount++;
+                }
+            }
+            
+            nextNode = node.next;
+            node.next = null;
+            node.prev = null;
+            node.item = null;
+            node = nextNode;
+        }
+
+        Node<E> suffixFirstNode = nextNode.next;
+        nextNode.next = null;
+        nextNode.prev = null;
+        nextNode.item = null;
+
+        if (prefixLastNode != null) {
+            if (suffixFirstNode == null) {
+                prefixLastNode.next = null;
+                last = prefixLastNode;
+            } else {
+                prefixLastNode.next = suffixFirstNode;
+                suffixFirstNode.prev = prefixLastNode;
+            }
+        } else {
+            suffixFirstNode.prev = null;
+            first = suffixFirstNode;
+        }
+        
+        fingerList.removeRange(
+                firstFingerIndex, 
+                fingerList.size() - firstFingerIndex - fingerCount, 
+                removalSize);
+    }
+    
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
@@ -2124,7 +2171,7 @@ public class EnhancedLinkedList<E>
             node = nextNode;
         }
         
-        Node suffixFirstNode = nextNode.next;
+        Node<E> suffixFirstNode = nextNode.next;
         nextNode.next = null;
         nextNode.prev = null;
         nextNode.item = null;
@@ -2141,12 +2188,6 @@ public class EnhancedLinkedList<E>
             suffixFirstNode.prev = null;
             first = suffixFirstNode;
         }
-    }
-    
-    private int computeNumberOfDanglingFingers(int fromIndex, int toIndex) {
-        int fromIndexFingerIndex = fingerList.getNextFingerIndex(fromIndex);
-        int toIndexFingerIndex   = fingerList.getNextFingerIndex(toIndex);
-        return toIndexFingerIndex - fromIndexFingerIndex;
     }
     
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
