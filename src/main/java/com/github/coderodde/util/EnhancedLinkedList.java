@@ -136,6 +136,7 @@ public class EnhancedLinkedList<E>
             fingerArray[size - numberOfFingers] = fingerArray[size];
             fingerArray[size] = null;
             size -= numberOfFingers;
+            // TODO: Remove?
             fingerArray[size].index = EnhancedLinkedList.this.size;
             contractFingerArrayIfNeeded(size);
         }
@@ -440,6 +441,8 @@ public class EnhancedLinkedList<E>
             int fingersToRemove = size - nextFingerListSize;
             
             removeTrailingFingers(fingersToRemove);
+            shiftFingerIndicesToLeft(size + 1 - fingersToRemove, removalSize);
+            contractFingerArrayIfNeeded(size - fingersToRemove);
         }
     }
      
@@ -613,14 +616,14 @@ public class EnhancedLinkedList<E>
         
         Finger<E> finger = fingerList.get(0);
         Node<E> node = first;
-        int fingerIndex = 0;
+        int fingerCount = 0;
         int tentativeSize = 0;
         
         while (node != null) {
             tentativeSize++;
             
             if (finger.node == node) {
-                finger = fingerList.get(++fingerIndex);
+                finger = fingerList.get(++fingerCount);
             }
             
             node = node.next;
@@ -634,12 +637,12 @@ public class EnhancedLinkedList<E>
                             + tentativeSize);
         }
         
-        if (fingerList.size() != fingerIndex) {
+        if (fingerList.size() != fingerCount) {
             throw new IllegalStateException(
                     "Number of fingers mismatch: fingerList.size() = " 
                             + fingerList.size() 
                             + ", fingerIndex = " 
-                            + fingerIndex);
+                            + fingerCount);
         }
     }
     
@@ -2076,29 +2079,34 @@ public class EnhancedLinkedList<E>
         
         int prefixFreeSpotCount = prefixSize - prefixFingersSize;
         int suffixFreeSpotCount = suffixSize - suffixFingersSize;
-        int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
-                                      + suffixFreeSpotCount;  
 
-        float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
-                                 ((float)(prefixSuffixFreeSpotCount));
-        
-        int numberOfFingersOnLeft = (int)(prefixLoadFactor * nextFingerCount);
-        int numberOfFingersOnRight = nextFingerCount - numberOfFingersOnLeft;
-        
-        fingerList.moveFingersToPrefix(fromIndex, numberOfFingersOnLeft);
-        fingerList.moveFingersToSuffix(toIndex, 
-                                       numberOfFingersOnRight, 
-                                       removalSize);
-        
-        if (numberOfFingersOnLeft == 0 && numberOfFingersOnRight == 0) {
+        if (prefixFreeSpotCount == 0 && suffixFreeSpotCount == 0) {
             fingerList.removeRangeNoPrefixNoSuffix(removalSize);
+            
         } else {
+            int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
+                                          + suffixFreeSpotCount;
+            
+            float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
+                                     ((float)(prefixSuffixFreeSpotCount));
+
+            int numberOfFingersOnLeft = 
+                    (int)(prefixLoadFactor * nextFingerCount);
+            
+            int numberOfFingersOnRight = 
+                    nextFingerCount - numberOfFingersOnLeft;
+
+            fingerList.moveFingersToPrefix(fromIndex, numberOfFingersOnLeft);
+            fingerList.moveFingersToSuffix(toIndex, 
+                                           numberOfFingersOnRight, 
+                                           removalSize);
+
             fingerList.removeRange(numberOfFingersOnLeft,
                                    numberOfFingersOnRight, 
                                    removalSize);
+            
+            removeRangeNodes(firstNodeToRemove, removalSize);
         }
-        
-        removeRangeNodes(firstNodeToRemove, removalSize);
         
         modCount++;
         size -= removalSize;
