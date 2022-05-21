@@ -280,18 +280,18 @@ public class EnhancedLinkedList<E>
             }
             
             int i;
-            Finger<E> previousFinger = null;
+            Finger<E> targetFinger = null;
             
             for (i = fromFingerIndex - 1; i >= 0; --i) {
                 Finger<E> finger = fingerArray[i];
                 
                 if (finger.index + numberOfFingers - 1 + i < fromIndex) {
-                    previousFinger = finger;
+                    targetFinger = finger;
                     break;
                 }
             }
             
-            if (previousFinger == null) {
+            if (targetFinger == null) {
                 System.out.println("Prefix.2");
                 
                 int toMove = fingerArray[0].index + numberOfFingers - fromIndex;
@@ -302,15 +302,13 @@ public class EnhancedLinkedList<E>
                 }
                 
                 finger.index -= toMove;
-                i = 0;
-                previousFinger = finger;
             }
             
-            for (int j = i + 1; j < numberOfFingers; ++j) {
+            for (int j = 1; j <= numberOfFingers; ++j) {
+                Finger<E> predecessorFinger = fingerArray[j - 1];
                 Finger<E> currentFinger = fingerArray[j];
-                currentFinger.index = previousFinger.index + 1;
-                currentFinger.node = previousFinger.node.next;
-                previousFinger = currentFinger;
+                currentFinger.index = predecessorFinger.index + 1;
+                currentFinger.node = predecessorFinger.node.next;
             }
         }
         
@@ -2068,36 +2066,53 @@ public class EnhancedLinkedList<E>
         int prefixFreeSpotCount = prefixSize - prefixFingersSize;
         int suffixFreeSpotCount = suffixSize - suffixFingersSize;
 
-        if (prefixFreeSpotCount == 0 && suffixFreeSpotCount == 0) {
-            removeRangeNoPrefixNoSuffix(firstNodeToRemove,
-                                        fromIndex, 
-                                        removalSize);
-            
+        if (prefixFreeSpotCount == 0) {
+            if (suffixFreeSpotCount == 0) {
+                removeRangeNoPrefixNoSuffix(firstNodeToRemove,
+                                            fromIndex, 
+                                            removalSize);
+            } else {
+                // Once here, prefixFreeSpotCount = 0 and 
+                // suffixFreeSpotCount > 0:
+                fingerList.moveFingersToSuffix(
+                        fromIndex, 
+                        fingerList.size() - nextFingerCount,
+                        removalSize);
+            }
         } else {
-            int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
-                                          + suffixFreeSpotCount;
-            
-            float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
-                                     ((float)(prefixSuffixFreeSpotCount));
+            if (suffixFreeSpotCount == 0) {
+                // Once here, suffixFreeSpotCount = 0 and 
+                // prefixFreeSpotCount > 0:
+                fingerList.moveFingersToPrefix(
+                        fromIndex,
+                        fingerList.size() - nextFingerCount);
+            } else {
+                int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
+                                              + suffixFreeSpotCount;
 
-            int numberOfFingersOnLeft = 
-                    (int)(prefixLoadFactor * nextFingerCount);
-            
-            int numberOfFingersOnRight = 
-                    nextFingerCount - numberOfFingersOnLeft;
+                float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
+                                         ((float)(prefixSuffixFreeSpotCount));
 
-            fingerList.moveFingersToPrefix(fromIndex, numberOfFingersOnLeft);
-            fingerList.moveFingersToSuffix(toIndex, 
-                                           numberOfFingersOnRight, 
-                                           removalSize);
+                int numberOfFingersOnLeft = 
+                        (int)(prefixLoadFactor * nextFingerCount);
 
-            fingerList.removeRange(numberOfFingersOnLeft,
-                                   numberOfFingersOnRight, 
-                                   removalSize);
-            
-            removeRangeNodes(firstNodeToRemove, removalSize);
+                int numberOfFingersOnRight = 
+                        nextFingerCount - numberOfFingersOnLeft;
+
+                fingerList.moveFingersToPrefix(fromIndex, 
+                                               numberOfFingersOnLeft);
+                
+                fingerList.moveFingersToSuffix(toIndex, 
+                                               numberOfFingersOnRight, 
+                                               removalSize);
+
+                fingerList.removeRange(numberOfFingersOnLeft,
+                                       numberOfFingersOnRight, 
+                                       removalSize);
+            }
         }
         
+        removeRangeNodes(firstNodeToRemove, removalSize);
         modCount++;
         size -= removalSize;
     }
