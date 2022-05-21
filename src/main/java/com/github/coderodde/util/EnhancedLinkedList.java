@@ -2072,20 +2072,25 @@ public class EnhancedLinkedList<E>
                                             fromIndex, 
                                             removalSize);
             } else {
+                int numberFoFingers = fingerList.size() - nextFingerCount;
+                
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0:
                 fingerList.moveFingersToSuffix(
                         fromIndex, 
-                        fingerList.size() - nextFingerCount,
+                        numberFoFingers,
                         removalSize);
+                
+                fingerList.removeRange(0, numberFoFingers, removelSize);
             }
         } else {
             if (suffixFreeSpotCount == 0) {
+                int numberOfFingers = fingerList.size() - nextFingerCount;
+                
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0:
-                fingerList.moveFingersToPrefix(
-                        fromIndex,
-                        fingerList.size() - nextFingerCount);
+                fingerList.moveFingersToPrefix(fromIndex, numberOfFingers);
+                fingerList.removeRange(numberOfFingers, 0, removalSize);
             } else {
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
                                               + suffixFreeSpotCount;
