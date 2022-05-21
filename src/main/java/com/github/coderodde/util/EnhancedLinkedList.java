@@ -2076,12 +2076,12 @@ public class EnhancedLinkedList<E>
                 
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0:
-                fingerList.moveFingersToSuffix(
-                        fromIndex, 
-                        numberFoFingers,
-                        removalSize);
+                fingerList.moveFingersToSuffix(toIndex,
+                                               numberFoFingers,
+                                               removalSize);
                 
-                fingerList.removeRange(0, numberFoFingers, removelSize);
+                fingerList.removeRange(0, numberFoFingers, removalSize);
+                removeRangeNodes(firstNodeToRemove, removalSize);
             }
         } else {
             if (suffixFreeSpotCount == 0) {
@@ -2091,6 +2091,7 @@ public class EnhancedLinkedList<E>
                 // prefixFreeSpotCount > 0:
                 fingerList.moveFingersToPrefix(fromIndex, numberOfFingers);
                 fingerList.removeRange(numberOfFingers, 0, removalSize);
+                removeRangeNodes(firstNodeToRemove, removalSize);
             } else {
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
                                               + suffixFreeSpotCount;
@@ -2114,10 +2115,11 @@ public class EnhancedLinkedList<E>
                 fingerList.removeRange(numberOfFingersOnLeft,
                                        numberOfFingersOnRight, 
                                        removalSize);
+                
+                removeRangeNodes(firstNodeToRemove, removalSize);
             }
         }
         
-        removeRangeNodes(firstNodeToRemove, removalSize);
         modCount++;
         size -= removalSize;
     }
