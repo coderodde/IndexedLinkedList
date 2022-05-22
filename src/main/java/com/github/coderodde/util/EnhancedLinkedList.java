@@ -2077,7 +2077,7 @@ public class EnhancedLinkedList<E>
                                             fromIndex, 
                                             removalSize);
             } else {
-                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
+                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0. In other words, we are moving to 
