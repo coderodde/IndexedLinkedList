@@ -2077,10 +2077,10 @@ public class EnhancedLinkedList<E>
                                             fromIndex, 
                                             removalSize);
             } else {
-                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
+                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
-                // suffixFreeSpotCount > 0. In other words, we are removing a 
+                // suffixFreeSpotCount > 0. In other words, we are moving to 
                 // suffix.
                 fingerList.moveFingersToSuffix(toIndex,                               
                                                numberOfFingersToMove,
@@ -2091,10 +2091,10 @@ public class EnhancedLinkedList<E>
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
+                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
                 
                 // Once here, suffixFreeSpotCount = 0 and 
-                // prefixFreeSpotCount > 0. In other words, we are removing a
+                // prefixFreeSpotCount > 0. In other words, we are moving a to
                 // prefix.
                 System.out.println("--------------");
                 System.out.println("numberOfFingersToMove: " + numberOfFingersToMove);
@@ -2107,8 +2107,8 @@ public class EnhancedLinkedList<E>
                 System.out.println("--------------");
                 
                 fingerList.moveFingersToPrefix(
-                        fromIndex, 
-                        nextFingerCount - prefixFingersSize);
+                        fromIndex,
+                        numberOfFingersToMove);
                 
                 fingerList.removeRange(numberOfFingersToMove, 0, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
