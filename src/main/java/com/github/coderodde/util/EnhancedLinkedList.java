@@ -265,7 +265,9 @@ public class EnhancedLinkedList<E>
             }
         }
         
-        void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
+        void moveFingersToPrefix(int fromIndex, 
+                                 int numberOfFingers) {
+            
             if (numberOfFingers == 0) {
                 System.out.println("Prefix.0");
                 return;
@@ -275,7 +277,10 @@ public class EnhancedLinkedList<E>
             
             if (fromFingerIndex == 0) {
                 System.out.println("Prefix.1");
-                moveFingersToPrefixOnEmptyPrefix(fromIndex, numberOfFingers);
+                moveFingersToPrefixOnEmptyPrefix(
+                        fromIndex, 
+                        numberOfFingers);
+                
                 return;
             }
             
@@ -2072,25 +2077,29 @@ public class EnhancedLinkedList<E>
                                             fromIndex, 
                                             removalSize);
             } else {
-                int numberFoFingers = fingerList.size() - nextFingerCount;
+                int numberOfFingersToRemove = fingerList.size() 
+                                            - nextFingerCount;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0:
-                fingerList.moveFingersToSuffix(toIndex,
-                                               numberFoFingers,
+                fingerList.moveFingersToSuffix(toIndex,                               
+                                               numberOfFingersToRemove,
                                                removalSize);
                 
-                fingerList.removeRange(0, numberFoFingers, removalSize);
+                fingerList.removeRange(0, numberOfFingersToRemove, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingers = fingerList.size() - nextFingerCount;
+                int numberOfFingersToRemove = fingerList.size() 
+                                            - nextFingerCount;
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0:
-                fingerList.moveFingersToPrefix(fromIndex, numberOfFingers);
-                fingerList.removeRange(numberOfFingers, 0, removalSize);
+                fingerList.moveFingersToPrefix(fromIndex,
+                                               numberOfFingersToRemove);
+                
+                fingerList.removeRange(numberOfFingersToRemove, 0, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
             } else {
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 

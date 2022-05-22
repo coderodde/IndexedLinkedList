@@ -227,7 +227,7 @@ public class EnhancedLinkedListTest {
         }
     }
     
-//    @Test
+    @Test
     public void sublistClear1() {
         list.addAll(getIntegerList(100));
         List<Integer> sublist = list.subList(49, 51);
@@ -237,7 +237,7 @@ public class EnhancedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
-//    @Test
+    @Test
     public void sublistClear2() {
         list.addAll(getIntegerList(1000));
         list.subList(10, 990).clear();
@@ -330,7 +330,7 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void bruteForceSublistClear() {
-        Random random = new Random(2L);
+        Random random = new Random(22L);
         
         for (int i = 0; i < 100; ++i) {
             System.out.println("i == " + i);
