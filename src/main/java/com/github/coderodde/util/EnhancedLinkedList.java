@@ -2077,29 +2077,40 @@ public class EnhancedLinkedList<E>
                                             fromIndex, 
                                             removalSize);
             } else {
-                int numberOfFingersToRemove = fingerList.size() 
-                                            - nextFingerCount;
+                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
-                // suffixFreeSpotCount > 0:
+                // suffixFreeSpotCount > 0. In other words, we are removing a 
+                // suffix.
                 fingerList.moveFingersToSuffix(toIndex,                               
-                                               numberOfFingersToRemove,
+                                               numberOfFingersToMove,
                                                removalSize);
                 
-                fingerList.removeRange(0, numberOfFingersToRemove, removalSize);
+                fingerList.removeRange(0, suffixFingersSize, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToRemove = fingerList.size() 
-                                            - nextFingerCount;
+                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
                 
                 // Once here, suffixFreeSpotCount = 0 and 
-                // prefixFreeSpotCount > 0:
-                fingerList.moveFingersToPrefix(fromIndex,
-                                               numberOfFingersToRemove);
+                // prefixFreeSpotCount > 0. In other words, we are removing a
+                // prefix.
+                System.out.println("--------------");
+                System.out.println("numberOfFingersToMove: " + numberOfFingersToMove);
+                System.out.println("nextFingerCount:       " + nextFingerCount);
+                System.out.println("prefixFingersSize:     " + prefixFingersSize);
+                System.out.println("prefixFreeSpotCount:   " + prefixFreeSpotCount);
+                System.out.println("fromIndex:             " + fromIndex);
+                System.out.println("toIndex:               " + toIndex);
+                System.out.println("size:                  " + size);
+                System.out.println("--------------");
                 
-                fingerList.removeRange(numberOfFingersToRemove, 0, removalSize);
+                fingerList.moveFingersToPrefix(
+                        fromIndex, 
+                        nextFingerCount - prefixFingersSize);
+                
+                fingerList.removeRange(numberOfFingersToMove, 0, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
             } else {
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
