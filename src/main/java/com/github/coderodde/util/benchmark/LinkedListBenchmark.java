@@ -62,7 +62,15 @@ final class LinkedListBenchmark {
     void benchmark() {
         profile(BenchmarkChoice.BENCHMARK);
     }
-
+    
+    // Simulate list.subList(fromIndex, toIndex) for those lists that do not
+    // support the method:
+    private static void clear(List<Integer> list, int fromIndex, int toIndex) {
+        for (int i = fromIndex; i < toIndex; ++i) {
+            list.remove(fromIndex);
+        }
+    }
+    
     private static  Integer getRandomInteger(Random random) {
         return random.nextInt(MAXIMUM_INTEGER + 1);
     }
@@ -85,7 +93,6 @@ final class LinkedListBenchmark {
         randomJavaUtilLinkedList = new Random(seed);
         randomJavaUtilArrayList  = new Random(seed);
         randomRoddeList          = new Random(seed);
-        randomRoddeList        = new Random(seed);
         randomTreeList           = new Random(seed);
     }
 
@@ -150,6 +157,7 @@ final class LinkedListBenchmark {
         profileListIteratorRemoval();
         profileStream();
         profileParallelStream();
+        profileSubListClear();
 
         printTotalDurations();
 
@@ -314,6 +322,37 @@ final class LinkedListBenchmark {
         Collections.sort(arrayList);
         Collections.sort(linkedList);
 
+        listsEqual();
+        System.out.println();
+    }
+    
+    private static List<Integer> getIntegerArray(int size) {
+        List<Integer> integers = new ArrayList<>(size);
+        
+        for (int i = 0; i < size; ++i) {
+            integers.add(Integer.valueOf(size % 900_000));
+        }
+        
+        Collections.shuffle(integers);
+        return integers;
+    }
+    
+    private void profileSubListClear() {
+        roddeList.clear();
+        arrayList.clear();
+        linkedList.clear();
+        treeList.clear();
+        
+        roddeList.addAll(getIntegerArray(1_000_000));
+        arrayList.addAll(roddeList);
+        linkedList.addAll(roddeList);
+        treeList.addAll(roddeList);
+        
+        profileSubListClearTreeList();
+        profileSubListClearRoddeList();
+        profileSubListClearArrayList();
+        profileSubListClearLinkedList();
+        
         listsEqual();
         System.out.println();
     }
@@ -673,6 +712,60 @@ final class LinkedListBenchmark {
 
         return durationMillis;
     }
+    
+    private long profileSubListClear(List<Integer> list) {
+        Class<?> clazz = list.getClass();
+        
+        long startMillis;
+        long endMillis;
+        long durationMillis;
+        
+        int fromIndex;
+        int toIndex;
+        
+        if (clazz.getSimpleName().equals("TreeList")) {
+            fromIndex = list.size() / 2;
+            toIndex = list.size() / 2 + 1;
+            
+            startMillis = System.currentTimeMillis();
+            
+            // Clear short range:
+            clear(list, fromIndex, toIndex);
+            
+            fromIndex = 10;
+            toIndex = list.size() - 9;
+            
+            // Clear long range:
+            clear(list, fromIndex, toIndex);
+            
+            endMillis = System.currentTimeMillis();
+        } else {
+            fromIndex = list.size() / 2;
+            toIndex = list.size() / 2 + 1;
+            
+            startMillis = System.currentTimeMillis();
+            
+            // Clear short range:
+            list.subList(fromIndex, toIndex).clear();
+            
+            fromIndex = 10;
+            toIndex = list.size() - 9;
+            
+            // Clear long range:
+            list.subList(fromIndex, toIndex).clear();
+            
+            endMillis = System.currentTimeMillis();
+        }
+        
+        durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() + 
+                        ".subList(...).clear() in (ms): " + 
+                        durationMillis);
+        
+        return durationMillis;
+    }
 
     private void profileAddFirstRoddeListV2() {
         totalMillisRoddeList += 
@@ -1017,6 +1110,22 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileParallelStream(treeList);
     }
 
+    private void profileSubListClearRoddeList() {
+        totalMillisRoddeList += profileSubListClear(roddeList);
+    }
+
+    private void profileSubListClearLinkedList() {
+        totalMillisLinkedList += profileSubListClear(linkedList);
+    }
+
+    private void profileSubListClearArrayList() {
+        totalMillisArrayList += profileSubListClear(arrayList);
+    }
+
+    private void profileSubListClearTreeList() {
+        totalMillisTreeList += profileSubListClear(treeList);
+    }
+    
     private void printTitle(BenchmarkChoice benchmarkChoice) {
         switch (benchmarkChoice) {
             case WARMUP:
