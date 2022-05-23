@@ -124,6 +124,9 @@ public class IndexedLinkedList<E>
                 int nextCapacity = 2 * fingerArray.length;
                 
                 while (nextCapacity < size + 1) {
+                    // If 'requestedSize' is too large, we may need to keep on
+                    // doubling the next capacity until it's large enought to 
+                    // accommodate 'requestedSize':
                     nextCapacity *= 2;
                 }
                 
