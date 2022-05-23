@@ -22,7 +22,7 @@ import java.util.function.UnaryOperator;
  * @version 1.61 (Sep 26, 2021)
  * @since 1.6 (Sep 1, 2021)
  */
-public class EnhancedLinkedList<E> 
+public class IndexedLinkedList<E> 
         implements Deque<E>, List<E>, Cloneable, java.io.Serializable {
     
     class FingerList<E> {
@@ -137,7 +137,7 @@ public class EnhancedLinkedList<E>
             fingerArray[size] = null;
             size -= numberOfFingers;
             // TODO: Remove?
-            fingerArray[size].index = EnhancedLinkedList.this.size;
+            fingerArray[size].index = IndexedLinkedList.this.size;
             contractFingerArrayIfNeeded(size);
         }
         
@@ -147,7 +147,7 @@ public class EnhancedLinkedList<E>
             enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
-            fingerArray[size].index = EnhancedLinkedList.this.size;
+            fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
         // Inserts the input finger into the finger list such that the entire
@@ -167,7 +167,7 @@ public class EnhancedLinkedList<E>
             shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
 
             fingerArray[beforeFingerIndex] = finger;
-            fingerArray[++size].index = EnhancedLinkedList.this.size;
+            fingerArray[++size].index = IndexedLinkedList.this.size;
         }
         
         ////////////////////////////////////////////////////////////////////////
@@ -368,7 +368,7 @@ public class EnhancedLinkedList<E>
             contractFingerArrayIfNeeded(--size);
             fingerArray[size] = fingerArray[size + 1];
             fingerArray[size + 1] = null;
-            fingerArray[size].index = EnhancedLinkedList.this.size;
+            fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
         void clear() {
@@ -437,6 +437,10 @@ public class EnhancedLinkedList<E>
      * The cached number of elements in this list.
      */
     private int size;
+    
+    /**
+     * The modification counter. Used to detect state changes.
+     */
     private int modCount;
     private transient Node<E> first;
     private transient Node<E> last;
@@ -447,7 +451,7 @@ public class EnhancedLinkedList<E>
     /**
      * Constructs an empty list.
      */
-    public EnhancedLinkedList() {
+    public IndexedLinkedList() {
         
     }
     
@@ -456,7 +460,7 @@ public class EnhancedLinkedList<E>
      * 
      * @param c the collection to copy. 
      */
-    public EnhancedLinkedList(Collection<? extends E> c) {
+    public IndexedLinkedList(Collection<? extends E> c) {
         this();
         addAll(c);
     }
@@ -656,7 +660,7 @@ public class EnhancedLinkedList<E>
     
     @Override
     public Object clone() {
-        EnhancedLinkedList<E> list = new EnhancedLinkedList<>(this);
+        IndexedLinkedList<E> list = new IndexedLinkedList<>(this);
         return list;
     }
     
@@ -1355,8 +1359,8 @@ public class EnhancedLinkedList<E>
 
         private Node<E> lastReturned;
         private Node<E> nextToIterate = last;
-        private int nextIndex = EnhancedLinkedList.this.size - 1;
-        int expectedModCount = EnhancedLinkedList.this.modCount;
+        private int nextIndex = IndexedLinkedList.this.size - 1;
+        int expectedModCount = IndexedLinkedList.this.modCount;
         
         @Override
         public boolean hasNext() {
@@ -2005,9 +2009,12 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    ////////////////////////////////////////////////////////////////////////////
-    // Removes a range from this list.
-    ////////////////////////////////////////////////////////////////////////////
+    /**
+     * Removes the range {@code list[fromIndex], ..., list[toIndex - 1]}.
+     * 
+     * @param fromIndex the start index, inclusive.
+     * @param toIndex the end index, exclusive.
+     */
     protected void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
@@ -2101,7 +2108,7 @@ public class EnhancedLinkedList<E>
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
-        int nextListSize = EnhancedLinkedList.this.size - removalSize;
+        int nextListSize = IndexedLinkedList.this.size - removalSize;
         int nextFingerListSize =
                 getRecommendedNumberOfFingers(nextListSize);
 
@@ -2476,14 +2483,14 @@ public class EnhancedLinkedList<E>
         
         static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
         
-        private final EnhancedLinkedList<E> list;
+        private final IndexedLinkedList<E> list;
         private Node<E> node;
         private long lengthOfSpliterator;
         private long numberOfProcessedElements;
         private long offsetOfSpliterator;
         private final int expectedModCount;
         
-        private LinkedListSpliterator(EnhancedLinkedList<E> list,
+        private LinkedListSpliterator(IndexedLinkedList<E> list,
                                       Node<E> node,
                                       long lengthOfSpliterator,
                                       long offsetOfSpliterator,
@@ -2601,12 +2608,12 @@ public class EnhancedLinkedList<E>
     
     private static class EnhancedSubList<E> extends AbstractList<E> {
         
-        private final EnhancedLinkedList<E> root;
+        private final IndexedLinkedList<E> root;
         private final EnhancedSubList<E> parent;
         private final int offset;
         private int size;
         
-        public EnhancedSubList(EnhancedLinkedList<E> root, int fromIndex, int toIndex) {
+        public EnhancedSubList(IndexedLinkedList<E> root, int fromIndex, int toIndex) {
             this.root = root;
             this.parent = null;
             this.offset = fromIndex;

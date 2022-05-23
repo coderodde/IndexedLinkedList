@@ -1,6 +1,6 @@
 package com.github.coderodde.util.benchmark;
 
-import com.github.coderodde.util.EnhancedLinkedList;
+import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -35,7 +35,7 @@ final class LinkedListBenchmark {
     private Random randomRoddeList;
     private Random randomTreeList;
 
-    private EnhancedLinkedList<Integer> roddeList = new EnhancedLinkedList<>();
+    private IndexedLinkedList<Integer> roddeList = new IndexedLinkedList<>();
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
     private TreeList<Integer> treeList = new TreeList<>();
@@ -174,7 +174,7 @@ final class LinkedListBenchmark {
     }
 
     private void resetLists() {
-        roddeList = new EnhancedLinkedList<>();
+        roddeList = new IndexedLinkedList<>();
         linkedList  = new java.util.LinkedList<>();
         arrayList   = new ArrayList<>();
         treeList    = new TreeList<>();

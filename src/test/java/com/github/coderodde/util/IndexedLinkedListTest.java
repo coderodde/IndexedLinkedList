@@ -1,7 +1,7 @@
 package com.github.coderodde.util;
 
-import com.github.coderodde.util.EnhancedLinkedList.BasicIterator;
-import com.github.coderodde.util.EnhancedLinkedList.EnhancedIterator;
+import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
+import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
@@ -32,9 +33,9 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EnhancedLinkedListTest {
+public class IndexedLinkedListTest {
 
-    private final EnhancedLinkedList<Integer> list = new EnhancedLinkedList<>();
+    private final IndexedLinkedList<Integer> list = new IndexedLinkedList<>();
     
     @Before
     public void setUp() {
@@ -70,7 +71,7 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void constructAdd() {
-        List<String> l = new EnhancedLinkedList<>(Arrays.asList("a", "b", "c"));
+        List<String> l = new IndexedLinkedList<>(Arrays.asList("a", "b", "c"));
         
         assertEquals(3, l.size());
         
@@ -523,8 +524,7 @@ public class EnhancedLinkedListTest {
         assertTrue(list.equals(Arrays.asList(3, 2, 1)));
     }
     
-    class BadList
-            extends com.github.coderodde.util.EnhancedLinkedList<Integer> {
+    class BadList extends IndexedLinkedList<Integer> {
         
         class BadListIterator implements Iterator<Integer> {
 
@@ -819,7 +819,7 @@ public class EnhancedLinkedListTest {
         list.addAll(
                 getIntegerList(
                         (int)
-                        (EnhancedLinkedList
+                        (IndexedLinkedList
                                 .LinkedListSpliterator
                                 .MINIMUM_BATCH_SIZE - 1L)));
         
@@ -1159,7 +1159,7 @@ public class EnhancedLinkedListTest {
     @Test(expected = ConcurrentModificationException.class)
     public void subListThrowsOnConcurrentModification() {
         List<Integer> l =
-                new EnhancedLinkedList<Integer>(
+                new IndexedLinkedList<Integer>(
                         Arrays.asList(1, 2, 3, 4));
         
         List<Integer> subList1 = l.subList(1, 4); // <2, 3, 4>
@@ -1171,8 +1171,7 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void removeFirstLastOccurrence() {
-        com.github.coderodde.util.EnhancedLinkedList<Integer> l =
-                new EnhancedLinkedList<>();
+        IndexedLinkedList<Integer> l = new IndexedLinkedList<>();
         
         list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
         l.addAll(list);
@@ -1194,8 +1193,7 @@ public class EnhancedLinkedListTest {
 
         list.addAll(getIntegerList());
 
-        java.util.LinkedList<Integer> referenceList = 
-                new java.util.LinkedList<>(list);
+        LinkedList<Integer> referenceList = new LinkedList<>(list);
 
         for (int op = 0; op < 100; op++) {
             int index = random.nextInt(list.size());
@@ -1487,8 +1485,7 @@ public class EnhancedLinkedListTest {
 
     @Test
     public void findFailingRemoveObject() {
-        java.util.LinkedList<Integer> referenceList = 
-                new java.util.LinkedList<>();
+        LinkedList<Integer> referenceList = new LinkedList<>();
 
         list.addAll(getIntegerList(10));
         referenceList.addAll(list);
@@ -1554,7 +1551,7 @@ public class EnhancedLinkedListTest {
     @Test
     public void bruteForceIteratorTest() {
         list.addAll(getIntegerList(100));
-        List<Integer> referenceList = new java.util.LinkedList<>(list);
+        List<Integer> referenceList = new LinkedList<>(list);
 
         ListIterator<Integer> iterator1 = list.listIterator(2);
         ListIterator<Integer> iterator2 = referenceList.listIterator(2);
@@ -1839,9 +1836,8 @@ public class EnhancedLinkedListTest {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
 
-            com.github.coderodde.util.EnhancedLinkedList<Integer> ll =    
-                    (com.github.coderodde.util.EnhancedLinkedList<Integer>)
-                    ois.readObject();
+            IndexedLinkedList<Integer> ll = 
+                    (IndexedLinkedList<Integer>) ois.readObject();
 
             ois.close();
             boolean equal = listsEqual(list, ll);
@@ -1874,9 +1870,8 @@ public class EnhancedLinkedListTest {
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis);
 
-                com.github.coderodde.util.EnhancedLinkedList<Integer> ll =    
-                        (com.github.coderodde.util.EnhancedLinkedList<Integer>)
-                        ois.readObject();
+                IndexedLinkedList<Integer> ll =
+                        (IndexedLinkedList<Integer>) ois.readObject();
 
                 ois.close();
                 boolean equal = listsEqual(list, ll);
@@ -2049,9 +2044,8 @@ public class EnhancedLinkedListTest {
         return getIntegerList(100);
     }
     
-    private static boolean listsEqual(
-            com.github.coderodde.util.EnhancedLinkedList<Integer> list1, 
-            java.util.List<Integer> list2) {
+    private static boolean listsEqual(IndexedLinkedList<Integer> list1,
+                                      List<Integer> list2) {
 
         if (list1.size() != list2.size()) {
             return false;

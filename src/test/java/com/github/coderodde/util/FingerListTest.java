@@ -6,8 +6,8 @@ import org.junit.Test;
 
 public class FingerListTest {
 
-    private final EnhancedLinkedList<Integer> list = new EnhancedLinkedList<>();
-    private final EnhancedLinkedList<Integer>.FingerList<Integer> fl = 
+    private final IndexedLinkedList<Integer> list = new IndexedLinkedList<>();
+    private final IndexedLinkedList<Integer>.FingerList<Integer> fl = 
             list.fingerList;
     
     @Before
