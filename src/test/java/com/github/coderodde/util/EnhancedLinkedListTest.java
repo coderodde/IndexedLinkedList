@@ -237,32 +237,50 @@ public class EnhancedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
-//    @Test
+    @Test
     public void sublistClear2() {
-        list.addAll(getIntegerList(1000));
-        list.subList(10, 990).clear();
+        int fromIndex = 10;
+        int toIndex = 990;
+        
+        List<Integer> referenceList = getIntegerList(1000);
+        list.addAll(referenceList);
+        referenceList.subList(fromIndex, toIndex).clear();
+        list.subList(fromIndex, toIndex).clear();
+        list.checkInvarant();
+        assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void sublistClear3() {
-        list.addAll(getIntegerList(1_000_000));
-        list.subList(10, 999990).clear();
+        int size = 1_000_000;
+        int fromIndex = 10;
+        int toIndex = 999_990;
+        checkSubList(size, fromIndex, toIndex);
     }
     
-//    @Test
+    private void checkSubList(int size, int fromIndex, int toIndex) {
+        List<Integer> referenceList = getIntegerList(size);
+        list.addAll(referenceList);
+        referenceList.subList(fromIndex, toIndex).clear();
+        list.subList(fromIndex, toIndex).clear();
+        list.checkInvarant();
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
     public void sublistClear4() {
-        list.addAll(getIntegerList(1_000));
-        list.subList(10, 500).clear();
+        int size = 1_000;
+        int fromIndex = 10;
+        int toIndex = 500;
+        checkSubList(size, fromIndex, toIndex);
     }
     
     @Test
     public void sublistClear5() {
-        list.addAll(getIntegerList(100));
-        List<Integer> referenceList = new ArrayList<>(list);
-        list.subList(10, 90).clear();
-        referenceList.subList(10, 90).clear();
-        assertEquals(referenceList, list);
-        list.checkInvarant();
+        int size = 100;
+        int fromIndex = 10;
+        int toIndex = 90;
+        checkSubList(size, fromIndex, toIndex);
     }
     
     @Test
@@ -283,37 +301,38 @@ public class EnhancedLinkedListTest {
         list.add(2);
         
         list.subList(1, 2).clear();
+        list.checkInvarant();
         
         assertEquals(1, list.size());
         assertEquals(Integer.valueOf(1), list.get(0));
-        list.checkInvarant();
     }
     
-//    @Test
+    @Test
     public void sublistClearRightOfSmall2() {
         List<Integer> referenceList = new ArrayList<>(getIntegerList(20));
         list.addAll(referenceList);
         
         list.subList(0, 5).clear();
+        list.checkInvarant();
         referenceList.subList(0, 5).clear();
         
         assertEquals(referenceList, list);
-        list.checkInvarant();
     }
     
     @Test
     public void debugClear1() {
         list.addAll(getIntegerList(12));
         list.subList(4, 9).clear();
+        list.checkInvarant();
         assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
     }
     
-//    @Test
+    @Test
     public void debugClear2() {
         list.addAll(getIntegerList(10));
         list.subList(0, 4).clear();
-        assertEquals(Arrays.asList(4, 5, 6, 7, 8, 9), list);
         list.checkInvarant();
+        assertEquals(Arrays.asList(4, 5, 6, 7, 8, 9), list);
     }
     
     @Test
