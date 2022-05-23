@@ -330,9 +330,9 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void bruteForceSublistClear() {
-        Random random = new Random(23L);
+        Random random = new Random(25L);
         
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 200; ++i) {
             System.out.println("i == " + i);
             int size = 1 + random.nextInt(15);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));

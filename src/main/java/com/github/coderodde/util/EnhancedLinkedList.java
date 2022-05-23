@@ -2091,7 +2091,10 @@ public class EnhancedLinkedList<E>
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
+                int numberOfFingersToMove = 
+                        Math.min(
+                                nextFingerCount - prefixFingersSize, 
+                                prefixFreeSpotCount);
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
@@ -2147,7 +2150,6 @@ public class EnhancedLinkedList<E>
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
-        System.out.println("removeRangeNoPrefixNoSuffix");
         int nextListSize = EnhancedLinkedList.this.size - removalSize;
         int nextFingerListSize =
                 getRecommendedNumberOfFingers(nextListSize);
@@ -2186,6 +2188,7 @@ public class EnhancedLinkedList<E>
         nextNode.item = null;
         
         if (fingersToRemove != 0) {
+            System.out.println("YEAH");
             // Count the last finger:
             fingerCount++;
         }
