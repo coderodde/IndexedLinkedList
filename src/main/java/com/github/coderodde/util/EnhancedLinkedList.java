@@ -226,7 +226,6 @@ public class EnhancedLinkedList<E>
         
         private void moveFingersToPrefixOnEmptyPrefix(int fromIndex,
                                                       int numberOfFingers) {
-            System.out.println("moveFingersToPrefixOnEmptyPrefix");
             Finger<E> firstFinger = fingerArray[0];
             int toMove = firstFinger.index - fromIndex + numberOfFingers;
 
@@ -270,14 +269,12 @@ public class EnhancedLinkedList<E>
                                  int numberOfFingers) {
             
             if (numberOfFingers == 0) {
-                System.out.println("Prefix.0");
                 return;
             }
             
             int fromFingerIndex = getFingerIndex(fromIndex);
             
             if (fromFingerIndex == 0) {
-                System.out.println("Prefix.1");
                 moveFingersToPrefixOnEmptyPrefix(
                         fromIndex, 
                         numberOfFingers);
@@ -300,8 +297,6 @@ public class EnhancedLinkedList<E>
             }
             
             if (targetFinger == null) {
-                System.out.println("Prefix.2");
-                
                 int toMove = fingerArray[0].index + numberOfFingers - fromIndex;
                 Finger<E> finger = fingerArray[0];
                 
@@ -325,14 +320,12 @@ public class EnhancedLinkedList<E>
                                  int numberOfFingers,
                                  int removalSize) {
             if (numberOfFingers == 0) {
-                System.out.println("Suffix.0");
                 return;
             }
             
             int toFingerIndex = getFingerIndexImpl(toIndex);
             
             if (toFingerIndex == fingerList.size) {
-                System.out.println("Suffix.1");
                 moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingers);
                 return;
             }
@@ -350,7 +343,6 @@ public class EnhancedLinkedList<E>
             }
             
             if (targetFinger == null) {
-                System.out.println("Suffix.2");
                 Finger<E> f = fingerArray[size - 1];
                 int toMove = toIndex + numberOfFingers - 1 - f.index;
                 
@@ -2067,17 +2059,7 @@ public class EnhancedLinkedList<E>
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
-                // prefix.
-                System.out.println("--------------");
-                System.out.println("numberOfFingersToMove: " + numberOfFingersToMove);
-                System.out.println("nextFingerCount:       " + nextFingerCount);
-                System.out.println("prefixFingersSize:     " + prefixFingersSize);
-                System.out.println("prefixFreeSpotCount:   " + prefixFreeSpotCount);
-                System.out.println("fromIndex:             " + fromIndex);
-                System.out.println("toIndex:               " + toIndex);
-                System.out.println("size:                  " + size);
-                System.out.println("--------------");
-                
+                // prefix:
                 fingerList.moveFingersToPrefix(
                         fromIndex,
                         numberOfFingersToMove);
