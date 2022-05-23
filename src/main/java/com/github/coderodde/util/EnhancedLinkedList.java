@@ -2147,7 +2147,7 @@ public class EnhancedLinkedList<E>
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
-
+        System.out.println("removeRangeNoPrefixNoSuffix");
         int nextListSize = EnhancedLinkedList.this.size - removalSize;
         int nextFingerListSize =
                 getRecommendedNumberOfFingers(nextListSize);
@@ -2156,17 +2156,20 @@ public class EnhancedLinkedList<E>
         int firstFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
         int fingerCount = 0;
         
-        Finger<E> finger = fingerList.get(firstFingerIndex);
+        Finger<E> finger1 = fingerList.get(firstFingerIndex);
+        Finger<E> finger2 = fingerList.get(firstFingerIndex + 1);
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
-
+        
         for (int i = 0; i < removalSize - 1; ++i) {
             Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
             
-            if (finger == f) {
+            if (finger1 == f) {
                 if (fingersToRemove != 0) {
                     fingersToRemove--;
                     fingerCount++;
+                    finger1 = finger2;
+                    finger2 = fingerList.get(firstFingerIndex + fingerCount);
                 }
             }
             
@@ -2181,6 +2184,11 @@ public class EnhancedLinkedList<E>
         nextNode.next = null;
         nextNode.prev = null;
         nextNode.item = null;
+        
+        if (fingersToRemove != 0) {
+            // Count the last finger:
+            fingerCount++;
+        }
 
         if (prefixLastNode != null) {
             if (suffixFirstNode == null) {
