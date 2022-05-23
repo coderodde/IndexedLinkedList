@@ -191,7 +191,8 @@ public class EnhancedLinkedList<E>
             
             Arrays.fill(fingerArray,
                         size + 1,
-                        size + 1 + fingersToRemove,
+                        Math.min(fingerArray.length, 
+                                 size + 1 + fingersToRemove),
                         null);
         }
         
@@ -285,6 +286,7 @@ public class EnhancedLinkedList<E>
             }
             
             int i;
+            int targetIndex = -1;
             Finger<E> targetFinger = null;
             
             for (i = fromFingerIndex - 1; i >= 0; --i) {
@@ -292,6 +294,7 @@ public class EnhancedLinkedList<E>
                 
                 if (finger.index + numberOfFingers - 1 + i < fromIndex) {
                     targetFinger = finger;
+                    targetIndex = i;
                     break;
                 }
             }
@@ -307,9 +310,10 @@ public class EnhancedLinkedList<E>
                 }
                 
                 finger.index -= toMove;
+                targetIndex = 0;
             }
             
-            for (int j = 1; j <= numberOfFingers; ++j) {
+            for (int j = targetIndex + 1; j < numberOfFingers; ++j) {
                 Finger<E> predecessorFinger = fingerArray[j - 1];
                 Finger<E> currentFinger = fingerArray[j];
                 currentFinger.index = predecessorFinger.index + 1;
@@ -2009,27 +2013,6 @@ public class EnhancedLinkedList<E>
         }
     }
     
-    private void removeFirstNode() {
-        first = first.next;
-        first.prev = null;
-        fingerList.fingerArray[0].node = first;
-        fingerList.fingerArray[1].node = null;
-        fingerList.fingerArray[1].index = 1;
-        fingerList.fingerArray[2] = null;
-        fingerList.size--;
-        decreaseSize();
-    }
-    
-    private void removeSecondNode() {
-        last = last.prev;
-        last.next = null;
-        fingerList.fingerArray[1] = fingerList.fingerArray[2];
-        fingerList.fingerArray[2] = null;
-        fingerList.fingerArray[1].index = 1;
-        fingerList.size--;
-        decreaseSize();
-    }
-    
     ////////////////////////////////////////////////////////////////////////////
     // Removes a range from this list.
     ////////////////////////////////////////////////////////////////////////////
@@ -2042,20 +2025,6 @@ public class EnhancedLinkedList<E>
         
         if (removalSize == size) {
             clear();
-            return;
-        }
-        
-        if (size == 2 && removalSize == 1) {
-            switch (fromIndex) {
-                case 0:
-                    removeFirstNode();
-                    break;
-                    
-                case 1:
-                    removeSecondNode();
-                    break;
-            }
-            
             return;
         }
         
@@ -2188,7 +2157,6 @@ public class EnhancedLinkedList<E>
         nextNode.item = null;
         
         if (fingersToRemove != 0) {
-            System.out.println("YEAH");
             // Count the last finger:
             fingerCount++;
         }

@@ -316,13 +316,15 @@ public class EnhancedLinkedListTest {
         list.checkInvarant();
     }
     
-//    @Test
+    @Test
     public void subListClear2Fingers3Nodes_1() {
         list.addAll(Arrays.asList(1, 2, 3));
         list.subList(0, 1).clear();
+        list.checkInvarant();
+        assertEquals(Arrays.asList(2, 3), list);
     }
     
-//    @Test
+    @Test
     public void sublistClear6() {
         list.addAll(getIntegerList(1000));
         list.subList(70, 1000).clear();
@@ -330,7 +332,7 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void bruteForceSublistClear() {
-        Random random = new Random(25L);
+        Random random = new Random(26L);
         
         for (int i = 0; i < 200; ++i) {
             System.out.println("i == " + i);
