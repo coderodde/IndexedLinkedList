@@ -354,7 +354,6 @@ public class EnhancedLinkedListTest {
         Random random = new Random(26L);
         
         for (int i = 0; i < 200; ++i) {
-            System.out.println("i == " + i);
             int size = 1 + random.nextInt(15);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
@@ -1157,6 +1156,19 @@ public class EnhancedLinkedListTest {
         assertTrue(listsEqual(list, referenceList));
     }
     
+    @Test(expected = ConcurrentModificationException.class)
+    public void subListThrowsOnConcurrentModification() {
+        List<Integer> l =
+                new EnhancedLinkedList<Integer>(
+                        Arrays.asList(1, 2, 3, 4));
+        
+        List<Integer> subList1 = l.subList(1, 4); // <2, 3, 4>
+        List<Integer> subList2 = subList1.subList(0, 2); // <2, 3>
+        
+        subList1.add(1, Integer.valueOf(10));
+        subList2.add(1, Integer.valueOf(11)); // Must throw here.
+    }
+    
     @Test
     public void removeFirstLastOccurrence() {
         com.github.coderodde.util.EnhancedLinkedList<Integer> l =
@@ -1334,7 +1346,6 @@ public class EnhancedLinkedListTest {
     @Test
     public void removeAtFindFailing() {
         long seed = 101L;
-        System.out.println("removeAtFindFailing: seed = " + seed);
         Random random = new Random(seed);
         int iteration = 0;
         while (true) {
@@ -1357,8 +1368,7 @@ public class EnhancedLinkedListTest {
                     list.remove(index);
                 } catch (NullPointerException ex) {
                     // Should not get here. Ever.
-                    System.out.println("Failing indices: " + indices);
-                    fail("Failing indices: "+  indices);
+                    fail("Failing indices: " +  indices);
                     return;
                 }catch (AssertionError ae) {
                     return;
@@ -1921,12 +1931,12 @@ public class EnhancedLinkedListTest {
         } 
     }
     
-//    @Test
+    @Test
     public void contractAdaptsToMinimumCapacity() {
-        System.out.println("contractAdaptsToMinimumCapacity, begin");
         list.addAll(getIntegerList(1000_000));
         list.subList(10, 1000_000 - 10).clear();
-        System.out.println("contractAdaptsToMinimumCapacity, end");
+        list.checkInvarant();
+        assertEquals(20, list.size());
     }
     
     @Test

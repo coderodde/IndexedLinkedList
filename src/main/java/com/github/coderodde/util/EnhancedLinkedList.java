@@ -2753,6 +2753,8 @@ public class EnhancedLinkedList<E>
                 throw new ConcurrentModificationException();
             }
             
+            // Set sorted content:
+            
             modCount++;
         }
         

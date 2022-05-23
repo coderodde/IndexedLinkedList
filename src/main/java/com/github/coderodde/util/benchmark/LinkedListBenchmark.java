@@ -348,10 +348,10 @@ final class LinkedListBenchmark {
         linkedList.addAll(roddeList);
         treeList.addAll(roddeList);
         
-        profileSubListClearTreeList();
         profileSubListClearRoddeList();
-        profileSubListClearArrayList();
         profileSubListClearLinkedList();
+        profileSubListClearArrayList();
+        profileSubListClearTreeList();
         
         listsEqual();
         System.out.println();
