@@ -250,14 +250,6 @@ public class EnhancedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    @Test
-    public void sublistClear3() {
-        int size = 1_000_000;
-        int fromIndex = 10;
-        int toIndex = 999_990;
-        checkSubList(size, fromIndex, toIndex);
-    }
-    
     private void checkSubList(int size, int fromIndex, int toIndex) {
         List<Integer> referenceList = getIntegerList(size);
         list.addAll(referenceList);
@@ -265,6 +257,14 @@ public class EnhancedLinkedListTest {
         list.subList(fromIndex, toIndex).clear();
         list.checkInvarant();
         assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void sublistClear3() {
+        int size = 1_000_000;
+        int fromIndex = 10;
+        int toIndex = 999_990;
+        checkSubList(size, fromIndex, toIndex);
     }
     
     @Test
@@ -524,7 +524,8 @@ public class EnhancedLinkedListTest {
         assertTrue(list.equals(Arrays.asList(3, 2, 1)));
     }
     
-    class BadList extends com.github.coderodde.util.LinkedList<Integer> {
+    class BadList
+            extends com.github.coderodde.util.EnhancedLinkedList<Integer> {
         
         class BadListIterator implements Iterator<Integer> {
 
@@ -819,7 +820,7 @@ public class EnhancedLinkedListTest {
         list.addAll(
                 getIntegerList(
                         (int)
-                        (LinkedList
+                        (EnhancedLinkedList
                                 .LinkedListSpliterator
                                 .MINIMUM_BATCH_SIZE - 1L)));
         
@@ -1158,8 +1159,8 @@ public class EnhancedLinkedListTest {
     
     @Test
     public void removeFirstLastOccurrence() {
-        com.github.coderodde.util.LinkedList<Integer> l =
-                new LinkedList<>();
+        com.github.coderodde.util.EnhancedLinkedList<Integer> l =
+                new EnhancedLinkedList<>();
         
         list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
         l.addAll(list);

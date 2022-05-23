@@ -1,5 +1,6 @@
 package com.github.coderodde.util.benchmark;
 
+import com.github.coderodde.util.EnhancedLinkedList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -32,24 +33,17 @@ final class LinkedListBenchmark {
     private Random randomJavaUtilLinkedList;
     private Random randomJavaUtilArrayList;
     private Random randomRoddeList;
-    private Random randomRoddeListV2;
     private Random randomTreeList;
 
-    private com.github.coderodde.util.LinkedList<Integer> roddeList = 
-            new com.github.coderodde.util.LinkedList<>();
-
-    private com.github.coderodde.util.EnhancedLinkedList<Integer> roddeListV2 = 
-            new com.github.coderodde.util.EnhancedLinkedList<>();
-
+    private EnhancedLinkedList<Integer> roddeList = new EnhancedLinkedList<>();
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
     private TreeList<Integer> treeList = new TreeList<>();
 
-    private long totalMillisRoddeList   = 0L;
-    private long totalMillisRoddeListV2 = 0L;
-    private long totalMillisLinkedList  = 0L;
-    private long totalMillisArrayList   = 0L;
-    private long totalMillisTreeList    = 0L;
+    private long totalMillisRoddeList  = 0L;
+    private long totalMillisLinkedList = 0L;
+    private long totalMillisArrayList  = 0L;
+    private long totalMillisTreeList   = 0L;
     
     private final List<Integer>[] getLists = new ArrayList[5];
 
@@ -91,13 +85,12 @@ final class LinkedListBenchmark {
         randomJavaUtilLinkedList = new Random(seed);
         randomJavaUtilArrayList  = new Random(seed);
         randomRoddeList          = new Random(seed);
-        randomRoddeListV2        = new Random(seed);
+        randomRoddeList        = new Random(seed);
         randomTreeList           = new Random(seed);
     }
 
     private void listsEqual() {
-        listsEqual(roddeList, 
-                   roddeListV2,
+        listsEqual(roddeList,
                    linkedList, 
                    arrayList, 
                    treeList);
@@ -168,20 +161,18 @@ final class LinkedListBenchmark {
         totalMillisArrayList   = 0;
         totalMillisLinkedList  = 0;
         totalMillisRoddeList   = 0;
-        totalMillisRoddeListV2 = 0;
+        totalMillisRoddeList = 0;
         totalMillisTreeList    = 0;
     }
 
     private void resetLists() {
-        roddeList   = new com.github.coderodde.util.LinkedList<>();
-        roddeListV2 = new com.github.coderodde.util.EnhancedLinkedList<>();
+        roddeList = new EnhancedLinkedList<>();
         linkedList  = new java.util.LinkedList<>();
         arrayList   = new ArrayList<>();
         treeList    = new TreeList<>();
     }
 
     private void profileAddFirst() {
-        profileAddFirstRoddeList();
         profileAddFirstRoddeListV2();
         profileAddFirstLinkedList();
         profileAddFirstArrayList();
@@ -192,7 +183,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddLast() {
-        profileAddLastRoddeList();
         profileAddLastRoddeListV2();
         profileAddLastLinkedList();
         profileAddLastArrayList();
@@ -203,7 +193,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddViaIndex() {
-        profileAddIndexRoddeList();
         profileAddIndexRoddeListV2();
         profileAddIndexLinkedList();
         profileAddIndexArrayList();
@@ -214,7 +203,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddCollection() {
-        profileAddCollectionRoddeList();
         profileAddCollectionRoddeListV2();
         profileAddCollectionLinkedList();
         profileAddCollectionArrayList();
@@ -225,7 +213,6 @@ final class LinkedListBenchmark {
     }
     
     private void profileGet() {
-        profileGetRoddeList();
         profileGetRoddeListV2();
         profileGetLinkedList();
         profileGetArrayList();
@@ -237,7 +224,6 @@ final class LinkedListBenchmark {
     }
     
     private void profileRemoveFirst() {
-        profileRemoveFirstRoddeList();
         profileRemoveFirstRoddeListV2();
         profileRemoveFirstLinkedList();
         profileRemoveFirstArrayList();
@@ -248,7 +234,6 @@ final class LinkedListBenchmark {
     }
     
     private void profileRemoveLast() {
-        profileRemoveLastRoddeList();
         profileRemoveLastRoddeListV2();
         profileRemoveLastLinkedList();
         profileRemoveLastArrayList();
@@ -259,7 +244,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileAppendCollection() {
-        profileAppendCollectionRoddeList();
         profileAppendCollectionRoddeListV2();
         profileAppendCollectionLinkedList();
         profileAppendCollectionArrayList();
@@ -270,7 +254,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileRemoveViaIndex() {
-        profileRemoveViaIndexRoddeList();
         profileRemoveViaIndexRoddeListV2();
         profileRemoveViaIndexLinkedList();
         profileRemoveViaIndexArrayList();
@@ -281,7 +264,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileRemoveObject() {
-        profileRemoveObjectRoddeList();
         profileRemoveObjectRoddeListV2();
         profileRemoveObjectLinkedList();
         profileRemoveObjectArrayList();
@@ -292,7 +274,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileListIteratorAddition() {
-        profileListIteratorAdditionRoddeList();
         profileListIteratorAdditionRoddeListV2();
         profileListIteratorAdditionLinkedList();
         profileListIteratorAdditionArrayList();
@@ -303,7 +284,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileListIteratorRemoval() {
-        profileListIteratorRemovalRoddeList();
         profileListIteratorRemovalRoddeListV2();
         profileListIteratorRemovalLinkedList();
         profileListIteratorRemovalArrayList();
@@ -314,7 +294,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileStream() {
-        profileStreamRoddeList();
         profileStreamRoddeListV2();
         profileStreamLinkedList();
         profileStreamArrayList();
@@ -325,7 +304,6 @@ final class LinkedListBenchmark {
     }
 
     private void profileParallelStream() {
-        profileParallelStreamRoddeList();
         profileParallelStreamRoddeListV2();
         profileParallelStreamLinkedList();
         profileParallelStreamArrayList();
@@ -333,7 +311,6 @@ final class LinkedListBenchmark {
 
         Collections.sort(treeList);
         Collections.sort(roddeList);
-        Collections.sort(roddeListV2);
         Collections.sort(arrayList);
         Collections.sort(linkedList);
 
@@ -343,15 +320,11 @@ final class LinkedListBenchmark {
 
     private void printTotalDurations() {
         System.out.println("--- Total time elapsed ---");
+        
         System.out.println(
                 roddeList.getClass().getName() + 
                         " in (ms): " + 
                         totalMillisRoddeList);
-
-        System.out.println(
-                roddeListV2.getClass().getName() + 
-                        " in (ms): " + 
-                        totalMillisRoddeListV2);
 
         System.out.println(
                 linkedList.getClass().getName() + 
@@ -701,20 +674,12 @@ final class LinkedListBenchmark {
         return durationMillis;
     }
 
-    private void profileAddFirstRoddeList() {
+    private void profileAddFirstRoddeListV2() {
         totalMillisRoddeList += 
                 profileAddFirst(
                         roddeList, 
                         ADD_FIRST_OPERATIONS, 
                         randomRoddeList);
-    }
-
-    private void profileAddFirstRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileAddFirst(
-                        roddeListV2, 
-                        ADD_FIRST_OPERATIONS, 
-                        randomRoddeListV2);
     }
 
     private void profileAddFirstLinkedList() {
@@ -738,14 +703,9 @@ final class LinkedListBenchmark {
                                 randomTreeList);
     }
 
-    private void profileAddLastRoddeList() {
+    private void profileAddLastRoddeListV2() {
         totalMillisRoddeList += 
             profileAddLast(roddeList, ADD_LAST_OPERATIONS, randomRoddeList);
-    }
-
-    private void profileAddLastRoddeListV2() {
-        totalMillisRoddeListV2 += 
-            profileAddLast(roddeListV2, ADD_LAST_OPERATIONS, randomRoddeListV2);
     }
 
     private void profileAddLastLinkedList() {
@@ -770,16 +730,11 @@ final class LinkedListBenchmark {
                                randomTreeList);
     }
 
-    private void profileAddIndexRoddeList() {
-        totalMillisRoddeList += 
-                profileAddIndex(roddeList, ADD_AT_OPERATIONS, randomRoddeList);
-    }
-
     private void profileAddIndexRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileAddIndex(roddeListV2,
+        totalMillisRoddeList += 
+                profileAddIndex(roddeList,
                                 ADD_AT_OPERATIONS, 
-                                randomRoddeListV2);
+                                randomRoddeList);
     }
 
     private void profileAddIndexLinkedList() {
@@ -806,20 +761,12 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
 
-    private void profileAddCollectionRoddeList() {
+    private void profileAddCollectionRoddeListV2() {
         totalMillisRoddeList +=
                 profileAddCollection(
                         roddeList, 
                         ADD_COLLECTION_AT_OPERATIONS, 
                         randomRoddeList);
-    }
-
-    private void profileAddCollectionRoddeListV2() {
-        totalMillisRoddeListV2 +=
-                profileAddCollection(
-                        roddeListV2, 
-                        ADD_COLLECTION_AT_OPERATIONS, 
-                        randomRoddeListV2);
     }
 
     private void profileAddCollectionLinkedList() {
@@ -846,14 +793,9 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
     
-    private void profileGetRoddeList() {
+    private void profileGetRoddeListV2() {
         totalMillisRoddeList += 
                 profileGet(roddeList, GET_OPERATIONS, randomRoddeList);
-    }
-    
-    private void profileGetRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileGet(roddeListV2, GET_OPERATIONS, randomRoddeListV2);
     }
     
     private void profileGetLinkedList() {
@@ -875,12 +817,8 @@ final class LinkedListBenchmark {
                 profileGet(treeList, GET_OPERATIONS, randomTreeList);
     }
 
-    private void profileRemoveFirstRoddeList() {
-        totalMillisRoddeList += profileRemoveFirst(roddeList);
-    }
-
     private void profileRemoveFirstRoddeListV2() {
-        totalMillisRoddeListV2 += profileRemoveFirst(roddeListV2);
+        totalMillisRoddeList += profileRemoveFirst(roddeList);
     }
 
     private void profileRemoveFirstLinkedList() {
@@ -895,12 +833,8 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileRemoveFirst(treeList);        
     }
 
-    private void profileRemoveLastRoddeList() {
-        totalMillisRoddeList += profileRemoveLast(roddeList);
-    }
-
     private void profileRemoveLastRoddeListV2() {
-        totalMillisRoddeListV2 += profileRemoveLast(roddeListV2);
+        totalMillisRoddeList += profileRemoveLast(roddeList);
     }
 
     private void profileRemoveLastLinkedList() {
@@ -915,20 +849,12 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileRemoveLast(treeList);        
     }
     
-    private void profileAppendCollectionRoddeList() {
+    private void profileAppendCollectionRoddeListV2() {
         totalMillisRoddeList +=
                 profileAppendCollection(
                         roddeList, 
                         ADD_LAST_COLLECTION_OPERATIONS, 
                         randomRoddeList);
-    }
-    
-    private void profileAppendCollectionRoddeListV2() {
-        totalMillisRoddeListV2 +=
-                profileAppendCollection(
-                        roddeListV2, 
-                        ADD_LAST_COLLECTION_OPERATIONS, 
-                        randomRoddeListV2);
     }
 
     private void profileAppendCollectionLinkedList() {
@@ -955,20 +881,12 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
 
-    private void profileRemoveViaIndexRoddeList() {
+    private void profileRemoveViaIndexRoddeListV2() {
         totalMillisRoddeList += 
                 profileRemoveViaIndex(
                         roddeList, 
                         REMOVE_VIA_INDEX_OPERATIONS, 
                         randomRoddeList);
-    }
-
-    private void profileRemoveViaIndexRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileRemoveViaIndex(
-                        roddeListV2, 
-                        REMOVE_VIA_INDEX_OPERATIONS, 
-                        randomRoddeListV2);
     }
 
     private void profileRemoveViaIndexLinkedList() {    
@@ -995,21 +913,12 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
 
-    private void profileRemoveObjectRoddeList() {
+    private void profileRemoveObjectRoddeListV2() {
         totalMillisRoddeList += 
                 profileRemoveObject(
                         roddeList, 
                         REMOVE_OBJECT_OPERATIONS, 
                         randomRoddeList);
-        roddeList.checkInvariant();
-    }
-
-    private void profileRemoveObjectRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileRemoveObject(
-                        roddeListV2, 
-                        REMOVE_OBJECT_OPERATIONS, 
-                        randomRoddeListV2);
     }
 
     private void profileRemoveObjectLinkedList() {    
@@ -1036,12 +945,8 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
     
-    private void profileListIteratorRemovalRoddeList() {
-        totalMillisRoddeList += profileListIteratorRemoval(roddeList);
-    }
-    
     private void profileListIteratorRemovalRoddeListV2() {
-        totalMillisRoddeListV2 += profileListIteratorRemoval(roddeListV2);
+        totalMillisRoddeList += profileListIteratorRemoval(roddeList);
     }
 
     private void profileListIteratorRemovalLinkedList() {
@@ -1055,15 +960,10 @@ final class LinkedListBenchmark {
     private void profileListIteratorRemovalTreeList() {
         totalMillisTreeList += profileListIteratorRemoval(treeList);
     }
-
-    private void profileListIteratorAdditionRoddeList() {
+    
+    private void profileListIteratorAdditionRoddeListV2() {
         totalMillisRoddeList += 
                 profileListIteratorAddition(roddeList, randomRoddeList);
-    }
-
-    private void profileListIteratorAdditionRoddeListV2() {
-        totalMillisRoddeListV2 += 
-                profileListIteratorAddition(roddeListV2, randomRoddeListV2);
     }
 
     private void profileListIteratorAdditionLinkedList() {
@@ -1085,12 +985,8 @@ final class LinkedListBenchmark {
                 profileListIteratorAddition(treeList, randomTreeList);
     }
 
-    private void profileStreamRoddeList() {
-        totalMillisRoddeList += profileStream(roddeList);
-    }
-
     private void profileStreamRoddeListV2() {
-        totalMillisRoddeListV2 += profileStream(roddeListV2);
+        totalMillisRoddeList += profileStream(roddeList);
     }
 
     private void profileStreamLinkedList() {
@@ -1105,12 +1001,8 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileStream(treeList);
     }
 
-    private void profileParallelStreamRoddeList() {
-        totalMillisRoddeList += profileParallelStream(roddeList);
-    }
-
     private void profileParallelStreamRoddeListV2() {
-        totalMillisRoddeListV2 += profileParallelStream(roddeListV2);
+        totalMillisRoddeList += profileParallelStream(roddeList);
     }
 
     private void profileParallelStreamLinkedList() {
