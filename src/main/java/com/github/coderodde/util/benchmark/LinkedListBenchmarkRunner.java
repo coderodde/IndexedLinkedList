@@ -9,6 +9,10 @@ package com.github.coderodde.util.benchmark;
  */
 public final class LinkedListBenchmarkRunner {
 
+    private LinkedListBenchmarkRunner() {
+        
+    }
+    
     /**
      * Runs the benchmark.
      * 
