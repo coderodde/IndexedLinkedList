@@ -157,7 +157,9 @@ final class LinkedListBenchmark {
         profileListIteratorRemoval();
         profileStream();
         profileParallelStream();
-        profileSubListClear();
+  
+        // SubList.clear() is not quite fair for TreeList.
+        //profileSubListClear();
 
         printTotalDurations();
 
