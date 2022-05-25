@@ -2,8 +2,10 @@ package com.github.coderodde.util.benchmark;
 
 import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,6 +159,7 @@ final class LinkedListBenchmark {
         profileListIteratorRemoval();
         profileStream();
         profileParallelStream();
+        profileRemoveAll();
   
         // SubList.clear() is not quite fair for TreeList.
         //profileSubListClear();
@@ -314,7 +317,7 @@ final class LinkedListBenchmark {
     }
 
     private void profileParallelStream() {
-        profileParallelStreamRoddeListV2();
+        profileParallelStreamRoddeList();
         profileParallelStreamLinkedList();
         profileParallelStreamArrayList();
         profileParallelStreamTreeList();
@@ -324,6 +327,34 @@ final class LinkedListBenchmark {
         Collections.sort(arrayList);
         Collections.sort(linkedList);
 
+        listsEqual();
+        System.out.println();
+    }
+    
+    private void profileRemoveAll() {
+        roddeList.clear();
+        linkedList.clear();
+        arrayList.clear();
+        treeList.clear();
+        
+        roddeList.addAll(getIntegerArray(10_000));
+        linkedList.addAll(roddeList);
+        arrayList.addAll(roddeList);
+        treeList.addAll(roddeList);
+        
+        Collection<Integer> toRemove = new HashSet<>();
+        Random random = new Random(seed + 1);
+        
+        for (int i = 0; i < 5_000; ++i) {
+            int value = random.nextInt(5_000);
+            toRemove.add(value);
+        }
+        
+        profileRemoveAllRoddeList  (toRemove);
+        profileRemoveAllLinkedList (toRemove);
+        profileRemoveAllArrayList  (toRemove);
+        profileRemoveAllTreeList   (toRemove);
+        
         listsEqual();
         System.out.println();
     }
@@ -715,6 +746,34 @@ final class LinkedListBenchmark {
         return durationMillis;
     }
     
+    private long profileRemoveAll(List<Integer> list, 
+                                  Collection<Integer> toRemove) {
+        long startMillis;
+        long endMillis;
+        
+        if (list instanceof TreeList || list instanceof LinkedList) {
+            startMillis = System.currentTimeMillis();
+            
+            for (Integer i : toRemove) {
+                list.remove(i);
+            }
+            
+            endMillis = System.currentTimeMillis();
+        } else {
+            startMillis = System.currentTimeMillis();
+            list.removeAll(toRemove);
+            endMillis = System.currentTimeMillis();
+        }
+        
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass().getName() +
+                        ".removeAll() in (ms): " + durationMillis);
+
+        return durationMillis;
+    }
+    
     private long profileSubListClear(List<Integer> list) {
         Class<?> clazz = list.getClass();
         
@@ -1096,7 +1155,7 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileStream(treeList);
     }
 
-    private void profileParallelStreamRoddeListV2() {
+    private void profileParallelStreamRoddeList() {
         totalMillisRoddeList += profileParallelStream(roddeList);
     }
 
@@ -1110,6 +1169,22 @@ final class LinkedListBenchmark {
 
     private void profileParallelStreamTreeList() {
         totalMillisTreeList += profileParallelStream(treeList);
+    }
+            
+    private void profileRemoveAllRoddeList(Collection<Integer> toRemove) {
+        totalMillisRoddeList += profileRemoveAll(roddeList, toRemove);
+    }
+    
+    private void profileRemoveAllLinkedList(Collection<Integer> toRemove) {
+        totalMillisLinkedList += profileRemoveAll(linkedList, toRemove);
+    }
+    
+    private void profileRemoveAllArrayList(Collection<Integer> toRemove) {
+        totalMillisArrayList += profileRemoveAll(arrayList, toRemove);
+    }
+    
+    private void profileRemoveAllTreeList(Collection<Integer> toRemove) {
+        totalMillisTreeList += profileRemoveAll(treeList, toRemove);
     }
 
     private void profileSubListClearRoddeList() {

@@ -23,9 +23,10 @@ import java.util.function.UnaryOperator;
  * @version 1.61 (Sep 26, 2021)
  * @since 1.6 (Sep 1, 2021)
  */
-public class IndexedLinkedList<E> 
-        implements Deque<E>, List<E>, Cloneable, java.io.Serializable {
-    
+public class IndexedLinkedList<E> implements Deque<E>, 
+                                             List<E>, 
+                                             Cloneable, 
+                                             java.io.Serializable {
     /**
      * This inner class implements the finger list data structure for managing
      * list fingers.
@@ -459,9 +460,7 @@ public class IndexedLinkedList<E>
         // Moves all the fingers in range [startFingerIndex, size] one  
         // position to the right (towards larger indices):
         private void shiftFingerIndicesToRightOnce(int startIndex) {
-            for (int i = startIndex; i <= size; ++i) {
-                fingerArray[i].index++;
-            }
+            shiftFingerIndicesToRight(startIndex, 1);
         }
     }
     
@@ -1080,7 +1079,10 @@ public class IndexedLinkedList<E>
     }
     
     /**
-     * {@inheritDoc }
+     * Removes the leftmost occurrence of {@code o}.
+     * 
+     * @return {@code true} only if {@code o} was present in the list and was 
+     *         successfully removed.
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
@@ -1349,7 +1351,7 @@ public class IndexedLinkedList<E>
             if (c.contains(node.item) == complement) {
                 modified = true;
                 Node<E> nextNode = node.next;
-                this.removeNode(node);
+                removeObjectImpl(node, from);
                 node = nextNode;
             }
         }
@@ -2008,10 +2010,6 @@ public class IndexedLinkedList<E>
     
     private void removeFinger() {
         fingerList.removeFinger();
-    }
-    
-    private void removeNode(Node<E> node) {
-        
     }
     
     /***************************************************************************
