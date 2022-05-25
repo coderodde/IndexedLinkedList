@@ -14,8 +14,10 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 /**
  * This class implements the indexed doubly-linked list data structure.
@@ -2616,12 +2618,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private static class EnhancedSubList<E> extends AbstractList<E> {
+    private static class EnhancedSubList<E> implements List<E> {
         
         private final IndexedLinkedList<E> root;
         private final EnhancedSubList<E> parent;
         private final int offset;
         private int size;
+        private int modCount;
         
         public EnhancedSubList(IndexedLinkedList<E> root, int fromIndex, int toIndex) {
             this.root = root;
@@ -2638,7 +2641,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.size = toIndex - fromIndex;
             this.modCount = root.modCount;
         }
+
+        @Override
+        public boolean add(E e) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
         
+        @Override
         public void add(int index, E element) {
             checkInsertionIndex(index);
             checkForComodification();
@@ -2646,10 +2655,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             updateSizeAndModCount(1);
         }
         
+        @Override
         public boolean addAll(Collection<? extends E> c) {
             return addAll(this.size, c);
         }
         
+        @Override
         public boolean addAll(int index, Collection<? extends E> collection) {
             checkInsertionIndex(index);
             int collectionSize = collection.size();
@@ -2664,22 +2675,61 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
         
+        @Override
         public void clear() {
             checkForComodification();
             root.removeRange(offset, offset + size);
             updateSizeAndModCount(-size);
         }
+
+        @Override
+        public boolean contains(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public void forEach(Consumer<? super E> action) {
+            List.super.forEach(action); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        }
         
+        @Override
         public E get(int index) {
             Objects.checkIndex(index, size);
             checkForComodification();
             return root.get(offset + index);
         }
+
+        @Override
+        public int indexOf(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
         
+        @Override
+        public boolean isEmpty() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+        
+        @Override
         public Iterator<E> iterator() {
             return listIterator();
         }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
         
+        @Override
         public ListIterator<E> listIterator(int index) {
             checkForComodification();
             checkInsertionIndex(index);
@@ -2735,7 +2785,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             };
         }
+
+        @Override
+        public Stream<E> parallelStream() {
+            return List.super.parallelStream(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        }
         
+        @Override
+        public boolean remove(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+        
+        @Override
         public E remove(int index) {
             Objects.checkIndex(index, size);
             checkForComodification();
@@ -2743,9 +2804,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
             updateSizeAndModCount(-1);
             return result;
         }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public boolean removeIf(Predicate<? super E> filter) {
+            return List.super.removeIf(filter); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        }
         
         public void replaceAll(UnaryOperator<E> operator) {
             root.replaceAllRange(operator, offset, offset + size);
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
         
         public E set(int index, E element) {
@@ -2774,16 +2850,31 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             modCount++;
         }
+
+        @Override
+        public Stream<E> stream() {
+            return List.super.stream(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        }
         
+        @Override
         public List<E> subList(int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
             return new EnhancedSubList<>(this, fromIndex, toIndex);
         }
-        
-        protected void removeRange(int fromIndex, int toIndex) {
-            checkForComodification();
-            root.removeRange(offset + fromIndex, offset + toIndex);
-            updateSizeAndModCount(fromIndex - toIndex);
+
+        @Override
+        public Object[] toArray() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public <T> T[] toArray(IntFunction<T[]> generator) {
+            return List.super.toArray(generator); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
         
         private void checkForComodification() {
