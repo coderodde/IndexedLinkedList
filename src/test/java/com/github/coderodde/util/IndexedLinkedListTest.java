@@ -136,6 +136,44 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void descendingIteratorForEachRemaining() {
+        list.addAll(Arrays.asList(1, 2, 3, -1, -2, -3));
+        Iterator<Integer> iterator = list.descendingIterator();
+        
+        assertEquals(Integer.valueOf(-3), iterator.next());
+        assertEquals(Integer.valueOf(-2), iterator.next());
+        assertEquals(Integer.valueOf(-1), iterator.next());
+        
+        class LocalConsumer implements Consumer<Integer> {
+
+            final List<Integer> list = new ArrayList<>();
+            
+            @Override
+            public void accept(Integer i) {
+                list.add(i);
+            }
+        }
+        
+        LocalConsumer consumer = new LocalConsumer();
+        iterator.forEachRemaining(consumer);
+        
+        assertEquals(Integer.valueOf(3), consumer.list.get(0));
+        assertEquals(Integer.valueOf(2), consumer.list.get(1));
+        assertEquals(Integer.valueOf(1), consumer.list.get(2));
+    }
+    
+    @Test
+    public void removeIf() {
+        list.addAll(getIntegerList(10));
+        list.removeIf((i) -> {
+            return i % 2 == 1;
+        });
+        
+        list.checkInvarant();
+        assertEquals(Arrays.asList(0, 2, 4, 6, 8), list);
+    }
+    
+    @Test
     public void descendingIteratorRemove2() {
         list.addAll(Arrays.asList(1, 2, 3, 4, 5));
         

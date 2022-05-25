@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
@@ -1098,6 +1099,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
     
+    public boolean removeIf(Predicate<? super E> filter) {
+        return removeIf(filter, 0, size);
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -1222,7 +1227,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return a;
     }
     
-    static void subListRangeCheck(int fromIndex, int toIndex, int size) {
+    private static void subListRangeCheck(int fromIndex, 
+                                          int toIndex, 
+                                          int size) {
         if (fromIndex < 0) {
             throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
         }
@@ -1241,9 +1248,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @java.io.Serial
     private static final long serialVersionUID = -1L;
     
-    /***************************************************************************
-    Appends the input collection to the tail of this list.
-    ***************************************************************************/
+    // Appends the input collection to the tail of this list.
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         Node<E> oldLast = last;
@@ -1267,19 +1272,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * This class implements a basic iterator over this list.
      */
     public final class BasicIterator implements Iterator<E> {
+        
+        private Node<E> lastReturned;
+        private Node<E> next = first;
+        private int nextIndex;
+        int expectedModCount = IndexedLinkedList.this.modCount;
 
         /**
-         * Default constructor.
+         * Constructs the basic iterator pointing to the first element.
          */
         BasicIterator() {
             
         }
         
-        private Node<E> lastReturned;
-        private Node<E> next = first;
-        private int nextIndex;
-        int expectedModCount = modCount;
-
         @Override
         public boolean hasNext() {
             return nextIndex < size;
@@ -1301,11 +1306,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public void remove() {
-            checkForComodification();
-            
             if (lastReturned == null) {
                 throw new IllegalStateException();
             }
+            
+            checkForComodification();
             
             int removalIndex = nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
@@ -1320,7 +1325,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
-                lastReturned = next;
                 next = next.next;
                 nextIndex++;
             }
@@ -1359,42 +1363,35 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return modified;
     }
     
-    private void checkForComodification(int expectedModCount) {
-        if (modCount != expectedModCount) {
-            throw new ConcurrentModificationException();
-        }
-    }
-
-    /***************************************************************************
-    Checks the element index. In the case of non-empty list, valid indices are
-    '{ 0, 1, ..., size - 1 }'.
-    ***************************************************************************/
+    // Checks the element index. In the case of non-empty list, valid indices 
+    // are '{ 0, 1, ..., size - 1 }'.
     private void checkElementIndex(int index) {
         if (!isElementIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
     
-   /***************************************************************************
-    Checks that the input index is a valid position index for add operation or
-    iterator position. In other words, checks that {@code index} is in the set
-    '{ 0, 1, ..., size}'.
-    ***************************************************************************/
+    private void checkForComodification(int expectedModCount) {
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+    }
+    
+    // Checks that the input index is a valid position index for add operation 
+    // or iterator position. In other words, checks that {@code index} is in the 
+    // set '{ 0, 1, ..., size}'.
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
     
-    
     private void decreaseSize() {
         size--;
         modCount++;
     }   
     
-    /***************************************************************************
-    Implements the descending list iterator over this list.                    
-    ***************************************************************************/
+    // Implements the descending list iterator over this list.
     private final class DescendingIterator implements Iterator<E> {
 
         private Node<E> lastReturned;
@@ -1423,21 +1420,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         @Override
         public void remove() {
-            checkForComodification();
-            
             if (lastReturned == null) {
                 throw new IllegalStateException();
             }
             
+            checkForComodification();
+            
             removeObjectImpl(lastReturned, nextIndex + 1);
-//            nextInde
             lastReturned = null;
             expectedModCount++;
         }
         
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
             
+            while (modCount == expectedModCount && hasNext()) {
+                action.accept(nextToIterate.item);
+                nextToIterate = nextToIterate.prev;
+                nextIndex--;
+            }
+            
+            checkForComodification();
         }
         
         private void checkForComodification() {
@@ -1447,9 +1451,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Implements the enhanced list iterator over this list.
-    ***************************************************************************/
+    // Implements the enhanced list iterator over this list.
     final class EnhancedIterator implements ListIterator<E> {
 
         private Node<E> lastReturned;
@@ -1565,7 +1567,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
-                lastReturned = next;
                 next = next.next;
                 nextIndex++;
             }
@@ -1580,7 +1581,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    boolean equalsRange(List<?> other, int from, int to) {
+    private boolean equalsRange(List<?> other, int from, int to) {
         Iterator<?> otherIterator = other.iterator();
         
         for (Node<E> node = node(from); from < to; from++, node = node.next) {
@@ -1593,7 +1594,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return true;
     }
 
-    int hashCodeRange(int from, int to) {
+    private int hashCodeRange(int from, int to) {
         int hashCode = 1;
         
         Node<E> node = node(from);
@@ -1609,36 +1610,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return hashCode;
     }
     
-    /***************************************************************************
-    Constructs an IndexOutOfBoundsException detail message.
-    ***************************************************************************/
+    // Constructs an IndexOutOfBoundsException detail message.
     private String getOutOfBoundsMessage(int index) {
         return "Index: " + index + ", Size: " + size;
     }
 
-    /***************************************************************************
-    Computes the recommended number of fingers.
-    ***************************************************************************/
+    // Computes the recommended number of fingers.
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size));
     }
     
-    /***************************************************************************
-    Computes the recommended number of fingers for 'size' elements.
-    ***************************************************************************/
+    // Computes the recommended number of fingers for 'size' elements.
     private static int getRecommendedNumberOfFingers(int size) {
         return (int) Math.ceil(Math.sqrt(size));
     }
     
-    /***************************************************************************
-    Increases the size of the list and its modification count.
-    ***************************************************************************/
+    // Increases the size of the list and its modification count.
     private void increaseSize() {
         ++size;
         ++modCount;
     }
     
-    int indexOfRange(Object o, int start, int end) {
+    private int indexOfRange(Object o, int start, int end) {
         int index = start;
         
         if (o == null) {
@@ -1662,25 +1655,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return -1;
     }
 
-    /***************************************************************************
-    Tells if the argument is the index of an existing element.
-    ***************************************************************************/
+    // Tells if the argument is the index of an existing element.
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
     }
 
-    /***************************************************************************
-    Tells if the argument is the index of a valid position for an iterator or an
-    add operation.
-    ***************************************************************************/
+    // Tells if the argument is the index of a valid position for an iterator or 
+    // an add operation.
     private boolean isPositionIndex(int index) {
         return index >= 0 && index <= size;
     }
     
-    ////////////////////////////////////////////////////////////////////////////
     // Returns the last appearance index of 'obj'.
-    ////////////////////////////////////////////////////////////////////////////
-    int lastIndexOfRange(Object o, int start, int end) {
+    private int lastIndexOfRange(Object o, int start, int end) {
         int index = end - 1;
         
         if (o == null) {
@@ -1704,9 +1691,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return -1;
     }
     
-    /***************************************************************************
-    Links the input element right before the node 'succ'.
-    ***************************************************************************/
+    // Links the input element right before the node 'succ'.
     private void linkBefore(E e, Node<E> succ, int index) {
         Node<E> pred = succ.prev;
         Node<E> newNode = new Node<>(e);
@@ -1732,9 +1717,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Prepends the input element to the head of this list.
-    ***************************************************************************/
+    // Prepends the input element to the head of this list.
     private void linkFirst(E e) {
         Node<E> f = first;
         Node<E> newNode = new Node<>(e);
@@ -1757,9 +1740,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Appends the input element to the tail of this list.
-    ***************************************************************************/
+    // Appends the input element to the tail of this list.
     private void linkLast(E e) {
         Node<E> l = last;
         Node<E> newNode = new Node<>(e);
@@ -1781,9 +1762,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Inserts the input collection right before the node 'succ'.
-    ***************************************************************************/
+    // Inserts the input collection right before the node 'succ'.
     private void insertAll(Collection<? extends E> c,
                            Node<E> succ,
                            int succIndex) {
@@ -1811,11 +1790,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  sz);
     }
     
-    /***************************************************************************
-    Returns a finger that does not point to the element to remove. We need this
-    in order to make sure that after removal, all the fingers point to valid
-    nodes.
-    ***************************************************************************/
+    // Sets a finger that does not point to the element to remove. We need this
+    // in order to make sure that after removal, all the fingers point to valid
+    // nodes.
     void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
         if (fingerList.size() == size()) {
             // Here, fingerList.size() is 1 or 2 and the size of the list is the
@@ -1902,24 +1879,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.get(fingerList.size()).index--;
     }
     
-    /***************************************************************************
-    Returns true only if this list requires more fingers.
-    ***************************************************************************/
+    // Returns true only if this list requires more fingers.
     private boolean mustAddFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
-    /***************************************************************************
-    Returns true only if this list requires less fingers.
-    ***************************************************************************/
+    // Returns true only if this list requires less fingers.
     private boolean mustRemoveFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() + 1
         return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
+    // Returns the node at index 'elementIndex'.
     private Node<E> node(int elementIndex) {
          return fingerList.node(elementIndex);
     }
@@ -2012,9 +1986,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.removeFinger();
     }
     
-    /***************************************************************************
-    Implements the node removal. 
-    ***************************************************************************/
+    // Removes all the items that satisfy the given predicate.
+    private boolean removeIf(Predicate<? super E> filter,
+                             int fromIndex, 
+                             int toIndex) {
+        subListRangeCheck(fromIndex, toIndex, size);
+        Objects.requireNonNull(filter);
+        
+        int index = toIndex - 1;
+        Node<E> node = node(index);
+        boolean modified = false;
+        
+        for (; index >= fromIndex; --index) {
+            Node<E> nextNodeToProcess = node.prev;
+            
+            if (filter.test(node.item)) {
+                modified = true;
+                removeObjectImpl(node, index);
+            }
+            
+            node = nextNodeToProcess;
+        }
+        
+        return modified;
+    }
+    
+    // Implements the node removal. 
     private void removeObjectImpl(Node<E> node, int index) {
         int closestFingerIndex = fingerList.getFingerIndex(index);
         Finger<E> closestFinger = fingerList.get(closestFingerIndex);
@@ -2044,13 +2041,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /**
-     * Removes the range {@code list[fromIndex], ..., list[toIndex - 1]}.
-     * 
-     * @param fromIndex the start index, inclusive.
-     * @param toIndex the end index, exclusive.
-     */
-    protected void removeRange(int fromIndex, int toIndex) {
+    // Removes the finger range 'fingereList[fromIndex], ..., 
+    // fingerList[toIndex - 1]'.
+    private void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
         if (removalSize == 0) {
@@ -2135,6 +2128,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         size -= removalSize;
     }
     
+    // Removes the unnecessary fingers when the prefix and suffix are empty.
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
@@ -2199,6 +2193,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 removalSize);
     }
     
+    // Unlinks the 'numberOfNodesToRemove' consecutive nodes starting from 
+    // 'node'.
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
@@ -2230,6 +2226,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
         Objects.requireNonNull(operator);
         int expectedModCount = modCount;
@@ -2245,9 +2242,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Adds fingers after appending a collection to this list.
-    ***************************************************************************/
+    // Adds fingers after appending a collection to this list.
     private void addFingersAfterAppendAll(
             Node<E> first,
             int firstIndex,
@@ -2288,10 +2283,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    
-    /***************************************************************************
-    Adds fingers after inserting a collection in this list.
-    ***************************************************************************/
+    // Adds fingers after inserting a collection in this list.
     private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
                                           int indexOfInsertedRangeHead,
                                           int collectionSize) {
@@ -2336,9 +2328,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Adds fingers after prepending a collection to this list.
-    ***************************************************************************/
+    // Adds fingers after prepending a collection to this list.
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
         int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerList.size();
@@ -2374,9 +2364,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Adds fingers after setting a collection as a list.
-    ***************************************************************************/
+    // Adds fingers after setting a collection as a list.
     private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
 
@@ -2410,9 +2398,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    /***************************************************************************
-    Prepends the input collection to the head of this list.
-    ***************************************************************************/
+    // Prepends the input collection to the head of this list.
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
         Node<E> oldFirst = first;
@@ -2438,9 +2424,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         addFingersAfterPrependAll(first, sz);
     }
     
-    /***************************************************************************
-    If steps &lt; 0, rewind to the right. Otherwise, rewind to the right.
-    ***************************************************************************/
+    // If steps > 0, rewind to the left. Otherwise, rewind to the right.
     private Node<E> traverseLinkedListBackwards(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
@@ -2459,14 +2443,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return node;
     }
     
+    // Adds the finger to the tail of the finger list and before the end-of-
+    // finger-list sentinel.
     private void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
     }
     
-    /***************************************************************************
-    Sets the input collection as a list.
-    ***************************************************************************/
+    // Sets the input collection as a list.
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
@@ -2487,9 +2471,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         addFingersAfterSetAll(c.size());
     }
     
-    /***************************************************************************
-    Unlinks the input node from the actual doubly-linked list.
-    ***************************************************************************/
+    // Unlinks the input node from the actual doubly-linked list.
     private void unlink(Node<E> x) {
         Node<E> next = x.next;
         Node<E> prev = x.prev;
@@ -2556,9 +2538,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
-            if (action == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(action);
             
             for (long i = numberOfProcessedElements; 
                  i < lengthOfSpliterator; 
