@@ -1,7 +1,6 @@
 package com.github.coderodde.util;
 
 import java.lang.reflect.Array;
-import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -2644,7 +2643,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean add(E e) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            checkInsertionIndex(size);
+            checkForComodification();
+            root.add(offset + size, e);
+            updateSizeAndModCount(1);
+            return true;
         }
         
         @Override
@@ -2684,7 +2687,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean contains(Object o) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return indexOf(o) >= 0;
         }
 
         @Override
@@ -2706,12 +2709,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public int indexOf(Object o) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            int index = root.indexOfRange(o, offset, offset + size);
+            checkForComodification();
+            return index >= 0 ? index - offset : -1;
         }
         
         @Override
         public boolean isEmpty() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return size == 0;
         }
         
         @Override
@@ -2721,12 +2726,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public int lastIndexOf(Object o) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            int index = root.lastIndexOfRange(o, offset, offset + size);
+            checkForComodification();
+            return index >= 0 ? index - offset : -1;
         }
 
         @Override
         public ListIterator<E> listIterator() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return listIterator();
         }
         
         @Override
@@ -2788,6 +2795,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public Stream<E> parallelStream() {
+            
             return List.super.parallelStream(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         }
         
