@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -427,6 +428,42 @@ public class IndexedLinkedListTest {
             list.checkInvarant();
             assertEquals(referenceList, list);
         }
+    }
+    
+    @Test
+    public void optmize() {
+        list.addAll(getIntegerList(100));
+        Random random = new Random(100L);
+        
+        for (int i = 0; i < 50; ++i) {
+            list.get(random.nextInt(list.size()));
+        }
+        
+        list.checkInvarant();
+        list.optimize();
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void sort() {
+        Random random = new Random(1L);
+        
+        for (int i = 0; i < 100; ++i) {
+            list.add(random.nextInt(70));
+        }
+        
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        Comparator<Integer> comp = (i1, i2) -> {
+            return Integer.compare(i1, i2);
+        };
+        
+        list.checkInvarant();
+        list.sort(comp);
+        list.checkInvarant();
+        
+        referenceList.sort(comp);
+        assertEquals(referenceList, list);
     }
     
     @Test
