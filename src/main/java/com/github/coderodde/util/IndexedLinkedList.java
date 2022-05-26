@@ -107,7 +107,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
             
-            shiftFingerIndicesToLeftOnce(lastPrefixIndex);
+            shiftFingerIndicesToLeftOnceUntil(lastPrefixIndex, size - 1);
         }
         
         // We can save some space while keeping the finger array operations 
@@ -242,6 +242,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetFinger == null) {
+//                    System.out.println("PREFIX!");
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 int toMove = fingerArray[0].index + numberOfFingers - fromIndex;
                 Finger<E> finger = fingerArray[0];
@@ -314,6 +315,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetFinger == null) {
+                System.out.println("SUFFIX!");
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
                 int toMove = toIndex + numberOfFingers - 1 - f.index;
@@ -444,10 +446,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        // Moves all the fingers in range [startFingerIndex, size] one 
+        // Moves all the fingers in range [startFingerIndex, endFingerIndex] one 
         // position to the left (towards smaller indices):
-        private void shiftFingerIndicesToLeftOnce(int startFingerIndex) {
-            shiftFingerIndicesToLeft(startFingerIndex, 1);
+        private void shiftFingerIndicesToLeftOnceUntil(int startFingerIndex,
+                                                       int endFingerIndex) {
+            for (int i = startFingerIndex; i <= endFingerIndex; ++i) {
+                fingerArray[i].index--;
+            }
         }
         
         // Moves all the fingers in range [startFingerIndex, size] 
@@ -1071,12 +1076,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else {
             first.prev = null;
         }
-
+        
+        fingerList.adjustOnRemoveFirst();
+        
         if (mustRemoveFinger()) {
             removeFinger();
         }
-        
-        fingerList.adjustOnRemoveFirst();
+
+        fingerList.get(fingerList.size()).index = size;
         return returnValue;
     }
     

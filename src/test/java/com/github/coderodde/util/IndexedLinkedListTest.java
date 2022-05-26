@@ -163,6 +163,26 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListClearOnEmptyPrefix() {
+        list.addAll(getIntegerList(100));
+        list.get(10);
+        list.subList(5, 100).clear();
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void removeFirstUntilEmpty() {
+        list.addAll(getIntegerList(10));
+        
+        while (!list.isEmpty()) {
+            list.removeFirst();
+            list.checkInvarant();
+        }
+        
+        list.checkInvarant();
+    }
+    
+    @Test
     public void removeIf() {
         list.addAll(getIntegerList(10));
         list.removeIf((i) -> {
@@ -389,7 +409,7 @@ public class IndexedLinkedListTest {
     }
     
     @Test
-    public void bruteForceSublistClear() {
+    public void bruteForceSublistClearOnSmallLists() {
         Random random = new Random(26L);
         
         for (int i = 0; i < 200; ++i) {
@@ -400,6 +420,29 @@ public class IndexedLinkedListTest {
             
             int fromIndex = random.nextInt(size);
             int toIndex = Math.min(size, fromIndex + random.nextInt(size));
+            
+            list.subList(fromIndex, toIndex).clear();
+            referenceList.subList(fromIndex, toIndex).clear();
+            
+            list.checkInvarant();
+            assertEquals(referenceList, list);
+        }
+    }
+    
+    @Test
+    public void bruteForceSublistClearOnLargeLists() {
+        Random random = new Random(26L);
+        
+        for (int i = 0; i < 30; ++i) {
+            int size = 1 + random.nextInt(5_000);
+            List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
+            list.clear();
+            list.addAll(referenceList); 
+            
+            int f = random.nextInt(size);
+            int t = random.nextInt(size);
+            int fromIndex = Math.min(f, t);
+            int toIndex = Math.max(f, t);
             
             list.subList(fromIndex, toIndex).clear();
             referenceList.subList(fromIndex, toIndex).clear();

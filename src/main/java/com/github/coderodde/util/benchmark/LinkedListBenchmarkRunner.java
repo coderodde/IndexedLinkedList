@@ -9,6 +9,8 @@ package com.github.coderodde.util.benchmark;
  */
 public final class LinkedListBenchmarkRunner {
 
+    private static final String ALL_BENCHMARK_METHODS_FLAG = "--all";
+    
     private LinkedListBenchmarkRunner() {
         
     }
@@ -19,12 +21,19 @@ public final class LinkedListBenchmarkRunner {
      * @param args the command line arguments. Ignored. 
      */
     public static void main(String[] args) {
+        boolean runAllBenchmarkMethods = false;
+        
+        if (args.length == 1 && args[0].equals(ALL_BENCHMARK_METHODS_FLAG)) {
+            runAllBenchmarkMethods = true;
+        }
+        
         long seed = System.currentTimeMillis();
 
         System.out.println("<<< Benchmark seed = " + seed + " >>>");
         System.out.println();
 
-        LinkedListBenchmark benchmark = new LinkedListBenchmark(seed);
+        LinkedListBenchmark benchmark = 
+                new LinkedListBenchmark(seed, runAllBenchmarkMethods);
 
         benchmark.warmup();
         System.out.println();

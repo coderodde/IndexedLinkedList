@@ -47,10 +47,13 @@ final class LinkedListBenchmark {
     private long totalMillisArrayList  = 0L;
     private long totalMillisTreeList   = 0L;
     
+    private final boolean runAllBenchmarkMethods;
+    
     private final List<Integer>[] getLists = new ArrayList[5];
 
-    LinkedListBenchmark(long seed) {
+    LinkedListBenchmark(long seed, boolean runAllBenchmarkMethods) {
         this.seed = seed;
+        this.runAllBenchmarkMethods = runAllBenchmarkMethods;
         
         for (int i = 0; i < getLists.length; i++) {
             getLists[i] = new ArrayList<>(GET_OPERATIONS);
@@ -159,11 +162,12 @@ final class LinkedListBenchmark {
         profileListIteratorRemoval();
         profileStream();
         profileParallelStream();
-        profileRemoveAll();
+        
+        if (runAllBenchmarkMethods) {
+            profileRemoveAll();
+            profileSubListClear();
+        }
   
-        // SubList.clear() is not quite fair for TreeList.
-        //profileSubListClear();
-
         printTotalDurations();
 
         resetLists();
@@ -247,7 +251,7 @@ final class LinkedListBenchmark {
     }
     
     private void profileRemoveLast() {
-        profileRemoveLastRoddeListV2();
+        profileRemoveLastRoddeList();
         profileRemoveLastLinkedList();
         profileRemoveLastArrayList();
         profileRemoveLastTreeList();
@@ -572,20 +576,27 @@ final class LinkedListBenchmark {
     }
     
     private long profileRemoveLast(List<Integer> list) {
-        long startMillis = System.currentTimeMillis();
+        long startMillis; 
+        long endMillis;
         
-        if (!list.getClass().equals(Deque.class)) {
-            for (int i = 0; i < REMOVE_FIRST_OPERATIONS; i++) {
-                list.remove(list.size() - 1);
-            }
-        } else {
-            for (int i = 0; i < REMOVE_FIRST_OPERATIONS; i++) {
+        if (list instanceof Deque<Integer>) {
+            startMillis = System.currentTimeMillis();
+            
+            for (int i = 0; i < REMOVE_FIRST_OPERATIONS; ++i) {
                 ((Deque<Integer>) list).removeLast();
             }
+            
+            endMillis = System.currentTimeMillis();
+        } else {
+            startMillis = System.currentTimeMillis();
+            
+            for (int i = 0; i < REMOVE_FIRST_OPERATIONS; ++i) {
+                list.remove(list.size() - 1);
+            }
+            
+            endMillis = System.currentTimeMillis();
         }
         
-        
-        long endMillis = System.currentTimeMillis();
         long durationMillis = endMillis - startMillis;
         
         System.out.println(
@@ -987,7 +998,7 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileRemoveFirst(treeList);        
     }
 
-    private void profileRemoveLastRoddeListV2() {
+    private void profileRemoveLastRoddeList() {
         totalMillisRoddeList += profileRemoveLast(roddeList);
     }
 
