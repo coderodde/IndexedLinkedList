@@ -3,8 +3,6 @@ package com.github.coderodde.util.benchmark;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class provides the entry point to the benchmark.
@@ -62,6 +60,7 @@ public final class LinkedListBenchmarkRunner {
         System.out.println("<<< Benchmark seed = " + seed + " >>>");
         System.out.println();
         
+        System.out.println("<<< Flags >>>");
         System.out.println("runSubListClear: " + runSubListClear);
         System.out.println("runRemoveAll   : " + runRemoveAll);
         System.out.println();

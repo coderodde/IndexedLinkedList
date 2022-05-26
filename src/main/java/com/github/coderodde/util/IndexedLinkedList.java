@@ -704,7 +704,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         return true;
     }
-
+    
     /**
      * {@inheritDoc }
      */
@@ -2460,6 +2460,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return node;
     }
     
+//    private void removeFromRange()
+    
     // Adds the finger to the tail of the finger list and before the end-of-
     // finger-list sentinel.
     private void appendFinger(Node<E> node, int index) {
@@ -2633,15 +2635,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private static class EnhancedSubList<E> implements List<E> {
+    private class EnhancedSubList implements List<E> {
         
         private final IndexedLinkedList<E> root;
-        private final EnhancedSubList<E> parent;
+        private final EnhancedSubList parent;
         private final int offset;
         private int size;
         private int modCount;
         
-        public EnhancedSubList(IndexedLinkedList<E> root, int fromIndex, int toIndex) {
+        public EnhancedSubList(IndexedLinkedList<E> root, 
+                               int fromIndex, 
+                               int toIndex) {
+            
             this.root = root;
             this.parent = null;
             this.offset = fromIndex;
@@ -2649,7 +2654,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.modCount = root.modCount;
         }
         
-        private EnhancedSubList(EnhancedSubList<E> parent, int fromIndex, int toIndex) {
+        private EnhancedSubList(EnhancedSubList parent, 
+                                int fromIndex, 
+                                int toIndex) {
+            
             this.root = parent.root;
             this.parent = parent;
             this.offset = parent.offset + fromIndex;
@@ -2708,12 +2716,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean containsAll(Collection<?> c) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            for (Object o : c) {
+                if (!contains(o)) {
+                    return false;
+                }
+            }
+            
+            return true;
         }
 
         @Override
         public void forEach(Consumer<? super E> action) {
-            List.super.forEach(action); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+            Objects.requireNonNull(action);
+            int expectedModCount = modCount;
+            
+            for (Node<E> node = first; 
+                    modCount == expectedModCount && node != null; 
+                    node = node.next) {
+                
+                action.accept(node.item);
+            }
+            
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
         }
         
         @Override
@@ -2749,7 +2775,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public ListIterator<E> listIterator() {
-            return listIterator();
+            return listIterator(0);
         }
         
         @Override
@@ -2808,16 +2834,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             };
         }
-
-        @Override
-        public Stream<E> parallelStream() {
-            
-            return List.super.parallelStream(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-        }
         
         @Override
         public boolean remove(Object o) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            ListIterator<E> iterator = listIterator();
+            
+            if (o == null) {
+                while (iterator.hasNext()) {
+                    if (iterator.next() == null) {
+                        iterator.remove();
+                        return true;
+                    }
+                }
+            } else {
+                while (iterator.hasNext()) {
+                    if (o.equals(iterator.next())) {
+                        iterator.remove();
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
         }
         
         @Override
@@ -2831,29 +2869,40 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return batchRemove(c, false);
         }
 
         @Override
         public boolean removeIf(Predicate<? super E> filter) {
-            return List.super.removeIf(filter); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+            checkForComodification();
+            int oldSize = root.size;
+            boolean modified = root.removeIf(filter, offset, offset + size);
+            
+            if (modified) {
+                updateSizeAndModCount(root.size - oldSize);
+            }
+            
+            return modified;
         }
         
+        @Override
         public void replaceAll(UnaryOperator<E> operator) {
             root.replaceAllRange(operator, offset, offset + size);
         }
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return batchRemove(c, true);
         }
         
+        @Override
         public E set(int index, E element) {
             Objects.checkIndex(index, size);
             checkForComodification();
             return root.set(offset + index, element);
         }
         
+        @Override
         public int size() {
             checkForComodification();
             return size;
@@ -2874,21 +2923,31 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             modCount++;
         }
-
-        @Override
-        public Stream<E> stream() {
-            return List.super.stream(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-        }
         
         @Override
         public List<E> subList(int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new EnhancedSubList<>(this, fromIndex, toIndex);
+            return new EnhancedSubList(this, fromIndex, toIndex);
         }
 
         @Override
         public Object[] toArray() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            checkForComodification();
+            int expectedModCount = root.modCount;
+            Object[] array = new Object[this.size];
+            Node<E> node = node(offset);
+            
+            for (int i = 0; 
+                    i < array.length && expectedModCount == root.modCount;
+                    i++, node = node.next) {
+                array[i] = node.item;
+            }
+            
+            if (expectedModCount != root.modCount) {
+                throw new ConcurrentModificationException();
+            }
+            
+            return array;
         }
 
         @Override
@@ -2898,7 +2957,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public <T> T[] toArray(T[] a) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return null;
+        }
+        
+        private boolean batchRemove(Collection<?> c, boolean complement) {
+            checkForComodification();
+            int oldSize = root.size;
+            boolean modified = root.batchRemove(c,
+                                                complement, 
+                                                offset, 
+                                                offset + size);
+            
+            if (modified) {
+                updateSizeAndModCount(root.size - oldSize);
+            }
+            
+            return modified;
         }
         
         private void checkForComodification() {
@@ -2908,17 +2982,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         private void checkInsertionIndex(int index) {
             if (index < 0) {
-                throw new IndexOutOfBoundsException(index);
+                throw new IndexOutOfBoundsException("Negative index: " + index);
             }
             
-            if (index > size) {
+            if (index > this.size) {
                 throw new IndexOutOfBoundsException(
                         "index(" + index + ") > size(" + size + ")");
             }
         }
         
         private void updateSizeAndModCount(int sizeDelta) {
-            EnhancedSubList<E> subList = this;
+            EnhancedSubList subList = this;
             
             do {
                 subList.size += sizeDelta;

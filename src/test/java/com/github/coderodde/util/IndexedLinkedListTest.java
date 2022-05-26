@@ -445,6 +445,38 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void removeFromRange() {
+        list.addAll(getIntegerList(10));
+        List<Integer> referenceList = new ArrayList<>(list);
+    
+        List<Integer> subList1 = list.subList(1, 9);
+        List<Integer> subList2 = referenceList.subList(1, 9);
+        
+        assertEquals(subList2, subList1);
+        
+        // Remove from ArrayList:
+        subList2.remove(Integer.valueOf(0));
+        
+        // Remove from IndexedLinkedList:
+        subList1.remove(Integer.valueOf(0));
+        
+        assertEquals(subList2, subList1);
+        
+        assertEquals(8, subList1.size());
+        assertEquals(10, list.size());
+        
+        subList1.remove(Integer.valueOf(5));
+        subList2.remove(Integer.valueOf(5));
+        
+        assertEquals(subList2, subList1);
+        
+        assertEquals(7, subList1.size());
+        assertEquals(9, list.size());
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
     public void sort() {
         Random random = new Random(1L);
         
