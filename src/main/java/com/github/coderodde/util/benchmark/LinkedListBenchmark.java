@@ -47,13 +47,18 @@ final class LinkedListBenchmark {
     private long totalMillisArrayList  = 0L;
     private long totalMillisTreeList   = 0L;
     
-    private final boolean runAllBenchmarkMethods;
+    private final boolean runSubListClear;
+    private final boolean runRemoveAll;
     
     private final List<Integer>[] getLists = new ArrayList[5];
 
-    LinkedListBenchmark(long seed, boolean runAllBenchmarkMethods) {
+    LinkedListBenchmark(long seed,
+                        boolean runSubListClear, 
+                        boolean runRemoveAll) {
+        
         this.seed = seed;
-        this.runAllBenchmarkMethods = runAllBenchmarkMethods;
+        this.runSubListClear = runSubListClear;
+        this.runRemoveAll = runRemoveAll;
         
         for (int i = 0; i < getLists.length; i++) {
             getLists[i] = new ArrayList<>(GET_OPERATIONS);
@@ -163,8 +168,11 @@ final class LinkedListBenchmark {
         profileStream();
         profileParallelStream();
         
-        if (runAllBenchmarkMethods) {
+        if (runRemoveAll) {
             profileRemoveAll();
+        }
+        
+        if (runSubListClear) {
             profileSubListClear();
         }
   
