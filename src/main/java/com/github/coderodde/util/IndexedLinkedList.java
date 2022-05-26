@@ -1173,6 +1173,53 @@ public class IndexedLinkedList<E> implements Deque<E>,
         modCount++;
     }
     
+    private void distributeFingersAfterSubListSort(int fromIndex, int toIndex) {
+        int rangeLength = toIndex - fromIndex;
+        
+        if (rangeLength == 0) {
+            return;
+        }
+        
+        if (rangeLength == size) {
+            distributeFingersEvenly();
+            return;
+        }
+        
+        int fingerPrefixLength = fingerList.getFingerIndexImpl(fromIndex);
+        int fingerSuffixLength = fingerList.size() 
+                               - fingerList.getFingerIndexImpl(toIndex);
+        
+        int numberOfRangeFingers = fingerList.size()
+                                 - fingerPrefixLength 
+                                 - fingerSuffixLength;
+        
+        int numberOfFingersPerFinger = numberOfRangeFingers / rangeLength;
+        int startOffset = numberOfFingersPerFinger / 2;
+        int index = fromIndex + startOffset;
+        
+        Node<E> node = node(fromIndex);
+        
+        for (int i = 0; i < startOffset; ++i) {
+            node = node.next;
+        }
+        
+        for (int i = 0; i < fingerList.size() - 1; ++i) {
+            Finger<E> finger = fingerList.get(i);
+            finger.node = node;
+            finger.index = index;
+            
+            for (int j = 0; j < numberOfFingersPerFinger; ++j) {
+                node = node.next;
+            }
+            
+            index += numberOfFingersPerFinger;
+        }
+        
+        Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
+        lastFinger.node = node;
+        lastFinger.index = index;
+    }
+    
     private void distributeFingersEvenly() {
         int nodesPerFinger = size / fingerList.size();
         int startOffset = nodesPerFinger / 2;
@@ -2911,16 +2958,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
         @Override
         @SuppressWarnings("unchecked")
         public void sort(Comparator<? super E> c) {
-            int expectedModCount = modCount;
-            Object[] arr = this.toArray();
-            Arrays.sort((E[]) arr, 0, size, c);
-            
-            if (modCount != expectedModCount) {
-                throw new ConcurrentModificationException();
+            if (size == 0) {
+                return;
             }
             
-            // Set sorted content:
+            int expectedModCount = modCount;
+            Object[] array = toArray();
+            Node<E> node = first;
+
+            Arrays.sort((E[]) array, c);
+
+            // Rearrange the items over the linked list nodes:
+            for (int i = 0; i < array.length; ++i, node = node.next) {
+                E item = (E) array[i];
+                node.item = item;
+            }
             
+            distributeFingersAfterSubListSort(offset, offset + size);
+        
             modCount++;
         }
         
@@ -2952,12 +3007,35 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public <T> T[] toArray(IntFunction<T[]> generator) {
-            return List.super.toArray(generator); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+            return toArray(generator.apply(0));
         }
 
         @Override
         public <T> T[] toArray(T[] a) {
-            return null;
+            checkForComodification();
+            
+            int expectedModCount = root.modCount;
+            
+            if (a.length < size) {
+                a = (T[]) Array.newInstance(
+                        a.getClass().getComponentType(),
+                        size);
+            }
+            
+            int index = 0;
+            
+            for (Node<E> node = node(offset);
+                    expectedModCount == root.modCount && index < size; 
+                    ++index, node = node.next) {
+                
+                a[index] = (T) node.item;
+            }
+            
+            if (a.length > size) {
+                a[size] = null;
+            }
+            
+            return a;
         }
         
         private boolean batchRemove(Collection<?> c, boolean complement) {
