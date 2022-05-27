@@ -499,6 +499,41 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void sortSubLists() {
+        Random random = new Random(12L);
+        
+        for (int i = 0; i < 10; ++i) {
+            list.clear();
+            list.addAll(getIntegerList(500));
+            Collections.shuffle(list, random);
+            List<Integer> referenceList = new ArrayList<>(list);
+            
+            int f = random.nextInt(list.size() + 1);
+            int t = random.nextInt(list.size() - 1);
+            
+            int fromIndex = Math.min(f, t);
+            int toIndex = Math.max(f, t);
+            
+            Comparator<Integer> cmp = Integer::compare;
+            
+            list.subList(fromIndex, toIndex).sort(cmp);
+            referenceList.subList(fromIndex, toIndex).sort(cmp);
+            
+            assertEquals(referenceList, list);
+        }
+    }
+    
+    @Test
+    public void sortSubListOfSubList() {
+        list.addAll(Arrays.asList(4, 1, 0, 2, 6, 8, 4, 1, 3));
+        List<Integer> referenceList = new ArrayList<>(list);
+        Comparator<Integer> cmp = Integer::compare;
+        list.subList(1, 7).subList(1, 4).sort(cmp);
+        referenceList.subList(1, 7).subList(1, 4).sort(cmp);
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
