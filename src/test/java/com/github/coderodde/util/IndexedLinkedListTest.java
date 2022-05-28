@@ -833,6 +833,99 @@ public class IndexedLinkedListTest {
         // subList = <2, 5, 4>
         assertEquals(Arrays.asList(2, 5, 4), subList);
         assertEquals(Arrays.asList(3, 10, 2, 5, 4, 7, 4), list);
+        
+        list.clear();
+        
+        list.addAll(Arrays.asList(1, 3, 2, 1, 2, 3, 3, 1, 2, 0, 0));
+        subList = list.subList(1, 6);
+        // subList = <3, 2, 1, 2, 3>
+        
+        subList.retainAll(Arrays.asList(3, 4, 5));
+        // subList = <3, 3>
+        assertEquals(Arrays.asList(3, 3), subList);
+        assertEquals(Arrays.asList(1, 3, 3, 3, 1, 2, 0, 0), list);
+    }
+    
+    @Test
+    public void subListSet() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        List<Integer> subList = list.subList(1, 4);
+        // subList = <2, 3, 4>
+        subList.set(0, 10);
+        subList.set(2, 11);
+        
+        assertEquals(Arrays.asList(10, 3, 11), subList);
+        assertEquals(Arrays.asList(1, 10, 3, 11, 5), list);
+    }
+    
+    @Test
+    public void subListSort() {
+        Random random = new Random();
+        
+        for (int i = 0; i < 100; ++i) {
+            int value = random.nextInt(100) % 75;
+            list.add(value);
+        }
+        
+        Collections.shuffle(list);
+        List<Integer> referenceList = new ArrayList<>(list);
+        
+        list.subList(10, 80).sort(Integer::compare);
+        referenceList.subList(10, 80).sort(Integer::compare);
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void subListToArray() {
+        list.addAll(getIntegerList(15));
+        List<Integer> subList = list.subList(5, 10);
+        
+        Object[] array = subList.toArray();
+        
+        for (int i = 0; i < subList.size(); ++i) {
+            Integer listInteger = list.get(i + 5);
+            Integer arrayInteger = (Integer) array[i];
+            assertEquals(listInteger, arrayInteger);
+        }
+    }
+    
+    @Test
+    public void subListToArrayGenerator() {
+        list.addAll(getIntegerList(20));
+        List<Integer> subList = list.subList(10, 16);
+        Integer[] array = subList.toArray(Integer[]::new);
+        
+        assertEquals(Integer.valueOf(10), array[0]);
+        assertEquals(Integer.valueOf(11), array[1]);
+        assertEquals(Integer.valueOf(12), array[2]);
+        assertEquals(Integer.valueOf(13), array[3]);
+        assertEquals(Integer.valueOf(14), array[4]);
+        assertEquals(Integer.valueOf(15), array[5]);
+    }
+    
+    @Test
+    public void subListToArrayGeneric() {
+        list.addAll(getIntegerList(15));
+        List<Integer> subList = list.subList(5, 10);
+        
+        Integer[] array = new Integer[5];
+        Integer[] resultArray = subList.toArray(array);
+        
+        assertTrue(array == resultArray);
+        
+        array = new Integer[7];
+        resultArray = subList.toArray(array);
+        
+        assertTrue(array == resultArray);
+        
+        assertNull(resultArray[5]);
+        
+        array = new Integer[3];
+        resultArray = subList.toArray(array);
+        
+        assertFalse(array == resultArray);
+        assertEquals(5, resultArray.length);
     }
     
     @Test
