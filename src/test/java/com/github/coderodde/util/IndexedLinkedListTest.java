@@ -797,6 +797,45 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListRemoveIf() {
+        list.addAll(Arrays.asList(1, 5, 2, 3, 4, 8, 9, 10, 4));
+        List<Integer> subList = list.subList(2, 7);
+        // subList = <2, 3, 4, 8, 9>
+        
+        subList.removeIf((i) -> {
+            return i % 2 == 1; // Remove odd integers.
+        });
+        
+        // subList = <2, 4, 8>
+        assertEquals(Arrays.asList(2, 4, 8), subList);
+        assertEquals(Arrays.asList(1, 5, 2, 4, 8, 10, 4), list);
+    }
+    
+    @Test
+    public void subListReplaceAll() {
+        list.addAll(Arrays.asList(4, 4, 5, 1, 8, 2, 9, 0, 1, 3));
+        List<Integer> subList = list.subList(2, 8);
+        // subList = <5, 1, 8, 2, 9, 0>
+        subList.replaceAll((i) -> { return i * 2; });
+        
+        assertEquals(Arrays.asList(10, 2, 16, 4, 18, 0), subList);
+        assertEquals(Arrays.asList(4, 4, 10, 2, 16, 4, 18, 0, 1, 3), list);
+    }
+    
+    @Test
+    public void subListRetainAll() {
+        list.addAll(Arrays.asList(3, 10, 8, 2, 5, 4, 1, 0, 7, 4));
+        List<Integer> subList = list.subList(2, 8);
+        // subList = <8, 2, 5, 4, 1, 0>
+        subList.retainAll(Arrays.asList(4, 2, 5, 11));
+        list.checkInvarant();
+        
+        // subList = <2, 5, 4>
+        assertEquals(Arrays.asList(2, 5, 4), subList);
+        assertEquals(Arrays.asList(3, 10, 2, 5, 4, 7, 4), list);
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         

@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
 
 /**
  * This class implements the indexed doubly-linked list data structure.
@@ -1259,6 +1258,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return a;
     }
     
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        
+        boolean firstIteration = true;
+        
+        for (E element : this) {
+            if (firstIteration) {
+                firstIteration = false;
+            } else {
+                stringBuilder.append(", ");
+            }
+            
+            stringBuilder.append(element);
+        }
+        
+        return stringBuilder.append("]").toString();
+    }
+    
     private static void subListRangeCheck(int fromIndex, 
                                           int toIndex, 
                                           int size) {
@@ -2031,21 +2050,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
                              int fromIndex, 
                              int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
-        Objects.requireNonNull(filter);
         
-        int index = toIndex - 1;
-        Node<E> node = node(index);
         boolean modified = false;
+        int numberOfNodesToIterate = toIndex - fromIndex;
+        int i = 0;
+        int nodeIndex = fromIndex;
         
-        for (; index >= fromIndex; --index) {
-            Node<E> nextNodeToProcess = node.prev;
+        for (Node<E> node = node(fromIndex); i < numberOfNodesToIterate; ++i) {
+            Node<E> nextNode = node.next;
             
             if (filter.test(node.item)) {
                 modified = true;
-                removeObjectImpl(node, index);
+                removeObjectImpl(node, nodeIndex);
+            } else {
+                nodeIndex++;
             }
             
-            node = nextNodeToProcess;
+            node = nextNode;
         }
         
         return modified;
@@ -2274,6 +2295,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         while (modCount == expectedModCount && i < end) {
             node.item = operator.apply(node.item);
+            node = node.next;
             i++;
         }
         
@@ -2916,7 +2938,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            return batchRemove(c, true);
+            return batchRemove(c, false);
         }
         
         @Override
@@ -3014,6 +3036,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return a;
         }
         
+        @Override
+        public String toString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("[");
+
+            boolean firstIteration = true;
+
+            for (E element : this) {
+                if (firstIteration) {
+                    firstIteration = false;
+                } else {
+                    stringBuilder.append(", ");
+                }
+
+                stringBuilder.append(element);
+            }
+
+            return stringBuilder.append("]").toString();
+        }
+    
         private boolean batchRemove(Collection<?> c, boolean complement) {
             checkForComodification();
             int oldSize = root.size;
