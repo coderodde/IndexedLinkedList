@@ -860,7 +860,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Moves all the fingers such that they are evenly distributed.
      */
     public void optimize() {
-        distributeFingers();
+        distributeFingersEvenly();
     }
     
     /**
@@ -1165,7 +1165,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node.item = item;
         }
         
-        distributeFingers();
+        distributeFingersEvenly();
         modCount++;
     }
     
@@ -1211,7 +1211,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         lastFinger.index = index;
     }
     
-    private void distributeFingers() {
+    private void distributeFingersEvenly() {
         distributeFingers(0, size);
     }
     
@@ -2744,10 +2744,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         public void forEach(Consumer<? super E> action) {
             Objects.requireNonNull(action);
             int expectedModCount = modCount;
+            int iterated = 0;
             
-            for (Node<E> node = first; 
-                    modCount == expectedModCount && node != null; 
-                    node = node.next) {
+            for (Node<E> node = node(offset); 
+                    modCount == expectedModCount && iterated < size; 
+                    node = node.next, ++iterated) {
                 
                 action.accept(node.item);
             }

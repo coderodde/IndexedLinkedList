@@ -596,6 +596,135 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListForEach() {
+        list.addAll(Arrays.asList(4, 2, 1, 3, 1, 2, 5, 8));
+        
+        class MyConsumer implements Consumer<Integer> {
+
+            final List<Integer> data = new ArrayList<>();
+            
+            @Override
+            public void accept(Integer t) {
+                data.add(t);
+            }
+        }
+        
+        MyConsumer myConsumer = new MyConsumer();
+        list.subList(1, 6).forEach(myConsumer);
+        
+        assertEquals(Integer.valueOf(2), myConsumer.data.get(0));
+        assertEquals(Integer.valueOf(1), myConsumer.data.get(1));
+        assertEquals(Integer.valueOf(3), myConsumer.data.get(2));
+        assertEquals(Integer.valueOf(1), myConsumer.data.get(3));
+        assertEquals(Integer.valueOf(2), myConsumer.data.get(4));
+    }
+    
+    @Test
+    public void subListGet() {
+        list.addAll(Arrays.asList(4, 2, 8, 0, 9));
+        List<Integer> subList = list.subList(1, 4);
+        assertEquals(Integer.valueOf(2), subList.get(0));
+        assertEquals(Integer.valueOf(8), subList.get(1));
+        assertEquals(Integer.valueOf(0), subList.get(2));
+    }
+    
+    @Test
+    public void subListIndexOf() {
+        list.addAll(Arrays.asList(5, 1, 9, 10, 2, 3, 7, 6));
+        List<Integer> subList = list.subList(2, 6); // <9, 10, 2, 3>
+        
+        assertEquals(-1, subList.indexOf(5));
+        assertEquals(-1, subList.indexOf(1));
+        assertEquals(-1, subList.indexOf(7));
+        assertEquals(-1, subList.indexOf(6));
+        
+        assertEquals(0, subList.indexOf(9));
+        assertEquals(1, subList.indexOf(10));
+        assertEquals(2, subList.indexOf(2));
+        assertEquals(3, subList.indexOf(3));
+    }
+    
+    @Test
+    public void subListIsEmpty() {
+        List<Integer> subList = list.subList(0, 0);
+        assertTrue(subList.isEmpty());
+        subList.add(1);
+        assertFalse(subList.isEmpty());
+        subList.remove(0);
+        assertTrue(subList.isEmpty());
+    }
+    
+    @Test
+    public void subListIterator() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6));
+        List<Integer> subList = list.subList(1, 5); // <2, 3, 4, 5>
+        Iterator<Integer> iterator = subList.iterator();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        iterator.remove();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(3), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(4), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(5), iterator.next());
+        
+        iterator.remove();
+        
+        assertFalse(iterator.hasNext());
+        
+        assertEquals(Arrays.asList(3, 4), subList);
+        assertEquals(Arrays.asList(1, 3, 4, 6), list);
+    }
+    
+    @Test
+    public void subListLastIndex() {
+        list.addAll(Arrays.asList(1, 2, 3, 2, 3, 2, 1));
+        List<Integer> subList = list.subList(2, 7); // <3, 2, 3, 2, 1>
+        
+        assertEquals(4, subList.lastIndexOf(1));
+        assertEquals(3, subList.lastIndexOf(2));
+        assertEquals(2, subList.lastIndexOf(3));
+        assertEquals(-1, subList.lastIndexOf(10));
+    }
+    
+    @Test
+    public void subListListIterator() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+        List<Integer> subList = list.subList(2, 8); // <3, 4, 5, 6, 7, 8>
+        
+        assertEquals(Arrays.asList(3, 4, 5, 6, 7, 8), subList);
+        
+        ListIterator<Integer> iterator = subList.listIterator(2);
+        
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasPrevious());
+        
+        assertEquals(Integer.valueOf(5), iterator.next());
+        
+        iterator.remove(); // subList = <3, 4, 6, 7, 8>
+        
+        assertEquals(Arrays.asList(1, 2, 3, 4, 6, 7, 8, 9), list);
+        assertEquals(Arrays.asList(3, 4, 6, 7, 8), subList);
+        
+        assertEquals(Integer.valueOf(4), iterator.previous());
+        
+        iterator.remove(); // subList = <3, 6, 7, 8>
+        
+        assertEquals(Integer.valueOf(6), iterator.next());
+        assertEquals(Integer.valueOf(7), iterator.next());
+        assertEquals(Integer.valueOf(8), iterator.next());
+        
+        assertFalse(iterator.hasNext());
+        assertTrue(iterator.hasPrevious());
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
