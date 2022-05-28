@@ -534,6 +534,68 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListAdd() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5));
+        list.subList(1, 4).add(Integer.valueOf(1000));
+        list.checkInvarant();
+        assertEquals(Arrays.asList(3, 2, 1, 4, 1000, 5), list);
+    }
+    
+    @Test
+    public void subListAddInt() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5));
+        list.subList(1, 4).add(1, Integer.valueOf(1000));
+        list.checkInvarant();
+        assertEquals(Arrays.asList(3, 2, 1000, 1, 4, 5), list);
+    }
+    
+    @Test
+    public void subListAddAll() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5));
+        list.subList(1, 4).addAll(Arrays.asList(10, 11));
+        list.checkInvarant();
+        assertEquals(Arrays.asList(3, 2, 1, 4, 10, 11, 5), list);
+    }
+    
+    @Test
+    public void subListAddAllInt() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5));
+        list.subList(1, 4).addAll(0, Arrays.asList(10, 11));
+        list.checkInvarant();
+        assertEquals(Arrays.asList(3, 10, 11, 2, 1, 4, 5), list);
+    }
+    
+    @Test
+    public void subListContains() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5, 8, 7));
+        
+        assertTrue(list.subList(1, 5).contains(2));
+        assertTrue(list.subList(1, 5).contains(1));
+        assertTrue(list.subList(1, 5).contains(4));
+        assertTrue(list.subList(1, 5).contains(5));
+        
+        assertFalse(list.subList(1, 5).contains(3));
+        assertFalse(list.subList(1, 5).contains(8));
+        assertFalse(list.subList(1, 5).contains(7));
+    }
+    
+    @Test
+    public void subListContainsAll() {
+        list.addAll(Arrays.asList(3, 2, 1, 4, 5, 8, 7));
+        
+        assertTrue(list.subList(1, 5).containsAll(Arrays.asList(2, 4, 1, 5)));
+        
+        assertFalse(list.subList(1, 5)
+                .containsAll(Arrays.asList(2, 4, 1, 5, 3)));
+        
+        assertFalse(list.subList(1, 5)
+                .containsAll(Arrays.asList(2, 4, 1, 5, 8)));
+        
+        assertFalse(list.subList(1, 5)
+                .containsAll(Arrays.asList(2, 4, 1, 5, 7)));
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
