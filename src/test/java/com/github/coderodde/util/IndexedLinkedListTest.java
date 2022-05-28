@@ -725,6 +725,78 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListRemoveObject() {
+        list.addAll(Arrays.asList(3, 1, 2, 4, null, 5, null, 8, 1));
+        List<Integer> subList = list.subList(2, 8);
+        // subList = <2, 4, null, 5, null, 8>
+        
+        subList.remove(null);
+        
+        assertEquals(Arrays.asList(2, 4, 5, null, 8), subList);
+        assertEquals(Arrays.asList(3, 1, 2, 4, 5, null, 8, 1), list);
+        
+        subList.remove(Integer.valueOf(5));
+        
+        assertEquals(Arrays.asList(2, 4, null, 8), subList);
+        assertEquals(Arrays.asList(3, 1, 2, 4, null, 8, 1), list);
+        
+        subList.remove(null);
+        
+        assertEquals(Arrays.asList(2, 4, 8), subList);
+        assertEquals(Arrays.asList(3, 1, 2, 4, 8, 1), list);
+    }
+    
+    @Test
+    public void subListRemoveInt() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+        List<Integer> subList = list.subList(3, 5);
+        
+        assertEquals(Arrays.asList(4, 5), subList);
+        
+        subList.remove(1);
+        
+        assertEquals(Arrays.asList(4), subList);
+        assertEquals(Arrays.asList(1, 2, 3, 4, 6, 7), list);
+        
+        subList.remove(0);
+        
+        assertEquals(Arrays.asList(), subList);
+        assertEquals(Arrays.asList(1, 2, 3, 6, 7), list);
+    }
+    
+    @Test
+    public void subListRemoveAll() {
+        list.addAll(Arrays.asList(4, 1, 2, 9, 8, 7, 5, 2, 8, 10, 11));
+        List<Integer> subList = list.subList(1, 9);
+        // subList = <1, 2, 9, 8, 7, 5, 2, 8>
+        
+        subList.removeAll(Arrays.asList(1));
+        // subList = <2, 9, 8, 7, 5, 2, 8>
+        list.checkInvarant();
+        
+        assertEquals(Arrays.asList(2, 9, 8, 7, 5, 2, 8), subList);
+        
+        subList.removeAll(Arrays.asList(2));
+        // subList = <9, 8, 7, 5, 8>
+        list.checkInvarant();
+        
+        assertEquals(Arrays.asList(9, 8, 7, 5, 8), subList);
+        
+        subList.removeAll(Arrays.asList(8, 7));
+        // subList = <9, 5>
+        list.checkInvarant();
+        
+        assertEquals(Arrays.asList(9, 5), subList);
+        
+        subList.removeAll(Arrays.asList(9, 5)); // subList = <>
+        list.checkInvarant();
+        
+        assertEquals(Arrays.asList(), subList);
+        assertTrue(subList.isEmpty());
+        assertFalse(list.isEmpty());
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         

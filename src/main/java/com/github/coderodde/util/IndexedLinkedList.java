@@ -1383,13 +1383,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         boolean modified = false;
         
-        for (Node<E> node = node(from); from < end; from++) {
+        int numberOfNodesToIterate = end - from;
+        int i = 0;
+        int nodeIndex = from;
+        
+        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
+            Node<E> nextNode = node.next;
+            
             if (c.contains(node.item) == complement) {
                 modified = true;
-                Node<E> nextNode = node.next;
-                removeObjectImpl(node, from);
-                node = nextNode;
+                removeObjectImpl(node, nodeIndex);
+            } else {
+                nodeIndex++;
             }
+            
+            node = nextNode;
         }
         
         return modified;
@@ -2885,7 +2893,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            return batchRemove(c, false);
+            return batchRemove(c, true);
         }
 
         @Override
