@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/coderodde/IndexedLinkedList.svg?branch=main)](https://app.travis-ci.com/coderodde/IndexedLinkedList)
+
 # IndexedLinkedList - an indexed, heuristic doubly-linked list in Java
 
 This repository maintains the implementation of a linked list data structure that runs single-element operations in &Theta;(sqrt(n)) time.
