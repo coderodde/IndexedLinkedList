@@ -929,6 +929,12 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void clone2() {
+        list.addAll(Arrays.asList(4, 1, 3, 2));
+        assertEquals(Arrays.asList(4, 1, 3, 2), list.clone());
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
