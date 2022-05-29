@@ -932,6 +932,7 @@ public class IndexedLinkedListTest {
     public void clone2() {
         list.addAll(Arrays.asList(4, 1, 3, 2));
         assertEquals(Arrays.asList(4, 1, 3, 2), list.clone());
+        System.out.println("test");
     }
     
     @Test
