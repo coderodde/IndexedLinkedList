@@ -68,14 +68,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         // Not 'private' since is used in the unit tests.
         void clear() {
-            Arrays.fill(fingerArray, 0, size, null);
-            fingerArray[0] = fingerArray[size];
-            fingerArray[0].index = 0;
-            
-            if (size != 0) {
-                fingerArray[size] = null;
-                size = 0;
-            }
+            fingerArray = Arrays.copyOf(fingerArray, INITIAL_CAPACITY);
+            fingerArray[0] = new Finger<>(null, 0);
+            size = 0;
         }
         
         Finger<E> get(int index) {
@@ -1420,6 +1415,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return modified;
+    }
+
+    int getFingerListSize() {
+        return fingerList.size();
     }
     
     // Checks the element index. In the case of non-empty list, valid indices 

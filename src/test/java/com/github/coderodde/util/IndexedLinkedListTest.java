@@ -948,6 +948,14 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void debugContractFingerArrayIfNeeded() {
+        list.addAll(getIntegerList(15_877)); // 128 finger spots occupied.
+        assertEquals(127, list.getFingerListSize());
+        list.subList(49, list.size()).clear(); // 8 finger spots occupied.
+        assertEquals(7, list.getFingerListSize());
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
