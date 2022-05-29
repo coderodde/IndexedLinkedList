@@ -1,4 +1,4 @@
-[![Build Status](https://app.travis-ci.com/coderodde/IndexedLinkedList.svg?branch=main)](https://app.travis-ci.com/coderodde/IndexedLinkedList)
+[![Build Status](https://app.travis-ci.com/coderodde/IndexedLinkedList.svg?branch=main)](https://app.travis-ci.com/coderodde/IndexedLinkedList) [![Code Coverage](https://codecov.io/github/coderodde/IndexedLinkedList/coverage.svg)](https://codecov.io/gh/coderodde/IndexedLinkedList)
 
 # IndexedLinkedList - an indexed, heuristic doubly-linked list in Java
 
