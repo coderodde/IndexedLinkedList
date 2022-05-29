@@ -123,10 +123,11 @@
                 </executions>
                 <configuration>
                     <excludes>
-                        <exclude>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner.class</exclude>
-                        <exclude>com.github.coderodde.util.benchmark.LinkedListBenchmark.class</exclude>
-                        <exclude>com.github.coderodde.util.benchmark.Finger.class</exclude>
-                        <exclude>com.github.coderodde.util.benchmark.Node.class</exclude>
+                        <exclude>**/com/github/coderodde/util/benchmark/LinkedListBenchmarkRunner.class</exclude>
+                        <exclude>**/com/github/coderodde/util/benchmark/LinkedListBenchmark.class</exclude>
+                        <exclude>**/com/github/coderodde/util/benchmark/LinkedListBenchmark$BenchmarkChoice.class</exclude>
+                        <exclude>**/com/github/coderodde/util/Finger.class</exclude>
+                        <exclude>**/com/github/coderodde/util/Node.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
