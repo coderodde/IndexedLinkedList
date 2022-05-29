@@ -2680,7 +2680,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private class EnhancedSubList implements List<E> {
+    class EnhancedSubList implements List<E>, Cloneable {
         
         private final IndexedLinkedList<E> root;
         private final EnhancedSubList parent;
@@ -2752,6 +2752,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             checkForComodification();
             root.removeRange(offset, offset + size);
             updateSizeAndModCount(-size);
+        }
+        
+        public Object clone() {
+            List<E> list = new IndexedLinkedList<>();
+            
+            for (E element : this) {
+                list.add(element);
+            }
+            
+            return list;
         }
 
         @Override

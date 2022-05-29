@@ -935,6 +935,19 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void subListClone() {
+        list.addAll(Arrays.asList(4, 1, 8, 9, 5, 6, 7, 0, 1));
+        List<Integer> subList1 = list.subList(1, list.size() - 1);
+        
+        IndexedLinkedList<Integer>.EnhancedSubList subList2 = 
+                (IndexedLinkedList<Integer>.EnhancedSubList) 
+                subList1.subList(1, subList1.size() - 1);
+        
+        List<Integer> clone = (List<Integer>) subList2.clone();
+        assertEquals(Arrays.asList(8, 9, 5, 6, 7), clone);
+    }
+    
+    @Test
     public void bruteForceSublistClearOnLargeLists() {
         Random random = new Random(26L);
         
