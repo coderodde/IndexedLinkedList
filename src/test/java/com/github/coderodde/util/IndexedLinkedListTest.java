@@ -596,6 +596,58 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void containsAll() {
+        list.addAll(Arrays.asList(4, 1, 8, 7, 5, 6));
+        
+        assertFalse(list.containsAll(Arrays.asList(8, 7, 3)));
+        assertFalse(list.containsAll(Arrays.asList(1, 4, 3)));
+        assertFalse(list.containsAll(Arrays.asList(-1)));
+        
+        list.addAll(Arrays.asList(4, 1, 8, 7, 5, 6));
+        
+        assertTrue(list.containsAll(Arrays.asList(8, 7)));
+        assertTrue(list.containsAll(Arrays.asList()));
+        assertTrue(list.containsAll(Arrays.asList(8, 1, 4, 7, 6, 5)));
+    }
+    
+    @Test
+    public void hashCode2() {
+        List<Integer> referenceList = new ArrayList<>();
+        
+        list.add(null);
+        referenceList.add(null);
+        assertEquals(referenceList.hashCode(), list.hashCode());
+        
+        list.add(1);
+        referenceList.add(1);
+        assertEquals(referenceList.hashCode(), list.hashCode());
+        
+        list.add(5);
+        referenceList.add(5);
+        assertEquals(referenceList.hashCode(), list.hashCode());
+        
+        list.add(7);
+        referenceList.add(7);
+        assertEquals(referenceList.hashCode(), list.hashCode());
+        
+        list.add(null);
+        referenceList.add(null);
+        assertEquals(referenceList.hashCode(), list.hashCode());
+    }
+    
+    @Test
+    public void removeAll() {
+        list.addAll(Arrays.asList(4, 1, 8, 9, 5, 1, -1, 5, 2, 3, 0));
+        list.removeAll(Arrays.asList(1, -1, 5));
+        // list = <4, 8, 9, 2, 3, 0>
+        assertEquals(Arrays.asList(4, 8, 9, 2, 3, 0), list);
+        
+        list.removeAll(Arrays.asList(-2, 8, 0));
+        // list = <4, 9, 2, 3>
+        assertEquals(Arrays.asList(4, 9, 2, 3), list);
+    }
+    
+    @Test
     public void subListForEach() {
         list.addAll(Arrays.asList(4, 2, 1, 3, 1, 2, 5, 8));
         
