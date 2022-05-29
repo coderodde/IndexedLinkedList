@@ -648,6 +648,73 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void replaceAll() {
+        list.addAll(Arrays.asList(3, 2, 1));
+        list.replaceAll((i) -> {
+            return i * 3 + 1;
+        });
+        
+        assertEquals(Arrays.asList(10, 7, 4), list);
+    }
+    
+    @Test
+    public void retainAll() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6));
+        
+        list.retainAll(Arrays.asList(2, 3, 5, 7));
+        
+        assertEquals(Arrays.asList(2, 3, 5), list);
+        
+        list.retainAll(Arrays.asList(3));
+        
+        assertEquals(Arrays.asList(3), list);
+        
+        list.retainAll(Arrays.asList(0));
+        
+        assertTrue(list.isEmpty());
+    }
+    
+    @Test
+    public void toArrayGeneric() {
+        list.addAll(Arrays.asList(3, 1, 2, 5, 4));
+        
+        Integer[] array = new Integer[7];
+        
+        array[5] = Integer.valueOf(10);
+        array[6] = Integer.valueOf(11);
+        
+        Integer[] cloneArray = list.toArray(array);
+        
+        assertTrue(cloneArray == array);
+        assertNull(cloneArray[5]);
+        assertEquals(Integer.valueOf(11), cloneArray[6]);
+        
+        array = new Integer[3];
+        
+        cloneArray = list.toArray(array);
+        
+        assertFalse(cloneArray == array);
+        
+        assertEquals(5, cloneArray.length);
+        
+        for (int i = 0; i < cloneArray.length; ++i) {
+            assertEquals(list.get(i), cloneArray[i]);
+        }
+    }
+    
+    @Test
+    public void toString2() {
+        list.addAll(Arrays.asList(1, 11, 111));
+        assertEquals("[1, 11, 111]", list.toString());
+    }
+    
+    @Test
+    public void subListToString() {
+        list.addAll(Arrays.asList(0, 2, 22, 222, 0));
+        assertEquals("[2, 22, 222]", list.subList(1, 4).toString());
+    }
+    
+    @Test
     public void subListForEach() {
         list.addAll(Arrays.asList(4, 2, 1, 3, 1, 2, 5, 8));
         
