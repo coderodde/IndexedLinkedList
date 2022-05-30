@@ -2235,13 +2235,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
 
         if (prefixLastNode != null) {
-            if (suffixFirstNode == null) {
-                prefixLastNode.next = null;
-                last = prefixLastNode;
-            } else {
-                prefixLastNode.next = suffixFirstNode;
-                suffixFirstNode.prev = prefixLastNode;
-            }
+            prefixLastNode.next = null;
+            last = prefixLastNode;
         } else {
             suffixFirstNode.prev = null;
             first = suffixFirstNode;
