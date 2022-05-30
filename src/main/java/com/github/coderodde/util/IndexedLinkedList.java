@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
+ * Running time \[\Theta(\sqrt{N})\]    .
+ * 
  * This class implements the indexed doubly-linked list data structure.
  * 
  * @author Rodion "rodde" Efremov
