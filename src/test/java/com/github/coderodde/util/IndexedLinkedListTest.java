@@ -14,11 +14,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
@@ -838,6 +840,52 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         list.subList(5, list.size() - 5).clear();
         list.checkInvarant();
+    }
+    
+    @Test
+    public void debugChainResolve2() {
+        list.addAll(getIntegerList(9_999));
+        list.checkInvarant();
+        list.subList(5, list.size()).clear();
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void debugChainResolve3() {
+        list.addAll(getIntegerList(9_999));
+        list.checkInvarant();
+        list.subList(0, list.size() - 5).clear();
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void addFingersAfterAppendAll() {
+        list.addAll(getIntegerList(9_990));
+        assertEquals(100, list.getFingerListSize());
+        list.addAll(Arrays.asList(-1, -2));
+        assertEquals(100, list.getFingerListSize());
+    }
+    
+    @Test
+    public void canUseListAsMapKey() {
+        List<Integer> l = new ArrayList<>(Arrays.asList(1, 5, 3));
+        list.addAll(l);
+        
+        Map<List<Integer>, Integer> map = new HashMap<>();
+        
+        map.put(l, 100);
+        
+        assertEquals(Integer.valueOf(100), map.get(list));
+        
+        l = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+        list.clear();
+        list.addAll(l);
+        
+        List<Integer> subList1 = l.subList(1, 4);
+        List<Integer> subList2 = list.subList(1, 4);
+        
+        map.put(subList1, Integer.valueOf(200));
+        assertEquals(Integer.valueOf(200), map.get(subList2));
     }
     
     @Test
