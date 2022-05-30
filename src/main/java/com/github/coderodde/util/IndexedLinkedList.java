@@ -18,9 +18,41 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
- * Running time \[\Theta(\sqrt{N})\]    .
+ * <p>
+ * This class implements the indexed, heuristic doubly-linked list data 
+ * structure that runs all the single-element operations in expected
+ * \(\mathcal{O}(\sqrt{N})\) time. Under the hood, the actual elements are
+ * stored in a doubly-linked list. However, we also maintain a list of so-called 
+ * <i>"fingers"</i> stored in a random access array. Each finger {@code F} 
+ * contains two data fields:
+ * <ul>
+ *  <li>{@code F.node} - the actual element node,</li>
+ *  <li>{@code F.index} - the appearance index of {@code F.node} in the actual 
+ *       list.</li>
+ * </ul>
  * 
- * This class implements the indexed doubly-linked list data structure.
+ * <p>
+ * 
+ * For the list of size \(N\), we maintain 
+ * \(\bigg \lceil \sqrt{N} \bigg \rceil + 1\) fingers. The rightmost finger in 
+ * the finger list is a <i>special end-of-list sentinel</i>. It always has 
+ * {@code F.node = null} and {@code F.index = } \(N\). The fingers are sorted by 
+ * their indices. That arrangement allows simpler and faster code in the method 
+ * that accesses a finger via element index; see 
+ * {@link FingerList#getFingerIndexImpl(int)}. Since number of fingers is 
+ * \(\sqrt{N}\), and assuming that the fingers are evenly distributed, each 
+ * finger "covers" \(N / \sqrt{N} = \sqrt{N}\) elements. In order to access an 
+ * element in the actual list, we first consult the finger list for the index 
+ * {@code i} of the finger {@code fingerArray[i]} that is closest to the index 
+ * of the target element. This runs in 
+ * 
+ * \[ 
+ * \mathcal{O}(\log \sqrt{N}) = \mathcal{O}(\log N^{1/2}) = \mathcal{O}(\frac{1}{2} \log N) = \mathcal{O}(\log N).
+ * \]
+ * 
+ * The rest is to <i>"rewind"</i> the closest finger to point to the target 
+ * element (which requires \(\mathcal{O}(\sqrt{N})\) on evenly distributed 
+ * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
  * @version 1.61 (Sep 26, 2021)
