@@ -1546,11 +1546,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     // Adds fingers after setting a collection as a list.
     private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
-
-        if (numberOfNewFingers == 0) {
-            return;
-        }
-
         int distance = size / numberOfNewFingers;
         int startIndex = distance / 2;
         int index = startIndex;
@@ -2637,12 +2632,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             this.node = list.node((int) this.offsetOfSpliterator);
             
-            return new LinkedListSpliterator<>(
-                    list,
-                    newSpliteratorNode,
-                    newSpliteratorLength, // length
-                    newSpliteratorOffset, // offset
-                    expectedModCount);
+            return new LinkedListSpliterator<>(list,
+                                               newSpliteratorNode,
+                                               newSpliteratorLength, // length
+                                               newSpliteratorOffset, // offset
+                                               expectedModCount);
         }
 
         @Override
@@ -2987,8 +2981,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 node.item = item;
             }
             
+            if (expectedModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+            
             distributeFingers(offset, offset + size);
             modCount++;
+        }
+        
+        @Override
+        public Spliterator<E> spliterator() {
+            return new LinkedListSpliterator(root,
+                                             node(offset),
+                                             size,
+                                             offset,
+                                             modCount);
         }
         
         @Override

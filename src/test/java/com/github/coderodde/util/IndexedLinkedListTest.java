@@ -889,6 +889,46 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void spliteratorOverSubList() {
+        list.addAll(getIntegerList(10));
+        List<Integer> subList = list.subList(1, 9);
+        
+        Spliterator<Integer> spliterator = subList.spliterator();
+        
+        class MyConsumer implements Consumer<Integer> {
+            final List<Integer> data = new ArrayList<>();
+
+            @Override
+            public void accept(Integer i) {
+                data.add(i);
+            }
+        } 
+        
+        MyConsumer myConsumer = new MyConsumer();
+        
+        assertEquals(8L, spliterator.getExactSizeIfKnown());
+        assertEquals(8L, spliterator.estimateSize());
+        
+        spliterator.tryAdvance(myConsumer);
+        assertEquals(1, myConsumer.data.size());
+        
+        spliterator.tryAdvance(myConsumer);
+        assertEquals(2, myConsumer.data.size());
+        
+        spliterator.tryAdvance(myConsumer);
+        assertEquals(3, myConsumer.data.size());
+        
+        spliterator.tryAdvance(myConsumer);
+        assertEquals(4, myConsumer.data.size());
+        
+        assertEquals(Arrays.asList(1, 2, 3, 4), myConsumer.data);
+        
+        spliterator.forEachRemaining(myConsumer);
+        assertEquals(8, myConsumer.data.size());
+        assertEquals(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8), myConsumer.data);
+    }
+    
+    @Test
     public void subListForEach() {
         list.addAll(Arrays.asList(4, 2, 1, 3, 1, 2, 5, 8));
         
