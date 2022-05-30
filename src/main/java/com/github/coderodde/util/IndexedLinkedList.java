@@ -1421,9 +1421,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     private boolean batchRemove(Collection<?> c,
                                 boolean complement,
-                                int from,
+                                int from,  
                                 int end) {
         Objects.requireNonNull(c);
+        System.out.println("fds");
         
         if (c.isEmpty()) {
             return false;
