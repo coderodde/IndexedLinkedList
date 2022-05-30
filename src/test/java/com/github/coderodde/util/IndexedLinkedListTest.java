@@ -714,6 +714,167 @@ public class IndexedLinkedListTest {
         assertEquals("[2, 22, 222]", list.subList(1, 4).toString());
     }
     
+    @Test(expected = IllegalStateException.class)
+    public void listIteratorSetAddThrows() {
+        list.addAll(getIntegerList(10));
+        ListIterator<Integer> listIterator = list.listIterator(3);
+        
+        listIterator.add(100);
+        listIterator.set(-100);
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void subListIteratorSetAddThrows() {
+        list.addAll(getIntegerList(10));
+        ListIterator<Integer> listIterator = list.subList(4, 9).listIterator(3);
+        
+        listIterator.add(100);
+        listIterator.set(-100);
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void listIteratorRemoveWithouttNextPreviousThrows() {
+        list.addAll(getIntegerList(5));
+        ListIterator<Integer> iter = list.listIterator(1);
+        iter.remove();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void subListIteratorRemoveWithouttNextPreviousThrows() {
+        list.addAll(getIntegerList(8));
+        List<Integer> subList = list.subList(1, 6);
+        ListIterator<Integer> iter = subList.listIterator(5);
+        iter.remove();
+    }
+    
+    @Test
+    public void listIteratorSetAdd() {
+        list.addAll(getIntegerList(5));
+        ListIterator<Integer> listIterator = list.listIterator(2);
+        // list = <0, 1, 2, 3, 4>
+        // iter:       |
+        
+        listIterator.add(100);
+        // list = <0, 1, 100, 2, 3, 4>
+        assertEquals(Integer.valueOf(2), listIterator.next());
+        listIterator.set(-100);
+        // list = <0, 1, 100, -100, 3, 4>
+        
+        assertEquals(Arrays.asList(0, 1, 100, -100, 3, 4), list);
+        // list = <0, 1, 100, -100, 3, 4>
+                     
+        listIterator = list.listIterator(4);
+        // list = <0, 1, 100, -100, 3, 4>
+        // iter:                   |
+        listIterator.add(1000);
+        // list = <0, 1, 100, -100, 1000, 3, 4>
+        assertEquals(Arrays.asList(0, 1, 100, -100, 1000, 3, 4), list);
+        
+        assertEquals(Integer.valueOf(1000), listIterator.previous());
+        listIterator.set(-1000);
+        // list = <0, 1, 100, -1000, 1000, 3, 4>
+        
+        assertEquals(
+                Arrays.asList(0, 1, 100, -100, -1000, 3, 4), 
+                list);
+    }
+    
+    @Test
+    public void subListIteratorSetAdd() {
+        list.addAll(getIntegerList(8));
+        List<Integer> subList = list.subList(1, 6);
+        ListIterator<Integer> listIterator = subList.listIterator(2);
+        // subList = <1, 2, 3, 4, 5>
+        // iter:           |
+        
+        listIterator.add(100);
+        assertEquals(Arrays.asList(1, 2, 100, 3, 4, 5), subList);
+        // subList = <1, 2, 100, 3, 4, 5>
+        
+        assertEquals(Integer.valueOf(3), listIterator.next());
+        listIterator.set(-100);
+        // subList = <1, 2, 100, -100, 4, 5>
+        // iter:                      |
+        
+        assertEquals(Arrays.asList(1, 2, 100, -100, 4, 5), subList);
+        assertEquals(Integer.valueOf(4), listIterator.next()); 
+        assertEquals(Integer.valueOf(5), listIterator.next()); 
+        
+        listIterator.add(1000);
+
+        // list = <1, 2, 100, -100, 4, 5, 1000>
+        assertEquals(Arrays.asList(1, 2, 100, -100, 4, 5, 1000), subList);
+        
+        assertEquals(Integer.valueOf(1000), listIterator.previous());
+        listIterator.set(-1000);
+        // list = <1, 2, 100, -100, 4, 5, -1000>
+        
+        assertEquals(Arrays.asList(1, 2, 100, -100, 4, 5, -1000), subList);
+    }
+    
+//    @Test
+    public void funky() {
+        
+        list.addAll(getIntegerList(10));
+        ListIterator<Integer> listIterator = list.listIterator(3);
+        // list = <0, 1, 2, 3, 4, 5, 6, 7, 8, 9>
+        
+        listIterator.add(100);
+        assertEquals(Integer.valueOf(3), listIterator.next());
+        listIterator.set(-100);
+        
+        assertEquals(Arrays.asList(0, 1, 2, 100, -100, 4, 5, 6, 7, 8, 9), list);
+        // list = <0, 1, 2, 100, -100, 4, 5, 6, 7, 8, 9>
+        //                                      ^
+        listIterator = list.listIterator(8);
+        
+        listIterator.add(1000);
+        // list = <0, 1, 2, 100, -100, 4, 5, 6, 1000, 7, 8, 9>
+        assertEquals(Integer.valueOf(1000), listIterator.previous());
+        listIterator.set(-1000);
+        
+        assertEquals(Arrays.asList(0, 1, 2, 100, -100, 4, 5, -1000, 1000, 7, 8, 9), list);
+    }
+    
+//    @Test
+    public void subListIteratorSetAdd2() {
+        List<Integer> list = new ArrayList<>();
+        list.addAll(getIntegerList(10));
+        ListIterator<Integer> listIterator = list.listIterator(3);
+        // list = <0, 1, 2, 3, 4, 5, 6, 7, 8, 9>
+        
+        listIterator.add(100);
+        assertEquals(Integer.valueOf(3), listIterator.next());
+        listIterator.set(-100);
+        
+        assertEquals(Arrays.asList(0, 1, 2, 100, -100, 4, 5, 6, 7, 8, 9), list);
+        // list = <0, 1, 2, 100, -100, 4, 5, 6, 7, 8, 9>
+        //                                      ^
+        listIterator = list.listIterator(8);
+        
+        listIterator.add(1000);
+        // list = <0, 1, 2, 100, -100, 4, 5, 6, 1000, 7, 8, 9>
+        assertEquals(Integer.valueOf(1000), listIterator.previous());
+        listIterator.set(-1000);
+        
+        assertEquals(Arrays.asList(0, 1, 2, 100, -100, 4, 5, -1000, 1000, 7, 8, 9), list);
+    }
+    
+    
+    
+    @Test
+    public void ttt() {
+        System.out.println("ttt");
+        List<Integer> l = getIntegerList(10);
+        ListIterator<Integer> iterator = l.listIterator(3);
+        
+        iterator.add(100);
+        iterator.next();
+        iterator.set(-100);
+        
+        System.out.println(l);
+    }
+    
     @Test
     public void subListForEach() {
         list.addAll(Arrays.asList(4, 2, 1, 3, 1, 2, 5, 8));
