@@ -49,16 +49,19 @@ final class LinkedListBenchmark {
     
     private final boolean runSubListClear;
     private final boolean runRemoveAll;
+    private final boolean runSort;
     
     private final List<Integer>[] getLists = new ArrayList[5];
 
     LinkedListBenchmark(long seed,
                         boolean runSubListClear, 
-                        boolean runRemoveAll) {
+                        boolean runRemoveAll,
+                        boolean runSort) {
         
         this.seed = seed;
         this.runSubListClear = runSubListClear;
         this.runRemoveAll = runRemoveAll;
+        this.runSort = runSort;
         
         for (int i = 0; i < getLists.length; i++) {
             getLists[i] = new ArrayList<>(GET_OPERATIONS);
@@ -174,6 +177,10 @@ final class LinkedListBenchmark {
         
         if (runSubListClear) {
             profileSubListClear();
+        }
+        
+        if (runSort) {
+            profileSort();
         }
   
         printTotalDurations();
@@ -402,6 +409,36 @@ final class LinkedListBenchmark {
         System.out.println();
     }
 
+    private void profileSort() {
+        roddeList.clear();
+        arrayList.clear();
+        linkedList.clear();
+        treeList.clear();
+        
+        Random random = new Random(seed + 1);
+        
+        for (int i = 0; i < 500_000; ++i) {
+            Integer value = random.nextInt((i % 460_000) + 1);
+            roddeList.add(value);
+            arrayList.add(value);
+            linkedList.add(value);
+            treeList.add(value);
+        }
+        
+        Collections.shuffle(roddeList, randomRoddeList);
+        Collections.shuffle(arrayList, randomJavaUtilArrayList);
+        Collections.shuffle(linkedList, randomJavaUtilLinkedList);
+        Collections.shuffle(treeList, randomTreeList);
+        
+        profileSortRoddeList();
+        profileSortLinkedList();
+        profileSortArrayList();
+        profileSortTreeList();
+        
+        listsEqual();
+        System.out.println();
+    }
+    
     private void printTotalDurations() {
         System.out.println("--- Total time elapsed ---");
         
@@ -846,6 +883,23 @@ final class LinkedListBenchmark {
         
         return durationMillis;
     }
+    
+    private long profileSort(List<Integer> list) {
+        long startMillis = System.currentTimeMillis();
+        
+        list.subList(10, list.size() - 10).sort(Integer::compare);
+        
+        long endMillis = System.currentTimeMillis();
+        long durationMillis = endMillis - startMillis;
+        
+        System.out.println(
+                list.getClass()
+                    .getSimpleName() 
+                        + ".subList().sort() in (ms): " 
+                        + durationMillis);
+        
+        return durationMillis;
+    }
 
     private void profileAddFirstRoddeListV2() {
         totalMillisRoddeList += 
@@ -1220,6 +1274,22 @@ final class LinkedListBenchmark {
 
     private void profileSubListClearTreeList() {
         totalMillisTreeList += profileSubListClear(treeList);
+    }
+    
+    private void profileSortRoddeList() {
+        totalMillisRoddeList += profileSort(roddeList);
+    }
+    
+    private void profileSortLinkedList() {
+        totalMillisLinkedList += profileSort(linkedList);
+    }
+    
+    private void profileSortArrayList() {
+        totalMillisArrayList += profileSort(arrayList);
+    }
+    
+    private void profileSortTreeList() {
+        totalMillisTreeList += profileSort(treeList);
     }
     
     private void printTitle(BenchmarkChoice benchmarkChoice) {

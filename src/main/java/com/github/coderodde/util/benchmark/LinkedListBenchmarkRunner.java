@@ -16,6 +16,7 @@ public final class LinkedListBenchmarkRunner {
     private static final String ALL_BENCHMARK_METHODS_FLAG = "--all";
     private static final String BENCHMARK_SUBLIST_CLEAR_FLAG = "--clear";
     private static final String BENCHMARK_REMOVE_ALL = "--remove-all";
+    private static final String BENCHMARK_SORT = "--sort";
     private static final String HELP = "-h";
     
     private LinkedListBenchmarkRunner() {
@@ -30,6 +31,7 @@ public final class LinkedListBenchmarkRunner {
     public static void main(String[] args) {
         boolean runSubListClear = false;
         boolean runRemoveAll = false;
+        boolean runSort = false;
         
         Set<String> commandLineArgumentSet = new HashSet<>(3);
         
@@ -45,6 +47,7 @@ public final class LinkedListBenchmarkRunner {
         if (commandLineArgumentSet.contains(ALL_BENCHMARK_METHODS_FLAG)) {
             runSubListClear = true;
             runRemoveAll = true;
+            runSort = true;
         } else {
             if (commandLineArgumentSet.contains(BENCHMARK_SUBLIST_CLEAR_FLAG)) {
                 runSubListClear = true;
@@ -52,6 +55,10 @@ public final class LinkedListBenchmarkRunner {
             
             if (commandLineArgumentSet.contains(BENCHMARK_REMOVE_ALL)) {
                 runRemoveAll = true;
+            }
+            
+            if (commandLineArgumentSet.contains(BENCHMARK_SORT)) {
+                runSort = true;
             }
         }
         
@@ -63,12 +70,14 @@ public final class LinkedListBenchmarkRunner {
         System.out.println("<<< Flags >>>");
         System.out.println("runSubListClear: " + runSubListClear);
         System.out.println("runRemoveAll   : " + runRemoveAll);
+        System.out.println("runSort        : " + runSort);
         System.out.println();
 
         LinkedListBenchmark benchmark = 
                 new LinkedListBenchmark(seed, 
                                         runSubListClear,
-                                        runRemoveAll);
+                                        runRemoveAll,
+                                        runSort);
 
         benchmark.warmup();
         System.out.println();
