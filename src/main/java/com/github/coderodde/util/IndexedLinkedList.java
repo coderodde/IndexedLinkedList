@@ -1275,6 +1275,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return fingerList.size();
     }
     
+    // Computes the recommended number of fingers for 'size' elements.
+    private static int getRecommendedNumberOfFingers(int size) {
+        return (int) Math.ceil(Math.sqrt(size));
+    }
+    
     private static void subListRangeCheck(int fromIndex, 
                                           int toIndex, 
                                           int size) {
@@ -1464,6 +1469,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
     
+    // Adds the finger to the tail of the finger list and before the end-of-
+    // finger-list sentinel.
+    private void appendFinger(Node<E> node, int index) {
+        Finger<E> finger = new Finger<>(node, index);
+        fingerList.appendFinger(finger);
+    }
+    
     /**
      * This class implements a basic iterator over this list.
      */
@@ -1570,6 +1582,34 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return modified;
     }
     
+    // Checks the element index. In the case of non-empty list, valid indices 
+    // are '{ 0, 1, ..., size - 1 }'.
+    private void checkElementIndex(int index) {
+        if (!isElementIndex(index)) {
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
+    }
+    
+    private void checkForComodification(int expectedModCount) {
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+    }
+    
+    // Checks that the input index is a valid position index for add operation 
+    // or iterator position. In other words, checks that {@code index} is in the 
+    // set '{ 0, 1, ..., size}'.
+    private void checkPositionIndex(int index) {
+        if (!isPositionIndex(index)) {
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
+    }
+    
+    private void decreaseSize() {
+        size--;
+        modCount++;
+    }   
+    
     // Distributes the fingers over the element list [fromIndex, toIndex):
     private void distributeFingers(int fromIndex, int toIndex) {
         int rangeLength = toIndex - fromIndex;
@@ -1619,34 +1659,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void distributeAllFingers() {
         distributeFingers(0, size);
     }
-    
-    // Checks the element index. In the case of non-empty list, valid indices 
-    // are '{ 0, 1, ..., size - 1 }'.
-    private void checkElementIndex(int index) {
-        if (!isElementIndex(index)) {
-            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
-        }
-    }
-    
-    private void checkForComodification(int expectedModCount) {
-        if (modCount != expectedModCount) {
-            throw new ConcurrentModificationException();
-        }
-    }
-    
-    // Checks that the input index is a valid position index for add operation 
-    // or iterator position. In other words, checks that {@code index} is in the 
-    // set '{ 0, 1, ..., size}'.
-    private void checkPositionIndex(int index) {
-        if (!isPositionIndex(index)) {
-            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
-        }
-    }
-    
-    private void decreaseSize() {
-        size--;
-        modCount++;
-    }   
     
     // Implements the descending list iterator over this list.
     private final class DescendingIterator implements Iterator<E> {
@@ -1861,11 +1873,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return (int) Math.ceil(Math.sqrt(size));
     }
     
-    // Computes the recommended number of fingers for 'size' elements.
-    private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.ceil(Math.sqrt(size));
-    }
-    
     // Computes the hash code for the range [from, to):
     private int hashCodeRange(int from, int to) {
         int hashCode = 1;
@@ -1912,6 +1919,34 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return -1;
+    }
+    
+    // Inserts the input collection right before the node 'succ'.
+    private void insertAll(Collection<? extends E> c,
+                           Node<E> succ,
+                           int succIndex) {
+        
+        Node<E> pred = succ.prev;
+        Node<E> prev = pred;
+
+        for (E item : c) {
+            Node<E> newNode = new Node<>(item);
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+
+        prev.next = succ;
+        succ.prev = prev;
+
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        // Add fingers:
+        addFingersAfterInsertAll(pred.next, 
+                                 succIndex,
+                                 sz);
     }
 
     // Tells if the argument is the index of an existing element.
@@ -2019,34 +2054,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else {
             fingerList.get(fingerList.size()).index++;
         }
-    }
-    
-    // Inserts the input collection right before the node 'succ'.
-    private void insertAll(Collection<? extends E> c,
-                           Node<E> succ,
-                           int succIndex) {
-        
-        Node<E> pred = succ.prev;
-        Node<E> prev = pred;
-
-        for (E item : c) {
-            Node<E> newNode = new Node<>(item);
-            newNode.prev = prev;
-            prev.next = newNode;
-            prev = newNode;
-        }
-
-        prev.next = succ;
-        succ.prev = prev;
-
-        int sz = c.size();
-        modCount++;
-        size += sz;
-        
-        // Add fingers:
-        addFingersAfterInsertAll(pred.next, 
-                                 succIndex,
-                                 sz);
     }
     
     // Sets a finger that does not point to the element to remove. We need this
@@ -2157,6 +2164,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
          return fingerList.node(elementIndex);
     }
     
+    // Prepends the input collection to the head of this list.
+    private void prependAll(Collection<? extends E> c) {
+        Iterator<? extends E> iterator = c.iterator();
+        Node<E> oldFirst = first;
+        first = new Node<>(iterator.next());
+
+        Node<E> prevNode = first;
+
+        for (int i = 1, sz = c.size(); i < sz; i++) {
+            Node<E> newNode = new Node<>(iterator.next());
+            newNode.prev = prevNode;
+            prevNode.next = newNode;
+            prevNode = newNode;
+        }
+
+        prevNode.next = oldFirst;
+        oldFirst.prev = prevNode;
+
+        int sz = c.size();
+        modCount++;
+        size += sz;
+
+        // Now, add the missing fingers:
+        addFingersAfterPrependAll(first, sz);
+    }
+    
     /**
      * Reconstitutes this {@code LinkedList} instance from a stream (that is, 
      * deserializes it).
@@ -2212,33 +2245,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         last = rightmostNode;
-    }
-    
-    /**
-     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
-     * serializes it).
-     * 
-     * @param s the object output stream.
-     *
-     * @serialData The size of the list (the number of elements it
-     *             contains) is emitted (int), followed by all of its
-     *             elements (each an Object) in the proper order.
-     * 
-     * @throws java.io.IOException if the I/O fails.
-     */
-    @java.io.Serial
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        // Write out any hidden serialization magic
-        s.defaultWriteObject();
-
-        // Write out size
-        s.writeInt(size);
-
-        // Write out all elements in the proper order.
-        for (Node<E> x = first; x != null; x = x.next) {
-            s.writeObject(x.item);
-        }
     }
     
     private void removeFinger() {
@@ -2482,7 +2488,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    
+    // Replaces all the elements from range [i, end):
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
         Objects.requireNonNull(operator);
         int expectedModCount = modCount;
@@ -2497,58 +2503,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
-    }
-    
-    // Prepends the input collection to the head of this list.
-    private void prependAll(Collection<? extends E> c) {
-        Iterator<? extends E> iterator = c.iterator();
-        Node<E> oldFirst = first;
-        first = new Node<>(iterator.next());
-
-        Node<E> prevNode = first;
-
-        for (int i = 1, sz = c.size(); i < sz; i++) {
-            Node<E> newNode = new Node<>(iterator.next());
-            newNode.prev = prevNode;
-            prevNode.next = newNode;
-            prevNode = newNode;
-        }
-
-        prevNode.next = oldFirst;
-        oldFirst.prev = prevNode;
-
-        int sz = c.size();
-        modCount++;
-        size += sz;
-
-        // Now, add the missing fingers:
-        addFingersAfterPrependAll(first, sz);
-    }
-    
-    // If steps > 0, rewind to the left. Otherwise, rewind to the right.
-    private Node<E> traverseLinkedListBackwards(Finger<E> finger, int steps) {
-        Node<E> node = finger.node;
-        
-        if (steps > 0) {
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
-        } else {
-            steps = -steps;
-            
-            for (int i = 0; i < steps; i++) {
-                node = node.next;
-            }
-        }
-        
-        return node;
-    }
-    
-    // Adds the finger to the tail of the finger list and before the end-of-
-    // finger-list sentinel.
-    private void appendFinger(Node<E> node, int index) {
-        Finger<E> finger = new Finger<>(node, index);
-        fingerList.appendFinger(finger);
     }
     
     // Sets the input collection as a list.
@@ -2572,6 +2526,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
         addFingersAfterSetAll(c.size());
     }
     
+    // If steps > 0, rewind to the left. Otherwise, rewind to the right.
+    private Node<E> traverseLinkedListBackwards(Finger<E> finger, int steps) {
+        Node<E> node = finger.node;
+        
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                node = node.prev;
+            }
+        } else {
+            steps = -steps;
+            
+            for (int i = 0; i < steps; i++) {
+                node = node.next;
+            }
+        }
+        
+        return node;
+    }
+    
     // Unlinks the input node from the actual doubly-linked list.
     private void unlink(Node<E> x) {
         Node<E> next = x.next;
@@ -2589,6 +2562,33 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else {
             next.prev = prev;
             x.next = null;
+        }
+    }
+    
+    /**
+     * Saves the state of this {@code LinkedList} instance to a stream (that is, 
+     * serializes it).
+     * 
+     * @param s the object output stream.
+     *
+     * @serialData The size of the list (the number of elements it
+     *             contains) is emitted (int), followed by all of its
+     *             elements (each an Object) in the proper order.
+     * 
+     * @throws java.io.IOException if the I/O fails.
+     */
+    @java.io.Serial
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        // Write out any hidden serialization magic
+        s.defaultWriteObject();
+
+        // Write out size
+        s.writeInt(size);
+
+        // Write out all elements in the proper order.
+        for (Node<E> x = first; x != null; x = x.next) {
+            s.writeObject(x.item);
         }
     }
     
@@ -2790,6 +2790,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             updateSizeAndModCount(-size);
         }
         
+        @Override
         public Object clone() {
             List<E> list = new IndexedLinkedList<>();
             
