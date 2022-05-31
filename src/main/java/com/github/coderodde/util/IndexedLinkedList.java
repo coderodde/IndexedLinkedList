@@ -484,6 +484,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    @java.io.Serial
+    private static final long serialVersionUID = -1L;
+    
     /**
      * The cached number of elements in this list.
      */
@@ -806,6 +809,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return last.item;
     }
     
+    @Override
     public int hashCode() {
         int expectedModCount = modCount;
         int hash = hashCodeRange(0, size);
@@ -888,7 +892,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Moves all the fingers such that they are evenly distributed.
      */
     public void optimize() {
-        distributeFingersEvenly();
+        distributeAllFingers();
     }
     
     /**
@@ -1092,6 +1096,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
     
+    @Override
     public boolean removeIf(Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
     }
@@ -1193,54 +1198,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node.item = item;
         }
         
-        distributeFingersEvenly();
+        distributeAllFingers();
         modCount++;
-    }
-    
-    private void distributeFingers(int fromIndex, int toIndex) {
-        int rangeLength = toIndex - fromIndex;
-        
-        if (rangeLength == 0) {
-            return;
-        }
-        
-        int fingerPrefixLength = fingerList.getFingerIndexImpl(fromIndex);
-        int fingerSuffixLength = fingerList.size() 
-                               - fingerList.getFingerIndexImpl(toIndex);
-        
-        int numberOfRangeFingers = fingerList.size()
-                                 - fingerPrefixLength 
-                                 - fingerSuffixLength;
-        
-        int numberOfFingersPerFinger = rangeLength / numberOfRangeFingers;
-        int startOffset = numberOfFingersPerFinger / 2;
-        int index = fromIndex + startOffset;
-        
-        Node<E> node = node(fromIndex);
-        
-        for (int i = 0; i < startOffset; ++i) {
-            node = node.next;
-        }
-        
-        for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
-            Finger<E> finger = fingerList.get(i);
-            finger.node = node;
-            finger.index = index;
-            
-            for (int j = 0; j < numberOfFingersPerFinger; ++j) {
-                node = node.next;
-            }
-            
-            index += numberOfFingersPerFinger;
-        }
-        
-        Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
-        lastFinger.node = node;
-        lastFinger.index = index;
-    }
-    
-    private void distributeFingersEvenly() {
-        distributeFingers(0, size);
     }
     
     /**
@@ -1266,6 +1225,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return arr;
+    }
+    
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> generator) {
+        return toArray(generator.apply(size));
     }
     
     @SuppressWarnings("unchecked")
@@ -1306,6 +1270,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         return stringBuilder.append("]").toString();
     }
+
+    int getFingerListSize() {
+        return fingerList.size();
+    }
     
     private static void subListRangeCheck(int fromIndex, 
                                           int toIndex, 
@@ -1323,137 +1291,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             throw new IllegalArgumentException(
                     "fromIndex(" + fromIndex + ") > toIndex(" 
                             + toIndex + ")");
-    }
-    
-    @java.io.Serial
-    private static final long serialVersionUID = -1L;
-    
-    // Appends the input collection to the tail of this list.
-    private void appendAll(Collection<? extends E> c) {
-        Node<E> prev = last;
-        Node<E> oldLast = last;
-
-        for (E item : c) {
-            Node<E> newNode = new Node<>(item);
-            newNode.item = item;
-            newNode.prev = prev;
-            prev.next = newNode;
-            prev = newNode;
-        }
-
-        last = prev;
-        int sz = c.size();
-        size += sz;
-        modCount++;
-        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
-    }
-    
-    /**
-     * This class implements a basic iterator over this list.
-     */
-    public final class BasicIterator implements Iterator<E> {
-        
-        private Node<E> lastReturned;
-        private Node<E> next = first;
-        private int nextIndex;
-        int expectedModCount = IndexedLinkedList.this.modCount;
-
-        /**
-         * Constructs the basic iterator pointing to the first element.
-         */
-        BasicIterator() {
-            
-        }
-        
-        @Override
-        public boolean hasNext() {
-            return nextIndex < size;
-        }
-
-        @Override
-        public E next() {
-            checkForComodification();
-            
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-
-            lastReturned = next;
-            next = next.next;
-            nextIndex++;
-            return lastReturned.item;
-        }
-
-        @Override
-        public void remove() {
-            if (lastReturned == null) {
-                throw new IllegalStateException();
-            }
-            
-            checkForComodification();
-            
-            int removalIndex = nextIndex - 1;
-            removeObjectImpl(lastReturned, removalIndex);
-            nextIndex--;
-            lastReturned = null;
-            expectedModCount++;
-        }
-
-        @Override
-        public void forEachRemaining(Consumer<? super E> action) {
-            Objects.requireNonNull(action);
-            
-            while (modCount == expectedModCount && nextIndex < size) {
-                action.accept(next.item);
-                next = next.next;
-                nextIndex++;
-            }
-            
-            checkForComodification();
-        }
-
-        private void checkForComodification() {
-            if (modCount != expectedModCount) {
-                throw new ConcurrentModificationException();
-            }
-        }
-    }
-    
-    private boolean batchRemove(Collection<?> c,
-                                boolean complement,
-                                int from,  
-                                int end) {
-        Objects.requireNonNull(c);
-        System.out.println("fds");
-        
-        if (c.isEmpty()) {
-            return false;
-        }
-        
-        boolean modified = false;
-        
-        int numberOfNodesToIterate = end - from;
-        int i = 0;
-        int nodeIndex = from;
-        
-        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
-            Node<E> nextNode = node.next;
-            
-            if (c.contains(node.item) == complement) {
-                modified = true;
-                removeObjectImpl(node, nodeIndex);
-            } else {
-                nodeIndex++;
-            }
-            
-            node = nextNode;
-        }
-        
-        return modified;
-    }
-
-    int getFingerListSize() {
-        return fingerList.size();
     }
     
     // Adds fingers after appending a collection to this list.
@@ -1605,7 +1442,183 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
             fingerList.setFinger(i, new Finger<>(node, index));
         }
-    }   
+    }
+    
+    // Appends the input collection to the tail of this list.
+    private void appendAll(Collection<? extends E> c) {
+        Node<E> prev = last;
+        Node<E> oldLast = last;
+
+        for (E item : c) {
+            Node<E> newNode = new Node<>(item);
+            newNode.item = item;
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+
+        last = prev;
+        int sz = c.size();
+        size += sz;
+        modCount++;
+        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
+    }
+    
+    /**
+     * This class implements a basic iterator over this list.
+     */
+    public final class BasicIterator implements Iterator<E> {
+        
+        private Node<E> lastReturned;
+        private Node<E> next = first;
+        private int nextIndex;
+        int expectedModCount = IndexedLinkedList.this.modCount;
+
+        /**
+         * Constructs the basic iterator pointing to the first element.
+         */
+        BasicIterator() {
+            
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+
+        @Override
+        public E next() {
+            checkForComodification();
+            
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            return lastReturned.item;
+        }
+
+        @Override
+        public void remove() {
+            if (lastReturned == null) {
+                throw new IllegalStateException();
+            }
+            
+            checkForComodification();
+            
+            int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
+            nextIndex--;
+            lastReturned = null;
+            expectedModCount++;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            
+            while (modCount == expectedModCount && nextIndex < size) {
+                action.accept(next.item);
+                next = next.next;
+                nextIndex++;
+            }
+            
+            checkForComodification();
+        }
+
+        private void checkForComodification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+    
+    // Implements the batch remove. If 'complement' is true, this operation 
+    // removes all the elements appearing in 'c'. Otherwise, it will retain all
+    // the elements present in 'c':
+    private boolean batchRemove(Collection<?> c,
+                                boolean complement,
+                                int from,  
+                                int end) {
+        Objects.requireNonNull(c);
+        
+        if (c.isEmpty()) {
+            return false;
+        }
+        
+        boolean modified = false;
+        
+        int numberOfNodesToIterate = end - from;
+        int i = 0;
+        int nodeIndex = from;
+        
+        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
+            Node<E> nextNode = node.next;
+            
+            if (c.contains(node.item) == complement) {
+                modified = true;
+                removeObjectImpl(node, nodeIndex);
+            } else {
+                nodeIndex++;
+            }
+            
+            node = nextNode;
+        }
+        
+        return modified;
+    }
+    
+    // Distributes the fingers over the element list [fromIndex, toIndex):
+    private void distributeFingers(int fromIndex, int toIndex) {
+        int rangeLength = toIndex - fromIndex;
+        
+        if (rangeLength == 0) {
+            return;
+        }
+        
+        int fingerPrefixLength = fingerList.getFingerIndexImpl(fromIndex);
+        int fingerSuffixLength = fingerList.size() 
+                               - fingerList.getFingerIndexImpl(toIndex);
+        
+        int numberOfRangeFingers = fingerList.size()
+                                 - fingerPrefixLength 
+                                 - fingerSuffixLength;
+        
+        int numberOfFingersPerFinger = rangeLength / numberOfRangeFingers;
+        int startOffset = numberOfFingersPerFinger / 2;
+        int index = fromIndex + startOffset;
+        
+        Node<E> node = node(fromIndex);
+        
+        for (int i = 0; i < startOffset; ++i) {
+            node = node.next;
+        }
+        
+        for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
+            Finger<E> finger = fingerList.get(i);
+            finger.node = node;
+            finger.index = index;
+            
+            for (int j = 0; j < numberOfFingersPerFinger; ++j) {
+                node = node.next;
+            }
+            
+            index += numberOfFingersPerFinger;
+        }
+        
+        // Since we cannot advance node to the right, we need to deal with the
+        // last (non-sentinel) finger manually:
+        Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
+        lastFinger.node = node;
+        lastFinger.index = index;
+    }
+    
+    // Distributes evenly all the figners over this list:
+    private void distributeAllFingers() {
+        distributeFingers(0, size);
+    }
     
     // Checks the element index. In the case of non-empty list, valid indices 
     // are '{ 0, 1, ..., size - 1 }'.
@@ -3061,7 +3074,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         @Override
         public <T> T[] toArray(IntFunction<T[]> generator) {
-            return toArray(generator.apply(0));
+            return toArray(generator.apply(size));
         }
 
         @Override
