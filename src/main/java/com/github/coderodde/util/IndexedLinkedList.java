@@ -808,7 +808,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @return {@code index}th element.
      * @throws IndexOutOfBoundsException if the index is out of range
-     *         {@code {0, 1, ..., size - 1}, or if this list is empty.
+     *         {@code 0, 1, ..., size - 1}, or if this list is empty.
      */
     @Override
     public E get(int index) {
@@ -865,8 +865,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Returns the index of the leftmost {@code obj}, or {@code -l} if 
      * {@code obj} does not appear in this list.
      * 
-     * @return the index of {@code obj}, or {@code -1} if {@code obj} does not
-     *         appear in this list.
+     * @return the index of the leftmost {@code obj}, or {@code -1} if 
+     *         {@code obj} does not appear in this list.
      * 
      * @see IndexedLinkedList#lastIndexOf(java.lang.Object) 
      */
@@ -896,20 +896,38 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Returns the index of the rightmost {@code obj}, or {@code -l} if 
+     * {@code obj} does not appear in this list.
+     * 
+     * @return the index of the rightmost {@code obj}, or {@code -1} if
+     *         {@code obj} does not appear in this list.
+     * 
+     * @see IndexedLinkedList#lastIndexOf(java.lang.Object) 
      */
     @Override
     public int lastIndexOf(Object obj) {
         return lastIndexOfRange(obj, 0, size);
     }
     
+    /**
+     * Returns the list iterator pointing to the head element of this list.
+     * 
+     * @return the list iterator.
+     * @see java.util.ListIterator
+     */
     @Override
     public ListIterator<E> listIterator() {
         return new EnhancedIterator(0);
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the list iterator pointing between {@code list[index - 1]} and
+     * {@code list[index]}.
+     * 
+     * @param index the gap index. The value of zero will point before the head 
+     *              element.
+     * 
+     * @return the list iterator pointing to the {@code index}th gap.
      */
     @Override
     public ListIterator<E> listIterator(int index) {
@@ -917,7 +935,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Adds {@code e} after the tail element of this list.
+     * 
+     * @param e the element to add.
+     * @return always {@code true}.
      */
     @Override
     public boolean offer(E e) {
@@ -925,7 +946,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Adds {@code e} before the head element of this list.
+     * 
+     * @param e the element to add.
+     * @return always {@code true}.
      */
     @Override
     public boolean offerFirst(E e) {
@@ -934,7 +958,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Adds {@code e} after the tail element of this list.
+     * 
+     * @param e the element to add.
+     * @return always {@code true}.
      */
     @Override
     public boolean offerLast(E e) {
@@ -950,7 +977,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Takes a look at the first element in this list.
+     * 
+     * @return the head element or {@code null} if this list is empty.
      */
     @Override
     public E peek() {
@@ -958,7 +987,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Takes a look at the first element in this list.
+     * 
+     * @return the head element or {@code null} if this list is empty.
      */
     @Override
     public E peekFirst() {
@@ -966,7 +997,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Takes a look at the last element in this list.
+     * 
+     * @return the tail element or {@code null} if this list is empty.
      */
     @Override
     public E peekLast() {
@@ -974,7 +1007,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * If this list is empty, does nothing else but return {@code null}. 
+     * Otherwise, removes the first element and returns it.
+     * 
+     * @return the first element (which was removed due to the call to this 
+     *         method), or {@code null} if the list is empty.
      */
     @Override
     public E poll() {
@@ -982,7 +1019,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * If this list is empty, does nothing else but return {@code null}. 
+     * Otherwise, removes the first element and returns it.
+     * 
+     * @return the first element (which was removed due to the call to this 
+     *         method), or {@code null} if the list is empty.
      */
     @Override
     public E pollFirst() {
@@ -990,7 +1031,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * If this list is empty, does nothing else but return {@code null}. 
+     * Otherwise, removes the last element and returns it.
+     * 
+     * @return the last element (which was removed due to the call to this 
+     *         method), or {@code null} if the list is empty.
      */
     @Override
     public E pollLast() {
@@ -998,7 +1043,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Removes the first element and returns it.
+     * 
+     * @return the first element.
+     * @throws NoSuchElementException if the list is empty.
      */
     @Override
     public E pop() {
@@ -1006,7 +1054,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Adds {@code e} before the head of this list.
      */
     @Override
     public void push(E e) {
@@ -1014,19 +1062,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Removes and returns the first element.
+     * 
+     * @return the head element of this list.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E remove() {
-        if (size == 0) {
-            throw new NoSuchElementException("remove() from empty LinkedList.");
-        }
-        
         return removeFirst();
     }
 
     /**
-     * {@inheritDoc }
+     * Removes the leftmost occurrence of {@code o} in this list.
+     * 
+     * @return {@code true} only if {@code o} was located in this list and, 
+     *         thus, removed.
      */
     @Override
     public boolean remove(Object o) {
@@ -1095,12 +1145,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return returnValue;
     }
     
+    /**
+     * Removes from this list all the elements mentioned in {@code c}.
+     * 
+     * @param c the collection holding all the elements to remove.
+     * @return {@code true} only if at least one element in {@code c} was 
+     *         located and removed from this list.
+     */
+    @Override
     public boolean removeAll(Collection<?> c) {
         return batchRemove(c, true, 0, size);
     }
 
     /**
-     * {@inheritDoc }
+     * Removes the first element from this list.
+     * 
+     * @return the first element.
+     * @throws NoSuchElementExceptioni if this list is empty.
      */
     @Override
     public E removeFirst() {
@@ -1150,13 +1211,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
     
+    /**
+     * Removes from this list all the elements that satisfy the given input
+     * predicate.
+     * 
+     * @param filter the filtering predicate.
+     * @return {@code true} only if at least one element was removed.
+     */
     @Override
     public boolean removeIf(Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
     }
     
     /**
-     * {@inheritDoc }
+     * Removes and returns the last element of this list.
+     * 
+     * @return the removed head element.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E removeLast() {
@@ -1183,7 +1254,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Removes the rightmost occurrence of {@code o}.
+     * 
+     * @param o the object to remove.
+     * @return {@code true} only if an element was actually removed.
      */
     @Override
     public boolean removeLastOccurrence(Object o) {
@@ -1199,12 +1273,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
 
+    /**
+     * Replaces all the elements in this list by applying the given input 
+     * operator to each of the elements.
+     * 
+     * @param operator the operator mapping one element to another. 
+     */
     @Override
     public void replaceAll(UnaryOperator<E> operator) {
         replaceAllRange(operator, 0, size);
         modCount++;
     }
     
+    /**
+     * Remove all the elements that <strong>do not</strong> appear in 
+     * {@code c}.
+     * 
+     * @param c the collection of elements to retain.
+     * @return {@code true} only if at least one element was removed.
+     */
     @Override
     public boolean retainAll(Collection<?> c) {
         return batchRemove(c, false, 0, size);
@@ -1228,13 +1315,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the number of elements in this list.
+     * 
+     * @return the size of this list.
      */
     @Override
     public int size() {
         return size;
     }
     
+    /**
+     * Sorts stably this list into non-descending order.
+     * 
+     * @param c the element comparator.
+     */
     @Override
     public void sort(Comparator<? super E> c) {
         if (size == 0) {
@@ -1257,18 +1351,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the spliterator over this list.
      */
     @Override
     public Spliterator<E> spliterator() {
         return new LinkedListSpliterator<>(this, first, size, 0, modCount);
     }
     
+    /**
+     * Returns a sublist view 
+     * {@code list[fromIndex, fromIndex + 1, ..., toIndex - 1}.
+     * 
+     * @param fromIndex the smallest index, inclusive.
+     * @param toIndex the largest index, exclusive.
+     * @return the sublist view.
+     */
     public List<E> subList(int fromIndex, int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
         return new EnhancedSubList(this, fromIndex, toIndex);
     }
     
+    /**
+     * Returns the {@link Object} array containing all the elements in this 
+     * list, in the same order as they appear in the list.
+     * 
+     * @return the list contents in an {@link Object} array.
+     */
     @Override
     public Object[] toArray() {
         Object[] arr = new Object[size];
@@ -1281,12 +1389,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return arr;
     }
     
+    /**
+     * Generates the array containing all the elements in this list.
+     * 
+     * @param <T>       the array component type.
+     * @param generator the generator function.
+     * @return the list contents in an array with component type of {@code T}.
+     */
     @Override
     public <T> T[] toArray(IntFunction<T[]> generator) {
         return toArray(generator.apply(size));
     }
     
+    /**
+     * 
+     * @param <T>
+     * @param a
+     * @return 
+     */
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T[] toArray(T[] a) {
         if (a.length < size) {
             a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
