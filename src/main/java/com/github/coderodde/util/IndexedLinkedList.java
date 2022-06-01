@@ -521,8 +521,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Appends the specified element to the end of this list. Runs in
-     * \(\mathcal{O}(1)\)
+     * Appends the specified element to the end of this list. Runs in amortized 
+     * constant time.
      *
      * <p>This method is equivalent to {@link #addLast}.
      *
@@ -610,8 +610,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds the element {@code e} before the head of this list. Runs in 
-     * Runs in \(\mathcal{O}(n)\)
+     * Adds the element {@code e} before the head of this list. Runs in Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @param e the element to add.
      */
@@ -749,7 +749,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Returns {@code true} only if this list contains all the elements 
-     * mentioned in the {@code c}. Runs in Runs in \(\mathcal{O}(mn\) time, 
+     * mentioned in the {@code c}. Runs in Runs in \(\mathcal{O}(mn)\) time, 
      * where \(m = |c|\).
      * 
      * @param c the query object collection.
@@ -986,7 +986,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Moves all the fingers such that they are evenly distributed.
+     * Moves all the fingers such that they are evenly distributed. Runs in 
+     * linear time.
      */
     public void optimize() {
         distributeAllFingers();
@@ -1172,7 +1173,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes from this list all the elements mentioned in {@code c}.
+     * Removes from this list all the elements mentioned in {@code c}. Runs in
+     * \(\mathcal{O}(n\sqrt{n} + fn)\) time, where \(\mathcal{O}(f)\) is the 
+     * time of checking for element inclusion in {@code c}.
      * 
      * @param c the collection holding all the elements to remove.
      * @return {@code true} only if at least one element in {@code c} was 
