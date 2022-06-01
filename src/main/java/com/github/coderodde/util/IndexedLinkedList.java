@@ -510,7 +510,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Constructs a new list and copies the data in {@code c} to it.
+     * Constructs a new list and copies the data in {@code c} to it. Runs in
+     * \(\mathcal{O}(m + \sqrt{m})\) time, where \(m = |c|\).
      * 
      * @param c the collection to copy. 
      */
@@ -520,7 +521,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Appends the specified element to the end of this list.
+     * Appends the specified element to the end of this list. Runs in
+     * \(\mathcal{O}(1)\)
      *
      * <p>This method is equivalent to {@link #addLast}.
      *
@@ -536,7 +538,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Inserts the specified element at the specified position in this list.
      * The affected finger indices will be incremented by one. A finger 
-     * {@code F} is <i>affected</i>, if {@code F.index >= index}.
+     * {@code F} is <i>affected</i>, if {@code F.index >= index}. Runs in
+     * \(\mathcal{O}(\sqrt{N})\) time.
      *
      * @param index index at which the specified element is to be inserted.
      * @param element element to be inserted.
@@ -559,7 +562,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * iterator.  The behavior of this operation is undefined if the specified 
      * collection is modified while the operation is in progress. (Note that 
      * this will occur if the specified collection is this list, and it's
-     * nonempty.)
+     * nonempty.) Runs in \(\mathcal{O}(m + \sqrt{m + n})\), where \(m = |c|\)
+     * and \(n\) is the size of this list.
      *
      * @param c collection containing elements to be added to this list.
      * @return {@code true} if this list changed as a result of the call.
@@ -573,7 +577,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Inserts all of the elements in the specified collection into this list, 
      * starting at the specified position. For each finger {@code F} with 
-     * {@code F.index >= index} will increment {@code F.index} by 1.
+     * {@code F.index >= index} will increment {@code F.index} by 1. Runs in 
+     * \(\mathcal{O}(m + \sqrt{m + n})\), where \(m = |c|\) and \(n\) is the 
+     * size of this list.
      *
      * @param index index at which to insert the first element from the
      *              specified collection.
@@ -604,7 +610,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds the element {@code e} before the head of this list.
+     * Adds the element {@code e} before the head of this list. Runs in 
+     * Runs in \(\mathcal{O}(n)\)
      * 
      * @param e the element to add.
      */
@@ -614,7 +621,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds the element {@code e} after the tail of this list.
+     * Adds the element {@code e} after the tail of this list. Runs in constant
+     * time.
      * 
      * @param e the element to add.
      */
@@ -637,6 +645,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * <li>Each finger {@code F} points to the {@code i}th linked list node,
      * where {@code i = F.index}.</li>
      * </ol>
+     * Runs always in linear time.
      */
     public void checkInvarant() {
         for (int i = 0; i < fingerList.size() - 1; ++i) {
@@ -728,7 +737,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns {@code true} only if {@code o} is present in this list.
+     * Returns {@code true} only if {@code o} is present in this list. Runs in
+     * worst-case linear time.
      * 
      * @param o the query object.
      */
@@ -739,7 +749,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Returns {@code true} only if this list contains all the elements 
-     * mentioned in the {@code c}.
+     * mentioned in the {@code c}. Runs in Runs in \(\mathcal{O}(mn\) time, 
+     * where \(m = |c|\).
      * 
      * @param c the query object collection.
      * @return {@code true} only if  this list contains all the elements in
@@ -767,7 +778,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the first element of this list.
+     * Returns the first element of this list. Runs in constant time.
      * 
      * @return the first element of this list.
      * @throws NoSuchElementException if this list is empty.
@@ -779,7 +790,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Returns {@code true} only if {@code o} is an instance of 
-     * {@link java.util.List} and has the sane contents as this list.
+     * {@link java.util.List} and has the sane contents as this list. Runs in
+     * worst-case linear time.
      * 
      * @return {@code true} only if {@code o} is a list with the same contents
      *         as this list.
@@ -804,7 +816,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns {@code index}th element.
+     * Returns {@code index}th element. Runs in worst-case Runs in worst-case
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return {@code index}th element.
      * @throws IndexOutOfBoundsException if the index is out of range
@@ -817,7 +830,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the first element of this list.
+     * Returns the first element of this list. Runs in constant time.
      * 
      * @return the first element of this list.
      * @throws NoSuchElementException if this list is empty.
@@ -833,7 +846,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the last element of this list.
+     * Returns the last element of this list. Runs in constant time.
      * 
      * @return the last element of this list.
      * @throws NoSuchElementException if this list is empty.
@@ -849,7 +862,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the hash code of this list.
+     * Returns the hash code of this list. Runs in linear time.
      * 
      * @return the hash code of this list.
      */
@@ -863,7 +876,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Returns the index of the leftmost {@code obj}, or {@code -l} if 
-     * {@code obj} does not appear in this list.
+     * {@code obj} does not appear in this list. Runs in worst-case linear time.
      * 
      * @return the index of the leftmost {@code obj}, or {@code -1} if 
      *         {@code obj} does not appear in this list.
@@ -897,7 +910,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * Returns the index of the rightmost {@code obj}, or {@code -l} if 
-     * {@code obj} does not appear in this list.
+     * {@code obj} does not appear in this list. Runs in worst-case linear time.
      * 
      * @return the index of the rightmost {@code obj}, or {@code -1} if
      *         {@code obj} does not appear in this list.
@@ -935,7 +948,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds {@code e} after the tail element of this list.
+     * Adds {@code e} after the tail element of this list. Runs in constant 
+     * time.
      * 
      * @param e the element to add.
      * @return always {@code true}.
@@ -946,7 +960,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Adds {@code e} before the head element of this list.
+     * Adds {@code e} before the head element of this list. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @param e the element to add.
      * @return always {@code true}.
@@ -958,7 +973,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Adds {@code e} after the tail element of this list.
+     * Adds {@code e} after the tail element of this list. Runs in constant 
+     * time.
      * 
      * @param e the element to add.
      * @return always {@code true}.
@@ -1008,7 +1024,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * If this list is empty, does nothing else but return {@code null}. 
-     * Otherwise, removes the first element and returns it.
+     * Otherwise, removes the first element and returns it. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return the first element (which was removed due to the call to this 
      *         method), or {@code null} if the list is empty.
@@ -1020,7 +1037,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * If this list is empty, does nothing else but return {@code null}. 
-     * Otherwise, removes the first element and returns it.
+     * Otherwise, removes the first element and returns it. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return the first element (which was removed due to the call to this 
      *         method), or {@code null} if the list is empty.
@@ -1032,7 +1050,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * If this list is empty, does nothing else but return {@code null}. 
-     * Otherwise, removes the last element and returns it.
+     * Otherwise, removes the last element and returns it. Runs in constant 
+     * time.
      * 
      * @return the last element (which was removed due to the call to this 
      *         method), or {@code null} if the list is empty.
@@ -1044,6 +1063,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Removes the first element and returns it.
+     * Runs in \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return the first element.
      * @throws NoSuchElementException if the list is empty.
@@ -1054,7 +1074,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Adds {@code e} before the head of this list.
+     * Adds {@code e} before the head of this list. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      */
     @Override
     public void push(E e) {
@@ -1062,7 +1083,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Removes and returns the first element.
+     * Removes and returns the first element. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return the head element of this list.
      * @throws NoSuchElementException if this list is empty.
@@ -1073,7 +1095,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Removes the leftmost occurrence of {@code o} in this list.
+     * Removes the leftmost occurrence of {@code o} in this list. Runs in worst-
+     * case Runs in \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for
+     * iterating the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the 
+     * fingers.
      * 
      * @return {@code true} only if {@code o} was located in this list and, 
      *         thus, removed.
@@ -1093,7 +1118,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes the element residing at the given index.
+     * Removes the element residing at the given index. Runs in worst-case
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @param index the index of the element to remove.
      * @return the removed element. (The one that resided at the index 
@@ -1158,10 +1184,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Removes the first element from this list.
+     * Removes the first element from this list. Runs in 
+     * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @return the first element.
-     * @throws NoSuchElementExceptioni if this list is empty.
      */
     @Override
     public E removeFirst() {
@@ -1192,7 +1218,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes the leftmost occurrence of {@code o}.
+     * Removes the leftmost occurrence of {@code o}. Runs in worst-case 
+     * \(\mathcal{O}(n)\) time.
      * 
      * @return {@code true} only if {@code o} was present in the list and was 
      *         successfully removed.
@@ -1213,7 +1240,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Removes from this list all the elements that satisfy the given input
-     * predicate.
+     * predicate. Runs in \(\mathcal{O}(n\sqrt{n})\) time.
      * 
      * @param filter the filtering predicate.
      * @return {@code true} only if at least one element was removed.
@@ -1224,7 +1251,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes and returns the last element of this list.
+     * Removes and returns the last element of this list. Runs in constant time.
      * 
      * @return the removed head element.
      * @throws NoSuchElementException if this list is empty.
@@ -1254,7 +1281,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Removes the rightmost occurrence of {@code o}.
+     * Removes the rightmost occurrence of {@code o}. Runs in 
+     * \(\mathcal{O}(n)\) time.
      * 
      * @param o the object to remove.
      * @return {@code true} only if an element was actually removed.
@@ -1275,7 +1303,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * Replaces all the elements in this list by applying the given input 
-     * operator to each of the elements.
+     * operator to each of the elements. Runs in linear time.
      * 
      * @param operator the operator mapping one element to another. 
      */
@@ -1287,7 +1315,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Remove all the elements that <strong>do not</strong> appear in 
-     * {@code c}.
+     * {@code c}. Runs in worst-case \(\mathcal{O}(nf + n\sqrt{n})\) time, where
+     * the inclusion check is run in \(\mathcal{O}(f)\) time.
      * 
      * @param c the collection of elements to retain.
      * @return {@code true} only if at least one element was removed.
@@ -1299,7 +1328,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Sets the element at index {@code index} to {@code element} and returns
-     * the old element.
+     * the old element. Runs in worst-case \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @param index   the target index.
      * @param element the element to set.
@@ -1325,7 +1354,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Sorts stably this list into non-descending order.
+     * Sorts stably this list into non-descending order. Runs in 
+     * \(\mathcal{O}(n \log n)\).
      * 
      * @param c the element comparator.
      */
@@ -1402,10 +1432,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * If {@code a} is sufficiently large, returns the same array holding all
+     * the contents of this list. Also, if {@code a} is larger than the input
+     * array, sets {@code a[s] = null}, where {@code s} is the size of this
+     * list. However, if {@code a} is smaller than this list, allocates a new
+     * array of the same length, populates it with the list contents and returns
+     * it.
      * 
-     * @param <T>
-     * @param a
-     * @return 
+     * @param <T> the element type.
+     * @param a the input array.
+     * @return an array holding the contents of this list.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -1427,6 +1463,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return a;
     }
     
+    /**
+     * Returns the string representation of this list, listing all the elements.
+     * 
+     * @return the string representation of this list.
+     */
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
