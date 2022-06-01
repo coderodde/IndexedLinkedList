@@ -1238,6 +1238,19 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void listToArrayGenerator() {
+        list.addAll(Arrays.asList(4, 1, 3, 2, 5));
+        Integer[] array = list.toArray(Integer[]::new);
+        
+        assertEquals(5, array.length);
+        assertEquals(Integer.valueOf(4), array[0]);
+        assertEquals(Integer.valueOf(1), array[1]);
+        assertEquals(Integer.valueOf(3), array[2]);
+        assertEquals(Integer.valueOf(2), array[3]);
+        assertEquals(Integer.valueOf(5), array[4]);
+    }
+    
+    @Test
     public void subListToArrayGeneric() {
         list.addAll(getIntegerList(15));
         List<Integer> subList = list.subList(5, 10);
