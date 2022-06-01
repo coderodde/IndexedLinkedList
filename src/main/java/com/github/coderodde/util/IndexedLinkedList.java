@@ -604,14 +604,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Adds the element {@code e} before the head of this list.
+     * 
+     * @param e the element to add.
      */
+    @Override
     public void addFirst(E e) {
         linkFirst(e);
     }
     
     /**
-     * {@inheritDoc }
+     * Adds the element {@code e} after the tail of this list.
+     * 
+     * @param e the element to add.
      */
     public void addLast(E e) {
         linkLast(e);
@@ -692,7 +697,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Completely clears this list.
      */
     @Override
     public void clear() {
@@ -712,19 +717,34 @@ public class IndexedLinkedList<E> implements Deque<E>,
         modCount++;
     }
     
+    /**
+     * Returns the clone list with same content as this list.
+     * 
+     * @return the clone list.
+     */
     @Override
     public Object clone() {
         return new IndexedLinkedList<>(this);
     }
     
     /**
-     * {@inheritDoc }
+     * Returns {@code true} only if {@code o} is present in this list.
+     * 
+     * @param o the query object.
      */
     @Override
     public boolean contains(Object o) {
         return indexOf(o) >= 0;
     }
     
+    /**
+     * Returns {@code true} only if this list contains all the elements 
+     * mentioned in the {@code c}.
+     * 
+     * @param c the query object collection.
+     * @return {@code true} only if  this list contains all the elements in
+     *         {@code c}, or {@code false} otherwise.
+     */
     @Override
     public boolean containsAll(Collection<?> c) {
         for (Object o : c) {
@@ -737,7 +757,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the descending iterator.
+     * 
+     * @return the descending iterator pointing to the tail of this list.
      */
     @Override
     public Iterator<E> descendingIterator() {
@@ -745,7 +767,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the first element of this list.
+     * 
+     * @return the first element of this list.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E element() {
@@ -753,7 +778,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns {@code true} only if {@code o} is an instance of 
+     * {@link java.util.List} and has the sane contents as this list.
+     * 
+     * @return {@code true} only if {@code o} is a list with the same contents
+     *         as this list.
      */
     @Override
     public boolean equals(Object o) {
@@ -775,7 +804,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns {@code index}th element.
+     * 
+     * @return {@code index}th element.
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code {0, 1, ..., size - 1}, or if this list is empty.
      */
     @Override
     public E get(int index) {
@@ -784,7 +817,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the first element of this list.
+     * 
+     * @return the first element of this list.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E getFirst() {
@@ -797,7 +833,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the last element of this list.
+     * 
+     * @return the last element of this list.
+     * @throws NoSuchElementException if this list is empty.
      */
     @Override
     public E getLast() {
@@ -809,6 +848,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return last.item;
     }
     
+    /**
+     * Returns the hash code of this list.
+     * 
+     * @return the hash code of this list.
+     */
     @Override
     public int hashCode() {
         int expectedModCount = modCount;
@@ -818,7 +862,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc }
+     * Returns the index of the leftmost {@code obj}, or {@code -l} if 
+     * {@code obj} does not appear in this list.
+     * 
+     * @return the index of {@code obj}, or {@code -1} if {@code obj} does not
+     *         appear in this list.
+     * 
+     * @see IndexedLinkedList#lastIndexOf(java.lang.Object) 
      */
     @Override
     public int indexOf(Object obj) {
@@ -826,7 +876,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * {@inheritDoc } 
+     * Returns {@code true} only if this list is empty.
+     * 
+     * @return {@code true} only if this list is empty.
      */
     @Override
     public boolean isEmpty() {
@@ -834,7 +886,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * {@inheritDoc }
+     * Returns the iterator over this list.
+     * 
+     * @return the iterator over this list.
      */
     @Override
     public Iterator<E> iterator() {
