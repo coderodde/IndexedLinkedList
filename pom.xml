@@ -4,7 +4,7 @@
     
     <groupId>io.github.coderodde</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.61</version>
+    <version>1.618</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
@@ -92,10 +92,6 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <configuration>
-                            <keyname>5AB8C07B</keyname>
-                            <passphraseServerId>Exp10r1ngPGPK3y</passphraseServerId>
-                        </configuration>
                     </execution>    
                 </executions>
             </plugin>
@@ -158,6 +154,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.4.0</version>
+                <configuration>
+                    <additionalOptions>
+                        <additionalOption>--allow-script-in-comments</additionalOption>
+                        <additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>
+                    </additionalOptions>
+                    <excludePackageNames>com.github.coderodde.util.benchmark</excludePackageNames>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
