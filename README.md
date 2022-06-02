@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/gh/coderodde/IndexedLinkedList/branch/main/graph/badge.svg)](https://codecov.io/gh/coderodde/IndexedLinkedList) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.coderodde/IndexedLinkedList/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.coderodde/IndexedLinkedList)
+[![javadoc](https://javadoc.io/badge2/io.github.coderodde/IndexedLinkedList/javadoc.svg)](https://javadoc.io/doc/io.github.coderodde/IndexedLinkedList)
 
 # IndexedLinkedList - an indexed, heuristic doubly-linked list in Java
 
