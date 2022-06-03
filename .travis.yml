@@ -11,6 +11,10 @@ install: true
 script:
 - mvn install
 
+install:
+  - echo $JAVA_HOME
+  - mvn -version
+
 # We can specify a list of JDKs to be used for testing
 # A list of available JDKs in Trusty can be seed in:
 # https://docs.travis-ci.com/user/reference/xenial/#jvm-clojure-groovy-java-scala-support
