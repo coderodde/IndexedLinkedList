@@ -12,7 +12,8 @@ language: java
 # A list of available JDKs in Trusty can be seed in:
 # https://docs.travis-ci.com/user/reference/xenial/#jvm-clojure-groovy-java-scala-support
 jdk:
- - oraclejdk-es
+ - oraclejdk-ea
+ - openjdk-ea
 
 # Each job in Travis CI has several steps:
 # https://docs.travis-ci.com/user/job-lifecycle/
