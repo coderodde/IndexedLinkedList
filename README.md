@@ -1,7 +1,8 @@
 [![Build Status](https://app.travis-ci.com/coderodde/IndexedLinkedList.svg?branch=main)](https://app.travis-ci.com/coderodde/IndexedLinkedList) 
 [![codecov](https://codecov.io/gh/coderodde/IndexedLinkedList/branch/main/graph/badge.svg)](https://codecov.io/gh/coderodde/IndexedLinkedList) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.coderodde/IndexedLinkedList/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.coderodde/IndexedLinkedList)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.coderodde/IndexedLinkedList.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.coderodde%22%20AND%20a:%22IndexedLinkedList%22)
+[![javadoc](https://javadoc.io/badge2/io.github.coderodde/IndexedLinkedList/javadoc.svg)](https://javadoc.io/doc/io.github.coderodde/IndexedLinkedList)
 
 # IndexedLinkedList - an indexed, heuristic doubly-linked list in Java
 
@@ -13,21 +14,21 @@ Our `IndexedLinkedList` exhibits performance faster than [Apache Commons Collect
 
 ## Running time comparison
 
-| Operation        | ArrayList      | java.util.LinkedList | IndexedLinkedList         | TreeList           |
-| ---------------- | -------------- | -------------------- | ------------------------- | ------------------ |
-| `add(int)`       | ***O(n)***     | ***O(n)***           | ***O(sqrt(n))***          | ***O(log n)***     |
-| `addFirst`       | ***O(n)***     | ***O(1)***           | ***O(sqrt(n))***          | ***O(log n)***     |
-| `addLast`        | ***O(1)***     | ***O(1)***           | ***O(1)***                | ***O(log n)***     |
-| `get`            | ***O(1)***     | ***O(n)***           | ***O(sqrt(n))***          | ***O(log n)***     |
-| `remove(int)`    | ***O(n)***     | ***O(n)***           | ***O(sqrt(n))***          | ***O(log n)***     |
-| `removeFirst`    | ***O(n)***     | ***O(1)***           | ***O(sqrt(n))***          | ***O(log n)***     |
-| `removeLast`     | ***O(1)***     | ***O(1)***           | ***O(1)***                | ***O(log n)***     |
-| `remove(Object)` | ***O(n)***     | ***O(n)***           | ***O(n)***                | ***O(n)***         |
-| `setAll`         | ***O(n)***     | ***O(n)***           | ***O(n)***                | ***O(n)***         |
-| `prependAll`     | ***O(m + n)*** | ***O(m)***           | ***O(m + sqrt(n))***      | ***O(m log n)***   |
-| `appendAll`      | ***O(m)***     | ***O(m)***           | ***O(m)***                | ***O(m + log n)*** |
-| `insertAll`      | ***O(m + n)*** | ***O(m + n)***       | ***O(m + sqrt(n))***      | ***O(m log n)***   |
-| `removeAll`      | ***O(m + n)*** | ***O(nm)***          | ***O(nf + n * sqrt(n))*** | ***O(nmf)***       |
+| Operation        | ArrayList      | LinkedList     | IndexedLinkedList         | TreeList           |
+| ---------------- | -------------- | -------------- | ------------------------- | ------------------ |
+| `add(int)`       | ***O(n)***     | ***O(n)***     | ***O(sqrt(n))***          | ***O(log n)***     |
+| `addFirst`       | ***O(n)***     | ***O(1)***     | ***O(sqrt(n))***          | ***O(log n)***     |
+| `addLast`        | ***O(1)***     | ***O(1)***     | ***O(1)***                | ***O(log n)***     |
+| `get`            | ***O(1)***     | ***O(n)***     | ***O(sqrt(n))***          | ***O(log n)***     |
+| `remove(int)`    | ***O(n)***     | ***O(n)***     | ***O(sqrt(n))***          | ***O(log n)***     |
+| `removeFirst`    | ***O(n)***     | ***O(1)***     | ***O(sqrt(n))***          | ***O(log n)***     |
+| `removeLast`     | ***O(1)***     | ***O(1)***     | ***O(1)***                | ***O(log n)***     |
+| `remove(Object)` | ***O(n)***     | ***O(n)***     | ***O(n)***                | ***O(n)***         |
+| `setAll`         | ***O(n)***     | ***O(n)***     | ***O(n)***                | ***O(n)***         |
+| `prependAll`     | ***O(m + n)*** | ***O(m)***     | ***O(m + sqrt(n))***      | ***O(m log n)***   |
+| `appendAll`      | ***O(m)***     | ***O(m)***     | ***O(m)***                | ***O(m + log n)*** |
+| `insertAll`      | ***O(m + n)*** | ***O(m + n)*** | ***O(m + sqrt(n))***      | ***O(m log n)***   |
+| `removeAll`      | ***O(m + n)*** | ***O(nm)***    | ***O(nf + n * sqrt(n))*** | ***O(nmf)***       |
 
 Above, ***n*** is the current size of a list, ***m*** is the size of a newly added collection, and ***f*** is the cost of consulting whether an element is contained in a filter collectoin.
 
