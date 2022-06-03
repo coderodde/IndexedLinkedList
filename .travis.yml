@@ -11,7 +11,7 @@ install: true
 script:
 - mvn install
 
-install:
+before_install:
   - echo $JAVA_HOME
   - mvn -version
 
