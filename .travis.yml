@@ -12,6 +12,7 @@ script:
 - mvn install
 
 before_install:
+  - export JAVA_HOME=/usr/lib/jvm/temurin-18-jdk-amd64/bin
   - echo $JAVA_HOME
   - mvn -version
 
