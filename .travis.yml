@@ -12,8 +12,7 @@ language: java
 # A list of available JDKs in Trusty can be seed in:
 # https://docs.travis-ci.com/user/reference/xenial/#jvm-clojure-groovy-java-scala-support
 jdk:
- - oraclejdk-ea
- - openjdk-ea
+ - openjdk18
 
 # Each job in Travis CI has several steps:
 # https://docs.travis-ci.com/user/job-lifecycle/
@@ -25,7 +24,3 @@ jdk:
 # If a build is successful, the code is submitted for coverage analysis
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
-script: 
-  - sudo mvn clean package
-  - sudo mvn install
