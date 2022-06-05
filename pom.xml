@@ -243,6 +243,6 @@
                     </archive>
                 </configuration>
             </plugin>
-        </plugins>
+        </plugins>  
     </build>
 </project>

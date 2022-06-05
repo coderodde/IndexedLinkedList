@@ -102,7 +102,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         // Not 'private' since is used in the unit tests.
         void clear() {
-            fingerArray = Arrays.copyOf(fingerArray, INITIAL_CAPACITY);
+            Arrays.fill(fingerArray, 0, size, null);
+            fingerArray = new Finger[INITIAL_CAPACITY];
             fingerArray[0] = new Finger<>(null, 0);
             size = 0;
         }
