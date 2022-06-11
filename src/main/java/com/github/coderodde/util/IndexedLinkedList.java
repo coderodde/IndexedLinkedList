@@ -407,8 +407,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Finger finger1 = fingerArray[fingerIndex - 1];
             Finger finger2 = fingerArray[fingerIndex];
             
-            int distance1 = Math.abs(elementIndex - finger1.index);
-            int distance2 = Math.abs(elementIndex - finger2.index);
+            int distance1 = elementIndex - finger1.index;
+            int distance2 = finger2.index - elementIndex;
             
             // Return the closest finger index:
             return distance1 < distance2 ? fingerIndex - 1 : fingerIndex;
@@ -497,8 +497,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * The modification counter. Used to detect state changes.
      */
     private transient int modCount;
-    private transient Node<E> first;
-    private transient Node<E> last;
+    transient Node<E> first;
+    transient Node<E> last;
     
     // Without 'private' since it is accessed in unit tests.
     transient FingerList<E> fingerList = new FingerList<>();
@@ -876,7 +876,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the index of the leftmost {@code obj}, or {@code -l} if 
+     * Returns the index of the leftmost {@code obj}, or {@code -1} if 
      * {@code obj} does not appear in this list. Runs in worst-case linear time.
      * 
      * @return the index of the leftmost {@code obj}, or {@code -1} if 
@@ -910,7 +910,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
 
     /**
-     * Returns the index of the rightmost {@code obj}, or {@code -l} if 
+     * Returns the index of the rightmost {@code obj}, or {@code -1} if 
      * {@code obj} does not appear in this list. Runs in worst-case linear time.
      * 
      * @return the index of the rightmost {@code obj}, or {@code -1} if
@@ -2316,17 +2316,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
         for (int f = fingerIndex; f < fingerList.size(); ++f) {
             Finger<E> fingerLeft  = fingerList.get(f);
             Finger<E> fingerRight = fingerList.get(f + 1);
-            
+
             if (fingerLeft.index + 1 < fingerRight.index) {
                 for (int i = f; i >= fingerIndex; --i) {
                     Finger<E> fngr = fingerList.get(i);
                     fngr.node = fngr.node.next;
                 }
-                
+
                 for (int j = f + 1; j <= fingerList.size(); ++j) {
                     fingerList.get(j).index--;
                 }
-                
+
                 return;
             }
         }

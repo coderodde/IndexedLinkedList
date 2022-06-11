@@ -4,7 +4,7 @@
     
     <groupId>io.github.coderodde</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.618</version>
+    <version>1.61803</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
@@ -59,12 +59,6 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.8</version>
-        </dependency>-->
     </dependencies>
     
     <distributionManagement>
@@ -81,7 +75,7 @@
 
     <build>
         <plugins>
-            <!--
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -96,9 +90,7 @@
                     </execution>    
                 </executions>
             </plugin>
-            -->
             
-            <!--
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -110,7 +102,6 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
-            -->
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

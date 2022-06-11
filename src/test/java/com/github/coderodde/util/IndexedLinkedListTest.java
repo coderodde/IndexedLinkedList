@@ -186,6 +186,24 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void moveFingerOutOfRemovalLocation() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.fingerArray[0] =
+                new Finger<>(list.last.prev.prev.prev, 12);
+        
+        list.fingerList.fingerArray[1] = new Finger<>(list.last.prev.prev, 13);
+        list.fingerList.fingerArray[2] = new Finger<>(list.last.prev, 14);
+        list.fingerList.fingerArray[3] = new Finger<>(list.last, 15);
+        
+        list.remove(12);
+        
+        Finger<Integer> finger = list.fingerList.fingerArray[0];
+        
+        assertEquals(Integer.valueOf(11), finger.node.item);
+        assertEquals(11, finger.index);
+    }
+    
+    @Test
     public void removeIf() {
         list.addAll(getIntegerList(10));
         list.removeIf((i) -> {
