@@ -486,7 +486,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     @java.io.Serial
-    private static final long serialVersionUID = -1L;
+    private static final long serialVersionUID = 54170828611556733L;
     
     /**
      * The cached number of elements in this list.

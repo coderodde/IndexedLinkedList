@@ -493,7 +493,7 @@ final class LinkedListBenchmark {
         long startMillis = System.currentTimeMillis();
 
         for (int i = 0; i < operations; i++) {
-            list.add(list.size(), getRandomInteger(random));
+            list.add(getRandomInteger(random));
         }
 
         long endMillis = System.currentTimeMillis();
@@ -540,7 +540,6 @@ final class LinkedListBenchmark {
 
         for (int i = 0; i < operations; i++) {
             List<Integer> collection = createRandomCollection(random);
-//            System.out.println("i = " + i);
             int index = random.nextInt(list.size());
             list.addAll(index, collection);
         }
