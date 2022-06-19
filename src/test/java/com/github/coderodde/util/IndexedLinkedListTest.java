@@ -2,6 +2,7 @@ package com.github.coderodde.util;
 
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
+import com.github.coderodde.util.IndexedLinkedList.Finger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

@@ -11,7 +11,7 @@ import java.util.Set;
  * @version 1.6
  * @since 1.6
  */
-public final class LinkedListBenchmarkRunner {
+final class LinkedListBenchmarkRunner {
 
     private static final String ALL_BENCHMARK_METHODS_FLAG = "--all";
     private static final String BENCHMARK_SUBLIST_CLEAR_FLAG = "--clear";

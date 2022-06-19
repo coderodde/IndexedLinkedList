@@ -4,7 +4,7 @@
     
     <groupId>io.github.coderodde</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.61803</version>
+    <version>1.6180339</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
