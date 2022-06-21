@@ -33,8 +33,85 @@ Our `IndexedLinkedList` exhibits performance faster than [Apache Commons Collect
 Above, ***n*** is the current size of a list, ***m*** is the size of a newly added collection, and ***f*** is the cost of consulting whether an element is contained in a filter collectoin.
 
 ## Benchmark output
-
 On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB L2 cache and 8 MB L3 cache, the benchmark gives typically the following results:
+
+### Benchmark with JMH
+
+```
+profileArrayListAddAtIndex: 0.07377950874087187
+profileLinkedListAddAtIndex: 0.1826810360524399
+profileRoddeListAddAtIndex: 0.11311531257052584
+profileTreeListAddAtIndex: 0.15641257891045124
+
+profileArrayListAddCollection: 0.13197080435638367
+profileLinkedListAddCollection: 0.12009559842331581
+profileRoddeListAddCollection: 0.1340797192513369
+profileTreeListAddCollection: 0.41431817055544085
+
+profileArrayListAddCollectionAtIndex: 0.3404183458134786
+profileLinkedListAddCollectionAtIndex: 3.183527716535433
+profileRoddeListAddCollectionAtIndex: 0.3282858144464373
+profileTreeListAddCollectionAtIndex: 1.8115773381294964
+
+profileArrayListAddFirst: 0.06995447875373809
+profileLinkedListAddFirst: 0.006980761677679028
+profileRoddeListAddFirst: 0.042050960729902456
+profileTreeListAddFirst: 0.08115097213220998
+
+profileArrayListAddLast: 0.005054052615245655
+profileLinkedListAddLast: 0.006112638678788728
+profileRoddeListAddLast: 0.011257708072124548
+profileTreeListAddLast: 0.08238975856537654
+
+profileArrayListGet: 0.014750680947392326
+profileLinkedListGet: 3.6779755027422305
+profileRoddeListGet: 0.1394116554639318
+profileTreeListGet: 0.11463395708154507
+
+profileArrayListRemoveAll: 0.16445848005896324
+profileLinkedListRemoveAll: 18.886341121495327
+profileRoddeListRemoveAll: 0.3527899085794655
+profileTreeListRemoveAll: 68.18373333333334
+
+profileArrayListRemoveAtIndex: 2.0069422845691385
+profileLinkedListRemoveAtIndex: 24.750559756097562
+profileRoddeListRemoveAtIndex: 4.914520975609756
+profileTreeListRemoveAtIndex: 2.908101304347826
+
+profileArrayListRemoveFirst: 3.6975104779411763
+profileLinkedListRemoveFirst: 0.18962545643742315
+profileRoddeListRemoveFirst: 1.0941218171926006
+profileTreeListRemoveFirst: 1.0494102403343784
+
+profileArrayListRemoveLast: 0.030474378113242037
+profileLinkedListRemoveLast: 0.13684737597375973
+profileRoddeListRemoveLast: 0.18406866477532718
+profileTreeListRemoveLast: 1.1446068867387593
+
+profileArrayListRemoveObject: 4.252681856540084
+profileLinkedListRemoveObject: 11.482463636363637
+profileRoddeListRemoveObject: 12.871063461538462
+profileTreeListRemoveObject: 33.33036393442623
+
+profileArrayListRemoveRange: 0.05083665087288114
+profileLinkedListRemoveRange: 0.5726812624964296
+profileRoddeListRemoveRange: 0.6386578964092787
+profileTreeListRemoveRange: 6.195104
+
+profileArrayListSortRange: 1.4289524625267667
+profileLinkedListSortRange: 1.5274395738203956
+profileRoddeListSortRange: 1.5078222305389222
+profileTreeListSortRange: 1.6737992493744787
+
+--- Total duration:
+
+ ArrayList: 12,268
+LinkedList: 64,723
+ RoddeList: 22,331
+  TreeList: 117,146
+```
+
+### Benchmark without JMH
 
 ```
 <<< Benchmark seed = 1654425745819 >>>
