@@ -39,152 +39,156 @@ On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB 
 
 #### Small size data
 
-| Operation                             | ms      |
-|---------------------------------------|---------|
-|            profileArrayListAddAtIndex |  0,071  |
-|           profileLinkedListAddAtIndex |  0,182  |
-|            profileRoddeListAddAtIndex |  0,114  |
-|             profileTreeListAddAtIndex |  0,172  |
-|                                       |         |
-|         profileArrayListAddCollection |  0,144  |
-|        profileLinkedListAddCollection |  0,119  |
-|         profileRoddeListAddCollection |  0,128  |
-|          profileTreeListAddCollection |  0,508  |
-|                                       |         |
-|  profileArrayListAddCollectionAtIndex |  0,332  |
-| profileLinkedListAddCollectionAtIndex |  3,134  |
-|  profileRoddeListAddCollectionAtIndex |  0,321  |
-|   profileTreeListAddCollectionAtIndex |  2,217  |
-|                                       |         |
-|              profileArrayListAddFirst |  0,070  |
-|             profileLinkedListAddFirst |  0,007  |
-|              profileRoddeListAddFirst |  0,044  |
-|               profileTreeListAddFirst |  0,103  |
-|                                       |         |
-|               profileArrayListAddLast |  0,007  |
-|              profileLinkedListAddLast |  0,006  |
-|               profileRoddeListAddLast |  0,010  |
-|                profileTreeListAddLast |  0,107  |
-|                                       |         |
-|                   profileArrayListGet |  0,017  |
-|                  profileLinkedListGet |  3,963  |
-|                   profileRoddeListGet |  0,143  |
-|                    profileTreeListGet |  0,153  |
-|                                       |         |
-|             profileArrayListRemoveAll |  0,185  |
-|            profileLinkedListRemoveAll | 19,993  |
-|             profileRoddeListRemoveAll |  0,456  |
-|              profileTreeListRemoveAll | 72,395  |
-|                                       |         |
-|         profileArrayListRemoveAtIndex |  2,475  |
-|        profileLinkedListRemoveAtIndex | 24,655  |
-|         profileRoddeListRemoveAtIndex |  5,260  |
-|          profileTreeListRemoveAtIndex |  3,403  |
-|                                       |         |
-|           profileArrayListRemoveFirst |  3,772  |
-|          profileLinkedListRemoveFirst |  0,189  |
-|           profileRoddeListRemoveFirst |  1,720  |
-|            profileTreeListRemoveFirst |  1,247  |
-|                                       |         |
-|            profileArrayListRemoveLast |  0,031  |
-|           profileLinkedListRemoveLast |  0,140  |
-||                                      |  0,211  |
-|             profileTreeListRemoveLast |  1,291  |
-|                                       |         |
-|          profileArrayListRemoveObject |  5,211  |
-|         profileLinkedListRemoveObject | 12,230  |
-|          profileRoddeListRemoveObject | 25,933  |
-|           profileTreeListRemoveObject | 38,010  |
-|                                       |         |
-|           profileArrayListRemoveRange |  0,054  |
-|          profileLinkedListRemoveRange |  0,576  |
-|           profileRoddeListRemoveRange |  0,710  |
-|            profileTreeListRemoveRange | 11,264  |
-|                                       |         |
-|             profileArrayListSortRange |  1,414  |
-|            profileLinkedListSortRange |  1,492  |
-|             profileRoddeListSortRange |  1,526  |
-|              profileTreeListSortRange |  2,513  |
-|                                       |         |
-|                             ArrayList | 13,782  |
-|                            LinkedList | 66,686  |
-|                             RoddeList | 36,576  |
-|                              TreeList | 133,383 |
+| Operation                               | ms      |
+|-----------------------------------------|---------|
+|                                         |         |
+|           `profileArrayListAddAtIndex`  |   0,084 |
+|          `profileLinkedListAddAtIndex`  |   0,186 |
+|           `profileRoddeListAddAtIndex`  |   0,114 |
+|            `profileTreeListAddAtIndex`  |   0,153 |
+|                                         |         |
+|        `profileArrayListAddCollection`  |   0,133 |
+|       `profileLinkedListAddCollection`  |   0,118 |
+|        `profileRoddeListAddCollection`  |   0,131 |
+|         `profileTreeListAddCollection`  |   0,408 |
+|                                         |         |
+|  `profileArrayListAddCollectionAtIndex` |   0,348 |
+| `profileLinkedListAddCollectionAtIndex` |   2,898 |
+|  `profileRoddeListAddCollectionAtIndex` |   0,315 |
+|   `profileTreeListAddCollectionAtIndex` |   1,883 |
+|                                                   |
+|              `profileArrayListAddFirst` |   0,074 |
+|             `profileLinkedListAddFirst` |   0,007 |
+|              `profileRoddeListAddFirst` |   0,043 |
+|               `profileTreeListAddFirst` |   0,221 |
+|                                         |         |
+|               `profileArrayListAddLast` |   0,005 |
+|              `profileLinkedListAddLast` |   0,006 |
+|               `profileRoddeListAddLast` |   0,010 |
+|                `profileTreeListAddLast` |   0,105 |
+|                                         |         |
+|                   `profileArrayListGet` |   0,015 |
+|                  `profileLinkedListGet` |   3,840 |
+|                   `profileRoddeListGet` |   0,141 |
+|                    `profileTreeListGet` |   0,155 |
+|                                         |         |
+|             `profileArrayListRemoveAll` |   0,164 |
+|            `profileLinkedListRemoveAll` |  19,716 |
+|             `profileRoddeListRemoveAll` |   0,362 |
+|              `profileTreeListRemoveAll` |  57,339 |
+|                                         |         |
+|        `profileArrayListRemov`eAtIndex` |   2,144 |
+|       `profileLinkedListRemove`AtIndex` |  24,915 |
+|         `profileRoddeListRemoveAtIndex` |   4,892 |
+|         `profileTreeListR`emoveAtIndex` |   2,901 |
+|                         `               |         |
+|          `profileArrayLis`tRemoveFirst` |   3,747 |
+|         `profileLinkedList`RemoveFirst` |   0,191 |
+|           `profileRoddeListRemoveFirst` |   1,105 |
+|           `profileTreeListR`emoveFirst` |   0,988 |
+|                           `             |         |
+|           `profileArrayList`RemoveLast` |   0,031 |
+|          `profileLinkedListR`emoveLast` |   0,137 |
+|            `profileRoddeListRemoveLast` |   0,186 |
+|            `profileTreeListR`emoveLast` |   1,381 |
+|                            `            |         |
+|         `profileArrayListRem`oveObject` |   4,617 |
+|        `profileLinkedListRemo`veObject` |  11,606 |
+|          `profileRoddeListRemoveObject` |  21,167 |
+|          `profileTreeListR`emoveObject` |  33,067 |
+|                          `              |         |
+|          `profileArrayList`RemoveRange` |   0,050 |
+|         `profileLinkedListR`emoveRange` |   0,517 |
+|           `profileRoddeListRemoveRange` |   0,533 |
+|           `profileTreeListR`emoveRange` |   6,120 |
+|                           `             |         |
+|            `profileArrayLis`tSortRange` |   1,389 |
+|           `profileLinkedList`SortRange` |   1,507 |
+|             `profileRoddeListSortRange` |   1,482 |
+|             `profileTreeListS`ortRange` |   1,635 |
+|                                         |         |
+|                              Ar`rayList | 12,800  |
+|                             Link`edList | 65,644  |
+|                               RoddeList | 30,480  |
+|                                TreeList | 106,356 |
 
 #### Medium size data
 
 
-| Operation                             | ms       |
-|---------------------------------------|----------|
-|            profileArrayListAddAtIndex |   0,325  |
-|           profileLinkedListAddAtIndex |   2,611  |
-|            profileRoddeListAddAtIndex |   0,435  |
-|             profileTreeListAddAtIndex |   0,573  |
-|                                       |          |
-|         profileArrayListAddCollection |   0,390  |
-|        profileLinkedListAddCollection |   0,411  | 
-|         profileRoddeListAddCollection |   0,389  |
-|          profileTreeListAddCollection |   1,253  |
-|                                       |          |
-|  profileArrayListAddCollectionAtIndex |   2,064  |
-| profileLinkedListAddCollectionAtIndex |  34,927  |
-|  profileRoddeListAddCollectionAtIndex |   1,449  |
-|   profileTreeListAddCollectionAtIndex |   5,877  |
-|                                       |          |
-|              profileArrayListAddFirst |   0,383  |
-|             profileLinkedListAddFirst |   0,018  |
-|              profileRoddeListAddFirst |   0,139  |
-|               profileTreeListAddFirst |   0,274  |
-|                                       |          |
-|               profileArrayListAddLast |   0,015  |
-|              profileLinkedListAddLast |   0,017  |
-|               profileRoddeListAddLast |   0,034  |
-|                profileTreeListAddLast |   0,282  |
-|                                       |          |
-|                   profileArrayListGet |   0,052  |
-|                  profileLinkedListGet |  35,351  |
-|                   profileRoddeListGet |   0,658  |
-|                    profileTreeListGet |   0,524  |
-|                                       |          |
-|             profileArrayListRemoveAll |   0,593  |
-|            profileLinkedListRemoveAll | 173,622  |
-|             profileRoddeListRemoveAll |   1,270  |
-|              profileTreeListRemoveAll | 733,071  |
-|                                       |          |
-|         profileArrayListRemoveAtIndex |  17,075  |
-|        profileLinkedListRemoveAtIndex | 259,932  |
-|         profileRoddeListRemoveAtIndex |  47,892  |
-|          profileTreeListRemoveAtIndex |   9,935  |
-|                                       |          |
-|           profileArrayListRemoveFirst |  34,460  |
-|          profileLinkedListRemoveFirst |   0,579  |
-|           profileRoddeListRemoveFirst |   5,147  |
-|            profileTreeListRemoveFirst |   3,201  |
-|                                       |          |
-|            profileArrayListRemoveLast |   0,089  |
-|           profileLinkedListRemoveLast |   0,567  |
-|            profileRoddeListRemoveLast |   0,872  |
-|             profileTreeListRemoveLast |   3,419  |
-|                                       |          |
-|          profileArrayListRemoveObject |  56,452  |
-|         profileLinkedListRemoveObject | 125,871  |
-|          profileRoddeListRemoveObject | 183,949  |
-|           profileTreeListRemoveObject | 379,314  |
-|                                       |          |
-|           profileArrayListRemoveRange |   0,097  |
-|          profileLinkedListRemoveRange |   1,083  |
-|           profileRoddeListRemoveRange |   1,190  |
-|            profileTreeListRemoveRange |  12,915  |
-|                                       |          |
-|             profileArrayListSortRange |   8,093  |
-|            profileLinkedListSortRange |   8,976  |
-|             profileRoddeListSortRange |   8,892  |
-|              profileTreeListSortRange |   9,448  |
-|                                       |          |
-|                             ArrayList | 120,089  |
-|                            LinkedList | 643,967  |
-|                             RoddeList | 252,316  |
-|                              TreeList | 1160,087 |
+| Operation                               | ms      |
+|-----------------------------------------|---------|
+|            `profileArrayListAddAtIndex` |   0,327 |
+|           `profileLinkedListAddAtIndex` |   2,599 |
+|            `profileRoddeListAddAtIndex` |   0,432 |
+|             `profileTreeListAddAtIndex` |   0,555 |
+|                                         |         |
+|         `profileArrayListAddCollection` |   0,386 |
+|        `profileLinkedListAddCollection` |   0,369 |
+|         `profileRoddeListAddCollection` |   0,394 |
+|          `profileTreeListAddCollection` |   1,246 |
+|                                         |         |
+|  `profileArrayListAddCollectionAtIndex` |   2,413 |
+| `profileLinkedListAddCollectionAtIndex` |  36,648 |
+|  `profileRoddeListAddCollectionAtIndex` |   1,370 |
+|   `profileTreeListAddCollectionAtIndex` |   5,880 |
+|                                         |         |
+|              `profileArrayListAddFirst` |   0,421 |
+|             `profileLinkedListAddFirst` |   0,019 |
+|              `profileRoddeListAddFirst` |   0,141 |
+|               `profileTreeListAddFirst` |   0,272 |
+|                                         |         |
+|               `profileArrayListAddLast` |   0,016 |
+|              `profileLinkedListAddLast` |   0,017 |
+|               `profileRoddeListAddLast` |   0,035 |
+|                `profileTreeListAddLast` |   0,290 |
+|                                         |         |
+|                   `profileArrayListGet` |   0,054 |
+|                  `profileLinkedListGet` |  35,779 |
+|                   `profileRoddeListGet` |   0,661 |
+|                    `profileTreeListGet` |   0,468 |
+|                                         |         |
+|             `profileArrayListRemoveAll` |   0,809 |
+|            `profileLinkedListRemoveAll` | 172,829 |
+|             `profileRoddeListRemoveAll` |   1,273 |
+|              `profileTreeListRemoveAll` | 699,206 |
+|                                         |         |
+|         `profileArrayListRemoveAtIndex` |  18,441 |
+|        `profileLinkedListRemoveAtIndex` | 258,263 |
+|         `profileRoddeListRemoveAtIndex` |  48,384 |
+|          `profileTreeListRemoveAtIndex` |  10,126 |
+|                                         |         |
+|           `profileArrayListRemoveFirst` |  38,078 |
+|          `profileLinkedListRemoveFirst` |   0,576 |
+|           `profileRoddeListRemoveFirst` |   5,176 |
+|            `profileTreeListRemoveFirst` |   3,377 |
+|                                         |         |
+|            `profileArrayListRemoveLast` |   0,089 |
+|           `profileLinkedListRemoveLast` |   0,576 |
+|            `profileRoddeListRemoveLast` |   0,863 |
+|             `profileTreeListRemoveLast` |   3,666 |
+|                                         |         |
+|          `profileArrayListRemoveObject` |  46,814 |
+|         `profileLinkedListRemoveObject` | 105,916 |
+|          `profileRoddeListRemoveObject` | 191,653 |
+|           `profileTreeListRemoveObject` | 306,468 |
+|                                         |         |
+|           `profileArrayListRemoveRange` |   0,099 |
+|          `profileLinkedListRemoveRange` |   1,262 |
+|           `profileRoddeListRemoveRange` |   1,212 |
+|            `profileTreeListRemoveRange` |  13,690 |
+|                                         |         |
+|             `profileArrayListSortRange` |   8,449 |
+|            `profileLinkedListSortRange` |   9,291 |
+|             `profileRoddeListSortRange` |   9,229 |
+|              `profileTreeListSortRange` |  10,035 |
+|                                         |         |
+|                               ArrayList | 116,396 |
+|                              LinkedList | 624,144 |
+|                               RoddeList | 260,822 |
+|                                TreeList | 1055,277|
+
+#### Larger size data
+
 
 ### Benchmark without JMH
 
