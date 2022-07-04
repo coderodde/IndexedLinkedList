@@ -107,13 +107,12 @@ On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB 
 |             `profileRoddeListSortRange` |   1,482 |
 |             `profileTreeListS`ortRange` |   1,635 |
 |                                         |         |
-|                              Ar`rayList | 12,800  |
-|                             Link`edList | 65,644  |
-|                               RoddeList | 30,480  |
-|                                TreeList | 106,356 |
+|                    Total of `ArrayList` | 12,800  |
+|                   Total of `LinkedList` | 65,644  |
+|                    Total of `RoddeList` | 30,480  |
+|                     Total of `TreeList` | 106,356 |
 
 #### Medium size data
-
 
 | Operation                               | ms      |
 |-----------------------------------------|---------|
