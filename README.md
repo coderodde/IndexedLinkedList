@@ -77,35 +77,35 @@ On a PC with a quad-core CPU with base speed 1,99 GHz and 256 kB L1 cache, 1 MB 
 |             `profileRoddeListRemoveAll` |   0,362 |
 |              `profileTreeListRemoveAll` |  57,339 |
 |                                         |         |
-|        `profileArrayListRemov`eAtIndex` |   2,144 |
-|       `profileLinkedListRemove`AtIndex` |  24,915 |
+|        `profileArrayListRemoveAtIndex`  |   2,144 |
+|       `profileLinkedListRemoveAtIndex`  |  24,915 |
 |         `profileRoddeListRemoveAtIndex` |   4,892 |
-|         `profileTreeListR`emoveAtIndex` |   2,901 |
-|                         `               |         |
-|          `profileArrayLis`tRemoveFirst` |   3,747 |
-|         `profileLinkedList`RemoveFirst` |   0,191 |
+|         `profileTreeListRemoveAtIndex`  |   2,901 |
+|                                         |         |
+|          `profileArrayListRemoveFirst`  |   3,747 |
+|         `profileLinkedListRemoveFirst`  |   0,191 |
 |           `profileRoddeListRemoveFirst` |   1,105 |
-|           `profileTreeListR`emoveFirst` |   0,988 |
-|                           `             |         |
-|           `profileArrayList`RemoveLast` |   0,031 |
-|          `profileLinkedListR`emoveLast` |   0,137 |
+|           `profileTreeListRemoveFirst`  |   0,988 |
+|                                         |         |
+|           `profileArrayListRemoveLast`  |   0,031 |
+|          `profileLinkedListRemoveLast`  |   0,137 |
 |            `profileRoddeListRemoveLast` |   0,186 |
-|            `profileTreeListR`emoveLast` |   1,381 |
-|                            `            |         |
-|         `profileArrayListRem`oveObject` |   4,617 |
-|        `profileLinkedListRemo`veObject` |  11,606 |
+|            `profileTreeListRemoveLast`  |   1,381 |
+|                                         |         |
+|         `profileArrayListRemoveObject`  |   4,617 |
+|        `profileLinkedListRemoveObject`  |  11,606 |
 |          `profileRoddeListRemoveObject` |  21,167 |
-|          `profileTreeListR`emoveObject` |  33,067 |
-|                          `              |         |
-|          `profileArrayList`RemoveRange` |   0,050 |
-|         `profileLinkedListR`emoveRange` |   0,517 |
+|          `profileTreeListRemoveObject`  |  33,067 |
+|                                         |         |
+|          `profileArrayListRemoveRange`  |   0,050 |
+|         `profileLinkedListRemoveRange`  |   0,517 |
 |           `profileRoddeListRemoveRange` |   0,533 |
-|           `profileTreeListR`emoveRange` |   6,120 |
-|                           `             |         |
-|            `profileArrayLis`tSortRange` |   1,389 |
-|           `profileLinkedList`SortRange` |   1,507 |
+|           `profileTreeListRemoveRange`  |   6,120 |
+|                                         |         |
+|            `profileArrayListSortRange`  |   1,389 |
+|           `profileLinkedListSortRange`  |   1,507 |
 |             `profileRoddeListSortRange` |   1,482 |
-|             `profileTreeListS`ortRange` |   1,635 |
+|             `profileTreeListSortRange`  |   1,635 |
 |                                         |         |
 |                    Total of `ArrayList` | 12,800  |
 |                   Total of `LinkedList` | 65,644  |
