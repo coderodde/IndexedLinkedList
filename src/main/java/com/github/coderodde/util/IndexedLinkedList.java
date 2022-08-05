@@ -430,6 +430,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return distance1 < distance2 ? fingerIndex - 1 : fingerIndex;
         }
         
+        /**
+         * Creates a finger for the input node {@code node} and inserts it at 
+         * the head of the finger array.
+         * 
+         * @param node the target node.
+         */
+        private void prependFingerForNode(Node<E> node) {
+            Finger<E> finger = new Finger<>(node, 0);
+            enlargeFingerArrayIfNeeded(size + 2);
+            shiftFingerIndicesToRightOnce(0);
+            System.arraycopy(fingerArray, 0, fingerArray, 1, size + 1);
+            fingerArray[0] = finger;
+            size++;
+        }
+        
         // Removes the last finger residing right before the end-of-finger-list
         // sentinel finger:
         private void removeFinger() {
@@ -2317,8 +2332,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         increaseSize();
 
         if (mustAddFinger()) {
-            fingerList.insertFingerAndShiftOnceToRight(
-                    new Finger<>(newNode, 0));
+            fingerList.prependFingerForNode(newNode);
         } else {
             fingerList.shiftFingerIndicesToRightOnce(0);
         }

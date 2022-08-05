@@ -909,50 +909,23 @@ final class LinkedListBenchmark {
     }
     
     private long profileSubListClear(List<Integer> list) {
-        Class<?> clazz = list.getClass();
+        int fromIndex = list.size() / 2;
+        int toIndex = list.size() / 2 + 1;
+
+        long startMillis = System.currentTimeMillis();
+
+        // Clear short range:
+        list.subList(fromIndex, toIndex).clear();
+
+        fromIndex = 10;
+        toIndex = list.size() - 9;
+
+        // Clear long range:
+        list.subList(fromIndex, toIndex).clear();
+
+        long endMillis = System.currentTimeMillis();
         
-        long startMillis;
-        long endMillis;
-        long durationMillis;
-        
-        int fromIndex;
-        int toIndex;
-        
-        if (clazz.getSimpleName().equals("TreeList")) {
-            fromIndex = list.size() / 2;
-            toIndex = list.size() / 2 + 1;
-            
-            startMillis = System.currentTimeMillis();
-            
-            // Clear short range:
-            clear(list, fromIndex, toIndex);
-            
-            fromIndex = 10;
-            toIndex = list.size() - 9;
-            
-            // Clear long range:
-            clear(list, fromIndex, toIndex);
-            
-            endMillis = System.currentTimeMillis();
-        } else {
-            fromIndex = list.size() / 2;
-            toIndex = list.size() / 2 + 1;
-            
-            startMillis = System.currentTimeMillis();
-            
-            // Clear short range:
-            list.subList(fromIndex, toIndex).clear();
-            
-            fromIndex = 10;
-            toIndex = list.size() - 9;
-            
-            // Clear long range:
-            list.subList(fromIndex, toIndex).clear();
-            
-            endMillis = System.currentTimeMillis();
-        }
-        
-        durationMillis = endMillis - startMillis;
+        long durationMillis = endMillis - startMillis;
         
         System.out.println(
                 list.getClass().getName() + 
