@@ -221,7 +221,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // finger list is sorted by indices:
         private void insertFingerAndShiftOnceToRight(Finger<E> finger) {
             enlargeFingerArrayIfNeeded(size + 2);
-            int beforeFingerIndex = getFingerIndex(finger.index);
+            int beforeFingerIndex = getFingerIndexImpl(finger.index);
             System.arraycopy(
                     fingerArray, 
                     beforeFingerIndex, 
