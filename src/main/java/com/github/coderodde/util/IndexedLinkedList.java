@@ -1619,12 +1619,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int distanceBetweenFingers = collectionSize / numberOfNewFingers;
         int nodesToSkip = distanceBetweenFingers / 2;
         int index = firstIndex + nodesToSkip;
-        Node<E> node = first;
-
-        for (int i = 0; i < nodesToSkip; i++) {
-            node = node.next;
-        }
-        
+        Node<E> node = scrollNodeToRight(first, nodesToSkip);
         int fingerIndex = fingerList.size();
         
         fingerList.makeRoomAtIndex(fingerIndex, 
@@ -1635,11 +1630,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
-
-            for  (int j = 0; j < distanceBetweenFingers; j++) {
-                node = node.next;
-            }
-
+            node = scrollNodeToRight(node, distanceBetweenFingers);
             fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         }
     }
@@ -1662,12 +1653,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int distanceBetweenFingers = collectionSize / numberOfNewFingers;
         int startOffset = distanceBetweenFingers / 2;
         int index = indexOfInsertedRangeHead + startOffset;
-        Node<E> node = headNodeOfInsertedRange;
-        
-        for (int i = 0; i < startOffset; i++) {
-           node = node.next;
-        }
-
+        Node<E> node = scrollNodeToRight(headNodeOfInsertedRange, startOffset);
         int startFingerIndex =
                 fingerList.getFingerIndexImpl(indexOfInsertedRangeHead);
         
@@ -1679,11 +1665,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distanceBetweenFingers;
-
-            for (int j = 0; j < distanceBetweenFingers; j++) {
-                node = node.next;
-            }
-
+            node = scrollNodeToRight(node, distanceBetweenFingers);
             fingerList.setFinger(startFingerIndex + i, 
                                  new Finger<>(node, index));
         }
@@ -1704,23 +1686,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int distance = collectionSize / numberOfNewFingers;
         int startIndex = distance / 2;
         int index = startIndex;
-        Node<E> node = first;
-
-        for (int i = 0; i < startIndex; i++) {
-            node = node.next;
-        }
-        
+        Node<E> node = scrollNodeToRight(first, startIndex);
         int fingerIndex = 0;
         
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
-
-            for (int j = 0; j < distance; j++) {
-                node = node.next;
-            }
-
+            node = scrollNodeToRight(node, distance);
             fingerList.setFinger(fingerIndex++, new Finger<>(node, index)); 
         }
     }
@@ -1735,21 +1708,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    numberOfNewFingers, 
                                    collectionSize);
         
-        Node<E> node = first;
-
-        for (int i = 0; i < startIndex; i++) {
-            node = node.next;
-        }
-        
+        Node<E> node = scrollNodeToRight(first, startIndex);
         fingerList.setFinger(0, new Finger<>(node, startIndex));
 
         for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
-
-            for (int j = 0; j < distance; j++) {
-                node = node.next;
-            }
-
+            node = scrollNodeToRight(node, distance);
             fingerList.setFinger(i, new Finger<>(node, index));
         }
     }
@@ -2807,6 +2771,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
+    }
+    
+    /**
+     * Scrolls the input node {@code scrolls} positions towards the tail of the
+     * linked list and returns the node being reached.
+     * 
+     * @param startNode the node from which to start the scrolling.
+     * @param scrolls   the number of positions to scroll.
+     * @return          the reached node.
+     */
+    private Node<E> scrollNodeToRight(Node<E> startNode, int scrolls) {
+        for (int i = 0; i < scrolls; i++) {
+            startNode = startNode.next;
+        }
+        
+        return startNode;
     }
     
     // Sets the input collection as a list.
