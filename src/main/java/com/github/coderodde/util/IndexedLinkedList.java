@@ -1603,7 +1603,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             + toIndex + ")");
     }
     
-    // Adds fingers after appending a collection to this list.
+    /**
+     * Adds the fingers for the range just appended.
+     * 
+     * @param first          the first node of the added collection.
+     * @param firstIndex     the index of {@code first}.
+     * @param collectionSize the size of the added collection.
+     */
     private void addFingersAfterAppendAll(
             Node<E> first,
             int firstIndex,
@@ -1615,24 +1621,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerList.get(fingerList.size()).index += collectionSize;
             return;
         }
-
-        int distanceBetweenFingers = collectionSize / numberOfNewFingers;
-        int nodesToSkip = distanceBetweenFingers / 2;
-        int index = firstIndex + nodesToSkip;
-        Node<E> node = scrollNodeToRight(first, nodesToSkip);
-        int fingerIndex = fingerList.size();
         
+        int fingerIndex = fingerList.size();
+
         fingerList.makeRoomAtIndex(fingerIndex, 
                                    numberOfNewFingers, 
                                    collectionSize);
 
-        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
-
-        for (int i = 1; i < numberOfNewFingers; i++) {
-            index += distanceBetweenFingers;
-            node = scrollNodeToRight(node, distanceBetweenFingers);
-            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
-        }
+        int distance = collectionSize / numberOfNewFingers;
+        int nodesToSkip = distance / 2;
+        int index = firstIndex + nodesToSkip;
+        spreadFingers(first, 
+                      numberOfNewFingers, 
+                      index, 
+                      distance,
+                      fingerIndex);
     }
     
     // Adds fingers after inserting a collection in this list.
@@ -1650,10 +1653,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return;
         }
 
-        int distanceBetweenFingers = collectionSize / numberOfNewFingers;
-        int startOffset = distanceBetweenFingers / 2;
-        int index = indexOfInsertedRangeHead + startOffset;
-        Node<E> node = scrollNodeToRight(headNodeOfInsertedRange, startOffset);
         int startFingerIndex =
                 fingerList.getFingerIndexImpl(indexOfInsertedRangeHead);
         
@@ -1661,14 +1660,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    numberOfNewFingers, 
                                    collectionSize);
         
-        fingerList.setFinger(startFingerIndex, new Finger<>(node, index));
-
-        for (int i = 1; i < numberOfNewFingers; i++) {
-            index += distanceBetweenFingers;
-            node = scrollNodeToRight(node, distanceBetweenFingers);
-            fingerList.setFinger(startFingerIndex + i, 
-                                 new Finger<>(node, index));
-        }
+        int distance = collectionSize / numberOfNewFingers;
+        int startOffset = distance / 2;
+        int index = indexOfInsertedRangeHead + startOffset;
+        
+        spreadFingers(headNodeOfInsertedRange,
+                      numberOfNewFingers,
+                      index,
+                      distance,
+                      startFingerIndex);
     }
     
     // Adds fingers after prepending a collection to this list.
@@ -1685,37 +1685,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         int distance = collectionSize / numberOfNewFingers;
         int startIndex = distance / 2;
-        int index = startIndex;
-        Node<E> node = scrollNodeToRight(first, startIndex);
-        int fingerIndex = 0;
         
-        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
-
-        for (int i = 1; i < numberOfNewFingers; i++) {
-            index += distance;
-            node = scrollNodeToRight(node, distance);
-            fingerList.setFinger(fingerIndex++, new Finger<>(node, index)); 
-        }
+        spreadFingers(first, 
+                      numberOfNewFingers,
+                      startIndex, 
+                      distance, 
+                      0);
     }
     
     // Adds fingers after setting a collection as a list.
     private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
-        int distance = size / numberOfNewFingers;
-        int startIndex = distance / 2;
-        int index = startIndex;
+        
         fingerList.makeRoomAtIndex(0,
-                                   numberOfNewFingers, 
+                                   numberOfNewFingers,
                                    collectionSize);
         
-        Node<E> node = scrollNodeToRight(first, startIndex);
-        fingerList.setFinger(0, new Finger<>(node, startIndex));
-
-        for (int i = 1; i < numberOfNewFingers; i++) {
-            index += distance;
-            node = scrollNodeToRight(node, distance);
-            fingerList.setFinger(i, new Finger<>(node, index));
-        }
+        int distance = size / numberOfNewFingers;
+        int startIndex = distance / 2;
+        
+        spreadFingers(first,
+                      numberOfNewFingers,
+                      startIndex, 
+                      distance,
+                      0);
     }
     
     // Appends the input collection to the tail of this list.
@@ -2808,6 +2801,29 @@ public class IndexedLinkedList<E> implements Deque<E>,
         modCount++;
 
         addFingersAfterSetAll(c.size());
+    }
+    
+    /**
+     * Spreads the fingers over the range starting from {@code node}.
+     * 
+     * @param node               the starting node.
+     * @param numberOfNewFingers the total number of fingers to spread.
+     * @param index              the starting index.
+     * @param distance           the distance between two consecutive fingers.
+     */
+    private void spreadFingers(Node<E> node, 
+                               int numberOfNewFingers,
+                               int index,
+                               int distance,
+                               int fingerIndex) {
+        node = scrollNodeToRight(node, distance / 2);
+        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
+        
+        for (int i = 01; i < numberOfNewFingers; i++) {
+            index += distance;
+            node = scrollNodeToRight(node, distance);
+            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
+        }
     }
     
     // If steps > 0, rewind to the left. Otherwise, rewind to the right.
