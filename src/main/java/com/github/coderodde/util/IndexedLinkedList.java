@@ -152,7 +152,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
             
-            shiftFingerIndicesToLeftOnceUntil(lastPrefixIndex, size - 1);
+            shiftFingerIndicesToLeftOnceUntil(lastPrefixIndex, size);
         }
         
         // We can save some space while keeping the finger array operations 
@@ -246,7 +246,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
                                                   // sentinel.
             System.arraycopy(fingerArray, 
-                             fingerIndex, 
+                             fingerIndex,
                              fingerArray, 
                              fingerIndex + roomSize,
                              size - roomSize - fingerIndex + 1);
@@ -1718,7 +1718,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         for (E item : c) {
             Node<E> newNode = new Node<>(item);
-            newNode.item = item;
             newNode.prev = prev;
             prev.next = newNode;
             prev = newNode;
@@ -2819,7 +2818,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         node = scrollNodeToRight(node, distance / 2);
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         
-        for (int i = 01; i < numberOfNewFingers; i++) {
+        for (int i = 1; i < numberOfNewFingers; i++) {
             index += distance;
             node = scrollNodeToRight(node, distance);
             fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
