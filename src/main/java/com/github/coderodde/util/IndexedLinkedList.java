@@ -444,7 +444,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void removeRange(int prefixSize, 
                                  int suffixSize,
                                  int nodesToRemove) {
-            int fingersToRemove = size - suffixSize - prefixSize;
+            int fingersToRemove = size - prefixSize - suffixSize;
             
             shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             
