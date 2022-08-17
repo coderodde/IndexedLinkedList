@@ -152,7 +152,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
             
-            shiftFingerIndicesToLeftOnceUntil(lastPrefixIndex, size);
+            shiftFingerIndicesToLeftOnceAll(lastPrefixIndex);
         }
         
         // We can save some space while keeping the finger array operations 
@@ -254,11 +254,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Moves 'numberOfFingers' fingers to the prefix ending in 'fromIndex':
         private void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
-            if (numberOfFingers == 0) {
-                // Here, nothing to move:
-                return;
-            }
-            
             int fromFingerIndex = getFingerIndex(fromIndex);
             
             if (fromFingerIndex == 0) {
@@ -271,8 +266,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             int i;
-            int targetIndex = -1;
-            Finger<E> targetFinger = null;
             
             // Find the rightmost finger index after which we can put
             // 'numberOfFingers' fingers:
@@ -280,14 +273,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 Finger<E> finger = fingerArray[i];
                 
                 if (finger.index + numberOfFingers - 1 + i < fromIndex) {
-                    targetFinger = finger;
-                    targetIndex = i;
                     break;
                 }
             }
             
             // Pack the rest of the prefix fingers:
-            for (int j = targetIndex + 1; j < numberOfFingers; ++j) {
+            for (int j = i + 1; j < numberOfFingers; ++j) {
                 Finger<E> predecessorFinger = fingerArray[j - 1];
                 Finger<E> currentFinger = fingerArray[j];
                 currentFinger.index = predecessorFinger.index + 1;
@@ -318,11 +309,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Moves 'numberOfFingers' fingers to the suffix starting in 
         // 'toIndex':
         private void moveFingersToSuffix(int toIndex, int numberOfFingers) {
-            if (numberOfFingers == 0) {
-                // Here, nothing to move:
-                return;
-            }
-            
             int toFingerIndex = getFingerIndexImpl(toIndex);
             
             if (toFingerIndex == fingerList.size) {
@@ -493,9 +479,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Moves all the fingers in range [startFingerIndex, endFingerIndex] one 
         // position to the left (towards smaller indices):
-        private void shiftFingerIndicesToLeftOnceUntil(int startFingerIndex,
-                                                       int endFingerIndex) {
-            for (int i = startFingerIndex; i <= endFingerIndex; ++i) {
+        private void shiftFingerIndicesToLeftOnceAll(int startFingerIndex) {
+            for (int i = startFingerIndex; i <= size; ++i) {
                 fingerArray[i].index--;
             }
         }
@@ -1235,11 +1220,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             closestFinger,
                             steps);
             
-            for (int i = closestFingerIndex + 1;
-                    i <= fingerList.size(); 
-                    i++) {
-                fingerList.get(i).index--;
-            }
+            fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
             
             if (steps > 0) {
                 fingerList.get(closestFingerIndex).index--;
@@ -2267,7 +2248,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerList.insertFingerAndShiftOnceToRight(
                     new Finger<>(newNode, index));
         } else {
-            int fingerIndex = fingerList.getFingerIndex(index);
+            int fingerIndex = fingerList.getFingerIndexImpl(index);
             fingerList.shiftFingerIndicesToRightOnce(fingerIndex);
         }
     }
@@ -2362,10 +2343,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fngr.node = fngr.node.next;
                 }
 
-                for (int j = f + 1; j <= fingerList.size(); ++j) {
-                    fingerList.get(j).index--;
-                }
-
+                fingerList.shiftFingerIndicesToLeftOnceAll(f + 1);
                 return;
             }
         }
@@ -2384,10 +2362,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fngr.index--;
                 }
                 
-                for (int i = fingerIndex + 1; i <= fingerList.size(); ++i) {
-                    fingerList.get(i).index--;
-                }
-                
+                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 return;
             }
         }
