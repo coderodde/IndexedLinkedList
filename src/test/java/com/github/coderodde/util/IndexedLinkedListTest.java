@@ -263,6 +263,29 @@ public class IndexedLinkedListTest {
     public void elementThrowsOnEmptyList() {
         list.element();
     }
+    
+    @Test
+    public void removeRangeBug() {
+        for (int i = 0; i < 40_000; i++) {
+            list.add(Integer.MIN_VALUE);
+        }
+        
+        list.subList(0, 500).clear();
+        
+        list.subList(20411, 20911).clear();
+        assertEquals(39000, list.size());
+    }
+    
+    @Test
+    public void removeRangeBug2() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
+        list.subList(0, 7).clear();
+        list.checkInvarant();
+        assertEquals(Arrays.asList(8, 9, 10, 11), list);
+        list.subList(0, 2).clear();
+        list.checkInvarant();
+        assertEquals(Arrays.asList(10, 11), list);
+    }
 
     @Test
     public void element() {

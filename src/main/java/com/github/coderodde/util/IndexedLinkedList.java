@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.github.coderodde.util;
 
 import java.lang.reflect.Array;
@@ -254,6 +238,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Moves 'numberOfFingers' fingers to the prefix ending in 'fromIndex':
         private void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
+            if (numberOfFingers == 0) {
+                return;
+            }
+            
             int fromFingerIndex = getFingerIndex(fromIndex);
             
             if (fromFingerIndex == 0) {
@@ -309,6 +297,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Moves 'numberOfFingers' fingers to the suffix starting in 
         // 'toIndex':
         private void moveFingersToSuffix(int toIndex, int numberOfFingers) {
+            if (numberOfFingers == 0) {
+                return;
+            }
+            
             int toFingerIndex = getFingerIndexImpl(toIndex);
             
             if (toFingerIndex == fingerList.size) {
@@ -320,12 +312,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             int i;
             Finger<E> targetFinger = null;
             
-            // Find the leftmost finger index before which we can put
-            // 'numberOfFingers' fingers:
+            // Find the leftmost finger index in the suffix before which we can 
+            // put 'numberOfFingers' fingers:
             for (i = toFingerIndex; i < size; ++i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingers + 1 >= toIndex) {
+                if (finger.index - numberOfFingers >= toIndex) {
                     targetFinger = finger;
                     break;
                 }
@@ -334,7 +326,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
-                int toMove = toIndex + numberOfFingers - 1 - f.index;
+                int toMove = toIndex + numberOfFingers - f.index;
                 
                 for (int j = 0; j < toMove; ++j) {
                     f.node = f.node.next;
@@ -344,7 +336,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 i = size - 1;
             }
 
-            int stopIndex = numberOfFingers - (size - i);
+            int stopIndex = numberOfFingers - (size - i) + 1;
             
             // Pack the rest of the suffix fingers:
             for (int j = i - 1, k = 0; k < stopIndex; ++k, --j) {
@@ -2575,13 +2567,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                             fromIndex, 
                                             removalSize);
             } else {
-                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
+//                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
+//                int numberOfFingersToMove = fingerList.size - suffixFreeSpotCount;
+                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
-                // suffixFreeSpotCount > 0. In other words, we are moving to 
+                // suffixFreeSpotCount > 0. In other words, we are moving to the
                 // suffix.
                 fingerList.moveFingersToSuffix(toIndex, numberOfFingersToMove);
-                fingerList.removeRange(0, suffixFingersSize, removalSize);
+                fingerList.removeRange(0, 
+                                       suffixFingersSize
+                                               + numberOfFingersToMove, 
+                                       removalSize);
+                
                 removeRangeNodes(firstNodeToRemove, removalSize);
             }
         } else {

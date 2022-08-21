@@ -3,12 +3,10 @@ package com.github.coderodde.util.benchmark;
 import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Random;
 import org.apache.commons.collections4.list.TreeList;
 
@@ -17,54 +15,55 @@ public class LinkedListBenchmark2 {
     private static final Object ELEMENT = new Object();
     
     private static final int[] LIST_SIZES = {
-        10_000,
-        20_000,
-        30_000,
+//        10_000,
+//        20_000,
+//        30_000,
         40_000,
-        50_000,
-        60_000,
-        70_000,
-        80_000,
-        90_000,
-        100_000,
-        110_000,
-        120_000,
-        130_000,
-        140_000,
-        150_000,
-        160_000,
-        170_000,
-        180_000,
-        190_000,
-        200_000,
+//        50_000,
+//        60_000,
+//        70_000,
+//        80_000,
+//        90_000,
+//        100_000,
+//        110_000,
+//        120_000,
+//        130_000,
+//        140_000,
+//        150_000,
+//        160_000,
+//        170_000,
+//        180_000,
+//        190_000,
+//        200_000,
     };
     
     private static final class Bounds {
         static final int NUMBER_OF_ADDITIONS_AT_BEGINNING = 2_000;
         static final int NUMBER_OF_RANDOM_ADDS = 2_000;
         static final int NUMBER_OF_GETS = 2_000;
-        static final int NUMBER_oF_REMOVE_FIRST_OPS = 5_000;
+        static final int NUMBER_OF_REMOVE_FIRST_OPS = 5_000;
         static final int NUMBER_OF_REMOVE_LAST_OPS = 20_000;
         static final int NUMBER_OF_RANDOM_REMOVES = 10_000;
         static final int NUMBER_OF_COLLECTION_APPENDS = 50;
         static final int APPEND_COLLECTION_SIZE = 10_000;
+        static final int REMOVE_RANGE_SIZE = 500;
         static final double ITERATE_AND_MODIFY_ADD_THRESHOLD = 0.7;
         static final double ITERATE_AND_MODIFY_REMOVE_THRESHOLD = 0.3;
     }
     
     private static final String[] METHOD_NAMES = {
-        "AddAtBeginning",
-        "AddAtEnd",
-        "AddRandom",
-        "AppendCollection",
-        "GetRandom",
-        "InsertCollection",
-        "Iterate",
-        "IterateAndModify",
-        "PrependCollection",
-        "RemoveFromBeginning",
-        "RemoveFromEnd",
-        "RemoveRandom",
+//        "AddAtBeginning",
+//        "AddAtEnd",
+//        "AddRandom",
+//        "AppendCollection",
+//        "GetRandom",
+//        "InsertCollection",
+//        "Iterate",
+//        "IterateAndModify",
+//        "PrependCollection",
+//        "RemoveFromBeginning",
+//        "RemoveFromEnd",
+//        "RemoveRandom",
         "RemoveRange",
     };
     
@@ -191,6 +190,14 @@ public class LinkedListBenchmark2 {
                 
             case "RemoveFromEnd":
                 BenchmarkMethods.removeFromEnd(list, print);
+                return;
+                        
+            case "RemoveRandom":
+                BenchmarkMethods.removeRandom(list, print, new Random(3L));
+                return;
+                
+            case "RemoveRange":
+                BenchmarkMethods.removeRange(list, print, new Random(4L));
                 return;
                 
             default:
@@ -415,7 +422,7 @@ public class LinkedListBenchmark2 {
                 Deque<Object> deque = (Deque<Object>) list;
                 startTime = System.nanoTime();
                 
-                for (int i = 0; i < Bounds.NUMBER_oF_REMOVE_FIRST_OPS; i++) {
+                for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_FIRST_OPS; i++) {
                     deque.removeFirst();
                 }
                 
@@ -423,7 +430,7 @@ public class LinkedListBenchmark2 {
             } else {
                 startTime = System.nanoTime();
                 
-                for (int i = 0; i < Bounds.NUMBER_oF_REMOVE_FIRST_OPS; i++) {
+                for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_FIRST_OPS; i++) {
                     list.remove(0);
                 }
                 
@@ -448,7 +455,10 @@ public class LinkedListBenchmark2 {
                 Deque<Object> deque = (Deque<Object>) list;
                 startTime = System.nanoTime();
                 
-                for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_LAST_OPS; i++) {
+                for (int i = 0;
+                        i < Bounds.NUMBER_OF_REMOVE_LAST_OPS 
+                        && !deque.isEmpty(); 
+                        i++) {
                     deque.removeLast();
                 }
                 
@@ -456,7 +466,9 @@ public class LinkedListBenchmark2 {
             } else {
                 startTime = System.nanoTime();
                 
-                for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_LAST_OPS; i++) {
+                for (int i = 0; 
+                        i < Bounds.NUMBER_OF_REMOVE_LAST_OPS && !list.isEmpty();
+                        i++) {
                     list.remove(list.size() - 1);
                 }
                 
@@ -486,6 +498,47 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "RemoveRandom: " 
+                        + (endTime - startTime));
+            }
+        }
+        
+        static void removeRange(List<Object> list,
+                                boolean print, 
+                                Random random) {
+            long startTime;
+            long endTime;
+            
+            startTime = System.nanoTime();
+            
+            int requestedSize = (4 * list.size()) / 5;
+            int ops = 0;
+            
+            while (list.size() > requestedSize) {
+                int fromIndex = random.nextInt(list.size()) - 
+                                Bounds.REMOVE_RANGE_SIZE;
+                
+                fromIndex = Math.max(fromIndex, 0);
+                int toIndex = fromIndex + Bounds.REMOVE_RANGE_SIZE;
+                
+                if (list.getClass().getSimpleName()
+                        .equals(IndexedLinkedList.class.getSimpleName())) {
+                    
+                    System.out.println(fromIndex + " -> " + toIndex);
+//                    System.out.println("ops: " + ops);
+                    ops++;
+                }
+                
+                
+                list.subList(fromIndex, toIndex).clear();
+            }
+            
+            endTime = System.nanoTime();
+            
+            if (print) {
+                String listTypeName = getListTypeName(list);
+                System.out.println(
+                        listTypeName 
+                        + "RemoveRange: " 
                         + (endTime - startTime));
             }
         }
