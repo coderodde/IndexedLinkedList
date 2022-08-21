@@ -296,8 +296,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Moves 'numberOfFingers' fingers to the suffix starting in 
         // 'toIndex':
-        private void moveFingersToSuffix(int toIndex, int numberOfFingers) {
-            if (numberOfFingers == 0) {
+        private void moveFingersToSuffix(int toIndex, 
+                                         int numberOfFingersToMove) {
+            
+            if (numberOfFingersToMove == 0) {
                 return;
             }
             
@@ -305,7 +307,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (toFingerIndex == fingerList.size) {
                 // Here, the suffix is empty:
-                moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingers);
+                moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingersToMove);
                 return;
             }
             
@@ -317,7 +319,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             for (i = toFingerIndex; i < size; ++i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingers >= toIndex) {
+                if (finger.index - numberOfFingersToMove >= toIndex) {
                     targetFinger = finger;
                     break;
                 }
@@ -326,7 +328,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
-                int toMove = toIndex + numberOfFingers - f.index;
+                int toMove = toIndex + numberOfFingersToMove - f.index;
                 
                 for (int j = 0; j < toMove; ++j) {
                     f.node = f.node.next;
@@ -336,7 +338,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 i = size - 1;
             }
 
-            int stopIndex = numberOfFingers - (size - i) + 1;
+//            int stopIndex = numberOfFingers - (size - i) + 1;
+            int stopIndex = numberOfFingersToMove;
             
             // Pack the rest of the suffix fingers:
             for (int j = i - 1, k = 0; k < stopIndex; ++k, --j) {
@@ -710,6 +713,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Runs always in linear time.
      */
     public void checkInvarant() {
+        if (fingerList.get(0).index < 0) {
+            throw new IllegalStateException(
+                    "First finger index is negative: "
+                            +  fingerList.get(0).index);
+        }
+        
         for (int i = 0; i < fingerList.size() - 1; ++i) {
             Finger<E> left = fingerList.get(i);
             Finger<E> right = fingerList.get(i + 1);
@@ -2605,8 +2614,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
                                          ((float)(prefixSuffixFreeSpotCount));
 
+                int numberOfCoveredFingers 
+                        = nextFingerCount 
+                        - prefixFingersSize
+                        - suffixFingersSize;
+                
                 int numberOfFingersOnLeft = 
-                        (int)(prefixLoadFactor * nextFingerCount);
+                        (int)(prefixLoadFactor * numberOfCoveredFingers);
 
                 int numberOfFingersOnRight = 
                         nextFingerCount - numberOfFingersOnLeft;

@@ -474,6 +474,7 @@ public class IndexedLinkedListTest {
         Random random = new Random(26L);
         
         for (int i = 0; i < 200; ++i) {
+            System.out.println("i = " + i);
             int size = 1 + random.nextInt(15);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
@@ -488,6 +489,13 @@ public class IndexedLinkedListTest {
             list.checkInvarant();
             assertEquals(referenceList, list);
         }
+    }
+    
+    @Test
+    public void debugSmallSublistClear1() {
+        list.addAll(getIntegerList(14));
+        list.subList(3, 7).clear();
+        list.checkInvarant();
     }
     
     @Test
