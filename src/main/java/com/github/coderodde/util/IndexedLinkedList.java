@@ -312,6 +312,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             int i;
+            int omittedFingers = 0;
+            int targetFingerIndex = -1;
             Finger<E> targetFinger = null;
             
             // Find the leftmost finger index in the suffix before which we can 
@@ -321,9 +323,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 if (finger.index - numberOfFingersToMove >= toIndex) {
                     targetFinger = finger;
+                    targetFingerIndex = i;
                     break;
                 }
+                
+                omittedFingers++;
             }
+            
+            boolean tailFingerMoved;
             
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
@@ -336,17 +343,33 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 f.index += toMove;
                 i = size - 1;
+                targetFinger = fingerArray[i];
+                targetFingerIndex = i;
+                tailFingerMoved = true;
+            } else {
+                tailFingerMoved = false;
             }
-
-//            int stopIndex = numberOfFingers - (size - i) + 1;
-            int stopIndex = numberOfFingersToMove;
             
-            // Pack the rest of the suffix fingers:
-            for (int j = i - 1, k = 0; k < stopIndex; ++k, --j) {
-                Finger<E> predecessorFinger = fingerArray[j];
-                Finger<E> currentFinger = fingerArray[j + 1];
-                predecessorFinger.index = currentFinger.index - 1;
-                predecessorFinger.node = currentFinger.node.prev;
+            Finger<E> curr = fingerArray[targetFingerIndex];
+            Finger<E> pred = fingerArray[targetFingerIndex - 1];
+            
+            int k = targetFingerIndex - 1;
+            
+            for (int j = 0; j < omittedFingers; j++, k--) {
+                pred.index = curr.index - 1;
+                pred.node = curr.node.prev;
+                curr = pred;
+                pred = fingerArray[k];
+            }
+            
+            pred = fingerArray[k];
+            curr = fingerArray[k + 1];
+            
+            for (int j = 0; j < numberOfFingersToMove; j++, k--) {
+                pred.index = curr.index - 1;
+                pred.node = curr.node.prev;
+                curr = pred;
+                pred = fingerArray[k];
             }
         }
 
@@ -440,6 +463,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int suffixSize,
                                  int nodesToRemove) {
             int fingersToRemove = size - prefixSize - suffixSize;
+            
+//            if (fingersToRemove == 0) {
+//                return;
+//            }
             
             shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             
@@ -2623,16 +2650,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
                         (int)(prefixLoadFactor * numberOfCoveredFingers);
 
                 int numberOfFingersOnRight = 
-                        nextFingerCount - numberOfFingersOnLeft;
+                        numberOfCoveredFingers - numberOfFingersOnLeft;
 
                 fingerList.moveFingersToPrefix(fromIndex, 
                                                numberOfFingersOnLeft);
                 
                 fingerList.moveFingersToSuffix(toIndex, numberOfFingersOnRight);
 
-                fingerList.removeRange(numberOfFingersOnLeft,
-                                       numberOfFingersOnRight, 
-                                       removalSize);
+                fingerList.removeRange(
+                        prefixFingersSize + numberOfFingersOnLeft,
+                        suffixFingersSize + numberOfFingersOnRight, 
+                        removalSize);
                 
                 removeRangeNodes(firstNodeToRemove, removalSize);
             }

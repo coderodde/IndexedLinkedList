@@ -457,10 +457,10 @@ public class IndexedLinkedListTest {
     
     @Test
     public void subListClear2Fingers3Nodes_1() {
-        list.addAll(Arrays.asList(1, 2, 3));
+        list.addAll(Arrays.asList(0, 1, 2));
         list.subList(0, 1).clear();
         list.checkInvarant();
-        assertEquals(Arrays.asList(2, 3), list);
+        assertEquals(Arrays.asList(1, 2), list);
     }
     
     @Test
