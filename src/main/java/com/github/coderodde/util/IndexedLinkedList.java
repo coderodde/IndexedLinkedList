@@ -266,7 +266,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             // Pack the rest of the prefix fingers:
-            for (int j = i + 1; j < numberOfFingers; ++j) {
+            for (int j = i + 1, k = 0; k < numberOfFingers; ++j, ++k) {
                 Finger<E> predecessorFinger = fingerArray[j - 1];
                 Finger<E> currentFinger = fingerArray[j];
                 currentFinger.index = predecessorFinger.index + 1;
@@ -330,8 +330,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 omittedFingers++;
             }
             
-            boolean tailFingerMoved;
-            
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
@@ -345,31 +343,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 i = size - 1;
                 targetFinger = fingerArray[i];
                 targetFingerIndex = i;
-                tailFingerMoved = true;
-            } else {
-                tailFingerMoved = false;
+                omittedFingers--;
             }
             
-            Finger<E> curr = fingerArray[targetFingerIndex];
-            Finger<E> pred = fingerArray[targetFingerIndex - 1];
+            int numberOfActualFingersMoved = omittedFingers
+                                           + numberOfFingersToMove;
             
-            int k = targetFingerIndex - 1;
-            
-            for (int j = 0; j < omittedFingers; j++, k--) {
-                pred.index = curr.index - 1;
-                pred.node = curr.node.prev;
-                curr = pred;
-                pred = fingerArray[k];
-            }
-            
-            pred = fingerArray[k];
-            curr = fingerArray[k + 1];
-            
-            for (int j = 0; j < numberOfFingersToMove; j++, k--) {
-                pred.index = curr.index - 1;
-                pred.node = curr.node.prev;
-                curr = pred;
-                pred = fingerArray[k];
+            for (int k = 0; k < numberOfActualFingersMoved; k++) {
+                Finger<E> currentFinger = fingerArray[targetFingerIndex - k];
+                Finger<E> previousFinger = fingerArray[targetFingerIndex - k - 1];
+                previousFinger.index = currentFinger.index - 1;
+                previousFinger.node = currentFinger.node.prev;
             }
         }
 
@@ -925,6 +909,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E get(int index) {
         checkElementIndex(index);
         return node(index).item;
+    }
+    
+    public double getEntropy() {
+        return 1.0 - getEntalpy();
     }
     
     /**
@@ -2131,6 +2119,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return true;
+    }
+    
+    private double getEntalpy() {
+        double entalpy = 0.0;
+        double expectedGapLength = ((double) size) / 
+                                   ((double) fingerList.size());
+        
+        for (int i = 0; i < size; i++) {
+            entalpy += Math.abs(fingerList.get(i + 1).index - 
+                                fingerList.get(i).index -
+                                    expectedGapLength);
+        }
+        
+        return entalpy;
     }
     
     // Constructs an IndexOutOfBoundsException detail message.

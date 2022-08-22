@@ -492,6 +492,13 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void debugRemoveRange() {
+        list.addAll(getIntegerList(15));
+        list.subList(6, 11).clear();
+        list.checkInvarant();
+    }
+    
+    @Test
     public void debugSmallSublistClear1() {
         list.addAll(getIntegerList(14));
         list.subList(3, 7).clear();
