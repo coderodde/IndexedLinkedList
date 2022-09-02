@@ -260,7 +260,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             for (i = fromFingerIndex - 1; i >= 0; --i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index + numberOfFingers - 1 + i < fromIndex) {
+                if (finger.index + numberOfFingers <= fromIndex) {
                     break;
                 }
             }
@@ -2605,9 +2605,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                             fromIndex, 
                                             removalSize);
             } else {
-//                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
-//                int numberOfFingersToMove = fingerList.size - suffixFreeSpotCount;
-                int numberOfFingersToMove = nextFingerCount - suffixFingersSize;
+                int numberOfFingersToMove = nextFingerCount 
+                                          - prefixFingersSize
+                                          - suffixFingersSize;
+                
+                numberOfFingersToMove = Math.min(numberOfFingersToMove, 
+                                                 toIndex - fromIndex);
                 
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0. In other words, we are moving to the

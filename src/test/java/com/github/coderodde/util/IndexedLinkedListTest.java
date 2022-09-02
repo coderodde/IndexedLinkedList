@@ -471,11 +471,13 @@ public class IndexedLinkedListTest {
     
     @Test
     public void bruteForceSublistClearOnSmallLists() {
-        Random random = new Random(26L);
+        long seed = 1662121251715L; // System.currentTimeMillis();
+        System.out.println("seed == " + seed);
+        Random random = new Random(seed);
         
         for (int i = 0; i < 200; ++i) {
-            System.out.println("i = " + i);
-            int size = 1 + random.nextInt(15);
+            System.out.println("my i = " + i);
+            int size = 1 + random.nextInt(400);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
             list.addAll(referenceList); 
@@ -1376,10 +1378,12 @@ public class IndexedLinkedListTest {
     
     @Test
     public void bruteForceSublistClearOnLargeLists() {
+        System.out.println("---");
         Random random = new Random(26L);
         
         for (int i = 0; i < 30; ++i) {
             int size = 1 + random.nextInt(5_000);
+            System.out.println("i = " + i);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
             list.addAll(referenceList); 
