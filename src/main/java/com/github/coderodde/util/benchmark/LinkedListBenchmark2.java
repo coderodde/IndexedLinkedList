@@ -74,10 +74,10 @@ public class LinkedListBenchmark2 {
         "treeList",
     };
     
-    public static void main(String[] args) {
-//        warmup();
-        benchmark();
-    }
+//    public static void main(String[] args) {
+////        warmup();
+//        benchmark();
+//    }
     
     private static void warmup() {
         for (String methodName : METHOD_NAMES) {
