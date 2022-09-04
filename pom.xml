@@ -227,7 +227,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner
+                                com.github.coderodde.util.benchmark.LinkedListBenchmark2
                             </mainClass>
                         </manifest>
                     </archive>

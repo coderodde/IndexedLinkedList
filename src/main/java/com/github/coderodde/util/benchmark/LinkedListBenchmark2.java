@@ -15,55 +15,47 @@ public class LinkedListBenchmark2 {
     private static final Object ELEMENT = new Object();
     
     private static final int[] LIST_SIZES = {
-//        10_000,
-//        20_000,
-//        30_000,
-        40_000,
-//        50_000,
-//        60_000,
-//        70_000,
-//        80_000,
-//        90_000,
-//        100_000,
-//        110_000,
-//        120_000,
-//        130_000,
-//        140_000,
-//        150_000,
-//        160_000,
-//        170_000,
-//        180_000,
-//        190_000,
-//        200_000,
+        100_000,
+        200_000,
+        300_000,
+        400_000,
+        500_000,
+        600_000,
+        700_000,
+        800_000,
+        900_000,
+        1_000_000,
     };
     
     private static final class Bounds {
         static final int NUMBER_OF_ADDITIONS_AT_BEGINNING = 2_000;
         static final int NUMBER_OF_RANDOM_ADDS = 2_000;
-        static final int NUMBER_OF_GETS = 2_000;
+        static final int NUMBER_OF_GETS = 500;
         static final int NUMBER_OF_REMOVE_FIRST_OPS = 5_000;
         static final int NUMBER_OF_REMOVE_LAST_OPS = 20_000;
         static final int NUMBER_OF_RANDOM_REMOVES = 10_000;
         static final int NUMBER_OF_COLLECTION_APPENDS = 50;
+        static final int NUMBER_OF_COLLECTION_INSERTS = 50;
         static final int APPEND_COLLECTION_SIZE = 10_000;
+        static final int INSERT_COLLECTION_SIZE = 3_500;
         static final int REMOVE_RANGE_SIZE = 500;
         static final double ITERATE_AND_MODIFY_ADD_THRESHOLD = 0.7;
         static final double ITERATE_AND_MODIFY_REMOVE_THRESHOLD = 0.3;
     }
     
     private static final String[] METHOD_NAMES = {
-//        "AddAtBeginning",
-//        "AddAtEnd",
-//        "AddRandom",
-//        "AppendCollection",
-//        "GetRandom",
-//        "InsertCollection",
-//        "Iterate",
-//        "IterateAndModify",
-//        "PrependCollection",
-//        "RemoveFromBeginning",
-//        "RemoveFromEnd",
-//        "RemoveRandom",
+        "AddAtBeginning",
+        "AddAtEnd",
+        "AddRandom",
+        "AppendCollection",
+        "GetRandom",
+        "InsertCollection",
+        "Iterate",
+        "IterateAndModify",
+        "PrependCollection",
+        "RemoveFromBeginning",
+        "RemoveFromEnd",
+        "RemoveRandom",
         "RemoveRange",
     };
     
@@ -74,10 +66,10 @@ public class LinkedListBenchmark2 {
         "treeList",
     };
     
-//    public static void main(String[] args) {
-////        warmup();
-//        benchmark();
-//    }
+    public static void main(String[] args) {
+        warmup();
+        benchmark();
+    }
     
     private static void warmup() {
         for (String methodName : METHOD_NAMES) {
@@ -168,6 +160,18 @@ public class LinkedListBenchmark2 {
                 BenchmarkMethods.getRandom(list, new Random(2L), print);
                 return;
                 
+            case "InsertCollection":
+                List<Object> listToInsert = 
+                        new ArrayList<>(Bounds.INSERT_COLLECTION_SIZE);
+                
+                loadList(listToInsert, Bounds.INSERT_COLLECTION_SIZE);
+                Random random = new Random();
+                BenchmarkMethods.insertCollection(list, 
+                                                  listToInsert, 
+                                                  random, 
+                                                  print);
+                return;
+                
             case "Iterate":
                 BenchmarkMethods.iterate(list, print);
                 return;
@@ -201,8 +205,8 @@ public class LinkedListBenchmark2 {
                 return;
                 
             default:
-//                throw new IllegalArgumentException(
-//                        "Unknown method name: " + methodName);
+                throw new IllegalArgumentException(
+                        "Unknown method name: " + methodName);
         }
     }
     
@@ -243,7 +247,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "AddAtBeginning: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -275,7 +279,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "AddAtEnd: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -293,7 +297,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "AddRandom: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -314,7 +318,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "AppendCollection: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -338,7 +342,29 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "GetRandom: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
+            }
+        }
+        
+        static void insertCollection(List<Object> list, 
+                                     List<Object> listToInsert,
+                                     Random random, 
+                                     boolean print) {
+            long startTime = System.nanoTime();
+            
+            for (int i = 0; i < Bounds.NUMBER_OF_COLLECTION_INSERTS; i++) {
+                int index = random.nextInt(list.size() + 1);
+                list.addAll(index, listToInsert);
+            }
+            
+            long endTime = System.nanoTime();
+            
+            if (print) {
+                String listTypeName = getListTypeName(list);
+                System.out.println(
+                        listTypeName 
+                        + "InsertCollection: " 
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -358,7 +384,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "Iterate: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -388,7 +414,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "IterateAndModify: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -409,7 +435,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "PrependCollection: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -442,7 +468,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "RemoveFromBeginning: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -480,7 +506,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "RemoveFromEnd: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -498,7 +524,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "RemoveRandom: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
         
@@ -511,7 +537,6 @@ public class LinkedListBenchmark2 {
             startTime = System.nanoTime();
             
             int requestedSize = (4 * list.size()) / 5;
-            int ops = 0;
             
             while (list.size() > requestedSize) {
                 int fromIndex = random.nextInt(list.size()) - 
@@ -519,16 +544,6 @@ public class LinkedListBenchmark2 {
                 
                 fromIndex = Math.max(fromIndex, 0);
                 int toIndex = fromIndex + Bounds.REMOVE_RANGE_SIZE;
-                
-                if (list.getClass().getSimpleName()
-                        .equals(IndexedLinkedList.class.getSimpleName())) {
-                    
-                    System.out.println(fromIndex + " -> " + toIndex);
-//                    System.out.println("ops: " + ops);
-                    ops++;
-                }
-                
-                
                 list.subList(fromIndex, toIndex).clear();
             }
             
@@ -539,7 +554,7 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "RemoveRange: " 
-                        + (endTime - startTime));
+                        + (endTime - startTime) / 1_000);
             }
         }
     }
