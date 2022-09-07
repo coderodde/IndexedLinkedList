@@ -1,4 +1,4 @@
-package com.github.coderodde.util;
+    package com.github.coderodde.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -224,7 +224,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Make sure we can insert 'roomSize' fingers starting from 
         // 'fingerIndex', shifting all the fingers starting from 'fingerIndex'
         // 'numberOfNodes' to the right:
-        private void makeRoomAtIndex(int fingerIndex, int roomSize, int numberOfNodes) {
+        private void makeRoomAtIndex(int fingerIndex, 
+                                     int roomSize,
+                                     int numberOfNodes) {
+            
             shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
             size += roomSize;
             enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
@@ -242,7 +245,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return;
             }
             
-            int fromFingerIndex = getFingerIndex(fromIndex);
+            int fromFingerIndex = getFingerIndexImpl(fromIndex);
             
             if (fromFingerIndex == 0) {
                 // Here, the prefix is empty:
@@ -1611,6 +1614,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Node<E> first,
             int firstIndex,
             int collectionSize) {
+        
         int numberOfNewFingers = 
                 getRecommendedNumberOfFingers() - fingerList.size();
 
@@ -2609,9 +2613,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                           - prefixFingersSize
                                           - suffixFingersSize;
                 
-                numberOfFingersToMove = Math.min(numberOfFingersToMove, 
-                                                 toIndex - fromIndex);
-                
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0. In other words, we are moving to the
                 // suffix.
@@ -2625,10 +2626,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = 
-                        Math.min(
-                                nextFingerCount - prefixFingersSize, 
-                                prefixFreeSpotCount);
+                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
@@ -2695,13 +2693,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         for (int i = 0; i < removalSize - 1; ++i) {
             Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
             
-            if (finger1 == f) {
-                if (fingersToRemove != 0) {
-                    fingersToRemove--;
-                    fingerCount++;
-                    finger1 = finger2;
-                    finger2 = fingerList.get(firstFingerIndex + fingerCount);
-                }
+            if (finger1 == f && fingersToRemove != 0) {
+                fingersToRemove--;
+                fingerCount++;
+                finger1 = finger2;
+                finger2 = fingerList.get(firstFingerIndex + fingerCount);
             }
             
             nextNode = node.next;

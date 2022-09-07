@@ -3,16 +3,23 @@ package com.github.coderodde.util.benchmark;
 import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Random;
 import org.apache.commons.collections4.list.TreeList;
 
 public class LinkedListBenchmark2 {
     
     private static final Object ELEMENT = new Object();
+    private static final Map<String, Long> DURATION_COUNTER_MAP =
+            new HashMap<>();
+    
+    private static final Map<String, Long> ITERATOR_DURATION_COUNTER_MAP = 
+            new HashMap<>();
     
     private static final int[] LIST_SIZES = {
         100_000,
@@ -25,6 +32,19 @@ public class LinkedListBenchmark2 {
         800_000,
         900_000,
         1_000_000,
+    };
+    
+    private static final int[] LIST_SIZES_FOR_ITERATOR_MODFICATIONS = {
+        10_000,
+        20_000,
+        30_000,
+        40_000,
+        50_000,
+        60_000,
+        70_000,
+        80_000,
+        90_000,
+        100_000,
     };
     
     private static final class Bounds {
@@ -51,7 +71,6 @@ public class LinkedListBenchmark2 {
         "GetRandom",
         "InsertCollection",
         "Iterate",
-        "IterateAndModify",
         "PrependCollection",
         "RemoveFromBeginning",
         "RemoveFromEnd",
@@ -66,9 +85,26 @@ public class LinkedListBenchmark2 {
         "treeList",
     };
     
+    static {
+        clearDurationCounterMap();
+    }
+    
+    private static void clearDurationCounterMap() {
+        for (int i = 0; i < LIST_TYPE_NAMES.length; i++) {
+            DURATION_COUNTER_MAP.put(LIST_TYPE_NAMES[i], 0L);
+            ITERATOR_DURATION_COUNTER_MAP.put(LIST_TYPE_NAMES[i], 0L);
+        }
+    }
+    
     public static void main(String[] args) {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        clearDurationCounterMap();
         warmup();
         benchmark();
+        System.out.println("<<< Total durations >>>");
+        printTotalDurations();
+        System.out.println("<<< Modified iterator >>>");
+        printModifiedIteratorDurations();
     }
     
     private static void warmup() {
@@ -79,15 +115,35 @@ public class LinkedListBenchmark2 {
                 }
             }
         }
+        
+        benchmarkModifiedIterator(false);
     }
     
     private static void benchmark() {
+        clearDurationCounterMap(); // Clear from the warmup run.
+        
         for (String methodName : METHOD_NAMES) {
             for (String listTypeName : LIST_TYPE_NAMES) {
                 for (int listSize : LIST_SIZES) {
                     benchmark(methodName, listTypeName, listSize, true);
                 }
             }
+        }
+        
+        
+        benchmarkModifiedIterator(true);
+    }
+    
+    private static void printTotalDurations() {
+        for (Map.Entry<String, Long> e : DURATION_COUNTER_MAP.entrySet()) {
+            System.out.println(e.getKey() + " " + e.getValue());
+        }
+    }
+    
+    private static void printModifiedIteratorDurations() {
+        for (Map.Entry<String, Long> e : 
+                ITERATOR_DURATION_COUNTER_MAP.entrySet()) {
+            System.out.println(e.getKey() + " " + e.getValue());
         }
     }
     
@@ -134,79 +190,116 @@ public class LinkedListBenchmark2 {
                                   boolean print) {
         List<Object> list = getEmptyList(listTypeName);
         loadList(list, listSize);
+        long duration;
+        System.gc();
         
         switch (methodName) {
             case "AddAtBeginning":
-                BenchmarkMethods.addAtBeginning(list, print);
-                return;
+                duration = BenchmarkMethods.addAtBeginning(list, print);
+                break;
                 
             case "AddAtEnd":
-                BenchmarkMethods.addAtEnd(list, print);
-                return;
+                duration = BenchmarkMethods.addAtEnd(list, print);
+                break;
                 
             case "AddRandom":
-                BenchmarkMethods.addRandom(list, print, new Random(1L));
-                return;
+                duration = BenchmarkMethods.addRandom(list,
+                                                      print,
+                                                      new Random(1L));
+                break;
                 
             case "AppendCollection":
                 List<Object> listToAppend = 
                         new ArrayList<>(Bounds.APPEND_COLLECTION_SIZE);
                 
                 loadList(listToAppend, Bounds.APPEND_COLLECTION_SIZE);
-                BenchmarkMethods.appendCollection(list, listToAppend, print);
-                return;
+                duration = BenchmarkMethods.appendCollection(list, 
+                                                             listToAppend,
+                                                             print);
+                break;
                 
             case "GetRandom":
-                BenchmarkMethods.getRandom(list, new Random(2L), print);
-                return;
+                duration = BenchmarkMethods.getRandom(list, new Random(2L), print);
+                break;
                 
             case "InsertCollection":
                 List<Object> listToInsert = 
                         new ArrayList<>(Bounds.INSERT_COLLECTION_SIZE);
                 
                 loadList(listToInsert, Bounds.INSERT_COLLECTION_SIZE);
-                Random random = new Random();
-                BenchmarkMethods.insertCollection(list, 
-                                                  listToInsert, 
-                                                  random, 
-                                                  print);
-                return;
+                Random random = new Random(4L);
+                duration = BenchmarkMethods.insertCollection(list, 
+                                                             listToInsert, 
+                                                             random, 
+                                                             print);
+                break;
                 
             case "Iterate":
-                BenchmarkMethods.iterate(list, print);
-                return;
+                duration = BenchmarkMethods.iterate(list, print);
+                break;
                 
             case "IterateAndModify":
-                BenchmarkMethods.iterateAndModify(list, new Random(2L), print);
-                return;
+                duration = BenchmarkMethods.iterateAndModify(list, 
+                                                             new Random(2L), 
+                                                             print);
+                break;
                 
             case "PrependCollection":
                 List<Object> listToPrepend = 
                         new ArrayList<>(Bounds.APPEND_COLLECTION_SIZE);
                 
                 loadList(listToPrepend, Bounds.APPEND_COLLECTION_SIZE);
-                BenchmarkMethods.prependCollection(list, listToPrepend, print);
-                return;
+                duration = BenchmarkMethods.prependCollection(list, 
+                                                              listToPrepend, 
+                                                              print);
+                break;
                 
             case "RemoveFromBeginning":
-                BenchmarkMethods.removeFromBeginning(list, print);
-                return;
+                duration = BenchmarkMethods.removeFromBeginning(list, print);
+                break;
                 
             case "RemoveFromEnd":
-                BenchmarkMethods.removeFromEnd(list, print);
-                return;
+                duration = BenchmarkMethods.removeFromEnd(list, print);
+                break;
                         
             case "RemoveRandom":
-                BenchmarkMethods.removeRandom(list, print, new Random(3L));
-                return;
+                duration = BenchmarkMethods.removeRandom(list, 
+                                                         print, 
+                                                         new Random(3L));
+                break;
                 
             case "RemoveRange":
-                BenchmarkMethods.removeRange(list, print, new Random(4L));
-                return;
+                duration = BenchmarkMethods.removeRange(list, 
+                                                        print,
+                                                        new Random(4L));
+                break;
                 
             default:
                 throw new IllegalArgumentException(
                         "Unknown method name: " + methodName);
+        }
+        
+        DURATION_COUNTER_MAP.put(listTypeName, 
+                                 DURATION_COUNTER_MAP.get(listTypeName) 
+                                         + duration);
+    }
+    
+    private static void benchmarkModifiedIterator(boolean print) {
+        for (String listTypeName : LIST_TYPE_NAMES) {
+            for (int size : LIST_SIZES_FOR_ITERATOR_MODFICATIONS) {
+                List<Object> list = getEmptyList(listTypeName);
+                loadList(list, size);
+                long duration = 
+                        BenchmarkMethods.iterateAndModify(
+                                list, 
+                                new Random(5L), 
+                                print);
+                
+                ITERATOR_DURATION_COUNTER_MAP.put(
+                        listTypeName, 
+                        ITERATOR_DURATION_COUNTER_MAP.get(listTypeName) 
+                                + duration);
+            }
         }
     }
     
@@ -218,7 +311,7 @@ public class LinkedListBenchmark2 {
     
     private static final class BenchmarkMethods {
         
-        static void addAtBeginning(List<Object> list, boolean print) {
+        static long addAtBeginning(List<Object> list, boolean print) {
             long startTime;
             long endTime;
             
@@ -241,17 +334,21 @@ public class LinkedListBenchmark2 {
                 endTime = System.nanoTime();
             }
             
+            long duration = (endTime - startTime) / 1_000;
+            
             if (print) {
                 String listTypeName = getListTypeName(list);
                 
                 System.out.println(
                         listTypeName 
                         + "AddAtBeginning: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void addAtEnd(List<Object> list, boolean print) {
+        static long addAtEnd(List<Object> list, boolean print) {
             long startTime;
             long endTime;
             
@@ -274,16 +371,20 @@ public class LinkedListBenchmark2 {
                 endTime = System.nanoTime();
             }
             
+            long duration = (endTime - startTime) / 1_000;
+            
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "AddAtEnd: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void addRandom(List<Object> list, boolean print, Random random) {
+        static long addRandom(List<Object> list, boolean print, Random random) {
             long startTime = System.nanoTime();
 
             for (int i = 0; i < Bounds.NUMBER_OF_RANDOM_ADDS; i++) {
@@ -291,17 +392,20 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "AddRandom: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void appendCollection(List<Object> list, 
+        static long appendCollection(List<Object> list, 
                                      List<Object> listToAdd,
                                      boolean print) {
             
@@ -312,17 +416,20 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "AppendCollection: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void getRandom(List<Object> list, Random random, boolean print) {
+        static long getRandom(List<Object> list, Random random, boolean print) {
             int[] indices = new int[Bounds.NUMBER_OF_GETS];
             
             for (int i = 0; i < indices.length; i++) {
@@ -336,17 +443,20 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "GetRandom: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void insertCollection(List<Object> list, 
+        static long insertCollection(List<Object> list, 
                                      List<Object> listToInsert,
                                      Random random, 
                                      boolean print) {
@@ -358,17 +468,20 @@ public class LinkedListBenchmark2 {
             }
             
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "InsertCollection: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void iterate(List<Object> list, boolean print) {
+        static long iterate(List<Object> list, boolean print) {
             Iterator<Object> iterator = list.iterator();
             
             long startTime = System.nanoTime();
@@ -378,17 +491,20 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "Iterate: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void iterateAndModify(List<Object> list,
+        static long iterateAndModify(List<Object> list,
                                      Random random, 
                                      boolean print) {
             
@@ -408,17 +524,20 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "IterateAndModify: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void prependCollection(List<Object> list, 
+        static long prependCollection(List<Object> list, 
                                       List<Object> listToPrepend,
                                       boolean print) {
             
@@ -429,20 +548,24 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "PrependCollection: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void removeFromBeginning(List<Object> list, boolean print) {
+        static long removeFromBeginning(List<Object> list, boolean print) {
             
             long startTime;
             long endTime;
+            long duration;
             
             if (list instanceof Deque) {
                 Deque<Object> deque = (Deque<Object>) list;
@@ -463,16 +586,20 @@ public class LinkedListBenchmark2 {
                 endTime = System.nanoTime();
             }
             
+            duration = (endTime - startTime) / 1_000;
+            
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "RemoveFromBeginning: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void removeFromEnd(List<Object> list, boolean print) {
+        static long removeFromEnd(List<Object> list, boolean print) {
             
             long startTime;
             long endTime;
@@ -501,16 +628,22 @@ public class LinkedListBenchmark2 {
                 endTime = System.nanoTime();
             }
             
+            long duration = (endTime - startTime) / 1_000;
+            
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "RemoveFromEnd: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void removeRandom(List<Object> list, boolean print, Random random) {
+        static long removeRandom(List<Object> list, 
+                                 boolean print, 
+                                 Random random) {
             long startTime = System.nanoTime();
 
             for (int i = 0; i < Bounds.NUMBER_OF_RANDOM_REMOVES; i++) {
@@ -518,25 +651,28 @@ public class LinkedListBenchmark2 {
             }
 
             long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "RemoveRandom: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
         
-        static void removeRange(List<Object> list,
+        static long removeRange(List<Object> list,
                                 boolean print, 
                                 Random random) {
             long startTime;
             long endTime;
             
-            startTime = System.nanoTime();
-            
             int requestedSize = (4 * list.size()) / 5;
+            
+            startTime = System.nanoTime();
             
             while (list.size() > requestedSize) {
                 int fromIndex = random.nextInt(list.size()) - 
@@ -548,14 +684,17 @@ public class LinkedListBenchmark2 {
             }
             
             endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1_000;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
                 System.out.println(
                         listTypeName 
                         + "RemoveRange: " 
-                        + (endTime - startTime) / 1_000);
+                        + duration);
             }
+            
+            return duration;
         }
     }
 }
