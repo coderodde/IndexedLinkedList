@@ -310,7 +310,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (toFingerIndex == fingerList.size) {
                 // Here, the suffix is empty:
-                moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingersToMove);
+                moveFingersToSuffixOnEmptySuffix(toIndex, 
+                                                 numberOfFingersToMove);
                 return;
             }
             
@@ -354,7 +355,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             for (int k = 0; k < numberOfActualFingersMoved; k++) {
                 Finger<E> currentFinger = fingerArray[targetFingerIndex - k];
-                Finger<E> previousFinger = fingerArray[targetFingerIndex - k - 1];
+                Finger<E> previousFinger = 
+                        fingerArray[targetFingerIndex - k - 1];
+                
                 previousFinger.index = currentFinger.index - 1;
                 previousFinger.node = currentFinger.node.prev;
             }
@@ -451,9 +454,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int nodesToRemove) {
             int fingersToRemove = size - prefixSize - suffixSize;
             
-//            if (fingersToRemove == 0) {
-//                return;
-//            }
+            if (fingersToRemove == 0) {
+                return;
+            }
             
             shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             
