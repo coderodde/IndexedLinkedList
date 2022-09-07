@@ -1268,7 +1268,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void subListSort() {
-        Random random = new Random();
+        Random random = new Random(1001L);
         
         for (int i = 0; i < 100; ++i) {
             int value = random.nextInt(100) % 75;

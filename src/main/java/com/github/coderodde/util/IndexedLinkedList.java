@@ -245,7 +245,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return;
             }
             
-            int fromFingerIndex = getFingerIndexImpl(fromIndex);
+            int fromFingerIndex = getFingerIndex(fromIndex);
             
             if (fromFingerIndex == 0) {
                 // Here, the prefix is empty:
@@ -310,8 +310,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (toFingerIndex == fingerList.size) {
                 // Here, the suffix is empty:
-                moveFingersToSuffixOnEmptySuffix(toIndex, 
-                                                 numberOfFingersToMove);
+                moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingersToMove);
                 return;
             }
             
@@ -355,9 +354,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             for (int k = 0; k < numberOfActualFingersMoved; k++) {
                 Finger<E> currentFinger = fingerArray[targetFingerIndex - k];
-                Finger<E> previousFinger = 
-                        fingerArray[targetFingerIndex - k - 1];
-                
+                Finger<E> previousFinger = fingerArray[targetFingerIndex - k - 1];
                 previousFinger.index = currentFinger.index - 1;
                 previousFinger.node = currentFinger.node.prev;
             }
@@ -453,10 +450,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int suffixSize,
                                  int nodesToRemove) {
             int fingersToRemove = size - prefixSize - suffixSize;
-            
-            if (fingersToRemove == 0) {
-                return;
-            }
             
             shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             
@@ -2629,7 +2622,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = nextFingerCount - prefixFingersSize;
+                int numberOfFingersToMove = nextFingerCount - prefixFingersSize; 
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
@@ -2696,11 +2689,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         for (int i = 0; i < removalSize - 1; ++i) {
             Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
             
-            if (finger1 == f && fingersToRemove != 0) {
-                fingersToRemove--;
-                fingerCount++;
-                finger1 = finger2;
-                finger2 = fingerList.get(firstFingerIndex + fingerCount);
+            if (finger1 == f) {
+                if (fingersToRemove != 0) {
+                    fingersToRemove--;
+                    fingerCount++;
+                    finger1 = finger2;
+                    finger2 = fingerList.get(firstFingerIndex + fingerCount);
+                }
             }
             
             nextNode = node.next;
