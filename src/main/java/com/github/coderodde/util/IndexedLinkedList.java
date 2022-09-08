@@ -3748,14 +3748,45 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * This inner class implements a sublist view over the compassing list. This
+     * class is not {@code static} since it needs to work with the underlying 
+     * list.
+     */
     class EnhancedSubList implements List<E>, Cloneable {
         
+        /**
+         * The root list.
+         */
         private final IndexedLinkedList<E> root;
+        
+        /**
+         * The parent view. This view cannot be wider than its parent view.
+         */
         private final EnhancedSubList parent;
+        
+        /**
+         * The offset with regard to the parent view or the root list.
+         */
         private final int offset;
+        
+        /**
+         * The length of this view.
+         */
         private int size;
+        
+        /**
+         * The modification count.
+         */
         private int modCount;
         
+        /**
+         * Constructs a new sublist view over a {@code IndexedLinkedList}.
+         * 
+         * @param root      the root list.
+         * @param fromIndex the starting, inclusive index of this view.
+         * @param toIndex   the ending, exclusive index of this view.
+         */
         public EnhancedSubList(IndexedLinkedList<E> root, 
                                int fromIndex, 
                                int toIndex) {
@@ -3767,6 +3798,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.modCount = root.modCount;
         }
         
+        /**
+         * Constructs a new sublist view over a parent view.
+         * 
+         * @param parent    the parent view.
+         * @param fromIndex the starting, inclusive index of the new subview.
+         *                  Starts from the beginning of {@code parent}.
+         * @param toIndex   the ending, exclusive index of the new subview.
+         *                  Starts from the beginning of {@code parent}.
+         */
         private EnhancedSubList(EnhancedSubList parent, 
                                 int fromIndex, 
                                 int toIndex) {
@@ -3778,6 +3818,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.modCount = root.modCount;
         }
 
+        /**
+         * Appends {@code e} to the end of this view.
+         * 
+         * @param e the element to add.
+         * @return always {@code true}.
+         */
         @Override
         public boolean add(E e) {
             checkInsertionIndex(size);
@@ -3787,6 +3833,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
         
+        /**
+         * Inserts the element {@code element} before view element at index
+         * {@code index}.
+         * 
+         * @param index   the insertion index.
+         * @param element the element to add.
+         */
         @Override
         public void add(int index, E element) {
             checkInsertionIndex(index);
@@ -3795,11 +3848,29 @@ public class IndexedLinkedList<E> implements Deque<E>,
             updateSizeAndModCount(1);
         }
         
+        /**
+         * Appends the entire collection {@code c} to the end of this view. The
+         * elements from {@code c} are appended in the iteration order of
+         * {@code c}.
+         * 
+         * @param c the collection to append.
+         * @return {@code true} if and only if this view changed due to the 
+         *         call.
+         */
         @Override
         public boolean addAll(Collection<? extends E> c) {
             return addAll(this.size, c);
         }
         
+        /**
+         * Inserts the collection {@code collection} before the {@code index}th 
+         * element of this view. The elements are inserted in the iteration 
+         * order of {@code collection}.
+         * 
+         * @param index      the index of the element before which to insert.
+         * @param collection the collection to insert.
+         * @return {@code true} if and only if this view changed.
+         */
         @Override
         public boolean addAll(int index, Collection<? extends E> collection) {
             checkInsertionIndex(index);
@@ -3815,6 +3886,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
         
+        /**
+         * Cleares the entire view. This will delegate down the parent chain to
+         * the actual root list, effectively removing a subrange from the root
+         * list.
+         */
         @Override
         public void clear() {
             checkForComodification();
@@ -3822,6 +3898,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             updateSizeAndModCount(-size);
         }
         
+        /**
+         * Creates a {@link IndexedLinkedList} and loads the contents of this 
+         * view to it in iterative order.
+         * 
+         * @return the clone object of this subview.
+         */
         @Override
         public Object clone() {
             List<E> list = new IndexedLinkedList<>();
@@ -3833,11 +3915,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return list;
         }
 
+        /**
+         * Return {@code true} if and only if the given object appears in this
+         * view.
+         * 
+         * @param o the object to locate.
+         * @return {@code true} if and only if {@code o} is in this view.
+         */
         @Override
         public boolean contains(Object o) {
             return indexOf(o) >= 0;
         }
 
+        /**
+         * Checks that all the elements in {@code c} are in this view.
+         * 
+         * @param c the collection to test for inclusion.
+         * @return {@code true} if and only if all the elements in {@code c}
+         *         appear in this view.
+         */
         @Override
         public boolean containsAll(Collection<?> c) {
             for (Object o : c) {
@@ -3849,11 +3945,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
 
+        /**
+         * Checks that the given object is a {@link java.util.List} and has the
+         * same content as this view.
+         * 
+         * @param o the object to check.
+         * @return {@code true} if and only if the input object is a list with
+         *         the same contents as this view.
+         */
         @Override
         public boolean equals(Object o) {
             return root.equalsRange((List<?>) o, offset, offset + size);
         }
         
+        /**
+         * Applies the input action to each element in this view.
+         * 
+         * @param action the action to apply.
+         */
         @Override
         public void forEach(Consumer<? super E> action) {
             Objects.requireNonNull(action);
@@ -3872,6 +3981,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+        /**
+         * Returns the {@code index}th element of this view.
+         * 
+         * @param index the index of the target element.
+         * @return the {@code index}th element.
+         */
         @Override
         public E get(int index) {
             Objects.checkIndex(index, size);
@@ -3879,11 +3994,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return root.get(offset + index);
         }
         
+        /**
+         * Returns the hash code of this view.
+         * 
+         * @return the hash code of this view. 
+         */
         @Override
         public int hashCode() {
             return root.hashCodeRange(offset, offset + size);
         }
 
+        /**
+         * Returns the index of the leftmost appearance of {@code o}, or 
+         * {@code -1} if there is no such.
+         * 
+         * @param o the target object.
+         * @return the index of the input object, or {@code -1} if there is no
+         *         match.
+         */
         @Override
         public int indexOf(Object o) {
             int index = root.indexOfRange(o, offset, offset + size);
@@ -3891,16 +4019,33 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return index >= 0 ? index - offset : -1;
         }
         
+        /**
+         * Returns {@code true} if and only if this view is empty.
+         * 
+         * @return {@code true} if and only if this view is empty.
+         */
         @Override
         public boolean isEmpty() {
             return size == 0;
         }
         
+        /**
+         * Returns an iterator over this view.
+         * 
+         * @return an iterator.
+         */
         @Override
         public Iterator<E> iterator() {
             return listIterator();
         }
 
+        /**
+         * Returns the index of the rightmost occurrence of {@code o}, or 
+         * {@code -1} if there is no such.
+         * 
+         * @param o the targe object.
+         * @return the index of {@code o} in this view.
+         */
         @Override
         public int lastIndexOf(Object o) {
             int index = root.lastIndexOfRange(o, offset, offset + size);
@@ -3908,11 +4053,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return index >= 0 ? index - offset : -1;
         }
 
+        /**
+         * Returns a list iterator over this view.
+         * 
+         * @return a list iterator. 
+         */
         @Override
         public ListIterator<E> listIterator() {
             return listIterator(0);
         }
         
+        /**
+         * Returns a list iterator over this view starting from the specified
+         * position.
+         * 
+         * @param index the starting position.
+         * @return a list iterator.
+         */
         @Override
         public ListIterator<E> listIterator(int index) {
             checkForComodification();
@@ -3922,10 +4079,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 private final ListIterator<E> i = 
                         root.listIterator(offset + index);
                 
+                @Override
                 public boolean hasNext() {
                     return nextIndex() < size;
                 }
                 
+                @Override
                 public E next() {
                     if (hasNext()) {
                         return i.next();
@@ -3934,10 +4093,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     throw new NoSuchElementException();
                 }
                 
+                @Override
                 public boolean hasPrevious() {
                     return previousIndex() >= 0;
                 }
                 
+                @Override
                 public E previous() {
                     if (hasPrevious()) {
                         return i.previous();
@@ -3946,23 +4107,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     throw new NoSuchElementException();
                 }
                 
+                @Override
                 public int nextIndex() {
                     return i.nextIndex() - offset;
                 }
                 
+                @Override
                 public int previousIndex() {
                     return i.previousIndex() - offset;
                 }
                 
+                @Override
                 public void remove() {
                     i.remove();
                     updateSizeAndModCount(-1);
                 }
                 
+                @Override
                 public void set(E e) {
                     i.set(e);
                 }
                 
+                @Override
                 public void add(E e) {
                     i.add(e);
                     updateSizeAndModCount(1);
@@ -3970,6 +4136,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             };
         }
         
+        /**
+         * Removes the leftmost occurrence of {@code o} from this view.
+         * 
+         * @param o the object to remove. May be {@code null}.
+         * @return {@code true} if and only if {@code o} was removed.
+         */
         @Override
         public boolean remove(Object o) {
             ListIterator<E> iterator = listIterator();
@@ -3993,6 +4165,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return false;
         }
         
+        /**
+         * Removes the {@code index}th element from this view.
+         * 
+         * @param index the index of the element to remove.
+         * @return the removed element.
+         */
         @Override
         public E remove(int index) {
             Objects.checkIndex(index, size);
@@ -4002,11 +4180,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return result;
         }
 
+        /**
+         * Removes all the elements appearing in {@code c}.
+         * 
+         * @param c the collection of elements to remove from this view.
+         * @return {@code true} if and only if any element in {@code c} was 
+         *         removed.
+         */
         @Override
         public boolean removeAll(Collection<?> c) {
             return batchRemove(c, true);
         }
 
+        /**
+         * Removes all the elements in this view that are filtered by 
+         * {@code filter}.
+         * 
+         * @param filter the filter to apply.
+         * @return {@code true} if and only if any element was removed.
+         */
         @Override
         public boolean removeIf(Predicate<? super E> filter) {
             checkForComodification();
@@ -4020,16 +4212,36 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return modified;
         }
         
+        /**
+         * Replaces all the elements in this view with another values dictated
+         * by {@code operator}.
+         * 
+         * @param operator the replacement operator to apply.
+         */
         @Override
         public void replaceAll(UnaryOperator<E> operator) {
             root.replaceAllRange(operator, offset, offset + size);
         }
 
+        /**
+         * Remove all the elements from this view that are <b><i>not</i></b>
+         * present in {@code c}.
+         * 
+         * @param c the collection to retain.
+         * @return {@code true} if and only if this view changed.
+         */
         @Override
         public boolean retainAll(Collection<?> c) {
             return batchRemove(c, false);
         }
         
+        /**
+         * Sets the {@code index}th element of this view to {@code element}.
+         * 
+         * @param index   the index of the target element.
+         * @param element the element to set instead of the target element.
+         * @return the old value of the {@code index}th element of this view.
+         */
         @Override
         public E set(int index, E element) {
             Objects.checkIndex(index, size);
@@ -4037,12 +4249,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return root.set(offset + index, element);
         }
         
+        /**
+         * Returns the size of this view.
+         * 
+         * @return the size of this view.
+         */
         @Override
         public int size() {
             checkForComodification();
             return size;
         }
         
+        /**
+         * Sorts this view.
+         * 
+         * @param c the comparator object.
+         */
         @Override
         @SuppressWarnings("unchecked")
         public void sort(Comparator<? super E> c) {
@@ -4070,6 +4292,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             modCount++;
         }
         
+        /**
+         * Returns the spliterator over this view.
+         * 
+         * @return the spliterator over this view.
+         */
         @Override
         public Spliterator<E> spliterator() {
             return new LinkedListSpliterator(root,
@@ -4079,12 +4306,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                              modCount);
         }
         
+        /**
+         * Returns the subview of this view. The subview in question is
+         * {@code this[fromIndex ... toIndex - 1]}.
+         * 
+         * @param fromIndex the starting, inclusive index of the new subview.
+         * @param toIndex   the ending, exclusive index of the new subview.
+         * @return the subview {@code this[fromIndex ... toIndex - 1}.
+         */
         @Override
         public List<E> subList(int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
             return new EnhancedSubList(this, fromIndex, toIndex);
         }
 
+        /**
+         * Returns the array of elements of this view.
+         * 
+         * @return the element array in the same order they appear in the 
+         *         underlying linked list.
+         */
         @Override
         public Object[] toArray() {
             checkForComodification();
@@ -4105,11 +4346,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return array;
         }
 
+        /**
+         * Returns the array of elements in this view.
+         * 
+         * @param <T>       the element data type.
+         * @param generator the generator function. 
+         * @return the element array in the same order they appear in the 
+         *         underlying linked list.
+         */
         @Override
         public <T> T[] toArray(IntFunction<T[]> generator) {
             return toArray(generator.apply(size));
         }
 
+        /**
+         * Returns the array of elements of this view. If the input array is too
+         * small, an array of size {@code size} is created and filled with the
+         * view contents. Otherwise, the elements in this view are copied to 
+         * {@code a}. Also, if {@code a.length > size}, we set {@code a[size]} 
+         * to {@code null} in order to signal the end-of-view.
+         * 
+         * @param <T> the element data type.
+         * @param a the input array.
+         * @return an array of all view elements.
+         */
         @Override
         public <T> T[] toArray(T[] a) {
             checkForComodification();
@@ -4138,6 +4398,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return a;
         }
         
+        /**
+         * Returns the textual representation of this view.
+         * 
+         * @return the textual representation.
+         */
         @Override
         public String toString() {
             StringBuilder stringBuilder = new StringBuilder();
@@ -4158,6 +4423,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return stringBuilder.append("]").toString();
         }
     
+        /**
+         * Operates in batch over all the elements in {@code c}.
+         * 
+         * @param c
+         * @param complement the mode flag. If {@code true}, all elements in 
+         *                   {@code c} will be removed from this view, and if
+         *                   {@code false}, all elements <b><i>not</i></b> in
+         *                   {@code c}, will be removed from this view.
+         * @return {@code true} if and only if this view was modified.
+         */
         private boolean batchRemove(Collection<?> c, boolean complement) {
             checkForComodification();
             int oldSize = root.size;
@@ -4173,11 +4448,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return modified;
         }
         
+        /**
+         * Makes sure that the root list and this view are in sync.
+         * 
+         * @throws ConcurrentModificationException if there is modification 
+         *                                         mismatch.
+         */
         private void checkForComodification() {
             if (root.modCount != this.modCount)
                 throw new ConcurrentModificationException();
         }
 
+        /**
+         * Checks that the input finger {@code index} is in the set
+         * \(\{ 0, 1, \ldots, N\}\), where \(N = \){@code size}.
+         * 
+         * @param index the insertion index to validate. 
+         */
         private void checkInsertionIndex(int index) {
             if (index < 0) {
                 throw new IndexOutOfBoundsException("Negative index: " + index);
@@ -4189,6 +4476,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+        /**
+         * Updates the sizes and modification counters up the subview chain.
+         * 
+         * @param sizeDelta the value to add to the chain. If this view grew in
+         *                  size, {@code sizeDelta} is positive. Otherwise, if
+         *                  the view shrinked in size, {@code sizeDelta} will be
+         *                  negative.
+         */
         private void updateSizeAndModCount(int sizeDelta) {
             EnhancedSubList subList = this;
             
