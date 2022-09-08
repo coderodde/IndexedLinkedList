@@ -250,8 +250,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return idx;
         }
         
-        // Inserts the input finger into the finger list such that the entire
-        // finger list is sorted by indices:
+        /**
+         * Inserts the input finger into the finger list such that the entire
+         * finger list is sorted by indices.
+         */
         private void insertFingerAndShiftOnceToRight(Finger<E> finger) {
             enlargeFingerArrayIfNeeded(size + 2);
             int beforeFingerIndex = getFingerIndexImpl(finger.index);
@@ -262,17 +264,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     beforeFingerIndex + 1, 
                     size + 1 - beforeFingerIndex);
             
-            // Shift fingerArray[beforeFingerIndex ... size] one position to the
-            // right (towards larger index values:
+            // Shift fingerArray[beforeFingerIndex + 1 ... size] one position to 
+            // the right (towards larger index values):
             shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
 
             fingerArray[beforeFingerIndex] = finger;
             fingerArray[++size].index = IndexedLinkedList.this.size;
         }
         
-        // Make sure we can insert 'roomSize' fingers starting from 
-        // 'fingerIndex', shifting all the fingers starting from 'fingerIndex'
-        // 'numberOfNodes' to the right:
+        /**
+         * Make sure we can insert {@code roomSize} fingers starting from 
+         * {@code fingerIndex}, shifting all the fingers starting from 
+         * {@code numberOfNodes} to the right.
+         * 
+         * @param fingerIndex   the finger index of the first finger in the 
+         *                      shifted finger slice.
+         * @param roomSize      the number of free spots requested.
+         * @param numberOfNodes the shift amount of the moved fingers.
+         */ 
         private void makeRoomAtIndex(int fingerIndex, 
                                      int roomSize,
                                      int numberOfNodes) {
@@ -288,7 +297,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
                              size - roomSize - fingerIndex + 1);
         }
         
-        // Moves 'numberOfFingers' fingers to the prefix ending in 'fromIndex':
+        /**
+         * Moves {@code numberOfFingers} fingers to the prefix starting from the
+         * element at the index {@code fromIndex + 1}.
+         * 
+         * @param fromIndex       the index of the leftmost element of the range 
+         *                        from which the fingers are moved to the finger 
+         *                        prefix.
+         * @param numberOfFingers the number of fingers to move from the range 
+         *                        to the finger prefix.
+         */
         private void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
             if (numberOfFingers == 0) {
                 return;
@@ -326,7 +344,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        // Move 'numberOfFingers' fingers to the empty prefix:
+        /**
+         * Move {@code numberOfFingers} fingers to the empty prefix.
+         * 
+         * @param fromIndex       the index of the leftmost element of the range 
+         *                        from which the fingers are moved to the finger 
+         *                        prefix.
+         * @param numberOfFingers the number of fingers to move from the range 
+         *                        to the finger prefix.
+         */
         private void moveFingersToPrefixOnEmptyPrefix(int fromIndex,
                                                       int numberOfFingers) {
             Finger<E> firstFinger = fingerArray[0];
@@ -346,8 +372,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        // Moves 'numberOfFingers' fingers to the suffix starting in 
-        // 'toIndex':
+        /**
+         * Moves {@code numberOfFingers} fingers to the suffix starting in 
+         * {@code toIndex}.
+         * 
+         * @param toIndex               the first element index of the finger 
+         *                              suffix.
+         * @param numberOfFingersToMove the number of fingers to move to the 
+         *                              finger suffix.
+         */
         private void moveFingersToSuffix(int toIndex, 
                                          int numberOfFingersToMove) {
             
@@ -409,7 +442,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
-        // Move 'numberOfFingers' fingers to the empty suffix:
+        /**
+         * Move {@code numberOfFingers} fingers to the empty suffix.
+         * 
+         * @param toIndex         the leftmost element index of the finger 
+         *                        suffix.
+         * @param numberOfFingers the number of fingers to move to the finger   
+         *                        suffix.
+         */
         private void moveFingersToSuffixOnEmptySuffix(int toIndex,
                                                       int numberOfFingers) {
             int toMove = toIndex 
@@ -432,8 +472,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
-        // Returns the 'i'th node of this linked list. The closest finger is 
-        // updated to point to the returned node:
+        /**
+         * Returns the {@code i}th node of this linked list. The closest finger 
+         * is updated to point to the returned node.
+         * 
+         * @param index the element index.
+         * @return the {@code index}th node in the linked list.
+         */
         private Node<E> node(int index) {
             Finger finger = fingerArray[getFingerIndex(index)];
             int steps = finger.index - index;
@@ -447,8 +492,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return finger.node;
         }
         
-        // Makes sure that the returned finger index 'i' points to the closest
-        // finger in the finger array:
+        /**
+         * Makes sure that the returned finger index {@code i} points to the 
+         * closest finger in the finger array.
+         * 
+         * @param fingerIndex  the finger index.
+         * @param elementIndex the element index.
+         * 
+         * @return the index of the finger that is closest to the 
+         *         {@code elementIndex}th element.
+         */
         private int normalize(int fingerIndex, int elementIndex) {
             if (fingerIndex == 0) {
                 // Since we cannot point to '-1'th finger, return 0:
@@ -487,7 +540,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         /**
          * Removes the last finger residing right before the end-of-finger-list
-         * sentinel finger:
+         * sentinel finger.
          */
         private void removeFinger() {
             contractFingerArrayIfNeeded(--size);
@@ -499,6 +552,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Removes the finger range {@code [prefixSize, size - suffixSize]}
          * from the finger list.
+         * 
+         * @param prefixSize    the length of the prefix that remains in this
+         *                      finger list.
+         * @param suffixSize    the length of the suffix that remains in this
+         *                      finger list.
+         * @param nodesToRemove the number of nodes that are to be removed.
          */
         private void removeRange(int prefixSize, 
                                  int suffixSize,
@@ -537,6 +596,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Moves all the fingers in range {@code [startFingerIndex, size]} 
          * {@code shiftLength} positions to the left (towards smaller indices).
+         * 
+         * @param startFingerIndex the index of the leftmost finger to shift.
+         * @param shiftLength      the length of the shift operation.
          */
         private void shiftFingerIndicesToLeft(int startFingerIndex,      
                                               int shiftLength) {
@@ -548,6 +610,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Moves all the fingers in range {@code [startFingerIndex, size]} one 
          * position to the left (towards smaller indices).
+         * 
+         * @param startFingerIndex the index of the leftmost finger to shift.
          */
         private void shiftFingerIndicesToLeftOnceAll(int startFingerIndex) {
             for (int i = startFingerIndex; i <= size; ++i) {
@@ -556,8 +620,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
-         * Moves all the fingers in range [startFingerIndex, size] 
+         * Moves all the fingers in range {@code [startFingerIndex, size]} 
          * {@code shiftLength} positions to the right (towards larger indices).
+         * 
+         * @param startIndex  the index of the leftmost finger to shift.
+         * @param shiftLength the length of the shift operation.
          */ 
         private void shiftFingerIndicesToRight(int startIndex,      
                                                int shiftLength) {
@@ -567,8 +634,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
-         * Moves all the fingers in range [startFingerIndex, size] one position 
-         * to the right (towards larger indices).
+         * Moves all the fingers in range {@code [startFingerIndex, size]} one 
+         * position to the right (towards larger indices).
          */
         private void shiftFingerIndicesToRightOnce(int startIndex) {
             shiftFingerIndicesToRight(startIndex, 1);
@@ -691,13 +758,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private int size;
     
     /**
-     * The modification counter. Used to detect state changes.
+     * The modification counter. Used to detect state changes during concurrent
+     * modifications.
      */
     private transient int modCount;
+    
+    /**
+     * The head node of the list.
+     */
     transient Node<E> first;
+    
+    /**
+     * The tail node of the list.
+     */
     transient Node<E> last;
     
-    // Without 'private' since it is accessed in unit tests.
+    /**
+     * The actual finger list. Without {@code private} keyword since it is 
+     * accessed in unit tests.
+     */
     transient FingerList<E> fingerList = new FingerList<>();
     
     /**
@@ -1695,15 +1774,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return stringBuilder.append("]").toString();
     }
 
+    /**
+     * Returns the number of fingers in the finger list. Does not count the 
+     * end-of-finger-list sentinel finger. Used in unit tests.
+     * 
+     * @return the size of the finger list.
+     */
     int getFingerListSize() {
         return fingerList.size();
     }
     
-    // Computes the recommended number of fingers for 'size' elements.
+    /**
+     * Computes the recommended number of fingers for {@code size} elements.
+     */
     private static int getRecommendedNumberOfFingers(int size) {
         return (int) Math.ceil(Math.sqrt(size));
     }
     
+    /**
+     * Checks the indices for a list of size {@code size}.
+     * 
+     * @param fromIndex the starting, inclusive index.
+     * @param toIndex   the ending, exclusive index.
+     * @param size      the size of the target list.
+     */
     private static void subListRangeCheck(int fromIndex, 
                                           int toIndex, 
                                           int size) {
@@ -1758,7 +1852,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
                       fingerIndex);
     }
     
-    // Adds fingers after inserting a collection in this list.
+    /**
+     * Adds fingers after inserting a collection in this list.
+     * 
+     * @param headNodeOfInsertedRange  the head node of the inserted range.
+     * @param indexOfInsertedRangeHead the index of 
+     *                                 {@code headNodeOfInsertedRange}.
+     * @param collectionSize           the size of the inserted collection.
+     */
     private void addFingersAfterInsertAll(Node<E> headNodeOfInsertedRange,
                                           int indexOfInsertedRangeHead,
                                           int collectionSize) {
@@ -1791,7 +1892,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                       startFingerIndex);
     }
     
-    // Adds fingers after prepending a collection to this list.
+    /**
+     * Adds fingers after prepending a collection to this list.
+     * 
+     * @param first          the first node of the prepended range.
+     * @param collectionSize the size of the prepended collection.
+     */
     private void addFingersAfterPrependAll(Node<E> first, int collectionSize) {
         int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerList.size();
@@ -1813,7 +1919,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                       0);
     }
     
-    // Adds fingers after setting a collection as a list.
+    /**
+     * Adds fingers after setting a collection as a list.
+     * 
+     * @param collectionSize the size of the collection being set.
+     */
     private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
         
@@ -1831,7 +1941,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                       0);
     }
     
-    // Appends the input collection to the tail of this list.
+    /**
+     * Appends the input collection to the tail of this list.
+     * 
+     * @param c the collection to append.
+     */
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = last;
         Node<E> oldLast = last;
@@ -1850,8 +1964,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
     
-    // Adds the finger to the tail of the finger list and before the end-of-
-    // finger-list sentinel.
+    /**
+     * Adds the finger to the tail of the finger list and before the 
+     * end-of-finger-list sentinel.
+     * 
+     * @param node  the node of the newly created finger.
+     * @param index the index of {@code node}.
+     */
     private void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
@@ -1862,9 +1981,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     public final class BasicIterator implements Iterator<E> {
         
+        /**
+         * Caches the most recently returned node.
+         */
         private Node<E> lastReturned;
+        
+        /**
+         * Caches the next node to iterate over.
+         */
         private Node<E> next = first;
+        
+        /**
+         * The index of the next node to iterate over.
+         */
         private int nextIndex;
+        
+        /**
+         * Caches the expected modification count. We use this value in order to
+         * detect the concurrent modifications as early as possible.
+         */
         int expectedModCount = IndexedLinkedList.this.modCount;
 
         /**
@@ -1874,11 +2009,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
         }
         
+        /**
+         * Returns {@code true} if and only if this iterator has more elements 
+         * to offer.
+         * 
+         * @return {@code true} if and only if iteration may continue.
+         */
         @Override
         public boolean hasNext() {
             return nextIndex < size;
         }
 
+        /**
+         * Attempts to return the next element in the iteration order.
+         * 
+         * @return the next element.
+         * @throws ConcurrentModificationException if the list was modified 
+         *                                         outside the iterator API. 
+         */
         @Override
         public E next() {
             checkForComodification();
@@ -1893,6 +2041,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return lastReturned.item;
         }
 
+        /**
+         * Removes the most recently iterated element from the list.
+         * 
+         * @throws IllegalStateException if there is no previously iterated 
+         *                               element.
+         */
         @Override
         public void remove() {
             if (lastReturned == null) {
@@ -1908,6 +2062,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             expectedModCount++;
         }
 
+        /**
+         * Runs {@code action} on every remaining elements.
+         * 
+         * @param action the action to perform on each remaining element.
+         * @throws ConcurrentModificationException if the list was modified 
+         *                                         outside the iterator API.
+         */
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
@@ -1928,9 +2089,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Implements the batch remove. If 'complement' is true, this operation 
-    // removes all the elements appearing in 'c'. Otherwise, it will retain all
-    // the elements present in 'c':
+    /**
+     * Implements the batch remove. If {@code complement} is {@code true}, this 
+     * operation removes all the elements appearing in {@code c}. Otherwise, it 
+     * will retain all the elements present in {@code c}.
+     * 
+     * @param c          the target collection to operate on.
+     * @param complement the operation choice flag.
+     * @param from       the starting, inclusive index of the range to consider.
+     * @param to         the ending, exclusive index of the range to consider.
+     * 
+     * @return {@code true} if and only if the list was modified.
+     */
     private boolean batchRemove(Collection<?> c,
                                 boolean complement,
                                 int from,  
@@ -1963,23 +2133,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return modified;
     }
     
-    // Checks the element index. In the case of non-empty list, valid indices 
-    // are '{ 0, 1, ..., size - 1 }'.
+    /**
+     * Checks the element index. In the case of non-empty list, valid indices 
+     * are {@code \{ 0, 1, ..., size - 1 }}'.
+     * 
+     * @param index the index to validate.
+     * @throws IndexOutOfBoundsException if the {@code index} is not a valid 
+     *                                   list index.
+     */
     private void checkElementIndex(int index) {
         if (!isElementIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
         }
     }
     
+    /**
+     * Checks that the input {@code expectedModCount} equals the list's 
+     * internal, cached modification count.
+     * 
+     * @param expectedModCount the modification count to check.
+     * @throws ConcurrentModificationException if the cached and the input 
+     *                                         modifications differ.
+     */
     private void checkForComodification(int expectedModCount) {
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
     }
     
-    // Checks that the input index is a valid position index for add operation 
-    // or iterator position. In other words, checks that {@code index} is in the 
-    // set '{ 0, 1, ..., size}'.
+    /**
+     * Checks that the input index is a valid position index for 
+     * {@link #add(int, java.lang.Object)} operation or iterator position. In 
+     * other words, checks that {@code index} is in the set 
+     * {@code \{0, 1, ..., size}}'.
+     * 
+     * @param index the index to validate.
+     */
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
