@@ -1112,8 +1112,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return node(index).item;
     }
     
+    /**
+     * Computes and returns the entropy of this list, which is defined as
+     * \(H = 1 - \frac{1}{N} \sum_{i = 0}^{n - 1} \Bigg|f_{i + 1} - f_i - \sqrt{N}\Bigg| \)
+     * 
+     * @return the entropy of this list.
+     */
     public double getEntropy() {
-        return 1.0 - getEntalpy();
+        double sum = 0.0;
+        double squareRootSize =
+                Math.ceil((1.0 * size) / 
+                          (1.0 * fingerList.size()));
+        
+        for (int i = 0; i < fingerList.size(); i++) {
+            double value = fingerList.get(i + 1).index 
+                         - fingerList.get(i).index 
+                         - squareRootSize;
+            
+            value = Math.abs(value);
+            
+            sum += value;
+        }
+        
+        sum /= size;
+        return 1 - sum;
     }
     
     /**
@@ -2044,8 +2066,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Removes the most recently iterated element from the list.
          * 
-         * @throws IllegalStateException if there is no previously iterated 
-         *                               element.
+         * @throws IllegalStateException if there is no most recent element. 
+         *                               This can happen if there was no 
+         *                               {@link DescendingIterator#next()} 
+         *                               on this iterator, or the previous 
+         *                               operation was
+         *                               {@link DescendingIterator#remove()}.
          */
         @Override
         public void remove() {
@@ -2167,7 +2193,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * other words, checks that {@code index} is in the set 
      * {@code \{0, 1, ..., size}}'.
      * 
-     * @param index the index to validate.
+     * @param index the index to validate.  
      */
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index)) {
@@ -2175,12 +2201,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * Decreases the size counter and increments the modification count.
+     */
     private void decreaseSize() {
         size--;
         modCount++;
     }   
     
-    // Distributes the fingers over the element list [fromIndex, toIndex):
+    /**
+     * Distributes the fingers over the element list
+     * {@code [fromIndex, toIndex)}.
+     * 
+     * @param fromIndex the leftmost element index in the range over which to 
+     *                  distribute the fingers.
+     * @param toIndex   the one past the rightmost element index in the range 
+     *                  over which to disribute the fingers.
+     */
     private void distributeFingers(int fromIndex, int toIndex) {
         int rangeLength = toIndex - fromIndex;
         
@@ -2201,10 +2238,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int index = fromIndex + startOffset;
         
         Node<E> node = node(fromIndex);
-        
-        for (int i = 0; i < startOffset; ++i) {
-            node = node.next;
-        }
+        node = scrollNodeToRight(node, startOffset);
         
         for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
             Finger<E> finger = fingerList.get(i);
@@ -2225,24 +2259,58 @@ public class IndexedLinkedList<E> implements Deque<E>,
         lastFinger.index = index;
     }
     
-    // Distributes evenly all the figners over this list:
+    /**
+     * Distributes evenly all the figners over this list.
+     */
     private void distributeAllFingers() {
         distributeFingers(0, size);
     }
     
-    // Implements the descending list iterator over this list.
+    /**
+     * Implements the descending list iterator over this list.
+     */
     private final class DescendingIterator implements Iterator<E> {
 
+        /**
+         * The most recently returned element.
+         */
         private Node<E> lastReturned;
+        
+        /**
+         * The next node to iterate.
+         */
         private Node<E> nextToIterate = last;
+        
+        /**
+         * The index of the node next to iterate.
+         */
         private int nextIndex = IndexedLinkedList.this.size - 1;
+        
+        /**
+         * The cached expected modification count. Used to detect the situations
+         * where the list is modified outside iterator API during iteration.
+         */
         int expectedModCount = IndexedLinkedList.this.modCount;
         
+        /**
+         * Returns {@code true} if and only if this iterator has more elements
+         * to offer.
+         * 
+         * @return {@code true} if and only if there is more to iterate. 
+         */
         @Override
         public boolean hasNext() {
             return nextIndex > -1;
         }
         
+        /**
+         * Returns the next element in the iteration order.
+         * 
+         * @return the next element.
+         * @throws ConcurrentModificationException if the underlying list was
+         *                                         modified outside the iterator
+         *                                         API.
+         */
         @Override
         public E next() {
             checkForComodification();
@@ -2257,6 +2325,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return lastReturned.item;
         }
         
+        /**
+         * Removes the most recently returned element from the list.
+         * 
+         * @throws IllegalStateException if there is no most recent element. 
+         *                               This can happen if there was no 
+         *                               {@link DescendingIterator#next()} 
+         *                               on this iterator, or the previous 
+         *                               operation was
+         *                               {@link DescendingIterator#remove()}.
+         */
         @Override
         public void remove() {
             if (lastReturned == null) {
@@ -2270,6 +2348,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             expectedModCount++;
         }
         
+        /**
+         * Iterates over all remaining elements in the descendinig iteration 
+         * order.
+         * 
+         * @param action the action to call for each iterated element. 
+         */
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
@@ -2283,6 +2367,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             checkForComodification();
         }
         
+        /**
+         * Makes sure that the expected modification count equals the iterator's
+         * modification count, and throws an exception if that is not the case.
+         * 
+         * @throws ConcurrentModificationException if the modification counts do
+         *                                         not match.
+         */
         private void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
@@ -2290,26 +2381,61 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Implements the enhanced list iterator over this list.
+    /**
+     * Implements the enhanced list iterator over this list.
+     */
     final class EnhancedIterator implements ListIterator<E> {
 
+        /**
+         * The most recently iterated node.
+         */
         private Node<E> lastReturned;
+        
+        /**
+         * The next node to iterate.
+         */
         private Node<E> next;
+        
+        /**
+         * The index of {@code next} in the list.
+         */
         private int nextIndex;
         
-        // Package-private for the sake of unit testing:
+        /**
+         * The expected modification count. Package-private for the sake of unit 
+         * testing.
+         */
         int expectedModCount = modCount;
         
+        /**
+         * Constructs a new enhanced list iterator starting from the node with
+         * index {@code index}.
+         * 
+         * @param index the starting node index.
+         */
         EnhancedIterator(int index) {
             next = (index == size) ? null : node(index);
             nextIndex = index;
         }
         
+        /**
+         * Returns {@code true} if and only if there is more to iterate.
+         * 
+         * @return {@code true} if and only if there is more to iterate.
+         */
         @Override
         public boolean hasNext() {
             return nextIndex < size;
         }
         
+        /**
+         * Returns the next element in the forward iteration order.
+         * 
+         * @return the next element in forward direction.
+         * @throws ConcurrentModificationException if the list was modified 
+         *                                         outside the iterator API.
+         * @throws NoSuchElementException if there is no elements to iterate.
+         */
         @Override
         public E next() {
             checkForComdification();
@@ -2324,11 +2450,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return lastReturned.item;
         }
 
+        /**
+         * Returns {@code true} if and only if there is a previous element in
+         * the forward iteration order.
+         * 
+         * @return {@code true} if and only if there is a previous element. 
+         */
         @Override
         public boolean hasPrevious() {
             return nextIndex > 0;
         }
 
+        /**
+         * Returns the previous element in the forward iteration order.
+         * 
+         * @return the previous element in forward direction.
+         * @throws ConcurrentModificationException if the list was modified 
+         *                                         outside the iterator API.
+         * @throws NoSuchElementException if there is no elements to iterate.
+         */
         @Override
         public E previous() {
             checkForComdification();
@@ -2342,16 +2482,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return lastReturned.item;
         }
 
+        /**
+         * Returns the index of the element next to iterate.
+         * 
+         * @return the index of the next element.
+         */
         @Override
         public int nextIndex() {
             return nextIndex;
         }
 
+        /**
+         * Returns the index of the element previously iterated.
+         * 
+         * @return the index of the previous element.
+         */
         @Override
         public int previousIndex() {
             return nextIndex - 1;
         }
 
+        /**
+         * Removes the most recently iterated element from the list.
+         * 
+         * @throws ConcurrentModificationException if the underlying list was
+         *                                         was modified outside the
+         *                                         iterator API.
+         * @throws IllegalStateException if there is no previously iterated 
+         *                               element. This can happen if 
+         *                               {@link ListIterator#previous()} or
+         *                               {@link ListIterator#next()} was not 
+         *                               called yet, or the previous operation 
+         *                               was 
+         *                               {@link ListIterator#add(java.lang.Object)}
+         *                               or {@link ListIterator#remove()}.
+         *                        
+         */
         @Override
         public void remove() {
             checkForComdification();
@@ -2374,6 +2540,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             expectedModCount++;
         }
 
+        /**
+         * Sets the element currently pointed by this iterator.
+         * 
+         * @param e the element to set.
+         * @throws IllegalStateException if there is no current element.
+         * @throws ConcurrentModificationException if the underlying list was
+         *                                         modified outside the iterator
+         *                                         API.
+         */
         @Override
         public void set(E e) {
             if (lastReturned == null) {
@@ -2384,6 +2559,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturned.item = e;
         }
 
+        /**
+         * Adds the element {@code e} right after the previously iterated 
+         * element.
+         * 
+         * @param e the element to add. 
+         */
         @Override
         public void add(E e) {
             checkForComdification();
@@ -2400,6 +2581,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             expectedModCount++;
         }
         
+        /**
+         * Iterates over the remaining elements in the forward iteration order.
+         * 
+         * @param action the action to apply to each remaining element. 
+         */
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
@@ -2413,6 +2599,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             checkForComdification();
         }
         
+        /**
+         * Checks that the expected modification count matches the modification
+         * count of the underlying list.
+         */
         private void checkForComdification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
@@ -2420,7 +2610,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * Checks that the list {@code other} matches {@code this[from ... to - 1]}.
+     * 
+     * @param other the target list to compare to.
+     * @param from  the starting, inclusive index of the range in this list.
+     * @param to    the ending, exclusive index of the range in this list.
+     * 
+     * @return {@code true} if and only if {@code other} equals 
+     *         {@code this[from ... to - 1]}.
+     */
     private boolean equalsRange(List<?> other, int from, int to) {
+        int rangeLength = to - from;
+        
+        if (rangeLength != other.size()) {
+            return false;
+        }
+        
         Iterator<?> otherIterator = other.iterator();
         
         for (Node<E> node = node(from); from < to; from++, node = node.next) {
@@ -2433,31 +2639,31 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return true;
     }
     
-    private double getEntalpy() {
-        double entalpy = 0.0;
-        double expectedGapLength = ((double) size) / 
-                                   ((double) fingerList.size());
-        
-        for (int i = 0; i < size; i++) {
-            entalpy += Math.abs(fingerList.get(i + 1).index - 
-                                fingerList.get(i).index -
-                                    expectedGapLength);
-        }
-        
-        return entalpy;
-    }
-    
-    // Constructs an IndexOutOfBoundsException detail message.
+    /**
+     * Constructs an IndexOutOfBoundsException detail message.
+     */
     private String getOutOfBoundsMessage(int index) {
         return "Index: " + index + ", Size: " + size;
     }
 
-    // Computes the recommended number of fingers.
+    /**
+     * Computes the recommended number of fingers.
+     * 
+     * @return the recommended number of fingers. Equals 
+     * \(\Bigg\lceil\sqrt{N}\Bigg\rceil\), \(N\) is {@code size}.
+     */
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size));
     }
     
-    // Computes the hash code for the range [from, to):
+    /**
+     * Computes the hash code for the range {@code this[from, to - 1]} and 
+     * returns it.
+     * 
+     * @param from the starting, inclusive index.
+     * @param to   the ending, exclusive index.
+     * @return the hash value of the range.
+     */
     private int hashCodeRange(int from, int to) {
         int hashCode = 1;
         
@@ -2475,12 +2681,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return hashCode;
     }
     
-    // Increases the size of the list and its modification count.
+    /**
+     * Increases the size of the list and its modification count.
+     */
     private void increaseSize() {
         ++size;
         ++modCount;
     }
     
+    /**
+     * Returns the index of the leftmost occurrence of the object {@code o}.
+     * 
+     * @param o     the object to search. May be {@code null}.
+     * @param start the starting, inclusive index of the range to search.
+     * @param end   the ending, exclusive index of the range to search.
+     * @return the leftmost occurrence index.
+     */
     private int indexOfRange(Object o, int start, int end) {
         int index = start;
         
@@ -2505,7 +2721,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return -1;
     }
     
-    // Inserts the input collection right before the node 'succ'.
+    /**
+     * Inserts the input collection right before the node {@code succ}.
+     * 
+     * @param c         the collection to insert.
+     * @param succ      the node that is right before the end of the inserted 
+     *                  collection.
+     * @param succIndex the appearance index of {@code succ} in the list.
+     */
     private void insertAll(Collection<? extends E> c,
                            Node<E> succ,
                            int succIndex) {
@@ -2533,18 +2756,36 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  sz);
     }
 
-    // Tells if the argument is the index of an existing element.
+    /**
+     * Tells if the argument is the index of an existing element. The index is
+     * valid if it is in the set \(\{0, 1, ..., size - 1\}\).
+     * 
+     * @param index the index to validate.
+     * @return {@code true} if and only if the index is valid.
+     */
     private boolean isElementIndex(int index) {
         return index >= 0 && index < size;
     }
 
-    // Tells if the argument is the index of a valid position for an iterator or 
-    // an add operation.
+    /**
+     * Tells if the argument is the index of a valid position for an iterator or 
+     * an add operation. The index is valid if it is in set
+     * \(\{ 0, 1, ..., size\}\).
+     * 
+     * @param index the index to validate.
+     * @return {@code true} if and only if the index is valid.
+     */
     private boolean isPositionIndex(int index) {
         return index >= 0 && index <= size;
     }
     
-    // Returns the last appearance index of 'obj'.
+    /**
+     * Returns the last appearance index of {@code obj}.
+     *
+     * @param o     the object to search for.
+     * @param start the starting, inclusive index of the range to search.
+     * @param end   the ending, exclusive index of the range to search.
+     */
     private int lastIndexOfRange(Object o, int start, int end) {
         int index = end - 1;
         
@@ -2569,7 +2810,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return -1;
     }
     
-    // Links the input element right before the node 'succ'.
+    /**
+     * Links the input element right before the node {@code succ}.
+     * 
+     * @param e     the element to link.
+     * @param succ  the node before which to link the {@code e}'s node.
+     * @param index the index of {@code e}.
+     */
     private void linkBefore(E e, Node<E> succ, int index) {
         Node<E> pred = succ.prev;
         Node<E> newNode = new Node<>(e);
@@ -2595,7 +2842,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Prepends the input element to the head of this list.
+    /**
+     * Prepends the input element to the head of this list.
+     * 
+     * @param e the element to prepend.
+     */
     private void linkFirst(E e) {
         Node<E> f = first;
         Node<E> newNode = new Node<>(e);
@@ -2617,7 +2868,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Appends the input element to the tail of this list.
+    /**
+     * Appends the input element to the tail of this list.
+     * 
+     * @param e the element to append.
+     */
     private void linkLast(E e) {
         Node<E> l = last;
         Node<E> newNode = new Node<>(e);
@@ -2639,9 +2894,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Sets a finger that does not point to the element to remove. We need this
-    // in order to make sure that after removal, all the fingers point to valid
-    // nodes.
+    /**
+     * Moves the {@code finger} out of the element with index 
+     * {@code finger.index}.
+     * 
+     * @param finger the finger to move. 
+     */
     void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
         if (fingerList.size() == size()) {
             // Here, fingerList.size() is 1 or 2 and the size of the list is the
@@ -2722,14 +2980,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.get(fingerList.size()).index--;
     }
     
-    // Returns true only if this list requires more fingers.
+    /**
+     * Returns {@code true} if and only if this list requires more fingers.
+     * 
+     * @return {@code true} if and only if this list requires more fingers.
+     */
     private boolean mustAddFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() - 1
         return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
-    // Returns true only if this list requires less fingers.
+    /**
+     * Returns {@code true} if and only if this list requires less fingers.
+     * 
+     * @return {@code true} if and only if this list requires less fingers.
+     */
     private boolean mustRemoveFinger() {
         // Here, fingerStack.size() == getRecommendedFingerCount(), or,
         // fingerStack.size() == getRecommendedFingerCount() + 1
