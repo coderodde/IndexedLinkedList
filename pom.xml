@@ -151,6 +151,7 @@
                 <version>3.4.0</version>
                 <configuration>
                     <additionalOptions>
+                        <additionalOption>-private</additionalOption>
                         <additionalOption>--allow-script-in-comments</additionalOption>
                         <additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>
                     </additionalOptions>
