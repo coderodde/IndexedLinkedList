@@ -3002,12 +3002,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return fingerList.size() != getRecommendedNumberOfFingers();
     }
     
-    // Returns the node at index 'elementIndex'.
+    /**
+     * Returns the node at index {@code elementIndex}.
+     * 
+     * @param elementIndex the index of the target element.
+     * @return the node containing the target element.
+     */
     private Node<E> node(int elementIndex) {
          return fingerList.node(elementIndex);
     }
     
-    // Prepends the input collection to the head of this list.
+    /**
+     * Prepends the input collection to the head of this list.
+     * 
+     * @param c the collection to prepend.
+     */
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
         Node<E> oldFirst = first;
@@ -3090,11 +3099,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         last = rightmostNode;
     }
     
+    /**
+     * Removes the last non-sentinel finger from the finger list. 
+     */
     private void removeFinger() {
         fingerList.removeFinger();
     }
     
-    // Removes all the items that satisfy the given predicate.
+    /**
+     * Removes all the items that satisfy the given predicate.
+     * 
+     * @param filter the filter object.
+     * @param fromIndex the starting, inclusive index of the range to crawl.
+     * @param toIndex   the ending, exclusive index of the range to crawl.
+     * 
+     * @return {@code true} if and only if this list was modified.
+     */
     private boolean removeIf(Predicate<? super E> filter,
                              int fromIndex, 
                              int toIndex) {
@@ -3121,7 +3141,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return modified;
     }
     
-    // Implements the node removal. 
+    /**
+     * Implements the node removal. 
+     * 
+     * @param node  the node to remove.
+     * @param index the index of {@code node}.
+     */
     private void removeObjectImpl(Node<E> node, int index) {
         int closestFingerIndex = fingerList.getFingerIndex(index);
         Finger<E> closestFinger = fingerList.get(closestFingerIndex);
@@ -3151,8 +3176,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Removes the finger range 'fingereList[fromIndex], ..., 
-    // fingerList[toIndex - 1]'.
+    /**
+     * Removes the finger range {@code [fromIndex, ..., toIndex - 1]}.
+     * 
+     * @param fromIndex the staring, inclusive range index.
+     * @param toIndex   the ending, exclusive range index.
+     */
     private void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
@@ -3247,7 +3276,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         size -= removalSize;
     }
     
-    // Removes the unnecessary fingers when the prefix and suffix are empty.
+    /**
+     * Removes the unnecessary fingers when the prefix and suffix are empty.
+     * 
+     * @param node        the first node of the removed range.
+     * @param fromIndex   the index of {@code node}.
+     * @param removalSize the number of elements being removed.
+     */
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
@@ -3307,8 +3342,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 removalSize);
     }
     
-    // Unlinks the 'numberOfNodesToRemove' consecutive nodes starting from 
-    // 'node'.
+    /**
+     * Unlinks the {@code numberOfNodesToRemove} consecutive nodes starting from 
+     * {@code node}.
+     * 
+     * @param node                  the staring node of the range to remove.
+     * @param numberOfNodesToRemove the number of nodes to remove.
+     */
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
         Node<E> nextNode = node;
@@ -3340,7 +3380,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // Replaces all the elements from range [i, end):
+    /**
+     * Replaces all the elements from range {@code [i, end - 1]}.
+     * 
+     * @param operator the replacement operator.
+     * @param i the starting, inclusive index of the range to replace.
+     * @param end the ending, exclusive index of the range to replace.
+     */
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
         Objects.requireNonNull(operator);
         int expectedModCount = modCount;
@@ -3373,7 +3419,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return startNode;
     }
     
-    // Sets the input collection as a list.
+    /**
+     * Sets the input collection as a list.
+     * 
+     * @param c the collection to set.
+     */
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
@@ -3417,7 +3467,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    // If steps > 0, rewind to the left. Otherwise, rewind to the right.
+    /**
+     * If steps > 0, rewind to the left. Otherwise, rewind to the right.
+     * 
+     * @param finger the finger to traverse.
+     * @param steps  the number of steps to traverse the {@code finger}.
+     */
     private Node<E> traverseLinkedListBackwards(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
@@ -3436,7 +3491,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return node;
     }
     
-    // Unlinks the input node from the actual doubly-linked list.
+    /**
+     * Unlinks the input node from the actual doubly-linked list.
+     * 
+     * @param x the node to unlink from the underlying linked list.
+     */
     private void unlink(Node<E> x) {
         Node<E> next = x.next;
         Node<E> prev = x.prev;
@@ -3483,17 +3542,54 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * This static inner class implements the spliterator over this list.
+     * 
+     * @param <E> the node datum type. 
+     */
     static final class LinkedListSpliterator<E> implements Spliterator<E> {
         
-        static final long MINIMUM_BATCH_SIZE = 1 << 10; // 1024 items
+        /**
+         * The minimum batch size.
+         */
+        static final long MINIMUM_BATCH_SIZE = 1024L;
         
+        /**
+         * The target list.
+         */
         private final IndexedLinkedList<E> list;
         private Node<E> node;
+        
+        /**
+         * The length of this spliterator.
+         */
         private long lengthOfSpliterator;
+        
+        /**
+         * The number of processed elements so far.
+         */
         private long numberOfProcessedElements;
+        
+        /**
+         * 
+         */
         private long offsetOfSpliterator;
+        
+        /**
+         * The expected modification count. We rely on this in order to catch 
+         * the modifications from outside the spliterator API.
+         */
         private final int expectedModCount;
         
+        /**
+         * Constructs a new spliterator.
+         * 
+         * @param list                the target list to split.
+         * @param node                the initial node of this spliterator.
+         * @param lengthOfSpliterator the length of this spliterator.
+         * @param offsetOfSpliterator the offset of this spliterator.
+         * @param expectedModCount    the expected modification count.
+         */
         private LinkedListSpliterator(IndexedLinkedList<E> list,
                                       Node<E> node,
                                       long lengthOfSpliterator,
@@ -3506,6 +3602,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.expectedModCount = expectedModCount;
         }
 
+        /**
+         * Makes an attempt to advance in this spliterator.
+         * 
+         * @param action the action which to apply to the advanced element.
+         * @return {@code true} if and only if there were an element to advance.
+         */
         @Override
         public boolean tryAdvance(Consumer<? super E> action) {
             if (action == null) {
@@ -3528,6 +3630,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
 
+        /**
+         * Applies {@code action} to all remaining elements in this spliterator.
+         * 
+         * @param action the action to apply to each remaining element.
+         */
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
@@ -3547,6 +3654,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+        /**
+         * Attempts to split this spliterator. Upon success, it returns the rest
+         * of this spliterator, and a child spliterator working on the another
+         * half of the range.
+         * 
+         * @return another spliterator, or {@code null} if splitting was not 
+         *         possible.
+         */
         @Override
         public Spliterator<E> trySplit() {
             long sizeLeft = estimateSize();
@@ -3578,16 +3693,35 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                                expectedModCount);
         }
 
+        /**
+         * Returns the estimated size left. This method, however, returns the 
+         * exact size estimate.
+         * 
+         * @return the number of elements in this spliterator not yet advanced
+         *         over.
+         */
         @Override
         public long estimateSize() {
             return (long)(lengthOfSpliterator - numberOfProcessedElements);
         }
 
+        /**
+         * Just like {@link #estimateSize()}, returns the exact number of 
+         * elements not yet advanced over via this spliterator.
+         * 
+         * @return the number of elements in this spliterator not yet advanced
+         *         over.
+         */
         @Override
         public long getExactSizeIfKnown() {
             return estimateSize();
         }
 
+        /**
+         * Returns characteristics masks.
+         * 
+         * @return characteristics masks.
+         */
         @Override
         public int characteristics() {
             return Spliterator.ORDERED | 
@@ -3595,6 +3729,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                    Spliterator.SIZED;
         }
         
+        /**
+         * Queries for particular characteristics.
+         * 
+         * @param characteristics the characteristic flag.
+         * @return {@code true} if and only if this spliterator supports the 
+         *         {@code characteristics}.
+         */
         @Override
         public boolean hasCharacteristics(int characteristics) {
             return switch (characteristics) {
