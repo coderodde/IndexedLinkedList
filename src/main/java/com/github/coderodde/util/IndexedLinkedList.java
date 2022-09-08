@@ -4481,7 +4481,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Operates in batch over all the elements in {@code c}.
          * 
-         * @param c
+         * @param c          the target collection to operate on.
          * @param complement the mode flag. If {@code true}, all elements in 
          *                   {@code c} will be removed from this view, and if
          *                   {@code false}, all elements <b><i>not</i></b> in
