@@ -1,4 +1,4 @@
-    package com.github.coderodde.util;
+package com.github.coderodde.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -70,28 +70,44 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     class FingerList<E> {
 
-        // This is also the minimum capacity.
+        /**
+         * This is also the minimum capacity.
+         */
         private static final int INITIAL_CAPACITY = 8;
 
-        // The actual list storage array:
+        /** 
+         * The actual list storage array.
+         */
         Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
 
-        // The number of fingers stored in the list. This field does not count
-        // the end-of-list sentinel finger 'F' for which 'F.index = size'.
+        /**
+         * The number of fingers stored in the list. This field does not count
+         * the end-of-list sentinel finger {@code F} for which 
+         * {@code F.index = size}.
+         */
         private int size;
 
-        // Constructs the empty finger list consisting only of end-of-list 
-        // sentinel finger.
+        /**
+         * Constructs the empty finger list consisting only of end-of-list 
+         * sentinel finger.
+         */
         private FingerList() {
             fingerArray[0] = new Finger<>(null, 0);
         }
         
+        /**
+         * Returns the textual representation of this finger list.
+         * 
+         * @return the textual representation. 
+         */
         @Override
         public String toString() {
             return "[FingerList, size = " + size + "]";
         }
         
-        // Appends the input finger to the tail of the finger list:
+        /**
+         * Appends the input finger to the tail of the finger list.
+         */
         void appendFinger(Finger<E> finger) {
             size++;
             enlargeFingerArrayIfNeeded(size + 1);
@@ -100,7 +116,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
-        // Not 'private' since is used in the unit tests.
+        /**
+         * Clears entirely this finger list. Only the end-of-finger-list finger
+         * remains in the finger list. Not {@code private} since is used in the
+         * unit tests.
+         */
         void clear() {
             Arrays.fill(fingerArray, 0, size, null);
             fingerArray = new Finger[INITIAL_CAPACITY];
@@ -108,16 +128,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
             size = 0;
         }
         
+        /**
+         * Returns {@code index}th finger.
+         * 
+         * @param index the index of the target finger.
+         * @return the {@code index}th finger.
+         */
         Finger<E> get(int index) {
             return fingerArray[index];
         }
         
-        // Returns the index of the finger that is closest to the 
-        // 'elementIndex'th list element.
+        /**
+         * Returns the index of the finger that is closest to the 
+         * {@code elementIndex}th list element.
+         */
         int getFingerIndex(int elementIndex) {
             return normalize(getFingerIndexImpl(elementIndex), elementIndex);
         }
 
+        /**
+         * Returns the number of fingers in this finger list not counting the
+         * end-of-finger-list finger.
+         * 
+         * @return the number of fingers in this finger list.
+         */
         int size() {
             return size;
         }
@@ -139,9 +173,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             shiftFingerIndicesToLeftOnceAll(lastPrefixIndex);
         }
         
-        // We can save some space while keeping the finger array operations 
-        // amortized O(1). The 'nextSize' defines the requested finger array 
-        // size not counting the end-of-finger-list sentinel finger:
+        /**
+         * Contracts the finger array, if possible. The {@code nextSize} defines
+         * the requested finger array size not counting the end-of-finger-list 
+         * sentinel finger.
+         * 
+         * @param nextSize the requested size not counting the 
+         *                 end-of-finger-list sentinel finger.
+         */
         private void contractFingerArrayIfNeeded(int nextSize) {
             // Can we contract at least once?
             if ((nextSize + 1) * 4 < fingerArray.length 
@@ -160,7 +199,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
-        // Makes sure that the next finger fits in this finger stack:
+        /**
+         * Enlarges the finger array so that it can accommodate 
+         * {@code requestedSize} fingers.
+         * 
+         * @param requestedSize the requested size, including the 
+         *                      end-of-finger-list sentinel finger.
+         */
         private void enlargeFingerArrayIfNeeded(int requestedSize) {
             // If the finger array is full, double the capacity:
             if (requestedSize > fingerArray.length) {
@@ -177,9 +222,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
-        // Returns the finger index 'i', such that 'fingerArray[i].index' is no
-        // less than 'i', and is closest to 'i'. This algorithm is translated
-        // from https://en.cppreference.com/w/cpp/algorithm/lower_bound 
+        /**
+         * Returns the finger index {@code i}, such that
+         * {@code fingerArray[i].index} is no less than {@code elementIndex}, 
+         * and {@code fingerArray[i].index} is closest to {@code elementIndex}. 
+         * This algorithm is translated from
+         * <a href="https://en.cppreference.com/w/cpp/algorithm/lower_bound">C++ <tt>lower_bound</tt> algorithm</a>.
+         */
         private int getFingerIndexImpl(int elementIndex) {
             int count = size + 1; // + 1 for the end sentinel.
             int it;
@@ -436,8 +485,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             size++;
         }
         
-        // Removes the last finger residing right before the end-of-finger-list
-        // sentinel finger:
+        /**
+         * Removes the last finger residing right before the end-of-finger-list
+         * sentinel finger:
+         */
         private void removeFinger() {
             contractFingerArrayIfNeeded(--size);
             fingerArray[size] = fingerArray[size + 1];
@@ -445,7 +496,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerArray[size].index = IndexedLinkedList.this.size;
         }
         
-        // Removes the finger range [startFingerIndex, endFingerIndex).
+        /**
+         * Removes the finger range {@code [prefixSize, size - suffixSize]}
+         * from the finger list.
+         */
         private void removeRange(int prefixSize, 
                                  int suffixSize,
                                  int nodesToRemove) {
@@ -469,12 +523,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                         null);
         }
         
+        /**
+         * Sets the finger {@code finger} to the finger array at index 
+         * {@code index}.
+         * 
+         * @param index  the index of the finger list component.
+         * @param finger the target finger to set.
+         */
         private void setFinger(int index, Finger<E> finger) {
             fingerArray[index] = finger;
         }
 
-        // Moves all the fingers in range [startFingerIndex, size] 
-        // 'shiftLength' positions to the left (towards smaller indices):
+        /**
+         * Moves all the fingers in range {@code [startFingerIndex, size]} 
+         * {@code shiftLength} positions to the left (towards smaller indices).
+         */
         private void shiftFingerIndicesToLeft(int startFingerIndex,      
                                               int shiftLength) {
             for (int i = startFingerIndex; i <= size; ++i) {
@@ -482,16 +545,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        // Moves all the fingers in range [startFingerIndex, endFingerIndex] one 
-        // position to the left (towards smaller indices):
+        /**
+         * Moves all the fingers in range {@code [startFingerIndex, size]} one 
+         * position to the left (towards smaller indices).
+         */
         private void shiftFingerIndicesToLeftOnceAll(int startFingerIndex) {
             for (int i = startFingerIndex; i <= size; ++i) {
                 fingerArray[i].index--;
             }
         }
         
-        // Moves all the fingers in range [startFingerIndex, size] 
-        // 'shiftLength' positions to the right (towards larger indices):
+        /**
+         * Moves all the fingers in range [startFingerIndex, size] 
+         * {@code shiftLength} positions to the right (towards larger indices).
+         */ 
         private void shiftFingerIndicesToRight(int startIndex,      
                                                int shiftLength) {
             for (int i = startIndex; i <= size; ++i) {
@@ -499,40 +566,92 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        // Moves all the fingers in range [startFingerIndex, size] one  
-        // position to the right (towards larger indices):
+        /**
+         * Moves all the fingers in range [startFingerIndex, size] one position 
+         * to the right (towards larger indices).
+         */
         private void shiftFingerIndicesToRightOnce(int startIndex) {
             shiftFingerIndicesToRight(startIndex, 1);
         }
     }
     
+    /**
+     * This static inner class implements the actual linked list node.
+     * 
+     * @param <E> the type of the satellite data.
+     */
     static final class Node<E> {
     
+        /**
+         * The actual satellite datum.
+         */
         E item;
+        
+        /**
+         * The previous node or {@code null} if this {@link Node} is the head of
+         * the list.
+         */
         Node<E> prev;
+        
+        /**
+         * The next node or {@code null} if this {@link Node} is the tail of the
+         * list.
+         */
         Node<E> next;
 
+        /**
+         * Constructs a new {@link Node} object.
+         * 
+         * @param item the satellite datum of the newly created {@link Node}.
+         */
         Node(E item) {
             this.item = item;
         }
 
+        /**
+         * Returns the textual representation of this {@link Node}.
+         * 
+         * @return the textual representation.
+         */
         @Override
         public String toString() {
             return "[Node; item = " + item + "]";
         }
     }
     
+    /**
+     * This static inner class implements the actual finger.
+     * 
+     * @param <E> the type of the list's satellite data.
+     */
     static final class Finger<E> {
  
+        /**
+         * The pointed to {@link Node}.
+         */
         Node<E> node;
-        int index; // Index at which 'node' is located.
-        int updateIndex;
+        
+        /**
+         * The index at which the {@code node} appears in the list.
+         */
+        int index;
 
+        /**
+         * Constructs a new {@link Finger}.
+         * 
+         * @param node  the pointed node.
+         * @param index the index of {@code node} in the actual list.
+         */
         Finger(Node<E> node, int index) {
             this.node = node;
             this.index = index;
         }
 
+        /**
+         * Returns the textual representation of this finger.
+         * 
+         * @return the textual representation.
+         */
         @Override
         public String toString() {
             return "[Finger; index = " + index + 
@@ -540,7 +659,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     "]";
         }
 
-        // Moves this finger 'steps' position to the left
+        /**
+         * Moves this finger {@code steps} position to the left.
+         */
         void rewindLeft(int steps) {
             for (int i = 0; i < steps; i++) {
                 node = node.prev;
@@ -549,7 +670,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             index -= steps;
         }
 
-        // Moves this finger 'steps' position to the right
+        /**
+         * Moves this finger {@code steps} position to the right.
+         */
         void rewindRight(int steps) {
             for (int i = 0; i < steps; i++) {
                 node = node.next;
