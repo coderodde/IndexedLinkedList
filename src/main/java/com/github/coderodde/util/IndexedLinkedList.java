@@ -841,7 +841,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Inserts the specified element at the specified position in this list.
      * The affected finger indices will be incremented by one. A finger 
      * {@code F} is <i>affected</i>, if {@code F.index >= index}. Runs in
-     * \(\mathcal{O}(\sqrt{n})\) time.
+     * \(\mathcal{O}(\sqrt{\mathrm{size}})\) time.
      *
      * @param index index at which the specified element is to be inserted.
      * @param element element to be inserted.
@@ -864,8 +864,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * iterator.  The behavior of this operation is undefined if the specified 
      * collection is modified while the operation is in progress. (Note that 
      * this will occur if the specified collection is this list, and it's
-     * nonempty.) Runs in \(\mathcal{O}(m + \sqrt{m + n})\), where \(m = |c|\)
-     * and \(n\) is the size of this list.
+     * nonempty.) Runs in \(\mathcal{O}(m + \sqrt{m + n} - \sqrt{n})\), where
+     * \(m = |c|\) and \(n\) is the size of this list.
      *
      * @param c collection containing elements to be added to this list.
      * @return {@code true} if this list changed as a result of the call.
@@ -880,8 +880,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Inserts all of the elements in the specified collection into this list, 
      * starting at the specified position. For each finger {@code F} with 
      * {@code F.index >= index} will increment {@code F.index} by 1. Runs in 
-     * \(\mathcal{O}(m + \sqrt{m + n})\), where \(m = |c|\) and \(n\) is the 
-     * size of this list.
+     * \(\Theta(m + \sqrt{m + n} - \sqrt{n}) + \mathcal{O}(\sqrt{n})\), where 
+     * \(m = |c|\) and \(n\) is the size of this list.
      *
      * @param index index at which to insert the first element from the
      *              specified collection.
@@ -912,7 +912,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds the element {@code e} before the head of this list. Runs in Runs in 
+     * Adds the element {@code e} before the head of this list. Runs in 
      * \(\mathcal{O}(\sqrt{n})\) time.
      * 
      * @param e the element to add.
@@ -1035,7 +1035,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the clone list with same content as this list.
+     * Returns a clone list with same content as this list.
      * 
      * @return the clone list.
      */
@@ -1124,8 +1124,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns {@code index}th element. Runs in worst-case Runs in worst-case
-     * \(\mathcal{O}(\sqrt{n})\) time.
+     * Returns {@code index}th element. Runs in the worst-case 
+     * \(\mathcal{O}(\sqrt{n})\) time, but may run in \(\mathcal{O}(\sqrt{n})\)
+     * if the entropy of this list is high.
      * 
      * @return {@code index}th element.
      * @throws IndexOutOfBoundsException if the index is out of range
@@ -1139,7 +1140,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Computes and returns the entropy of this list, which is defined as
-     * \(H = 1 - \frac{1}{N} \sum_{i = 0}^{n - 1} \Bigg|f_{i + 1} - f_i - \sqrt{N}\Bigg| \)
+     * \[
+     * H = 1 - \frac{1}{N} \sum_{i = 0}^{n - 1} \Bigg|f_{i + 1} - f_i - \sqrt{N}\Bigg|. 
+     * \]
+     * The larger the entropy, the faster the single-element operations should
+     * run.
      * 
      * @return the entropy of this list.
      */
@@ -1431,9 +1436,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * Removes the leftmost occurrence of {@code o} in this list. Runs in worst-
-     * case Runs in \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for
-     * iterating the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the 
-     * fingers.
+     * case \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for iterating 
+     * the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the fingers.
      * 
      * @return {@code true} only if {@code o} was located in this list and, 
      *         thus, removed.
@@ -1649,7 +1653,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Remove all the elements that <strong>do not</strong> appear in 
      * {@code c}. Runs in worst-case \(\mathcal{O}(nf + n\sqrt{n})\) time, where
-     * the inclusion check is run in \(\mathcal{O}(f)\) time.
+     * the inclusion check in {@code c} is run in \(\mathcal{O}(f)\) time.
      * 
      * @param c the collection of elements to retain.
      * @return {@code true} only if at least one element was removed.
@@ -1723,7 +1727,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Returns a sublist view 
-     * {@code list[fromIndex, fromIndex + 1, ..., toIndex - 1}.
+     * {@code list[fromIndex, fromIndex + 1, ..., toIndex - 1]}.
      * 
      * @param fromIndex the smallest index, inclusive.
      * @param toIndex the largest index, exclusive.
@@ -1833,7 +1837,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Computes the recommended number of fingers for {@code size} elements. 
-     * Equals \(\Bigg\lceil \sqrt{N} \Bigg\rceil\), where \(N = \){@code size}.
+     * Equals \(\Bigg\lceil \sqrt{N} \Bigg\rceil\), where \(N = \) {@code size}.
      * 
      * @param size the size for which we want to compute the recommended number
      *             of fingers.
@@ -2196,7 +2200,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Checks the element index. In the case of non-empty list, valid indices 
-     * are {@code \{ 0, 1, ..., size - 1 }}'.
+     * are {@code { 0, 1, ..., size - 1 }}.
      * 
      * @param index the index to validate.
      * @throws IndexOutOfBoundsException if the {@code index} is not a valid 
@@ -2214,7 +2218,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @param expectedModCount the modification count to check.
      * @throws ConcurrentModificationException if the cached and the input 
-     *                                         modifications differ.
+     *                                         modification counts differ.
      */
     private void checkForComodification(int expectedModCount) {
         if (modCount != expectedModCount) {
@@ -2226,7 +2230,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Checks that the input index is a valid position index for 
      * {@link #add(int, java.lang.Object)} operation or iterator position. In 
      * other words, checks that {@code index} is in the set 
-     * {@code \{0, 1, ..., size}}'.
+     * {@code {0, 1, ..., size}}.
      * 
      * @param index the index to validate.  
      */
@@ -2695,7 +2699,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Computes the recommended number of fingers.
      * 
      * @return the recommended number of fingers. Equals 
-     * \(\Bigg\lceil\sqrt{N}\Bigg\rceil\), \(N\) is {@code size}.
+     * \(\Bigg\lceil\sqrt{N}\Bigg\rceil\), where \(N\) is {@code size}.
      */
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size));
@@ -2735,7 +2739,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Returns the index of the leftmost occurrence of the object {@code o}.
+     * Returns the index of the leftmost occurrence of the object {@code o} in
+     * the range {@code this[start ... end - 1]}.   
      * 
      * @param o     the object to search. May be {@code null}.
      * @param start the starting, inclusive index of the range to search.
@@ -2803,7 +2808,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
     /**
      * Tells if the argument is the index of an existing element. The index is
-     * valid if it is in the set \(\{0, 1, ..., size - 1\}\).
+     * valid if it is in the set \(\{0, 1, ..., \) {@code size}\( - 1\}\).
      * 
      * @param index the index to validate.
      * @return {@code true} if and only if the index is valid.
@@ -2815,7 +2820,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Tells if the argument is the index of a valid position for an iterator or 
      * an add operation. The index is valid if it is in set
-     * \(\{ 0, 1, ..., size\}\).
+     * \(\{ 0, 1, ..., \) {@code size}\(\}\).
      * 
      * @param index the index to validate.
      * @return {@code true} if and only if the index is valid.
@@ -3226,7 +3231,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes the finger range {@code [fromIndex, ..., toIndex - 1]}.
+     * Removes the list range {@code [fromIndex, ..., toIndex - 1]}.
      * 
      * @param fromIndex the staring, inclusive range index.
      * @param toIndex   the ending, exclusive range index.
@@ -3326,7 +3331,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Removes the unnecessary fingers when the prefix and suffix are empty.
+     * Removes the unnecessary fingers when the prefix and the suffix are empty.
      * 
      * @param node        the first node of the removed range.
      * @param fromIndex   the index of {@code node}.
@@ -3454,7 +3459,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Scrolls the input node {@code scrolls} positions towards the tail of the
-     * linked list and returns the node being reached.
+     * linked list and returns the reached node.
      * 
      * @param startNode the node from which to start the scrolling.
      * @param scrolls   the number of positions to scroll.
@@ -3518,7 +3523,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * If steps > 0, rewind to the left. Otherwise, rewind to the right.
+     * If steps > 0, rewind to the left. Otherwise, rewinds to the right.
      * 
      * @param finger the finger to traverse.
      * @param steps  the number of steps to traverse the {@code finger}.
