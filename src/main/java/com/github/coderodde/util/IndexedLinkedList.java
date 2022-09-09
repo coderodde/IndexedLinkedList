@@ -3886,7 +3886,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public boolean add(E e) {
-            checkInsertionIndex(size);
+            checkInsertionIndex(size); 
             checkForComodification();
             root.add(offset + size, e);
             updateSizeAndModCount(1);
