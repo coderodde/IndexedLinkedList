@@ -29,7 +29,8 @@ jobs:
           name: Test
           command: mvn test
       # Oh fuck yeah.
-      - codecov/upload
+      - codecov/upload:
+          file: target/cov/coverage.xml
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
