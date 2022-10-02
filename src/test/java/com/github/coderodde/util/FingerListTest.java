@@ -42,31 +42,31 @@ public class FingerListTest {
         fl.fingerArray[4].index = 8;
         fl.fingerArray[4].node = new Node<>(Integer.valueOf(1000));
         
-        Finger<Integer> finger = fl.get(fl.getFingerIndex(0));
+        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(0));
         assertEquals(0, finger.index);
         assertEquals(Integer.valueOf(0), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(1));
+        finger = fl.get(fl.getClosestFingerIndex(1));
         assertEquals(1, finger.index);
         assertEquals(Integer.valueOf(1), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(2));
+        finger = fl.get(fl.getClosestFingerIndex(2));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(3));
+        finger = fl.get(fl.getClosestFingerIndex(3));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(4));
+        finger = fl.get(fl.getClosestFingerIndex(4));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(5));
+        finger = fl.get(fl.getClosestFingerIndex(5));
         assertEquals(6, finger.index);
         assertEquals(Integer.valueOf(6), finger.node.item);
         
-        finger = fl.get(fl.getFingerIndex(6));
+        finger = fl.get(fl.getClosestFingerIndex(6));
         assertEquals(6, finger.index);
         assertEquals(Integer.valueOf(6), finger.node.item);
     }
@@ -82,7 +82,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
         
-        Finger<Integer> finger = fl.get(fl.getFingerIndex(0));
+        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(0));
         assertEquals(insertionFinger.index, finger.index);
         
         assertEquals(5, fl.size());
@@ -102,7 +102,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
 
-        Finger<Integer> finger = fl.get(fl.getFingerIndex(6));
+        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(6));
         assertEquals(insertionFinger.index, finger.index);
         
         assertEquals(4, fl.size());

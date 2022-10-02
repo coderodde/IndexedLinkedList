@@ -63,6 +63,22 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void debugAdjustOnRemoveFirst() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        list.fingerList.fingerArray[0].index = 0;
+        list.fingerList.fingerArray[1].index = 1;
+        list.fingerList.fingerArray[2].index = 3;
+        list.fingerList.fingerArray[3].index = 5;
+        
+        list.fingerList.fingerArray[0].node = list.first;
+        list.fingerList.fingerArray[1].node = list.first.next;
+        list.fingerList.fingerArray[2].node = list.first.next.next.next;
+        
+        list.removeFirst();
+        list.checkInvarant();
+    }
+    
+    @Test
     public void addFirstLarge() {
         List<Integer> l = getIntegerList(1000);
         
