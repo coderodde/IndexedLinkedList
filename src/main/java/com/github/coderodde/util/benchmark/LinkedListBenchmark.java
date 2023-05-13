@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.list.CursorableLinkedList;
-import org.apache.commons.collections4.list.NodeCachingLinkedList;
 import org.apache.commons.collections4.list.TreeList;
 
 final class LinkedListBenchmark {
@@ -39,25 +37,16 @@ final class LinkedListBenchmark {
     private Random randomJavaUtilArrayList;
     private Random randomRoddeList;
     private Random randomTreeList;
-    private Random randomCachingList;
-    private Random randomCursorableList;
     
     private IndexedLinkedList<Integer> roddeList = new IndexedLinkedList<>();
     private LinkedList<Integer> linkedList = new LinkedList<>();
     private ArrayList<Integer> arrayList = new ArrayList<>();
     private TreeList<Integer> treeList = new TreeList<>();
-    private NodeCachingLinkedList<Integer> cachingList =
-            new NodeCachingLinkedList<>(NODE_CACHE_SIZE);
-    
-    private CursorableLinkedList<Integer> cursorableList = 
-            new CursorableLinkedList<>();
 
     private long totalMillisRoddeList      = 0L;
     private long totalMillisLinkedList     = 0L;
     private long totalMillisArrayList      = 0L;
     private long totalMillisTreeList       = 0L;
-    private long totalMillisCachingList    = 0L;
-    private long totalMillisCursorableList = 0L;
     
     private final boolean runSubListClear;
     private final boolean runRemoveAll;
@@ -69,6 +58,7 @@ final class LinkedListBenchmark {
                         boolean runSubListClear, 
                         boolean runRemoveAll,
                         boolean runSort) {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         
         this.seed = seed;
         this.runSubListClear = runSubListClear;
@@ -119,17 +109,13 @@ final class LinkedListBenchmark {
         randomJavaUtilArrayList  = new Random(seed);
         randomRoddeList          = new Random(seed);
         randomTreeList           = new Random(seed);
-        randomCachingList        = new Random(seed);
-        randomCursorableList     = new Random(seed);
     }
 
     private void listsEqual() {
         listsEqual(roddeList,
                    linkedList, 
                    arrayList, 
-                   treeList,
-                   cachingList,
-                   cursorableList);
+                   treeList);
     }
 
     private static void listsEqual(List<Integer>... lists) {
@@ -210,17 +196,13 @@ final class LinkedListBenchmark {
         totalMillisLinkedList     = 0;
         totalMillisRoddeList      = 0;
         totalMillisTreeList       = 0;
-        totalMillisCachingList    = 0;
-        totalMillisCursorableList = 0;
     }
 
     private void resetLists() {
-        roddeList      = new IndexedLinkedList<>();
-        linkedList     = new java.util.LinkedList<>();
-        arrayList      = new ArrayList<>();
-        treeList       = new TreeList<>();
-        cachingList    = new NodeCachingLinkedList<>(NODE_CACHE_SIZE);
-        cursorableList = new CursorableLinkedList<>();
+        roddeList  = new IndexedLinkedList<>();
+        linkedList = new java.util.LinkedList<>();
+        arrayList  = new ArrayList<>();
+        treeList   = new TreeList<>();
     }
 
     private void profileAddFirst() {
@@ -228,8 +210,6 @@ final class LinkedListBenchmark {
         profileAddFirstLinkedList();
         profileAddFirstArrayList();
         profileAddFirstTreeList();
-        profileAddFirstCachingList();
-        profileAddFirstCursorableList();
 
         listsEqual();
         System.out.println();
@@ -240,8 +220,6 @@ final class LinkedListBenchmark {
         profileAddLastLinkedList();
         profileAddLastArrayList();
         profileAddLastTreeList();
-        profileAddLastCachingList();
-        profileAddLastCursorableList();
 
         listsEqual();
         System.out.println();
@@ -252,8 +230,6 @@ final class LinkedListBenchmark {
         profileAddIndexLinkedList();
         profileAddIndexArrayList();
         profileAddIndexTreeList();
-        profileAddIndexCachingList();
-        profileAddIndexCursorableList();
 
         listsEqual();
         System.out.println();
@@ -264,8 +240,6 @@ final class LinkedListBenchmark {
         profileAddCollectionLinkedList();
         profileAddCollectionArrayList();
         profileAddCollectionTreeList();
-        profileAddCollectionCachingList();
-        profileAddCollectionCursorableList();
 
         listsEqual();
         System.out.println();
@@ -276,8 +250,6 @@ final class LinkedListBenchmark {
         profileGetLinkedList();
         profileGetArrayList();
         profileGetTreeList();
-        profileGetCachingList();
-        profileGetCursorableList();
         
         listsEqual();
         
@@ -289,8 +261,6 @@ final class LinkedListBenchmark {
         profileRemoveFirstLinkedList();
         profileRemoveFirstArrayList();
         profileRemoveFirstTreeList();
-        profileRemoveFirstCachingList();
-        profileRemoveFirstCursorableList();
         
         listsEqual();
         System.out.println();
@@ -301,8 +271,6 @@ final class LinkedListBenchmark {
         profileRemoveLastLinkedList();
         profileRemoveLastArrayList();
         profileRemoveLastTreeList();
-        profileRemoveLastCachingList();
-        profileRemoveLastCursorableList();
         
         listsEqual();
         System.out.println();
@@ -313,8 +281,6 @@ final class LinkedListBenchmark {
         profileAppendCollectionLinkedList();
         profileAppendCollectionArrayList();
         profileAppendCollectionTreeList();
-        profileAppendCollectionCachingList();
-        profileAppendCollectionCursorableList();
 
         listsEqual();
         System.out.println();
@@ -325,8 +291,6 @@ final class LinkedListBenchmark {
         profileRemoveViaIndexLinkedList();
         profileRemoveViaIndexArrayList();
         profileRemoveViaIndexTreeList();
-        profileRemoveViaIndexCachingList();
-        profileRemoveViaIndexCursorableList();
 
         listsEqual();
         System.out.println();
@@ -337,8 +301,6 @@ final class LinkedListBenchmark {
         profileRemoveObjectLinkedList();
         profileRemoveObjectArrayList();
         profileRemoveObjectTreeList();
-        profileRemoveObjectCachingList();
-        profileRemoveObjectCursorableList();
 
         listsEqual();
         System.out.println();
@@ -349,8 +311,6 @@ final class LinkedListBenchmark {
         profileListIteratorAdditionLinkedList();
         profileListIteratorAdditionArrayList();
         profileListIteratorAdditionTreeList();
-        profileListIteratorAdditionCachingList();
-        profileListIteratorAdditionCursorableList();
 
         listsEqual();
         System.out.println();
@@ -361,8 +321,6 @@ final class LinkedListBenchmark {
         profileListIteratorRemovalLinkedList();
         profileListIteratorRemovalArrayList();
         profileListIteratorRemovalTreeList();
-        profileListIteratorRemovalCachingList();
-        profileListIteratorRemovalCursorableList();
 
         listsEqual();
         System.out.println();
@@ -373,8 +331,6 @@ final class LinkedListBenchmark {
         profileStreamLinkedList();
         profileStreamArrayList();
         profileStreamTreeList();
-        profileStreamCachingList();
-        profileStreamCursorableList();
         
         listsEqual();
         System.out.println();
@@ -385,15 +341,11 @@ final class LinkedListBenchmark {
         profileParallelStreamLinkedList();
         profileParallelStreamArrayList();
         profileParallelStreamTreeList();
-        profileParallelStreamCachingList();
-        profileParallelStreamCursorableList();
 
         Collections.sort(treeList);
         Collections.sort(roddeList);
         Collections.sort(arrayList);
         Collections.sort(linkedList);
-        Collections.sort(cachingList);
-        Collections.sort(cursorableList);
         
         listsEqual();
         System.out.println();
@@ -404,15 +356,11 @@ final class LinkedListBenchmark {
         linkedList.clear();
         arrayList.clear();
         treeList.clear();
-        cachingList.clear();
-        cursorableList.clear();
         
         roddeList.addAll(getIntegerArray(10_000));
         linkedList.addAll(roddeList);
         arrayList.addAll(roddeList);
         treeList.addAll(roddeList);
-        cachingList.addAll(roddeList);
-        cursorableList.addAll(roddeList);
         
         Collection<Integer> toRemove = new HashSet<>();
         Random random = new Random(seed + 1);
@@ -422,12 +370,10 @@ final class LinkedListBenchmark {
             toRemove.add(value);
         }
         
-        profileRemoveAllRoddeList      (toRemove);
-        profileRemoveAllLinkedList     (toRemove);
-        profileRemoveAllArrayList      (toRemove);
-        profileRemoveAllTreeList       (toRemove);
-        profileRemoveAllCachingList    (toRemove);
-        profileRemoveAllCursorableList (toRemove);
+        profileRemoveAllRoddeList  (toRemove);
+        profileRemoveAllLinkedList (toRemove);
+        profileRemoveAllArrayList  (toRemove);
+        profileRemoveAllTreeList   (toRemove);
         
         listsEqual();
         System.out.println();
@@ -449,22 +395,16 @@ final class LinkedListBenchmark {
         arrayList.clear();
         linkedList.clear();
         treeList.clear();
-        cachingList.clear();
-        cursorableList.clear();
         
         roddeList.addAll(getIntegerArray(1_000_000));
         arrayList.addAll(roddeList);
         linkedList.addAll(roddeList);
         treeList.addAll(roddeList);
-        cachingList.addAll(roddeList);
-        cursorableList.addAll(roddeList);
         
         profileSubListClearRoddeList();
         profileSubListClearLinkedList();
         profileSubListClearArrayList();
         profileSubListClearTreeList();
-        profileSubListClearCachingList();
-        profileSubListClearCursorableList();
         
         listsEqual();
         System.out.println();
@@ -475,8 +415,6 @@ final class LinkedListBenchmark {
         arrayList.clear();
         linkedList.clear();
         treeList.clear();
-        cachingList.clear();
-        cursorableList.clear();
         
         Random random = new Random(seed + 1);
         
@@ -486,23 +424,17 @@ final class LinkedListBenchmark {
             arrayList.add(value);
             linkedList.add(value);
             treeList.add(value);
-            cachingList.add(value);
-            cursorableList.add(value);
         }
         
         Collections.shuffle(roddeList, randomRoddeList);
         Collections.shuffle(arrayList, randomJavaUtilArrayList);
         Collections.shuffle(linkedList, randomJavaUtilLinkedList);
         Collections.shuffle(treeList, randomTreeList);
-        Collections.shuffle(cachingList, randomCachingList);
-        Collections.shuffle(cursorableList, randomCursorableList);
         
         profileSortRoddeList();
         profileSortLinkedList();
         profileSortArrayList();
         profileSortTreeList();
-        profileSortCachingList();
-        profileSortCursorableList();
         
         listsEqual();
         System.out.println();
@@ -530,16 +462,6 @@ final class LinkedListBenchmark {
                 treeList.getClass().getName() + 
                         " in (ms): " + 
                         totalMillisTreeList);
-
-        System.out.println(
-                cachingList.getClass().getName() + 
-                        " in (ms): " + 
-                        totalMillisCachingList);
-
-        System.out.println(
-                cursorableList.getClass().getName() + 
-                        " in (ms): " + 
-                        totalMillisCursorableList);
     }
 
     private long profileAddFirst(
@@ -981,20 +903,6 @@ final class LinkedListBenchmark {
                                 randomTreeList);
     }
 
-    private void profileAddFirstCachingList() {
-        totalMillisCachingList += 
-                profileAddFirst(cachingList,
-                                ADD_FIRST_OPERATIONS,
-                                randomCachingList);
-    }
-
-    private void profileAddFirstCursorableList() {
-        totalMillisCursorableList += 
-                profileAddFirst(cursorableList,
-                                ADD_FIRST_OPERATIONS,
-                                randomCursorableList);
-    }
-
     private void profileAddLastRoddeListV2() {
         totalMillisRoddeList += 
             profileAddLast(roddeList, ADD_LAST_OPERATIONS, randomRoddeList);
@@ -1020,20 +928,6 @@ final class LinkedListBenchmark {
                 profileAddLast(treeList, 
                                ADD_LAST_OPERATIONS, 
                                randomTreeList);
-    }
-
-    private void profileAddLastCachingList() {
-        totalMillisCachingList += 
-                profileAddLast(cachingList, 
-                               ADD_LAST_OPERATIONS, 
-                               randomCachingList);
-    }
-
-    private void profileAddLastCursorableList() {
-        totalMillisCursorableList += 
-                profileAddLast(cursorableList, 
-                               ADD_LAST_OPERATIONS, 
-                               randomCursorableList);
     }
 
     private void profileAddIndexRoddeListV2() {
@@ -1065,22 +959,6 @@ final class LinkedListBenchmark {
                         treeList, 
                         ADD_AT_OPERATIONS, 
                         randomTreeList);
-    }
-
-    private void profileAddIndexCachingList() {
-        totalMillisCachingList +=
-                profileAddIndex(
-                        cachingList, 
-                        ADD_AT_OPERATIONS, 
-                        randomCachingList);
-    }
-
-    private void profileAddIndexCursorableList() {
-        totalMillisCursorableList +=
-                profileAddIndex(
-                        cursorableList, 
-                        ADD_AT_OPERATIONS, 
-                        randomCursorableList);
     }
 
     private void profileAddCollectionRoddeListV2() {
@@ -1115,22 +993,6 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
 
-    private void profileAddCollectionCachingList() {
-        totalMillisCachingList +=
-                profileAddCollection(
-                        cachingList,
-                        ADD_COLLECTION_AT_OPERATIONS,
-                        randomCachingList);
-    }
-
-    private void profileAddCollectionCursorableList() {
-        totalMillisCursorableList +=
-                profileAddCollection(
-                        cursorableList,
-                        ADD_COLLECTION_AT_OPERATIONS,
-                        randomCursorableList);
-    }
-    
     private void profileGetRoddeListV2() {
         totalMillisRoddeList += 
                 profileGet(roddeList, GET_OPERATIONS, randomRoddeList);
@@ -1154,18 +1016,6 @@ final class LinkedListBenchmark {
         totalMillisTreeList += 
                 profileGet(treeList, GET_OPERATIONS, randomTreeList);
     }
-    
-    private void profileGetCachingList() {
-        totalMillisCachingList += 
-                profileGet(cachingList, GET_OPERATIONS, randomCachingList);
-    }
-    
-    private void profileGetCursorableList() {
-        totalMillisCursorableList += 
-                profileGet(cursorableList, 
-                           GET_OPERATIONS, 
-                           randomCursorableList);
-    }
 
     private void profileRemoveFirstRoddeListV2() {
         totalMillisRoddeList += profileRemoveFirst(roddeList);
@@ -1183,14 +1033,6 @@ final class LinkedListBenchmark {
         totalMillisTreeList += profileRemoveFirst(treeList);        
     }
 
-    private void profileRemoveFirstCachingList() {
-        totalMillisCachingList += profileRemoveFirst(cachingList);        
-    }
-
-    private void profileRemoveFirstCursorableList() {
-        totalMillisCursorableList += profileRemoveFirst(cursorableList);        
-    }
-
     private void profileRemoveLastRoddeList() {
         totalMillisRoddeList += profileRemoveLast(roddeList);
     }
@@ -1205,14 +1047,6 @@ final class LinkedListBenchmark {
 
     private void profileRemoveLastTreeList() {
         totalMillisTreeList += profileRemoveLast(treeList);        
-    }
-
-    private void profileRemoveLastCachingList() {
-        totalMillisCachingList += profileRemoveLast(cachingList);        
-    }
-
-    private void profileRemoveLastCursorableList() {
-        totalMillisCursorableList += profileRemoveLast(cursorableList);        
     }
     
     private void profileAppendCollectionRoddeListV2() {
@@ -1247,22 +1081,6 @@ final class LinkedListBenchmark {
                         randomTreeList);
     }
 
-    private void profileAppendCollectionCachingList() {
-        totalMillisCachingList +=
-                profileAppendCollection(
-                        cachingList, 
-                        ADD_LAST_COLLECTION_OPERATIONS, 
-                        randomCachingList);
-    }
-
-    private void profileAppendCollectionCursorableList() {
-        totalMillisCursorableList +=
-                profileAppendCollection(
-                        cursorableList, 
-                        ADD_LAST_COLLECTION_OPERATIONS, 
-                        randomCursorableList);
-    }
-
     private void profileRemoveViaIndexRoddeListV2() {
         totalMillisRoddeList += 
                 profileRemoveViaIndex(
@@ -1293,22 +1111,6 @@ final class LinkedListBenchmark {
                         treeList, 
                         REMOVE_VIA_INDEX_OPERATIONS, 
                         randomTreeList);
-    }
-
-    private void profileRemoveViaIndexCachingList() {
-        totalMillisCachingList += 
-                profileRemoveViaIndex(
-                        cachingList, 
-                        REMOVE_VIA_INDEX_OPERATIONS, 
-                        randomCachingList);
-    }
-
-    private void profileRemoveViaIndexCursorableList() {
-        totalMillisCursorableList += 
-                profileRemoveViaIndex(
-                        cursorableList, 
-                        REMOVE_VIA_INDEX_OPERATIONS, 
-                        randomCursorableList);
     }
 
     private void profileRemoveObjectRoddeListV2() {
@@ -1342,22 +1144,6 @@ final class LinkedListBenchmark {
                         REMOVE_OBJECT_OPERATIONS, 
                         randomTreeList);
     }
-
-    private void profileRemoveObjectCachingList() {
-        totalMillisCachingList += 
-                profileRemoveObject(
-                        cachingList,
-                        REMOVE_OBJECT_OPERATIONS, 
-                        randomCachingList);
-    }
-
-    private void profileRemoveObjectCursorableList() {
-        totalMillisCursorableList += 
-                profileRemoveObject(
-                        cursorableList,
-                        REMOVE_OBJECT_OPERATIONS, 
-                        randomCursorableList);
-    }
     
     private void profileListIteratorRemovalRoddeListV2() {
         totalMillisRoddeList += profileListIteratorRemoval(roddeList);
@@ -1373,14 +1159,6 @@ final class LinkedListBenchmark {
 
     private void profileListIteratorRemovalTreeList() {
         totalMillisTreeList += profileListIteratorRemoval(treeList);
-    }
-
-    private void profileListIteratorRemovalCachingList() {
-        totalMillisCachingList += profileListIteratorRemoval(cachingList);
-    }
-
-    private void profileListIteratorRemovalCursorableList() {
-        totalMillisCursorableList += profileListIteratorRemoval(cursorableList);
     }
     
     private void profileListIteratorAdditionRoddeListV2() {
@@ -1407,17 +1185,6 @@ final class LinkedListBenchmark {
                 profileListIteratorAddition(treeList, randomTreeList);
     }
 
-    private void profileListIteratorAdditionCachingList() {
-        totalMillisCachingList += 
-                profileListIteratorAddition(cachingList, randomCachingList);
-    }
-
-    private void profileListIteratorAdditionCursorableList() {
-        totalMillisCursorableList += 
-                profileListIteratorAddition(cursorableList, 
-                                            randomCursorableList);
-    }
-
     private void profileStreamRoddeListV2() {
         totalMillisRoddeList += profileStream(roddeList);
     }
@@ -1432,14 +1199,6 @@ final class LinkedListBenchmark {
 
     private void profileStreamTreeList() {
         totalMillisTreeList += profileStream(treeList);
-    }
-
-    private void profileStreamCachingList() {
-        totalMillisCachingList += profileStream(cachingList);
-    }
-
-    private void profileStreamCursorableList() {
-        totalMillisCursorableList += profileStream(cursorableList);
     }
 
     private void profileParallelStreamRoddeList() {
@@ -1457,14 +1216,6 @@ final class LinkedListBenchmark {
     private void profileParallelStreamTreeList() {
         totalMillisTreeList += profileParallelStream(treeList);
     }
-
-    private void profileParallelStreamCachingList() {
-        totalMillisCachingList += profileParallelStream(cachingList);
-    }
-
-    private void profileParallelStreamCursorableList() {
-        totalMillisCursorableList += profileParallelStream(cursorableList);
-    }
             
     private void profileRemoveAllRoddeList(Collection<Integer> toRemove) {
         totalMillisRoddeList += profileRemoveAll(roddeList, toRemove);
@@ -1480,14 +1231,6 @@ final class LinkedListBenchmark {
     
     private void profileRemoveAllTreeList(Collection<Integer> toRemove) {
         totalMillisTreeList += profileRemoveAll(treeList, toRemove);
-    }
-    
-    private void profileRemoveAllCachingList(Collection<Integer> toRemove) {
-        totalMillisCachingList += profileRemoveAll(cachingList, toRemove);
-    }
-    
-    private void profileRemoveAllCursorableList(Collection<Integer> toRemove) {
-        totalMillisCursorableList += profileRemoveAll(cursorableList, toRemove);
     }
 
     private void profileSubListClearRoddeList() {
@@ -1505,14 +1248,6 @@ final class LinkedListBenchmark {
     private void profileSubListClearTreeList() {
         totalMillisTreeList += profileSubListClear(treeList);
     }
-
-    private void profileSubListClearCachingList() {
-        totalMillisCachingList += profileSubListClear(cachingList);
-    }
-
-    private void profileSubListClearCursorableList() {
-        totalMillisCursorableList += profileSubListClear(cursorableList);
-    }
     
     private void profileSortRoddeList() {
         totalMillisRoddeList += profileSort(roddeList);
@@ -1528,14 +1263,6 @@ final class LinkedListBenchmark {
     
     private void profileSortTreeList() {
         totalMillisTreeList += profileSort(treeList);
-    }
-    
-    private void profileSortCachingList() {
-        totalMillisCachingList += profileSort(cachingList);
-    }
-    
-    private void profileSortCursorableList() {
-        totalMillisCursorableList += profileSort(cursorableList);
     }
     
     private void printTitle(BenchmarkChoice benchmarkChoice) {
