@@ -25,7 +25,6 @@ final class LinkedListBenchmark {
     private static final int REMOVE_OBJECT_OPERATIONS       = 5_000;
     private static final int GET_OPERATIONS                 = 5_000;
     private static final int REMOVE_FIRST_OPERATIONS        = 5_000;
-    private static final int NODE_CACHE_SIZE                = 100_000;
 
     private static final int MAXIMUM_COLLECTION_SIZE = 20;
 
@@ -76,14 +75,6 @@ final class LinkedListBenchmark {
 
     void benchmark() {
         profile(BenchmarkChoice.BENCHMARK);
-    }
-    
-    // Simulate list.subList(fromIndex, toIndex) for those lists that do not
-    // support the method:
-    private static void clear(List<Integer> list, int fromIndex, int toIndex) {
-        for (int i = fromIndex; i < toIndex; ++i) {
-            list.remove(fromIndex);
-        }
     }
     
     private static  Integer getRandomInteger(Random random) {
@@ -189,6 +180,8 @@ final class LinkedListBenchmark {
 
         resetLists();
         zeroTimeDurationCounters();
+        
+        System.gc();
     }
 
     private void zeroTimeDurationCounters() {
