@@ -12,9 +12,9 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
-                <exec.vmArgs>-Xmx2000m -Xms2000m</exec.vmArgs>
-                <exec.appArgs>--all</exec.appArgs>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+                <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
+                <exec.appArgs></exec.appArgs>
             </properties>
         </action>
         <action>
@@ -30,9 +30,9 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
-                <exec.vmArgs>-Xmx2000m -Xms2000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
-                <exec.appArgs>--all</exec.appArgs>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+                <exec.vmArgs>-Xms3000m -Xmx3000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.appArgs></exec.appArgs>
             </properties>
         </action>
         <action>
@@ -45,11 +45,15 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
+<<<<<<< HEAD
                 <exec.vmArgs>-Xmx2000m -Xms2000m</exec.vmArgs>
+=======
+                <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
+>>>>>>> 0bd84db (Update benchmark VM arguments.)
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--all</exec.appArgs>
+                <exec.appArgs></exec.appArgs>
             </properties>
         </action>
         <action>

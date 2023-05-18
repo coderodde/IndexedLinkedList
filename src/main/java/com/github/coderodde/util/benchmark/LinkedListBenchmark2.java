@@ -130,7 +130,6 @@ public class LinkedListBenchmark2 {
             }
         }
         
-        
         benchmarkModifiedIterator(true);
     }
     
