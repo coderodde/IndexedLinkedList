@@ -135,7 +135,9 @@ public class LinkedListBenchmark2 {
     
     private static void printTotalDurations() {
         for (Map.Entry<String, Long> e : DURATION_COUNTER_MAP.entrySet()) {
-            System.out.println(e.getKey() + " " + e.getValue());
+            System.out.printf("%-" + "indexedLinkedList".length() + "s: %d\n", 
+                    e.getKey(),
+                    e.getValue());
         }
     }
     
