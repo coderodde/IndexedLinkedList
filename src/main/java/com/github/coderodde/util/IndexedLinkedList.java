@@ -3793,13 +3793,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public boolean hasCharacteristics(int characteristics) {
-            return switch (characteristics) {
-                case Spliterator.ORDERED, 
-                     Spliterator.SIZED, 
-                     Spliterator.SUBSIZED -> true;
+            switch (characteristics) {
+                case Spliterator.ORDERED:
+                case Spliterator.SIZED:
+                case Spliterator.SUBSIZED:
+                    return true;
                     
-                default -> false;
-            };
+                default:
+                    return false;
+            }
         }
     }
     
