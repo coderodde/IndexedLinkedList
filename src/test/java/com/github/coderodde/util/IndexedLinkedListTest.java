@@ -19,6 +19,7 @@ package com.github.coderodde.util;
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
 import com.github.coderodde.util.IndexedLinkedList.Finger;
+import com.github.coderodde.util.IndexedLinkedList.Node;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -60,6 +61,48 @@ public class IndexedLinkedListTest {
     @Before
     public void setUp() {
         list.clear();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void breakInvariant1() {
+        list.add(11);
+        list.add(12);
+        list.add(13);
+        
+        list.fingerList.fingerArray[0].index = 1;
+        list.fingerList.fingerArray[1].index = 0;
+        
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void breakInvariant2() {
+        list.add(11);
+        list.add(12);
+        list.add(13);
+        
+        list.fingerList.fingerArray[list.fingerList.size()].index = 
+                list.fingerList.size() + 10;
+        
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void breakInvariant3() {
+        list.add(11);
+        list.add(12);
+        list.add(13);
+        
+        list.fingerList.fingerArray[list.fingerList.size()].node = 
+                new Node<>(null);
+        
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void nodeToString() {
+        Node<Integer> node = new Node<>(12);
+        assertEquals("[Node; item = 12]", node.toString());
     }
     
     @Test

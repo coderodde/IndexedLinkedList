@@ -32,6 +32,21 @@ public class FingerListTest {
     public void setUp() {
         fl.clear();
     }
+    
+    @Test
+    public void fingerToString() {
+        Finger<Integer> f = new Finger<>(new Node<>(13), 2);
+        assertEquals("[Finger; index = 2, item = 13]", f.toString());
+        f = new Finger<>(new Node<>(null), 3);
+        assertEquals("[Finger; index = 3, item = null]", f.toString());
+    }
+    
+    @Test
+    public void fingerListString() {
+        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
+        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 1));
+        assertEquals("[FingerList, size = 2]", fl.toString());
+    }
 
     @Test
     public void appendGetFinger() {
