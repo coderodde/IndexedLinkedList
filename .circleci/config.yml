@@ -2,14 +2,19 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 orbs:
-  codecov: codecov/codecov@3.0.0
-  
-jobs:
-  build:
-    docker:
-      - image: circleci/clojure:openjdk-18-lein-2.9.8-buster-node-browsers-legacy
-    steps:
+  codecov: codecov/codecov@3.3.0
+workflows:
+  upload-to-codecov:
+    jobs:
       - checkout
-      - run : mvn test
-      - store_artifacts:
-          path:  target
+      - codecov/upload
+  
+#jobs:
+#  build:
+#    docker:
+#      - image: circleci/clojure:openjdk-18-lein-2.9.8-buster-node-browsers-legacy
+#    steps:
+#      - checkout
+#      - run : mvn test
+#      - store_artifacts:
+#          path:  target
