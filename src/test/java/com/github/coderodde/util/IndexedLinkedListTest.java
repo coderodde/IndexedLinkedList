@@ -99,6 +99,28 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
+    @Test(expected = IllegalStateException.class)
+    public void breakInvariant4() {
+        list.add(11);
+        list.add(12);
+        list.add(13);
+        list.size = 2;
+        
+        list.checkInvarant();
+    }
+    @Test(expected = IllegalStateException.class)
+    public void breakInvariant5() {
+        list.add(11);
+        list.add(12);
+        list.add(13);
+        
+        list.fingerList.fingerArray[2] = new Finger<>(new Node<>(100), 2);
+        list.fingerList.fingerArray[3] = new Finger<>(null, 3);
+        list.fingerList.size = 3;
+        
+        list.checkInvarant();
+    }
+    
     @Test
     public void nodeToString() {
         Node<Integer> node = new Node<>(12);
@@ -1521,6 +1543,130 @@ public class IndexedLinkedListTest {
         list.addFirst(Integer.valueOf(-1));
 
         assertEquals(Integer.valueOf(-1), list.peek());
+    }
+    
+    @Test
+    public void sortEmpty() {
+        list.sort((c1,c2) -> { return -1; });
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void sublistRangeCheck1() {
+        list.add(1);
+        list.subListRangeCheck(-1, 2, 5);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void sublistRangeCheck2() {
+        list.add(1);
+        list.subListRangeCheck(0, 3, 2);
+    }
+    
+    @Test(expected = IllegalArgumentException.class) 
+    public void sublistRangeCheck3() {
+        list.add(1);
+        list.subListRangeCheck(1, 0, 1);
+    }
+    
+    @Test
+    public void emptyBatchRemove() {
+        list.batchRemove(List.of(), true, 0, 1);
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void checkForComodification() {
+        list.modCount = 123;
+        list.checkForComodification(122);
+    }
+    
+    @Test
+    public void distributeFingers() {
+        list.distributeFingers(2, 2);
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void iteratorNextThrowsOnNoElements() {
+        Iterator<Integer> iterator = 
+                new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
+        
+        try {
+            iterator.next();
+            iterator.next();
+        } catch (NoSuchElementException ex) {
+            fail("Should not throw here.");
+        }
+        
+        iterator.next();
+    }
+    @Test(expected = IllegalStateException.class)
+    public void iteratorNextThrowsOnRemove() {
+        Iterator<Integer> iterator = 
+                new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
+        
+        try {
+            iterator.next();
+            iterator.next();
+            iterator.remove();
+        } catch (IllegalStateException ex) {
+            fail("Should not throw here.");
+        }
+        
+        iterator.remove();
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void checkIteratorComodification() {
+        BasicIterator iterator =
+                (BasicIterator) 
+                new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
+        
+        iterator.expectedModCount = 1000;
+        iterator.checkForComodification();
+    }
+    
+    @Test
+    public void removeEntrieRange() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        list.removeRange(0, 3);
+    }
+    
+    @Test
+    public void addAllEmpty() {
+        list.addAll(0, List.of());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void listIteratorNext() {
+        ListIterator<Integer> iterator = 
+                new IndexedLinkedList<>(Arrays.asList(1,2,3)).listIterator(1);
+        
+        try {
+            iterator.next();
+            iterator.next();
+        } catch (NoSuchElementException ex) {
+            fail("Should not throw here.");
+        }
+        
+        iterator.next();
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void listIteratorPrev() {
+        ListIterator<Integer> iterator = 
+                new IndexedLinkedList<>(Arrays.asList(1,2,3)).listIterator(1);
+        
+        try {
+            iterator.previous();
+        } catch (NoSuchElementException ex) {
+            fail("Should not throw here.");
+        }
+        
+        iterator.previous();
+    }
+    
+    @Test
+    public void forRemainingOnEmptyList() {
+        new IndexedLinkedList<>().iterator().forEachRemaining((a) -> {});
     }
     
     @Test

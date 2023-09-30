@@ -85,7 +85,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * the end-of-list sentinel finger {@code F} for which 
          * {@code F.index = size}.
          */
-        private int size;
+        int size;
 
         /**
          * Constructs the empty finger list consisting only of end-of-list 
@@ -776,13 +776,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * The cached number of elements in this list.
      */
-    private int size;
+    int size;
     
     /**
      * The modification counter. Used to detect state changes during concurrent
      * modifications.
      */
-    private transient int modCount;
+    transient int modCount;
     
     /**
      * The head node of the list.
@@ -987,6 +987,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (finger.node == node) {
                 finger = fingerList.get(++fingerCount);
+                
+                if (finger == null) {
+                    break;
+                }
             }
             
             node = node.next;
@@ -1851,9 +1855,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param toIndex   the ending, exclusive index.
      * @param size      the size of the target list.
      */
-    private static void subListRangeCheck(int fromIndex, 
-                                          int toIndex, 
-                                          int size) {
+static void subListRangeCheck(int fromIndex, 
+                                  int toIndex, 
+                                  int size) {
         if (fromIndex < 0) {
             throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
         }
@@ -2142,7 +2146,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * Makes sure that the list was not modified outside of the iterator API
          * while iterating.
          */
-        private void checkForComodification() {
+        void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
@@ -2161,10 +2165,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @return {@code true} if and only if the list was modified.
      */
-    private boolean batchRemove(Collection<?> c,
-                                boolean complement,
-                                int from,  
-                                int end) {
+    boolean batchRemove(Collection<?> c,
+                        boolean complement,
+                        int from,  
+                        int end) {
         Objects.requireNonNull(c);
         
         if (c.isEmpty()) {
@@ -2215,7 +2219,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @throws ConcurrentModificationException if the cached and the input 
      *                                         modification counts differ.
      */
-    private void checkForComodification(int expectedModCount) {
+    void checkForComodification(int expectedModCount) {
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
@@ -2252,7 +2256,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param toIndex   the one past the rightmost element index in the range 
      *                  over which to disribute the fingers.
      */
-    private void distributeFingers(int fromIndex, int toIndex) {
+    void distributeFingers(int fromIndex, int toIndex) {
         int rangeLength = toIndex - fromIndex;
         
         if (rangeLength == 0) {
@@ -3231,7 +3235,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fromIndex the staring, inclusive range index.
      * @param toIndex   the ending, exclusive range index.
      */
-    private void removeRange(int fromIndex, int toIndex) {
+    void removeRange(int fromIndex, int toIndex) {
         int removalSize = toIndex - fromIndex;
         
         if (removalSize == 0) {
