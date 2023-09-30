@@ -1661,7 +1661,7 @@ public class IndexedLinkedListTest {
             fail("Should not throw here.");
         }
         
-        iterator.previous();
+        iterator.previous();    
     }
     
     @Test
