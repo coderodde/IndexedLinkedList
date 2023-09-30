@@ -55,7 +55,7 @@ import java.util.function.UnaryOperator;
  * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
- * @version 1.61 (Sep 26, 2021)
+ * @version 1.618033988 (Sep 30, 2023)
  * @since 1.6 (Sep 1, 2021)
  */
 public class IndexedLinkedList<E> implements Deque<E>, 
@@ -3793,13 +3793,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public boolean hasCharacteristics(int characteristics) {
-            return switch (characteristics) {
-                case Spliterator.ORDERED, 
-                     Spliterator.SIZED, 
-                     Spliterator.SUBSIZED -> true;
+            switch (characteristics) {
+                case Spliterator.ORDERED:
+                case Spliterator.SIZED:
+                case Spliterator.SUBSIZED:
+                    return true;
                     
-                default -> false;
-            };
+                default:
+                    return false;
+            }
         }
     }
     
