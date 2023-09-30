@@ -7,7 +7,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:18.0
+      - image: circleci/clojure:openjdk-18-lein-2.9.8-buster-node-browsers-legacy
     steps:
       - checkout
       - run : mvn test
