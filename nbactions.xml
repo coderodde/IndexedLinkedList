@@ -57,6 +57,6 @@
             <displayName>Coverage</displayName>
             <goals>
                 <goal>cobertura:cobertura</goal>
-            </goals>
+            </goals> 
         </action>
     </actions>
