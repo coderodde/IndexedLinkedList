@@ -45,11 +45,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-<<<<<<< HEAD
-                <exec.vmArgs>-Xmx2000m -Xms2000m</exec.vmArgs>
-=======
                 <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
->>>>>>> 0bd84db (Update benchmark VM arguments.)
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
                 <exec.executable>java</exec.executable>

@@ -4,7 +4,7 @@
     
     <groupId>io.github.coderodde</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.61803398</version>
+    <version>1.618033988</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
@@ -12,9 +12,7 @@
     <url>https://github.com/coderodde/IndexedLinkedList</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>   
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>   
     </properties>
 
     <licenses>
@@ -27,8 +25,8 @@
     <developers>
         <developer>
             <name>Rodion Efremov</name>
-            <email>coderodd3@gmail.com</email>
-            <organization>github.com</organization>
+            <email>rodion.efremov@helsinki.fi</email>
+            <organization>University of Helsinki, Department of Computer Science</organization>
             <organizationUrl>github.com/coderodde</organizationUrl>
         </developer>
     </developers>
@@ -105,13 +103,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.1.2</version>
                 
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
                         <artifactId>surefire-junit4</artifactId>
-                        <version>3.0.0-M5</version>
+                        <version>3.1.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -119,13 +117,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-g</arg>
                     </compilerArgs>
-                    <source>18</source>
-                    <target>18</target>
+                    <source>20</source>
+                    <target>20</target>
                     <debug>true</debug>
                     <debuglevel>lines,vars,source</debuglevel>
                 </configuration>
@@ -134,7 +132,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -148,7 +146,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <configuration>
                     <additionalOptions>
                         <additionalOption>-private</additionalOption>
@@ -170,7 +168,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>0.8.10</version>
                 
                 <executions>
                     <execution>
@@ -202,6 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -221,7 +220,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
