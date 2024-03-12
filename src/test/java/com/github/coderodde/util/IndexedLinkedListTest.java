@@ -63,6 +63,23 @@ public class IndexedLinkedListTest {
         list.clear();
     }
     
+    @Test
+    public void slideTest() {
+        list.addAll(Arrays.asList(1, 2, 5, 3, 4, 5));
+            
+        list.fingerList.fingerArray[0].index = 1;
+        list.fingerList.fingerArray[1].index = 3;
+        list.fingerList.fingerArray[2].index = 5;
+        
+        list.fingerList.fingerArray[0].node = list.head.next;
+        list.fingerList.fingerArray[1].node = list.head.next.next.next;
+        list.fingerList.fingerArray[2].node = list.head.next.next.next.next.next;
+        
+        list.remove(4);
+        
+        System.out.println(list.fingerList.toString());
+    }
+    
     @Test(expected = IllegalStateException.class)
     public void breakInvariant1() {
         list.add(11);
@@ -135,9 +152,9 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[2].index = 3;
         list.fingerList.fingerArray[3].index = 5;
         
-        list.fingerList.fingerArray[0].node = list.first;
-        list.fingerList.fingerArray[1].node = list.first.next;
-        list.fingerList.fingerArray[2].node = list.first.next.next.next;
+        list.fingerList.fingerArray[0].node = list.head;
+        list.fingerList.fingerArray[1].node = list.head.next;
+        list.fingerList.fingerArray[2].node = list.head.next.next.next;
         
         list.removeFirst();
         list.checkInvarant();
@@ -287,11 +304,11 @@ public class IndexedLinkedListTest {
     public void moveFingerOutOfRemovalLocation() {
         list.addAll(getIntegerList(16));
         list.fingerList.fingerArray[0] =
-                new Finger<>(list.last.prev.prev.prev, 12);
+                new Finger<>(list.tail.prev.prev.prev, 12);
         
-        list.fingerList.fingerArray[1] = new Finger<>(list.last.prev.prev, 13);
-        list.fingerList.fingerArray[2] = new Finger<>(list.last.prev, 14);
-        list.fingerList.fingerArray[3] = new Finger<>(list.last, 15);
+        list.fingerList.fingerArray[1] = new Finger<>(list.tail.prev.prev, 13);
+        list.fingerList.fingerArray[2] = new Finger<>(list.tail.prev, 14);
+        list.fingerList.fingerArray[3] = new Finger<>(list.tail, 15);
         
         list.remove(12);
         

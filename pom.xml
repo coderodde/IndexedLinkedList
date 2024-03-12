@@ -70,7 +70,7 @@
     </distributionManagement>
 
     <build>
-        <plugins>
+        <plugins><!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -85,7 +85,8 @@
                     </execution>    
                 </executions>
             </plugin>
-            
+            -->
+            <!--
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -96,7 +97,7 @@
                     <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-                <!--                <executions>
+                <executions>
                     <execution>
                         <id>default-deploy</id>
                         <phase>deploy</phase>
@@ -109,8 +110,9 @@
                     <serverId>nexus</serverId>
                     <nexusUrl>http://localhost:8081/nexus/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>-->
+                </configuration>
             </plugin>
+            -->
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -134,8 +136,8 @@
                     <compilerArgs>
                         <arg>-g</arg>
                     </compilerArgs>
-                    <source>18</source>
-                    <target>18</target>
+                    <source>20</source>
+                    <target>20</target>
                     <debug>true</debug>
                     <debuglevel>lines,vars,source</debuglevel>
                     <compilerArgument>--add-opens=java.base/java.util=ALL-UNNAMED</compilerArgument>

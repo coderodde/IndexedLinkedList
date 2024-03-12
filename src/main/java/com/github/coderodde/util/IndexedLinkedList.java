@@ -79,6 +79,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * The actual list storage array.
          */
         Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
+        
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder().append("[");
+            boolean first = true;
+            
+            for (int i = 0; i != size; i++) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(", ");
+                }
+                
+                sb.append(fingerArray[i].toString());
+            }
+            
+            return sb.append("]").toString();
+        }
 
         /**
          * The number of fingers stored in the list. This field does not count
@@ -96,16 +114,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
-         * Returns the textual representation of this finger list.
-         * 
-         * @return the textual representation. 
-         */
-        @Override
-        public String toString() {
-            return "[FingerList, size = " + size + "]";
-        }
-        
-        /**
          * Appends the input finger to the tail of the finger list.
          * 
          * @param finger the finger to append.
@@ -115,7 +123,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
-            fingerArray[size].index = IndexedLinkedList.this.size;
+            fingerArray[size].index++;
+            // Commented out 9.3.2024:
+//            fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
         /**
@@ -194,6 +204,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             // Can we contract at least once?
             if ((nextSize + 1) * 4 < fingerArray.length 
                     && fingerArray.length > 2 * INITIAL_CAPACITY) {
+                
                 int nextCapacity = fingerArray.length / 4;
   
                 // Good, we can. But can we keep on splitting in half the 
@@ -241,11 +252,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         private int getFingerIndexImpl(int elementIndex) {
             int count = size + 1; // + 1 for the end sentinel.
-            int it;
             int idx = 0;
 
             while (count > 0) {
-                it = idx;
+                int it = idx;
                 int step = count / 2;
                 it += step;
 
@@ -390,13 +400,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * 
          * @param toIndex               the first element index of the finger 
          *                              suffix.
-         * @param numberOfFingersToMove the number of fingers to move to the 
+         * @param numberOfFingers the number of fingers to move to the 
          *                              finger suffix.
          */
-        private void moveFingersToSuffix(int toIndex, 
-                                         int numberOfFingersToMove) {
+        private void moveFingersToSuffix(int toIndex, int numberOfFingers) {
             
-            if (numberOfFingersToMove == 0) {
+            if (numberOfFingers == 0) {
                 return;
             }
             
@@ -404,7 +413,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (toFingerIndex == fingerList.size) {
                 // Here, the suffix is empty:
-                moveFingersToSuffixOnEmptySuffix(toIndex, numberOfFingersToMove);
+                moveFingersToSuffixOnEmptySuffix(toIndex, 
+                                                 numberOfFingers);
                 return;
             }
             
@@ -418,7 +428,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             for (i = toFingerIndex; i < size; ++i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingersToMove >= toIndex) {
+                if (finger.index - numberOfFingers >= toIndex) {
                     targetFinger = finger;
                     targetFingerIndex = i;
                     break;
@@ -430,7 +440,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
-                int toMove = toIndex + numberOfFingersToMove - f.index;
+                int toMove = toIndex + numberOfFingers - f.index;
                 
                 for (int j = 0; j < toMove; ++j) {
                     f.node = f.node.next;
@@ -444,13 +454,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             int numberOfActualFingersMoved = omittedFingers
-                                           + numberOfFingersToMove;
+                                           + numberOfFingers;
             
             for (int k = 0; k < numberOfActualFingersMoved; k++) {
+                Finger<E> predecessorFinger = 
+                        fingerArray[targetFingerIndex - k - 1];
+                
                 Finger<E> currentFinger = fingerArray[targetFingerIndex - k];
-                Finger<E> previousFinger = fingerArray[targetFingerIndex - k - 1];
-                previousFinger.index = currentFinger.index - 1;
-                previousFinger.node = currentFinger.node.prev;
+                predecessorFinger.index = currentFinger.index - 1;
+                predecessorFinger.node = currentFinger.node.prev;
             }
         }
 
@@ -521,7 +533,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (fingerIndex == size) {
-                // Don't go outside of 'size - 1*:
+                // Don't go outside of 'size - 1':
                 return size - 1;
             }
             
@@ -579,7 +591,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
             
             System.arraycopy(fingerArray, 
-                             size - suffixSize, 
+                             size - suffixSize,
                              fingerArray, 
                              prefixSize,
                              suffixSize + 1);
@@ -787,12 +799,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * The head node of the list.
      */
-    transient Node<E> first;
+    transient Node<E> head;
     
     /**
      * The tail node of the list.
      */
-    transient Node<E> last;
+    transient Node<E> tail;
     
     /**
      * The actual finger list. Without {@code private} keyword since it is 
@@ -978,7 +990,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         Finger<E> finger = fingerList.get(0);
-        Node<E> node = first;
+        Node<E> node = head;
         int fingerCount = 0;
         int tentativeSize = 0;
         
@@ -1022,7 +1034,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         size = 0;
         
         // Help GC:
-        for (Node<E> node = first; node != null;) {
+        for (Node<E> node = head; node != null;) {
             node.prev = null;
             node.item = null;
             Node<E> next = node.next;
@@ -1030,7 +1042,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = next;
         }
 
-        first = last = null;
+        head = tail = null;
         modCount++;
     }
     
@@ -1176,12 +1188,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E getFirst() {
-        if (first == null) {
+        if (head == null) {
             throw new NoSuchElementException(
                     "Getting the head element from an empty list.");
         }
         
-        return first.item;
+        return head.item;
     }
     
     /**
@@ -1192,12 +1204,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E getLast() {
-        if (last == null) {
+        if (tail == null) {
             throw new NoSuchElementException(
                     "Getting the tail element from an empty list.");
         }
         
-        return last.item;
+        return tail.item;
     }
     
     /**
@@ -1339,7 +1351,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E peek() {
-        return first == null ? null : first.item;
+        return head == null ? null : head.item;
     }
 
     /**
@@ -1349,7 +1361,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E peekFirst() {
-        return first == null ? null : first.item;
+        return head == null ? null : head.item;
     }
 
     /**
@@ -1359,7 +1371,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E peekLast() {
-        return last == null ? null : last.item;
+        return tail == null ? null : tail.item;
     }
     
     /**
@@ -1372,7 +1384,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E poll() {
-        return first == null ? null : removeFirst();
+        return head == null ? null : removeFirst();
     }
 
     /**
@@ -1385,7 +1397,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E pollFirst() {
-        return first == null ? null : removeFirst();
+        return head == null ? null : removeFirst();
     }
 
     /**
@@ -1398,7 +1410,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public E pollLast() {
-        return last == null ? null : removeLast();
+        return tail == null ? null : removeLast();
     }
     
     /**
@@ -1446,7 +1458,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public boolean remove(Object o) {
         int index = 0;
 
-        for (Node<E> x = first; x != null; x = x.next, index++) {
+        for (Node<E> x = head; x != null; x = x.next, index++) {
             if (Objects.equals(o, x.item)) {
                 removeObjectImpl(x, index);
                 return true;
@@ -1530,18 +1542,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E removeFirst() {
         if (size == 0) {
             throw new NoSuchElementException(
-                    "removeFirst from an empty LinkedList");
+                    "removeFirst from an empty IndexedLinkedList");
         }
         
-        E returnValue = first.item;
+        E returnValue = head.item;
         decreaseSize();
         
-        first = first.next;
+        head = head.next;
         
-        if (first == null) {
-            last = null;
+        if (head == null) {
+            tail = null;
         } else {
-            first.prev = null;
+            head.prev = null;
         }
         
         fingerList.adjustOnRemoveFirst();
@@ -1565,7 +1577,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public boolean removeFirstOccurrence(Object o) {
         int index = 0;
         
-        for (Node<E> x = first; x != null; x = x.next, index++) {
+        for (Node<E> x = head; x != null; x = x.next, index++) {
             if (Objects.equals(o, x.item)) {
                 removeObjectImpl(x, index);
                 return true;
@@ -1596,18 +1608,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @Override
     public E removeLast() {
         if (size == 0) {
-            throw new NoSuchElementException("removeLast on empty LinkedList");
+            throw new NoSuchElementException(
+                    "removeLast on empty IndexedLinkedList");
         }
         
-        E returnValue = last.item;
+        E returnValue = tail.item;
         decreaseSize();
         
-        last = last.prev;
+        tail = tail.prev;
         
-        if (last == null) {
-            first = null;
+        if (tail == null) {
+            head = null;
         } else {
-            last.next = null;
+            tail.next = null;
         }
         
         if (mustRemoveFinger()) {
@@ -1628,7 +1641,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public boolean removeLastOccurrence(Object o) {
         int index = size - 1;
 
-        for (Node<E> x = last; x != null; x = x.prev, index--) {
+        for (Node<E> x = tail; x != null; x = x.prev, index--) {
             if (Objects.equals(o, x.item)) {
                 removeObjectImpl(x, index);
                 return true;
@@ -1705,7 +1718,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Object[] array = toArray();
         Arrays.sort((E[]) array, c);
         
-        Node<E> node = first;
+        Node<E> node = head;
         
         // Rearrange the items over the linked list nodes:
         for (int i = 0; i < array.length; ++i, node = node.next) {
@@ -1722,7 +1735,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public Spliterator<E> spliterator() {
-        return new LinkedListSpliterator<>(this, first, size, 0, modCount);
+        return new LinkedListSpliterator<>(this, head, size, 0, modCount);
     }
     
     /**
@@ -1749,7 +1762,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Object[] arr = new Object[size];
         int index = 0;
         
-        for (Node<E> node = first; node != null; node = node.next) {
+        for (Node<E> node = head; node != null; node = node.next) {
             arr[index++] = node.item;
         }
         
@@ -1789,7 +1802,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int index = 0;
         
-        for (Node<E> node = first; node != null; node = node.next) {
+        for (Node<E> node = head; node != null; node = node.next) {
             a[index++] = (T) node.item;
         }
         
@@ -1902,6 +1915,7 @@ static void subListRangeCheck(int fromIndex,
         int distance = collectionSize / numberOfNewFingers;
         int nodesToSkip = distance / 2;
         int index = firstIndex + nodesToSkip;
+        
         spreadFingers(first, 
                       numberOfNewFingers, 
                       index, 
@@ -1968,7 +1982,7 @@ static void subListRangeCheck(int fromIndex,
         int distance = collectionSize / numberOfNewFingers;
         int startIndex = distance / 2;
         
-        spreadFingers(first, 
+        spreadFingers(head, 
                       numberOfNewFingers,
                       startIndex, 
                       distance, 
@@ -1990,7 +2004,7 @@ static void subListRangeCheck(int fromIndex,
         int distance = size / numberOfNewFingers;
         int startIndex = distance / 2;
         
-        spreadFingers(first,
+        spreadFingers(head,
                       numberOfNewFingers,
                       startIndex, 
                       distance,
@@ -2003,8 +2017,8 @@ static void subListRangeCheck(int fromIndex,
      * @param c the collection to append.
      */
     private void appendAll(Collection<? extends E> c) {
-        Node<E> prev = last;
-        Node<E> oldLast = last;
+        Node<E> prev = tail;
+        Node<E> oldLast = tail;
 
         for (E item : c) {
             Node<E> newNode = new Node<>(item);
@@ -2013,7 +2027,7 @@ static void subListRangeCheck(int fromIndex,
             prev = newNode;
         }
 
-        last = prev;
+        tail = prev;
         int sz = c.size();
         size += sz;
         modCount++;
@@ -2045,7 +2059,7 @@ static void subListRangeCheck(int fromIndex,
         /**
          * Caches the next node to iterate over.
          */
-        private Node<E> next = first;
+        private Node<E> next = head;
         
         /**
          * The index of the next node to iterate over.
@@ -2317,7 +2331,7 @@ static void subListRangeCheck(int fromIndex,
         /**
          * The next node to iterate.
          */
-        private Node<E> nextToIterate = last;
+        private Node<E> nextToIterate = tail;
         
         /**
          * The index of the node next to iterate.
@@ -2522,7 +2536,7 @@ static void subListRangeCheck(int fromIndex,
                 throw new NoSuchElementException();
             }
             
-            lastReturned = next = (next == null) ? last : next.prev;
+            lastReturned = next = (next == null) ? tail : next.prev;
             nextIndex--;
             return lastReturned.item;
         }
@@ -2876,7 +2890,7 @@ static void subListRangeCheck(int fromIndex,
         succ.prev = newNode;
 
         if (pred == null) {
-            first = newNode;
+            head = newNode;
         } else {
             pred.next = newNode;
             newNode.prev = pred;
@@ -2900,15 +2914,16 @@ static void subListRangeCheck(int fromIndex,
      * @param e the element to prepend.
      */
     private void linkFirst(E e) {
-        Node<E> f = first;
+        Node<E> oldFirst = head;
         Node<E> newNode = new Node<>(e);
-        newNode.next = f;
-        first = newNode;
+        newNode.item = e;
+        newNode.next = oldFirst;
+        head = newNode;
 
-        if (f == null) {
-            last = newNode;
+        if (oldFirst == null) {
+            tail = newNode;
         } else {
-            f.prev = newNode;
+            oldFirst.prev = newNode;
         }
 
         increaseSize();
@@ -2926,15 +2941,15 @@ static void subListRangeCheck(int fromIndex,
      * @param e the element to append.
      */
     private void linkLast(E e) {
-        Node<E> l = last;
+        Node<E> oldTail = tail;
         Node<E> newNode = new Node<>(e);
-        newNode.prev = l;
-        last = newNode;
+        newNode.prev = oldTail;
+        tail = newNode;
         
-        if (l == null) {
-            first = newNode;
+        if (oldTail == null) {
+            head = newNode;
         } else {
-            l.next = newNode;
+            oldTail.next = newNode;
         }
         
         increaseSize();
@@ -3072,10 +3087,10 @@ static void subListRangeCheck(int fromIndex,
      */
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
-        Node<E> oldFirst = first;
-        first = new Node<>(iterator.next());
+        Node<E> oldFirst = head;
+        head = new Node<>(iterator.next());
 
-        Node<E> prevNode = first;
+        Node<E> prevNode = head;
 
         for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>(iterator.next());
@@ -3124,13 +3139,13 @@ static void subListRangeCheck(int fromIndex,
                 
             case 1:
                 Node<E> newNode = new Node<>((E) s.readObject());
-                first = last = newNode;
+                head = tail = newNode;
                 fingerList.appendFinger(new Finger<>(newNode, 0));
                 return;
         }
         
         Node<E> rightmostNode = new Node<>((E) s.readObject());
-        first = rightmostNode;
+        head = rightmostNode;
         
         int numberOfRequestedFingers = getRecommendedNumberOfFingers(size);
         int distance = size / numberOfRequestedFingers;
@@ -3149,7 +3164,7 @@ static void subListRangeCheck(int fromIndex,
             rightmostNode = node;
         }
         
-        last = rightmostNode;
+        tail = rightmostNode;
     }
     
     /**
@@ -3252,12 +3267,12 @@ static void subListRangeCheck(int fromIndex,
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
         int prefixSize = fromIndex;
         int suffixSize = size - toIndex;
-        int prefixFingersSize = fingerList.getFingerIndexImpl(fromIndex);
-        int suffixFingersSize = fingerList.size - 
-                                fingerList.getFingerIndexImpl(toIndex);
+        int prefixFingersLength = fingerList.getFingerIndexImpl(fromIndex);
+        int suffixFingersLength = fingerList.size - 
+                                  fingerList.getFingerIndexImpl(toIndex);
         
-        int prefixFreeSpotCount = prefixSize - prefixFingersSize;
-        int suffixFreeSpotCount = suffixSize - suffixFingersSize;
+        int prefixFreeSpotCount = prefixSize - prefixFingersLength;
+        int suffixFreeSpotCount = suffixSize - suffixFingersLength;
 
         if (prefixFreeSpotCount == 0) {
             if (suffixFreeSpotCount == 0) {
@@ -3266,15 +3281,15 @@ static void subListRangeCheck(int fromIndex,
                                             removalSize);
             } else {
                 int numberOfFingersToMove = nextFingerCount 
-                                          - prefixFingersSize
-                                          - suffixFingersSize;
+                                          - prefixFingersLength
+                                          - suffixFingersLength;
                 
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0. In other words, we are moving to the
                 // suffix.
                 fingerList.moveFingersToSuffix(toIndex, numberOfFingersToMove);
                 fingerList.removeRange(0, 
-                                       suffixFingersSize
+                                       suffixFingersLength
                                                + numberOfFingersToMove, 
                                        removalSize);
                 
@@ -3282,7 +3297,8 @@ static void subListRangeCheck(int fromIndex,
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = nextFingerCount - prefixFingersSize; 
+                int numberOfFingersToMove = nextFingerCount
+                                          - prefixFingersLength; 
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
@@ -3302,8 +3318,8 @@ static void subListRangeCheck(int fromIndex,
 
                 int numberOfCoveredFingers 
                         = nextFingerCount 
-                        - prefixFingersSize
-                        - suffixFingersSize;
+                        - prefixFingersLength
+                        - suffixFingersLength;
                 
                 int numberOfFingersOnLeft = 
                         (int)(prefixLoadFactor * numberOfCoveredFingers);
@@ -3317,8 +3333,8 @@ static void subListRangeCheck(int fromIndex,
                 fingerList.moveFingersToSuffix(toIndex, numberOfFingersOnRight);
 
                 fingerList.removeRange(
-                        prefixFingersSize + numberOfFingersOnLeft,
-                        suffixFingersSize + numberOfFingersOnRight, 
+                        prefixFingersLength + numberOfFingersOnLeft,
+                        suffixFingersLength + numberOfFingersOnRight, 
                         removalSize);
                 
                 removeRangeNodes(firstNodeToRemove, removalSize);
@@ -3339,11 +3355,11 @@ static void subListRangeCheck(int fromIndex,
     void removeRangeNoPrefixNoSuffix(Node<E> node,
                                      int fromIndex, 
                                      int removalSize) {
-        int nextListSize = IndexedLinkedList.this.size - removalSize;
-        int nextFingerListSize =
-                getRecommendedNumberOfFingers(nextListSize);
+        int nextListLength = IndexedLinkedList.this.size - removalSize;
+        int nextFingerListLength =
+                getRecommendedNumberOfFingers(nextListLength);
 
-        int fingersToRemove = fingerList.size() - nextFingerListSize;
+        int fingersToRemove = fingerList.size() - nextFingerListLength;
         int firstFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
         int fingerCount = 0;
         
@@ -3355,13 +3371,11 @@ static void subListRangeCheck(int fromIndex,
         for (int i = 0; i < removalSize - 1; ++i) {
             Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
             
-            if (finger1 == f) {
-                if (fingersToRemove != 0) {
-                    fingersToRemove--;
-                    fingerCount++;
-                    finger1 = finger2;
-                    finger2 = fingerList.get(firstFingerIndex + fingerCount);
-                }
+            if (finger1 == f && fingersToRemove != 0) {
+                fingersToRemove--;
+                fingerCount++;
+                finger1 = finger2;
+                finger2 = fingerList.get(firstFingerIndex + fingerCount);
             }
             
             nextNode = node.next;
@@ -3383,10 +3397,10 @@ static void subListRangeCheck(int fromIndex,
 
         if (prefixLastNode != null) {
             prefixLastNode.next = null;
-            last = prefixLastNode;
+            tail = prefixLastNode;
         } else {
             suffixFirstNode.prev = null;
-            first = suffixFirstNode;
+            head = suffixFirstNode;
         }
         
         fingerList.removeRange(
@@ -3422,14 +3436,14 @@ static void subListRangeCheck(int fromIndex,
         if (prefixLastNode != null) {
             if (suffixFirstNode == null) {
                 prefixLastNode.next = null;
-                last = prefixLastNode;
+                tail = prefixLastNode;
             } else {
                 prefixLastNode.next = suffixFirstNode;
                 suffixFirstNode.prev = prefixLastNode;
             }
         } else {
             suffixFirstNode.prev = null;
-            first = suffixFirstNode;
+            head = suffixFirstNode;
         }
     }
     
@@ -3480,8 +3494,8 @@ static void subListRangeCheck(int fromIndex,
     private void setAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
 
-        first = new Node<>(iterator.next());
-        Node<E> prevNode = first;
+        head = new Node<>(iterator.next());
+        Node<E> prevNode = head;
 
         for (int i = 1, sz = c.size(); i < sz; i++) {
             Node<E> newNode = new Node<>(iterator.next());
@@ -3490,7 +3504,7 @@ static void subListRangeCheck(int fromIndex,
             prevNode = newNode;
         }
 
-        last = prevNode;
+        tail = prevNode;
         size = c.size();
         modCount++;
 
@@ -3511,6 +3525,7 @@ static void subListRangeCheck(int fromIndex,
                                int index,
                                int distance,
                                int fingerIndex) {
+        
         node = scrollNodeToRight(node, distance / 2);
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         
@@ -3556,14 +3571,14 @@ static void subListRangeCheck(int fromIndex,
         Node<E> prev = x.prev;
 
         if (prev == null) {
-            first = next;
+            head = next;
         } else {
             prev.next = next;
             x.prev = null;
         }
 
         if (next == null) {
-            last = prev;
+            tail = prev;
         } else {
             next.prev = prev;
             x.next = null;
@@ -3592,7 +3607,7 @@ static void subListRangeCheck(int fromIndex,
         s.writeInt(size);
 
         // Write out all elements in the proper order.
-        for (Node<E> x = first; x != null; x = x.next) {
+        for (Node<E> x = head; x != null; x = x.next) {
             s.writeObject(x.item);
         }
     }
