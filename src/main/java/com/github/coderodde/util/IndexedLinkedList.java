@@ -2285,8 +2285,8 @@ static void subListRangeCheck(int fromIndex,
                                  - fingerPrefixLength 
                                  - fingerSuffixLength;
         
-        int numberOfFingersPerFinger = rangeLength / numberOfRangeFingers;
-        int startOffset = numberOfFingersPerFinger / 2;
+        int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
+        int startOffset = numberOfElementsPerFinger / 2;
         int index = fromIndex + startOffset;
         
         Node<E> node = node(fromIndex);
@@ -2297,11 +2297,11 @@ static void subListRangeCheck(int fromIndex,
             finger.node = node;
             finger.index = index;
             
-            for (int j = 0; j < numberOfFingersPerFinger; ++j) {
+            for (int j = 0; j < numberOfElementsPerFinger; ++j) {
                 node = node.next;
             }
             
-            index += numberOfFingersPerFinger;
+            index += numberOfElementsPerFinger;
         }
         
         // Since we cannot advance node to the right, we need to deal with the
