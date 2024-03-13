@@ -2655,6 +2655,52 @@ public class IndexedLinkedListTest {
         
         assertEquals(referenceList, list);
     }
+    
+    @Test
+    public void enhancedIteratorAdditionToHead() {
+        List<Integer> referenceList = new ArrayList<>();
+        list.clear();
+        
+        ListIterator<Integer> referenceListIterator = 
+                referenceList.listIterator();
+        
+        ListIterator<Integer> myListIterator = list.listIterator();
+        
+        referenceListIterator.add(1);
+        myListIterator.add(1);
+        
+        assertEquals(referenceList, list);
+        
+        referenceListIterator.add(3);
+        myListIterator.add(3);
+        
+        assertEquals(referenceList, list);
+        
+        assertTrue(referenceListIterator.hasPrevious());
+        assertTrue(myListIterator.hasPrevious());
+        
+        assertEquals(Integer.valueOf(3), referenceListIterator.previous());
+        assertEquals(Integer.valueOf(3), myListIterator.previous());
+        
+        referenceListIterator.add(2);
+        myListIterator.add(2);
+        
+        assertEquals(referenceList, list);
+        
+        assertEquals(Integer.valueOf(2), referenceListIterator.previous());
+        assertEquals(Integer.valueOf(2), myListIterator.previous());
+        
+        assertEquals(Integer.valueOf(1), referenceListIterator.previous());
+        assertEquals(Integer.valueOf(1), myListIterator.previous());
+        
+        myListIterator.add(0);
+        referenceListIterator.add(0);
+        
+        assertEquals(referenceList, list);
+        
+        assertEquals(Integer.valueOf(1), referenceListIterator.next());
+        assertEquals(Integer.valueOf(1), myListIterator.next());
+    }
 
     @Test
     public void enhancedIteratorAddition() {

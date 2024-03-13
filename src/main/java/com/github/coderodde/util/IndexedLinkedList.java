@@ -62,6 +62,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                              List<E>, 
                                              Cloneable, 
                                              java.io.Serializable {
+    
     /**
      * This inner class implements the finger list data structure for managing
      * list fingers.
@@ -859,7 +860,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public void add(int index, E element) {
         checkPositionIndex(index);
         
-        if (index == size) {
+        if (index == 0) {
+            linkFirst(element);
+        } else if (index == size) {
             linkLast(element);
         } else {
             linkBefore(element, index, node(index));
@@ -2497,7 +2500,7 @@ static void subListRangeCheck(int fromIndex,
          */
         @Override
         public E next() {
-            checkForComdification();
+            checkForComodification();
             
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -2530,7 +2533,7 @@ static void subListRangeCheck(int fromIndex,
          */
         @Override
         public E previous() {
-            checkForComdification();
+            checkForComodification();
             
             if (!hasPrevious()) {
                 throw new NoSuchElementException();
@@ -2579,7 +2582,7 @@ static void subListRangeCheck(int fromIndex,
          */
         @Override
         public void remove() {
-            checkForComdification();
+            checkForComodification();
             
             if (lastReturned == null) {
                 throw new IllegalStateException();
@@ -2614,7 +2617,7 @@ static void subListRangeCheck(int fromIndex,
                 throw new IllegalStateException();
             }
             
-            checkForComdification();
+            checkForComodification();
             lastReturned.item = e;
         }
 
@@ -2626,12 +2629,14 @@ static void subListRangeCheck(int fromIndex,
          */
         @Override
         public void add(E e) {
-            checkForComdification();
+            checkForComodification();
             
             lastReturned = null;
             
             if (next == null) {
                 linkLast(e);
+            } else if (next.prev == null) {
+                linkFirst(e);
             } else {
                 linkBefore(e, nextIndex, next);
             }
@@ -2655,14 +2660,14 @@ static void subListRangeCheck(int fromIndex,
                 nextIndex++;
             }
             
-            checkForComdification();
+            checkForComodification();
         }
         
         /**
          * Checks that the expected modification count matches the modification
          * count of the underlying list.
          */
-        private void checkForComdification() {
+        private void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
@@ -2886,18 +2891,13 @@ static void subListRangeCheck(int fromIndex,
     private void linkBefore(E e, int index, Node<E> succ) {
         Node<E> pred = succ.prev;
         Node<E> newNode = new Node<>(e);
+        
         newNode.next = succ;
+        newNode.prev = pred;
         succ.prev = newNode;
+        pred.next = newNode;
 
-        if (pred == null) {
-            head = newNode;
-        } else {
-            pred.next = newNode;
-            newNode.prev = pred;
-        }
-
-        size++;
-        modCount++;
+        increaseSize();
 
         if (mustAddFinger()) {
             fingerList.insertFingerAndShiftOnceToRight(
