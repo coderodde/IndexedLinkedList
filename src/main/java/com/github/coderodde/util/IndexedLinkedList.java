@@ -860,10 +860,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public void add(int index, E element) {
         checkPositionIndex(index);
         
-        if (index == 0) {
-            linkFirst(element);
-        } else if (index == size) {
+        if (index == size) { // Check push-back first as it is used more often.
             linkLast(element);
+        } else if (index == 0) {
+            linkFirst(element);
         } else {
             linkBefore(element, index, node(index));
         }
@@ -911,10 +911,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         if (size == 0) {
             setAll(c);
-        } else if (index == 0) {
-            prependAll(c);
         } else if (index == size) {
             appendAll(c);
+        } else if (index == 0) {
+            prependAll(c);
         } else {
             insertAll(c, node(index), index);
         }
