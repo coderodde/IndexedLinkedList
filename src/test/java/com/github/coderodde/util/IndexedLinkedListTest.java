@@ -57,10 +57,206 @@ import org.junit.Test;
 public class IndexedLinkedListTest {
 
     private final IndexedLinkedList<Integer> list = new IndexedLinkedList<>();
+    private final List<Integer> referenceList = new ArrayList<>();
     
     @Before
     public void setUp() {
         list.clear();
+        referenceList.clear();
+    }
+    
+    @Test
+    public void singleElementListIterator() {
+        ListIterator<Integer> referenceListIterator = 
+                referenceList.listIterator();
+        
+        ListIterator<Integer> myListIterator = list.listIterator();
+        
+        assertEquals(referenceListIterator.previousIndex(), 
+                     myListIterator.previousIndex());
+        
+        assertEquals(referenceListIterator.nextIndex(), 
+                     myListIterator.nextIndex());
+        
+        referenceListIterator.add(1);
+        myListIterator.add(1);
+        
+        assertEquals(referenceList, list);
+        assertEquals(referenceListIterator.previousIndex(),
+                     myListIterator.previousIndex());
+        
+        assertEquals(referenceListIterator.nextIndex(),
+                     myListIterator.nextIndex());
+        
+        assertEquals(referenceListIterator.previous(), 
+                     myListIterator.previous());
+        
+        try {
+            referenceListIterator.previous();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        try {
+            myListIterator.previous();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        assertEquals(referenceListIterator.next(), myListIterator.next());
+        assertEquals(referenceListIterator.previous(),
+                     myListIterator.previous());
+        
+        assertEquals(referenceListIterator.next(), myListIterator.next());
+        
+        try {
+            referenceListIterator.next();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        try {
+            myListIterator.next();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        assertEquals(referenceListIterator.previous(),
+                     myListIterator.previous());
+        
+        referenceListIterator.remove();
+        myListIterator.remove();
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void twoElementsListIterator() {
+        ListIterator<Integer> referenceListIterator = 
+                referenceList.listIterator();
+        
+        ListIterator<Integer> myListIterator = list.listIterator();
+        
+        referenceListIterator.add(1);
+        referenceListIterator.add(2);
+        
+        myListIterator.add(1);
+        myListIterator.add(2);
+        
+        try {
+            myListIterator.next();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        try {
+            referenceListIterator.next();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        assertEquals(referenceListIterator.nextIndex(), 
+                     myListIterator.nextIndex());
+        
+        assertEquals(referenceListIterator.previousIndex(), 
+                     myListIterator.previousIndex());
+        
+        assertEquals(referenceListIterator.hasNext(), myListIterator.hasNext());
+        assertEquals(referenceListIterator.hasPrevious(),
+                     myListIterator.hasPrevious());
+        
+        assertEquals(referenceListIterator.previous(), 
+                     myListIterator.previous());
+        
+        assertEquals(referenceListIterator.hasNext(), myListIterator.hasNext());
+        assertEquals(referenceListIterator.hasPrevious(),
+                     myListIterator.hasPrevious());
+        
+        assertEquals(referenceListIterator.previous(), 
+                     myListIterator.previous());
+        
+        assertEquals(referenceListIterator.hasNext(), myListIterator.hasNext());
+        assertEquals(referenceListIterator.hasPrevious(),
+                     myListIterator.hasPrevious());
+        
+        try {
+            myListIterator.previous();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        try {
+            referenceListIterator.previous();
+            fail();
+        } catch (Exception ex) {
+            
+        }
+        
+        assertEquals(referenceList, list);
+        
+        list.clear();
+        referenceList.clear();
+        
+        myListIterator = list.listIterator();
+        referenceListIterator = referenceList.listIterator();
+        
+        myListIterator.add(2);
+        referenceListIterator.add(2);
+        
+        assertEquals(referenceList, list);
+        
+        assertEquals(referenceListIterator.nextIndex(), 
+                     myListIterator.nextIndex());
+        
+        assertEquals(referenceListIterator.previousIndex(), 
+                     myListIterator.previousIndex());
+        
+        assertEquals(referenceListIterator.previous(), 
+                     myListIterator.previous());
+        
+        referenceListIterator.add(1);
+        myListIterator.add(1);
+        
+        assertEquals(referenceList, list);
+        
+        assertEquals(referenceListIterator.nextIndex(), 
+                     myListIterator.nextIndex());
+        
+        assertEquals(referenceListIterator.previousIndex(), 
+                     myListIterator.previousIndex());
+        
+        assertEquals(referenceListIterator.next(), myListIterator.next());
+        
+        assertEquals(referenceListIterator.hasNext(), 
+                     myListIterator.hasNext());
+        
+        assertEquals(referenceListIterator.hasPrevious(), 
+                     myListIterator.hasPrevious());
+        
+        assertEquals(referenceListIterator.previous(),
+                     myListIterator.previous());
+        
+        assertEquals(referenceListIterator.hasNext(), 
+                     myListIterator.hasNext());
+        
+        assertEquals(referenceListIterator.hasPrevious(), 
+                     myListIterator.hasPrevious());
+        
+        assertEquals(referenceListIterator.previous(),
+                     myListIterator.previous());
+        
+        assertEquals(referenceListIterator.hasNext(), 
+                     myListIterator.hasNext());
+        
+        assertEquals(referenceListIterator.hasPrevious(), 
+                     myListIterator.hasPrevious());
     }
     
     @Test
