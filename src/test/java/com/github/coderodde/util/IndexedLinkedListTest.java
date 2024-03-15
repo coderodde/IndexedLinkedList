@@ -65,6 +65,34 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
+    @Test 
+    public void removeIntAtZeroIndex() {
+        referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        list.addAll(referenceList);
+        
+        while (!referenceList.isEmpty()) {
+            referenceList.remove(0);
+            list.remove(0);
+            assertEquals(referenceList, list);
+        }
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test 
+    public void removeIntAtLastIndex() {
+        referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        list.addAll(referenceList);
+        
+        while (!referenceList.isEmpty()) {
+            referenceList.remove(referenceList.size() - 1);
+            list.remove(list.size() - 1);
+            assertEquals(referenceList, list);
+        }
+        
+        assertEquals(referenceList, list);
+    }
+    
     @Test
     public void singleElementListIterator() {
         ListIterator<Integer> referenceListIterator = 

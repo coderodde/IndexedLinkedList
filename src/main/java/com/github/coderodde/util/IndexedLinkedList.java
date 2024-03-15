@@ -1483,6 +1483,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E remove(int index) {
         checkElementIndex(index);
         
+        if (index == size - 1) {
+            return removeLastImpl();
+        }
+        
+        if (index == 0) {
+            return removeFirstImpl();
+        }
+        
         int closestFingerIndex = fingerList.getClosestFingerIndex(index);
         Finger<E> closestFinger = fingerList.get(closestFingerIndex);
         
@@ -1548,6 +1556,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     "removeFirst from an empty IndexedLinkedList");
         }
         
+        return removeFirstImpl();
+    }
+    
+    private E removeFirstImpl() {
         E returnValue = head.item;
         decreaseSize();
         
@@ -1602,19 +1614,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return removeIf(filter, 0, size);
     }
     
-    /**
-     * Removes and returns the last element of this list. Runs in constant time.
-     * 
-     * @return the removed head element.
-     * @throws NoSuchElementException if this list is empty.
-     */
-    @Override
-    public E removeLast() {
-        if (size == 0) {
-            throw new NoSuchElementException(
-                    "removeLast on empty IndexedLinkedList");
-        }
-        
+    private E removeLastImpl() {
         E returnValue = tail.item;
         decreaseSize();
         
@@ -1631,6 +1631,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return returnValue;
+    }
+    
+    /**
+     * Removes and returns the last element of this list. Runs in constant time.
+     * 
+     * @return the removed head element.
+     * @throws NoSuchElementException if this list is empty.
+     */
+    @Override
+    public E removeLast() {
+        if (size == 0) {
+            throw new NoSuchElementException(
+                    "removeLast on empty IndexedLinkedList");
+        }
+        
+        return removeLastImpl();
     }
 
     /**
