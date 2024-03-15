@@ -1483,13 +1483,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E remove(int index) {
         checkElementIndex(index);
         
-        if (index == size - 1) {
-            return removeLastImpl();
-        }
-        
-        if (index == 0) {
-            return removeFirstImpl();
-        }
+//        if (index == size - 1) {
+//            return removeLastImpl();
+//        }
+//        
+//        if (index == 0) {
+//            return removeFirstImpl();
+//        }
         
         int closestFingerIndex = fingerList.getClosestFingerIndex(index);
         Finger<E> closestFinger = fingerList.get(closestFingerIndex);
