@@ -504,7 +504,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param index the element index.
          * @return the {@code index}th node in the linked list.
          */
-        private Node<E> node(int index) {
+        private Node<E> getNode(int index) {
             Finger finger = fingerArray[getClosestFingerIndex(index)];
             int steps = finger.index - index;
 
@@ -3001,38 +3001,13 @@ static void subListRangeCheck(int fromIndex,
         }
         
         // Try push the fingers to the right:
-        for (int j = fingerIndex; j < fingerList.size(); ++j) {
-            Finger<E> fingerLeft  = fingerList.get(j);
-            Finger<E> fingerRight = fingerList.get(j + 1);
-
-            if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = j; i >= fingerIndex; --i) {
-                    Finger<E> fngr = fingerList.get(i);
-                    fngr.node = fngr.node.next;
-                }
-
-                fingerList.shiftFingerIndicesToLeftOnceAll(j + 1);
-                return;
-            }
+        if (tryPushFingersToRight(fingerIndex)) {
+            return;
         }
         
-        // Could not push the fingers to the right. Push to the left. Since the
-        // number of fingers here is smaller than the list size, there must be
-        // a spot to move to some fingers:
-        for (int j = fingerIndex; j > 0; --j) {
-            Finger<E> fingerLeft  = fingerList.get(j - 1);
-            Finger<E> fingerRight = fingerList.get(j);
-            
-            if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = fingerIndex; i > 0; --i) {
-                    Finger<E> fngr = fingerList.get(i);
-                    fngr.node = fngr.node.prev;
-                    fngr.index--;
-                }
-                
-                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
-                return;
-            }
+        // Could not push the fingers to the right. Try push to the left:
+        if (tryPushFingersToLeft(fingerIndex)) {
+            return;
         }
         
         // Once here, the only free spots are at the very beginning of the
@@ -3046,6 +3021,59 @@ static void subListRangeCheck(int fromIndex,
         // The end-of-finger-list node has no Finger<E>.node defined. Take it 
         // outside of the above loop and decrement its index manually:cd 
         fingerList.get(fingerList.size()).index--;
+    }
+    
+    /**
+     * Attempts to move the finger with index {@code fingerIndex} to the right.
+     * 
+     * @param fingerIndex the index of the finger to move to the right.
+     * 
+     * @return {@code true} if a free spot is found, {@code false} otherwise.
+     */
+    private boolean tryPushFingersToRight(int fingerIndex) {
+        for (int j = fingerIndex; j < fingerList.size(); ++j) {
+            Finger<E> fingerLeft  = fingerList.get(j);
+            Finger<E> fingerRight = fingerList.get(j + 1);
+
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = j; i >= fingerIndex; --i) {
+                    Finger<E> fngr = fingerList.get(i);
+                    fngr.node = fngr.node.next;
+                }
+
+                fingerList.shiftFingerIndicesToLeftOnceAll(j + 1);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Attempts to move the finger with index {@code fingerIndex} to the left.
+     * 
+     * @param fingerIndex the index of the finger to move to the left.
+     * 
+     * @return {@code true} if a free spot is found, {@code false} otherwise. 
+     */
+    private boolean tryPushFingersToLeft(int fingerIndex) {
+        for (int j = fingerIndex; j > 0; --j) {
+            Finger<E> fingerLeft  = fingerList.get(j - 1);
+            Finger<E> fingerRight = fingerList.get(j);
+            
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = fingerIndex; i > 0; --i) {
+                    Finger<E> fngr = fingerList.get(i);
+                    fngr.node = fngr.node.prev;
+                    fngr.index--;
+                }
+                
+                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     /**
@@ -3077,7 +3105,7 @@ static void subListRangeCheck(int fromIndex,
      * @return the node containing the target element.
      */
     private Node<E> node(int elementIndex) {
-         return fingerList.node(elementIndex);
+         return fingerList.getNode(elementIndex);
     }
     
     /**
