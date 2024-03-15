@@ -3024,59 +3024,6 @@ static void subListRangeCheck(int fromIndex,
     }
     
     /**
-     * Attempts to move the finger with index {@code fingerIndex} to the right.
-     * 
-     * @param fingerIndex the index of the finger to move to the right.
-     * 
-     * @return {@code true} if a free spot is found, {@code false} otherwise.
-     */
-    private boolean tryPushFingersToRight(int fingerIndex) {
-        for (int j = fingerIndex; j < fingerList.size(); ++j) {
-            Finger<E> fingerLeft  = fingerList.get(j);
-            Finger<E> fingerRight = fingerList.get(j + 1);
-
-            if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = j; i >= fingerIndex; --i) {
-                    Finger<E> fngr = fingerList.get(i);
-                    fngr.node = fngr.node.next;
-                }
-
-                fingerList.shiftFingerIndicesToLeftOnceAll(j + 1);
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Attempts to move the finger with index {@code fingerIndex} to the left.
-     * 
-     * @param fingerIndex the index of the finger to move to the left.
-     * 
-     * @return {@code true} if a free spot is found, {@code false} otherwise. 
-     */
-    private boolean tryPushFingersToLeft(int fingerIndex) {
-        for (int j = fingerIndex; j > 0; --j) {
-            Finger<E> fingerLeft  = fingerList.get(j - 1);
-            Finger<E> fingerRight = fingerList.get(j);
-            
-            if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = fingerIndex; i > 0; --i) {
-                    Finger<E> fngr = fingerList.get(i);
-                    fngr.node = fngr.node.prev;
-                    fngr.index--;
-                }
-                
-                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    /**
      * Returns {@code true} if and only if this list requires more fingers.
      * 
      * @return {@code true} if and only if this list requires more fingers.
@@ -3587,6 +3534,59 @@ static void subListRangeCheck(int fromIndex,
         }
         
         return node;
+    }
+    
+    /**
+     * Attempts to move the finger with index {@code fingerIndex} to the left.
+     * 
+     * @param fingerIndex the index of the finger to move to the left.
+     * 
+     * @return {@code true} if a free spot is found, {@code false} otherwise. 
+     */
+    private boolean tryPushFingersToLeft(int fingerIndex) {
+        for (int j = fingerIndex; j > 0; --j) {
+            Finger<E> fingerLeft  = fingerList.get(j - 1);
+            Finger<E> fingerRight = fingerList.get(j);
+            
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = fingerIndex; i > 0; --i) {
+                    Finger<E> fngr = fingerList.get(i);
+                    fngr.node = fngr.node.prev;
+                    fngr.index--;
+                }
+                
+                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Attempts to move the finger with index {@code fingerIndex} to the right.
+     * 
+     * @param fingerIndex the index of the finger to move to the right.
+     * 
+     * @return {@code true} if a free spot is found, {@code false} otherwise.
+     */
+    private boolean tryPushFingersToRight(int fingerIndex) {
+        for (int j = fingerIndex; j < fingerList.size(); ++j) {
+            Finger<E> fingerLeft  = fingerList.get(j);
+            Finger<E> fingerRight = fingerList.get(j + 1);
+
+            if (fingerLeft.index + 1 < fingerRight.index) {
+                for (int i = j; i >= fingerIndex; --i) {
+                    Finger<E> fngr = fingerList.get(i);
+                    fngr.node = fngr.node.next;
+                }
+
+                fingerList.shiftFingerIndicesToLeftOnceAll(j + 1);
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     /**
