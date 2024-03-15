@@ -1559,28 +1559,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return removeFirstImpl();
     }
     
-    private E removeFirstImpl() {
-        E returnValue = head.item;
-        decreaseSize();
-        
-        head = head.next;
-        
-        if (head == null) {
-            tail = null;
-        } else {
-            head.prev = null;
-        }
-        
-        fingerList.adjustOnRemoveFirst();
-        
-        if (mustRemoveFinger()) {
-            removeFinger();
-        }
-
-        fingerList.get(fingerList.size()).index = size;
-        return returnValue;
-    }
-    
     /**
      * Removes the leftmost occurrence of {@code o}. Runs in worst-case 
      * \(\mathcal{O}(n)\) time.
@@ -1612,25 +1590,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @Override
     public boolean removeIf(Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
-    }
-    
-    private E removeLastImpl() {
-        E returnValue = tail.item;
-        decreaseSize();
-        
-        tail = tail.prev;
-        
-        if (tail == null) {
-            head = null;
-        } else {
-            tail.next = null;
-        }
-        
-        if (mustRemoveFinger()) {
-            removeFinger();
-        }
-        
-        return returnValue;
     }
     
     /**
@@ -3166,6 +3125,33 @@ static void subListRangeCheck(int fromIndex,
     }
     
     /**
+     * Implements the actual removal of the first/head element.
+     * 
+     * @return the removed element.
+     */
+    private E removeFirstImpl() {
+        E returnValue = head.item;
+        decreaseSize();
+        
+        head = head.next;
+        
+        if (head == null) {
+            tail = null;
+        } else {
+            head.prev = null;
+        }
+        
+        fingerList.adjustOnRemoveFirst();
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+
+        fingerList.get(fingerList.size()).index = size;
+        return returnValue;
+    }
+    
+    /**
      * Removes all the items that satisfy the given predicate.
      * 
      * @param filter the filter object.
@@ -3198,6 +3184,30 @@ static void subListRangeCheck(int fromIndex,
         }
         
         return modified;
+    }
+    
+    /**
+     * Implements the actual removal of the last/tail element.
+     * 
+     * @return the removed element.
+     */
+    private E removeLastImpl() {
+        E returnValue = tail.item;
+        decreaseSize();
+        
+        tail = tail.prev;
+        
+        if (tail == null) {
+            head = null;
+        } else {
+            tail.next = null;
+        }
+        
+        if (mustRemoveFinger()) {
+            removeFinger();
+        }
+        
+        return returnValue;
     }
     
     /**
