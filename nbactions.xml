@@ -12,9 +12,9 @@
             <properties>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
                 <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
         <action>
@@ -30,9 +30,9 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
                 <exec.vmArgs>-Xms3000m -Xmx3000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
         <action>
@@ -47,9 +47,9 @@
             <properties>
                 <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+                <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
         <action>
