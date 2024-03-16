@@ -76,6 +76,7 @@ public class LinkedListBenchmark2 {
         "RemoveFromEnd",
         "RemoveRandom",
         "RemoveRange",
+        "Sort",
     };
     
     private static final String[] LIST_TYPE_NAMES = {
@@ -163,7 +164,7 @@ public class LinkedListBenchmark2 {
         }
     }
     
-    private static String getListTypeName(List<Object> list) {
+    private static String getListTypeName(List list) {
         String className = list.getClass().getSimpleName();
         
         switch (className) {
@@ -220,7 +221,8 @@ public class LinkedListBenchmark2 {
                 break;
                 
             case "GetRandom":
-                duration = BenchmarkMethods.getRandom(list, new Random(2L), print);
+                duration = BenchmarkMethods.getRandom(list, 
+                                                      new Random(2L), print);
                 break;
                 
             case "InsertCollection":
@@ -275,6 +277,14 @@ public class LinkedListBenchmark2 {
                                                         new Random(4L));
                 break;
                 
+            case "Sort":
+                List<Integer> listToSort = 
+                        createRandomIntegerList(listTypeName,
+                                                listSize, 
+                                                new Random(5L));
+                
+                duration = BenchmarkMethods.sort(listToSort, print);
+                
             default:
                 throw new IllegalArgumentException(
                         "Unknown method name: " + methodName);
@@ -283,6 +293,39 @@ public class LinkedListBenchmark2 {
         DURATION_COUNTER_MAP.put(listTypeName, 
                                  DURATION_COUNTER_MAP.get(listTypeName) 
                                          + duration);
+    }
+    
+    private static List<Integer> createRandomIntegerList(String listTypeName,
+                                                         int listSize,
+                                                         Random random) {
+        List<Integer> list;
+        
+        switch (listTypeName) {
+            case "arrayList":
+                list = new ArrayList<>(listSize);
+                break;
+                
+            case "linkedList":
+                list = new LinkedList<>();
+                break;
+                
+            case "treeList":
+                list = new TreeList<>();
+                break;
+                
+            case "indexedLinkedList":
+                list = new IndexedLinkedList<>();
+                break;
+                
+            default:
+                throw new IllegalStateException();
+        }
+        
+        for (int i = 0; i < listSize; i++) {
+            list.add(random.nextInt());
+        }
+        
+        return list;
     }
     
     private static void benchmarkModifiedIterator(boolean print) {
@@ -311,6 +354,29 @@ public class LinkedListBenchmark2 {
     }
     
     private static final class BenchmarkMethods {
+        
+        private static final int SKIP_FRONT = 13;
+        private static final int SKIP_BACK = 39;
+        
+        static long sort(List<Integer> list, boolean print) {
+            long startTime = System.nanoTime();
+            list.subList(SKIP_BACK, list.size() - SKIP_BACK)
+                .sort(Integer::compareTo);
+            long endTime = System.nanoTime();
+            
+            long duration = (endTime - startTime) / 1000;
+            
+            if (print) {
+                String listTypeName = getListTypeName(list);
+                
+                System.out.println(
+                        listTypeName 
+                        + "Sort: " 
+                        + duration);
+            }
+            
+            return duration;
+        }
         
         static long addAtBeginning(List<Object> list, boolean print) {
             long startTime;
