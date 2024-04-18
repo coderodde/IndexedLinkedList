@@ -31,7 +31,11 @@
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+<<<<<<< HEAD
                 <exec.vmArgs>-Xms1000m -Xmx1000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+=======
+                <exec.vmArgs>-Xms3000m -Xmx3000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+>>>>>>> e5fa429ccefb73592677fea194382d9468d6346e
                 <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
