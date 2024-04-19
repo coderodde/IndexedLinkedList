@@ -13,7 +13,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
-                <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
+                <exec.vmArgs>-Xms1000m -Xmx1000m</exec.vmArgs>
                 <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
@@ -31,7 +31,11 @@
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
+<<<<<<< HEAD
+                <exec.vmArgs>-Xms1000m -Xmx1000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+=======
                 <exec.vmArgs>-Xms3000m -Xmx3000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+>>>>>>> e5fa429ccefb73592677fea194382d9468d6346e
                 <exec.appArgs>--all</exec.appArgs>
             </properties>
         </action>
@@ -45,7 +49,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Xms3000m -Xmx3000m</exec.vmArgs>
+                <exec.vmArgs>-Xms1000m -Xmx1000m</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.github.coderodde.util.benchmark.LinkedListBenchmark2</exec.mainClass>
                 <exec.executable>java</exec.executable>

@@ -50,6 +50,7 @@ public class LinkedListBenchmark2 {
     private static final class Bounds {
         static final int NUMBER_OF_ADDITIONS_AT_BEGINNING = 2_000;
         static final int NUMBER_OF_RANDOM_ADDS = 2_000;
+        static final int NUMBER_OF_ADDITIONS_AT_END = 10_000;
         static final int NUMBER_OF_GETS = 500;
         static final int NUMBER_OF_REMOVE_FIRST_OPS = 5_000;
         static final int NUMBER_OF_REMOVE_LAST_OPS = 20_000;
@@ -70,7 +71,7 @@ public class LinkedListBenchmark2 {
         "AppendCollection",
         "GetRandom",
         "InsertCollection",
-        "Iterate",
+//        "Iterate",
         "PrependCollection",
         "RemoveFromBeginning",
         "RemoveFromEnd",
@@ -423,7 +424,7 @@ public class LinkedListBenchmark2 {
                 startTime = System.nanoTime();
                 Deque<Object> deque = (Deque<Object>) list;
                 
-                for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_BEGINNING; i++) {
+                for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_END; i++) {
                     deque.addLast(ELEMENT);
                 }
                 
@@ -431,7 +432,7 @@ public class LinkedListBenchmark2 {
             } else {
                 startTime = System.nanoTime();
                 
-                for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_BEGINNING; i++) {
+                for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_END; i++) {
                     list.add(ELEMENT);
                 }
                 

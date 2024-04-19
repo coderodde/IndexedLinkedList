@@ -617,7 +617,7 @@ final class LinkedListBenchmark {
         long startMillis; 
         long endMillis;
         
-        if (list instanceof Deque<Integer>) {
+        if (list instanceof Deque) {
             startMillis = System.currentTimeMillis();
             
             for (int i = 0; i < REMOVE_FIRST_OPERATIONS; ++i) {
