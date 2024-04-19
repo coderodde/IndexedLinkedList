@@ -57,6 +57,7 @@ import java.util.function.UnaryOperator;
  * @author Rodion "rodde" Efremov
  * @version 1.618033988 (Sep 30, 2023)
  * @since 1.6 (Sep 1, 2021)
+ * @param <E> the element type.
  */
 public class IndexedLinkedList<E> implements Deque<E>, 
                                              List<E>, 
@@ -69,7 +70,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @param <E> the list node item type.
      */
-    class FingerList<E> {
+    public final class FingerList<E> {
 
         /**
          * This is also the minimum capacity.
@@ -80,7 +81,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * The actual list storage array.
          */
         Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
-        
+                
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder().append("[");
@@ -147,7 +148,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param index the index of the target finger.
          * @return the {@code index}th finger.
          */
-        Finger<E> get(int index) {
+        public Finger<E> get(int index) {
             return fingerArray[index];
         }
         
@@ -169,7 +170,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * 
          * @return the number of fingers in this finger list.
          */
-        int size() {
+        public int size() {
             return size;
         }
         
@@ -718,7 +719,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @param <E> the type of the list's satellite data.
      */
-    static final class Finger<E> {
+    public static final class Finger<E> {
  
         /**
          * The pointed to {@link Node}.
@@ -739,6 +740,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Finger(Node<E> node, int index) {
             this.node = node;
             this.index = index;
+        }
+        
+        /**
+         * Returns the index of this finger. Used for research.
+         * 
+         * @return the index of this finger.
+         */
+        public int getIndex() {
+            return index;
         }
 
         /**
@@ -764,6 +774,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
 
             index -= steps;
+            this.node = node;
         }
 
         /**
@@ -777,6 +788,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
 
             index += steps;
+            this.node = node;
         }
     }
     
@@ -854,7 +866,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      *
      * @param index index at which the specified element is to be inserted.
      * @param element element to be inserted.
-     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IndexOutOfBoundsException if index is outside of the valid range.
      */
     @Override
     public void add(int index, E element) {
@@ -898,7 +910,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      *              specified collection.
      * @param c collection containing elements to be added to this list.
      * @return {@code true} if this list changed as a result of the call.
-     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IndexOutOfBoundsException if the index is outside of the valid
+     *                                   range.
      * @throws NullPointerException if the specified collection is null
      */
     @Override
@@ -1091,6 +1104,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Packs all the fingers to beginning of this list. Used for research.
+     */
+    public void deoptimize() {
+        Node<E> node = head;
+        
+        for (int i = 0; i < fingerList.size(); i++) {
+            fingerList.get(i).index = i;
+            fingerList.get(i).node = node;
+            node = node.next;
+        }
+    }
+    
+    /**
      * Returns the descending iterator.
      * 
      * @return the descending iterator pointing to the tail of this list.
@@ -1165,22 +1191,27 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     public double getEntropy() {
         double sum = 0.0;
-        double squareRootSize =
-                Math.ceil((1.0 * size) / 
-                          (1.0 * fingerList.size()));
         
         for (int i = 0; i < fingerList.size(); i++) {
             double value = fingerList.get(i + 1).index 
                          - fingerList.get(i).index 
-                         - squareRootSize;
+                         - fingerList.size();
             
             value = Math.abs(value);
-            
             sum += value;
         }
         
         sum /= size;
-        return 1 - sum;
+        return Math.max(0.0, 1.0 - sum);
+    }
+            
+    /**
+     * Returns the finger list.
+     * 
+     * @return the finger list.
+     */
+    public FingerList<E> getFingerList() {
+        return fingerList;
     }
     
     /**
@@ -3448,7 +3479,7 @@ static void subListRangeCheck(int fromIndex,
      * @param end the ending, exclusive index of the range to replace.
      */
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
-        Objects.requireNonNull(operator);
+        Objects.requireNonNull(operator); 
         int expectedModCount = modCount;
         Node<E> node = node(i);
         
