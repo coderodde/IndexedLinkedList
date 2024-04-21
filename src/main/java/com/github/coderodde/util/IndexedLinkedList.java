@@ -1101,7 +1101,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return true;
-    }
+    }   
     
     /**
      * Packs all the fingers to beginning of this list. Used for research.
