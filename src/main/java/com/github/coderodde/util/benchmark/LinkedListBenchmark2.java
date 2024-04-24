@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import org.apache.commons.collections4.list.TreeList;
 
 public class LinkedListBenchmark2 {
@@ -20,6 +21,9 @@ public class LinkedListBenchmark2 {
     
     private static final Map<String, Long> ITERATOR_DURATION_COUNTER_MAP = 
             new HashMap<>();
+    
+    private static final Map<String, Long> PER_OPERATION_DURATION_COUNTER_MAP = 
+            new TreeMap<>();
     
     private static final int[] LIST_SIZES = {
         100_000,
@@ -77,7 +81,7 @@ public class LinkedListBenchmark2 {
         "RemoveFromEnd",
         "RemoveRandom",
         "RemoveRange",
-        "Sort",
+//        "Sort",
     };
     
     private static final String[] LIST_TYPE_NAMES = {
@@ -126,9 +130,20 @@ public class LinkedListBenchmark2 {
         
         for (String methodName : METHOD_NAMES) {
             for (String listTypeName : LIST_TYPE_NAMES) {
+                long start = System.nanoTime();
+                
                 for (int listSize : LIST_SIZES) {
                     benchmark(methodName, listTypeName, listSize, true);
                 }
+                
+                long end = System.nanoTime();
+                long duration = (end - start) / 1000;
+                PER_OPERATION_DURATION_COUNTER_MAP.put(
+                        String.format(
+                                "%s%s", 
+                                listTypeName, 
+                                methodName), 
+                        duration);
             }
         }
         
@@ -140,6 +155,18 @@ public class LinkedListBenchmark2 {
             System.out.printf("%-" + "indexedLinkedList".length() + "s: %d\n", 
                     e.getKey(),
                     e.getValue());
+        }
+        
+        System.out.println("--- Per operation counts ---");
+        
+        final String fmt =
+                String.format(
+                        "%%-%ds: %% d\n",
+                        "indexedLinkedListRemoveFromBeginning".length());
+        
+        for (Map.Entry<String, Long> e :
+                PER_OPERATION_DURATION_COUNTER_MAP.entrySet()) {
+            System.out.printf(fmt, e.getKey(), e.getValue());
         }
     }
     
@@ -191,10 +218,10 @@ public class LinkedListBenchmark2 {
                                   String listTypeName,
                                   int listSize,
                                   boolean print) {
+        System.gc();
         List<Object> list = getEmptyList(listTypeName);
         loadList(list, listSize);
         long duration;
-        System.gc();
         
         switch (methodName) {
             case "AddAtBeginning":
@@ -208,7 +235,7 @@ public class LinkedListBenchmark2 {
             case "AddRandom":
                 duration = BenchmarkMethods.addRandom(list,
                                                       print,
-                                                      new Random(1L));
+                                                      new Random(13L));
                 break;
                 
             case "AppendCollection":
@@ -223,7 +250,8 @@ public class LinkedListBenchmark2 {
                 
             case "GetRandom":
                 duration = BenchmarkMethods.getRandom(list, 
-                                                      new Random(2L), print);
+                                                      new Random(26L),
+                                                      print);
                 break;
                 
             case "InsertCollection":

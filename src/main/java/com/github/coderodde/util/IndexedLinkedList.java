@@ -1176,8 +1176,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public double getEntropy() {
         double sum = 0.0;
         double squareRootSize = Math.ceil(Math.sqrt(size));
-//                Math.ceil((1.0 * size) / 
-//                          (1.0 * fingerList.size()));
         
         for (int i = 0; i < fingerList.size(); i++) {
             double value = fingerList.get(i + 1).index 
