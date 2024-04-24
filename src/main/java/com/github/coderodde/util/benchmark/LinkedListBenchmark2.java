@@ -504,7 +504,7 @@ public class LinkedListBenchmark2 {
         static long appendCollection(List<Object> list, 
                                      List<Object> listToAdd,
                                      boolean print) {
-            
+                                     
             long startTime = System.nanoTime();
 
             for (int i = 0; i < Bounds.NUMBER_OF_COLLECTION_APPENDS; i++) {
