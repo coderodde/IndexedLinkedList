@@ -137,7 +137,9 @@ public class LinkedListBenchmark2 {
                 }
                 
                 long end = System.nanoTime();
+                // duration in microseconds.
                 long duration = (end - start) / 1000;
+                
                 PER_OPERATION_DURATION_COUNTER_MAP.put(
                         String.format(
                                 "%s%s", 
@@ -164,10 +166,30 @@ public class LinkedListBenchmark2 {
                         "%%-%ds: %% d\n",
                         "indexedLinkedListRemoveFromBeginning".length());
         
+        Map<String, Long> m = new HashMap<>();
+        
+        for (String listName : LIST_TYPE_NAMES) {
+            m.put(listName, 0L);
+        }
+        
         for (Map.Entry<String, Long> e :
                 PER_OPERATION_DURATION_COUNTER_MAP.entrySet()) {
             System.out.printf(fmt, e.getKey(), e.getValue());
+            
+            if (e.getKey().startsWith("arrayList")) {
+                m.put("arrayList", m.get("arrayList") + e.getValue());
+            } else if (e.getKey().startsWith("linkedList")) {
+                m.put("linkedList", m.get("linkedList") + e.getValue());
+            } else if (e.getKey().startsWith("indexedLinkedList")) {
+                m.put("indexedLinkedList", m.get("indexedLinkedList") + e.getValue());
+            } else if (e.getKey().startsWith("treeList")) {
+                m.put("treeList", m.get("treeList") + e.getValue());
+            } else {
+                throw new IllegalStateException();
+            }
         }
+        
+        System.out.println(m);
     }
     
     private static void printModifiedIteratorDurations() {
