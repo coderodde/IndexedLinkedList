@@ -44,19 +44,6 @@ public class LinkedListBenchmark2 {
         1_000_000,
     };
     
-    private static final int[] LIST_SIZES_FOR_ITERATOR_MODFICATIONS = {
-        10_000,
-        20_000,
-        30_000,
-        40_000,
-        50_000,
-        60_000,
-        70_000,
-        80_000,
-        90_000,
-        100_000,
-    };
-    
     private static final class Bounds {
         static final int NUMBER_OF_ADDITIONS_AT_BEGINNING = 2_000;
         static final int NUMBER_OF_RANDOM_ADDS = 2_000;
@@ -82,12 +69,10 @@ public class LinkedListBenchmark2 {
         "AppendCollection",
         "InsertCollection",
         "GetRandom",
-//        "Iterate",
         "RemoveFromBeginning",
         "RemoveFromEnd",
         "RemoveRandom",
         "RemoveRange",
-//        "Sort",
     };
     
     private static final String[] LIST_TYPE_NAMES = {
@@ -184,7 +169,6 @@ public class LinkedListBenchmark2 {
         printTotalDurations();
         System.out.println();
         System.out.println("<<< Modified iterator >>>");
-        printModifiedIteratorDurations();
     }
     
     private static void warmup() {
@@ -197,7 +181,6 @@ public class LinkedListBenchmark2 {
         }
         
         printTotalDurations();
-        benchmarkModifiedIterator(false);
         clearPerOperationCounterMap();
     }
     
@@ -212,7 +195,6 @@ public class LinkedListBenchmark2 {
             }
         }
         
-        benchmarkModifiedIterator(true);
         showPerOperationStatistics();
     }
     
@@ -243,7 +225,8 @@ public class LinkedListBenchmark2 {
                 System.out.printf(
                         fmt,
                         String.format("\"%s\"", algorithmName),
-                        milliseconds(PER_OPERATION_DURATION_COUNTER_MAP.get(line)),
+                        milliseconds(
+                                PER_OPERATION_DURATION_COUNTER_MAP.get(line)),
                         COLOR_MAP.get(algorithmName)
                         );
                 
@@ -263,13 +246,6 @@ public class LinkedListBenchmark2 {
             System.out.printf("%-" + "indexedLinkedList".length() + "s: %d\n", 
                     e.getKey(),
                     milliseconds(e.getValue()));
-        }
-    }
-    
-    private static void printModifiedIteratorDurations() {
-        for (Map.Entry<String, Long> e : 
-                ITERATOR_DURATION_COUNTER_MAP.entrySet()) {
-            System.out.println(e.getKey() + " " + e.getValue());
         }
     }
     
@@ -362,16 +338,6 @@ public class LinkedListBenchmark2 {
                                                              print);
                 break;
                 
-            case "Iterate":
-                duration = BenchmarkMethods.iterate(list, print);
-                break;
-                
-            case "IterateAndModify":
-                duration = BenchmarkMethods.iterateAndModify(list, 
-                                                             new Random(2L), 
-                                                             print);
-                break;
-                
             case "PrependCollection":
                 List<Object> listToPrepend = 
                         new ArrayList<>(Bounds.APPEND_COLLECTION_SIZE);
@@ -402,14 +368,6 @@ public class LinkedListBenchmark2 {
                                                         new Random(4L));
                 break;
                 
-            case "Sort":
-                List<Integer> listToSort = 
-                        createRandomIntegerList(listTypeName,
-                                                listSize, 
-                                                new Random(5L));
-                
-                duration = BenchmarkMethods.sort(listToSort, print);
-                
             default:
                 throw new IllegalArgumentException(
                         "Unknown method name: " + methodName);
@@ -426,58 +384,6 @@ public class LinkedListBenchmark2 {
                                          + duration);
     }
     
-    private static List<Integer> createRandomIntegerList(String listTypeName,
-                                                         int listSize,
-                                                         Random random) {
-        List<Integer> list;
-        
-        switch (listTypeName) {
-            case "arrayList":
-                list = new ArrayList<>(listSize);
-                break;
-                
-            case "linkedList":
-                list = new LinkedList<>();
-                break;
-                
-            case "treeList":
-                list = new TreeList<>();
-                break;
-                
-            case "indexedLinkedList":
-                list = new IndexedLinkedList<>();
-                break;
-                
-            default:
-                throw new IllegalStateException();
-        }
-        
-        for (int i = 0; i < listSize; i++) {
-            list.add(random.nextInt());
-        }
-        
-        return list;
-    }
-    
-    private static void benchmarkModifiedIterator(boolean print) {
-        for (String listTypeName : LIST_TYPE_NAMES) {
-            for (int size : LIST_SIZES_FOR_ITERATOR_MODFICATIONS) {
-                List<Object> list = getEmptyList(listTypeName);
-                loadList(list, size);
-                long duration = 
-                        BenchmarkMethods.iterateAndModify(
-                                list, 
-                                new Random(5L), 
-                                print);
-                
-                ITERATOR_DURATION_COUNTER_MAP.put(
-                        listTypeName, 
-                        ITERATOR_DURATION_COUNTER_MAP.get(listTypeName) 
-                                + duration);
-            }
-        }
-    }
-    
     private static void loadList(List<Object> list, int listSize) {
         for (int i = 0; i < listSize; i++) {
             list.add(ELEMENT);
@@ -485,30 +391,6 @@ public class LinkedListBenchmark2 {
     }
     
     private static final class BenchmarkMethods {
-        
-        private static final int SKIP_FRONT = 13;
-        private static final int SKIP_BACK = 39;
-        
-        static long sort(List<Integer> list, boolean print) {
-            long startTime = microseconds();
-            
-            list.subList(SKIP_BACK, list.size() - SKIP_BACK)
-                .sort(Integer::compareTo);
-            
-            long endTime = microseconds();
-            long duration = endTime - startTime;
-            
-            if (print) {
-                String listTypeName = getListTypeName(list);
-                
-                System.out.println(
-                        listTypeName 
-                        + "Sort: " 
-                        + duration);
-            }
-            
-            return duration;
-        }
         
         static long addAtBeginning(List<Object> list, boolean print) {
             long startTime;
@@ -674,62 +556,6 @@ public class LinkedListBenchmark2 {
                 System.out.println(
                         listTypeName 
                         + "InsertCollection: " 
-                        + duration);
-            }
-            
-            return duration;
-        }
-        
-        static long iterate(List<Object> list, boolean print) {
-            Iterator<Object> iterator = list.iterator();
-            
-            long startTime = microseconds();
-
-            while (iterator.hasNext()) {
-                iterator.next();
-            }
-
-            long endTime = microseconds();
-            long duration = endTime - startTime;
-            
-            if (print) {
-                String listTypeName = getListTypeName(list);
-                System.out.println(
-                        listTypeName 
-                        + "Iterate: " 
-                        + duration);
-            }
-            
-            return duration;
-        }
-        
-        static long iterateAndModify(List<Object> list,
-                                     Random random, 
-                                     boolean print) {
-            
-            ListIterator<Object> iterator = list.listIterator();
-            
-            long startTime = microseconds();
-
-            while (iterator.hasNext()) {
-                iterator.next();
-                double value = random.nextDouble();
-                
-                if (value > Bounds.ITERATE_AND_MODIFY_ADD_THRESHOLD) {
-                    iterator.add(ELEMENT);
-                } else if (value < Bounds.ITERATE_AND_MODIFY_REMOVE_THRESHOLD) {
-                    iterator.remove();
-                }
-            }
-
-            long endTime = microseconds();
-            long duration = endTime - startTime;
-            
-            if (print) {
-                String listTypeName = getListTypeName(list);
-                System.out.println(
-                        listTypeName 
-                        + "IterateAndModify: " 
                         + duration);
             }
             
