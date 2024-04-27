@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -24,6 +25,11 @@ public class LinkedListBenchmark2 {
     
     private static final Map<String, Long> PER_OPERATION_DURATION_COUNTER_MAP = 
             new TreeMap<>();
+    
+    private static final Map<String, String>
+            BENCHMARK_OPERATION_NAME_TO_GNUPLOT_NAME = new LinkedHashMap<>();
+    
+    private static final Map<String, String> COLOR_MAP = new HashMap<>();
     
     private static final int[] LIST_SIZES = {
         100_000,
@@ -72,11 +78,11 @@ public class LinkedListBenchmark2 {
         "AddAtBeginning",
         "AddAtEnd",
         "AddRandom",
-        "AppendCollection",
-        "GetRandom",
-        "InsertCollection",
-//        "Iterate",
         "PrependCollection",
+        "AppendCollection",
+        "InsertCollection",
+        "GetRandom",
+//        "Iterate",
         "RemoveFromBeginning",
         "RemoveFromEnd",
         "RemoveRandom",
@@ -93,6 +99,9 @@ public class LinkedListBenchmark2 {
     
     static {
         clearDurationCounterMap();
+        initializeOperationNames();
+        initializePerOperationMap();
+        initializeColorMap();
     }
     
     private static void clearDurationCounterMap() {
@@ -102,6 +111,70 @@ public class LinkedListBenchmark2 {
         }
     }
     
+    private static void clearPerOperationCounterMap() {
+        for (final String listTypeName : LIST_TYPE_NAMES) {
+            for (final String methodName : METHOD_NAMES) {
+                final String line = 
+                        String.format(
+                                "%s%s", 
+                                listTypeName, 
+                                methodName);
+                
+                PER_OPERATION_DURATION_COUNTER_MAP.put(line, 0L);
+            }
+        }
+    }
+    
+    private static void initializeOperationNames() {
+        Map<String, String> m = BENCHMARK_OPERATION_NAME_TO_GNUPLOT_NAME;
+        
+        m.put("AddAtBeginning",      "Push-Front");
+        m.put("AddAtEnd",            "Push-Back");
+        m.put("AddRandom",           "Insert");
+        m.put("PrependCollection",   "Push-Front-Collection");
+        m.put("AppendCollection",    "Push-Back-Collection");
+        m.put("InsertCollection",    "Insert-Collection");
+        m.put("GetRandom",           "Search");
+        m.put("RemoveFromBeginning", "Pop-Front");
+        m.put("RemoveFromEnd",       "Pop-Back");
+        m.put("RemoveRandom",        "Delete");
+        m.put("RemoveRange",         "Delete-Range");
+    }
+    
+    private static void initializeColorMap() {
+        final String insertColor = "0x289e37";
+        final String searchColor = "0x28579e";
+        final String deleteColor = "0xa83232";
+        
+        COLOR_MAP.put("Push-Front",            insertColor);
+        COLOR_MAP.put("Push-Back",             insertColor);
+        COLOR_MAP.put("Insert",                insertColor);
+        COLOR_MAP.put("Push-Front-Collection", insertColor);
+        COLOR_MAP.put("Push-Back-Collection",  insertColor);
+        COLOR_MAP.put("Insert-Collection",     insertColor);
+        
+        COLOR_MAP.put("Search",                searchColor);
+        
+        COLOR_MAP.put("Pop-Front",             deleteColor);
+        COLOR_MAP.put("Pop-Back",              deleteColor);
+        COLOR_MAP.put("Delete",                deleteColor);
+        COLOR_MAP.put("Delete-Range",          deleteColor);
+    }
+    
+    private static void initializePerOperationMap() {
+        // Initialize the per operation duration map:
+        for (String listName : LIST_TYPE_NAMES) {
+            for (String methodName : METHOD_NAMES) {
+                PER_OPERATION_DURATION_COUNTER_MAP
+                        .put(String.format(
+                                "%s%s", 
+                                listName,
+                                methodName), 
+                                0L);
+            }
+        }  
+    }
+    
     public static void main(String[] args) {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         clearDurationCounterMap();
@@ -109,6 +182,7 @@ public class LinkedListBenchmark2 {
         benchmark();
         System.out.println("<<< Total durations >>>");
         printTotalDurations();
+        System.out.println();
         System.out.println("<<< Modified iterator >>>");
         printModifiedIteratorDurations();
     }
@@ -122,7 +196,9 @@ public class LinkedListBenchmark2 {
             }
         }
         
+        printTotalDurations();
         benchmarkModifiedIterator(false);
+        clearPerOperationCounterMap();
     }
     
     private static void benchmark() {
@@ -130,66 +206,64 @@ public class LinkedListBenchmark2 {
         
         for (String methodName : METHOD_NAMES) {
             for (String listTypeName : LIST_TYPE_NAMES) {
-                long start = System.nanoTime();
-                
                 for (int listSize : LIST_SIZES) {
                     benchmark(methodName, listTypeName, listSize, true);
                 }
-                
-                long end = System.nanoTime();
-                // duration in microseconds.
-                long duration = (end - start) / 1000;
-                
-                PER_OPERATION_DURATION_COUNTER_MAP.put(
-                        String.format(
-                                "%s%s", 
-                                listTypeName, 
-                                methodName), 
-                        duration);
             }
         }
         
         benchmarkModifiedIterator(true);
+        showPerOperationStatistics();
+    }
+    
+    private static void showPerOperationStatistics() {
+        System.out.println();
+        System.out.println();
+        
+        for (final String listTypeName : LIST_TYPE_NAMES) {
+            System.out.printf(">>> List type name: %s\n", listTypeName);
+            long listDuration = 0L;
+            
+            for (final String methodName : METHOD_NAMES) {
+                final String line =
+                        String.format(
+                                "%s%s",
+                                listTypeName, 
+                                methodName);
+                
+                final String algorithmName =
+                        BENCHMARK_OPERATION_NAME_TO_GNUPLOT_NAME
+                                .get(methodName);
+                
+                final String fmt = 
+                        String.format(
+                                "%%%ds %%10d %%8s\n",
+                                "\"Push-Front-Collection\"".length());
+                
+                System.out.printf(
+                        fmt,
+                        String.format("\"%s\"", algorithmName),
+                        milliseconds(PER_OPERATION_DURATION_COUNTER_MAP.get(line)),
+                        COLOR_MAP.get(algorithmName)
+                        );
+                
+                listDuration += PER_OPERATION_DURATION_COUNTER_MAP.get(line);
+            }
+            
+            System.out.printf("    List duration: %d microseconds.\n\n",
+                              listDuration);
+        }
+        
+        System.out.println();
+        System.out.println();
     }
     
     private static void printTotalDurations() {
         for (Map.Entry<String, Long> e : DURATION_COUNTER_MAP.entrySet()) {
             System.out.printf("%-" + "indexedLinkedList".length() + "s: %d\n", 
                     e.getKey(),
-                    e.getValue());
+                    milliseconds(e.getValue()));
         }
-        
-        System.out.println("--- Per operation counts ---");
-        
-        final String fmt =
-                String.format(
-                        "%%-%ds: %% d\n",
-                        "indexedLinkedListRemoveFromBeginning".length());
-        
-        Map<String, Long> m = new HashMap<>();
-        
-        for (String listName : LIST_TYPE_NAMES) {
-            m.put(listName, 0L);
-        }
-        
-        for (Map.Entry<String, Long> e :
-                PER_OPERATION_DURATION_COUNTER_MAP.entrySet()) {
-            System.out.printf(fmt, e.getKey(), e.getValue());
-            
-            if (e.getKey().startsWith("arrayList")) {
-                m.put("arrayList", m.get("arrayList") + e.getValue());
-            } else if (e.getKey().startsWith("linkedList")) {
-                m.put("linkedList", m.get("linkedList") + e.getValue());
-            } else if (e.getKey().startsWith("indexedLinkedList")) {
-                m.put("indexedLinkedList", m.get("indexedLinkedList") + e.getValue());
-            } else if (e.getKey().startsWith("treeList")) {
-                m.put("treeList", m.get("treeList") + e.getValue());
-            } else {
-                throw new IllegalStateException();
-            }
-        }
-        
-        System.out.println(m);
     }
     
     private static void printModifiedIteratorDurations() {
@@ -341,6 +415,12 @@ public class LinkedListBenchmark2 {
                         "Unknown method name: " + methodName);
         }
         
+        final String line = String.format("%s%s", listTypeName, methodName);
+        
+        PER_OPERATION_DURATION_COUNTER_MAP.put(
+                line, 
+                PER_OPERATION_DURATION_COUNTER_MAP.get(line) + duration);
+        
         DURATION_COUNTER_MAP.put(listTypeName, 
                                  DURATION_COUNTER_MAP.get(listTypeName) 
                                          + duration);
@@ -410,12 +490,13 @@ public class LinkedListBenchmark2 {
         private static final int SKIP_BACK = 39;
         
         static long sort(List<Integer> list, boolean print) {
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
+            
             list.subList(SKIP_BACK, list.size() - SKIP_BACK)
                 .sort(Integer::compareTo);
-            long endTime = System.nanoTime();
             
-            long duration = (endTime - startTime) / 1000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -434,25 +515,25 @@ public class LinkedListBenchmark2 {
             long endTime;
             
             if (list instanceof Deque) {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 Deque<Object> deque = (Deque<Object>) list;
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_BEGINNING; i++) {
                     deque.addFirst(ELEMENT);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             } else {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_BEGINNING; i++) {
                     list.add(0, ELEMENT);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             }
             
-            long duration = (endTime - startTime) / 1_000;
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -471,25 +552,25 @@ public class LinkedListBenchmark2 {
             long endTime;
             
             if (list instanceof Deque) {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 Deque<Object> deque = (Deque<Object>) list;
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_END; i++) {
                     deque.addLast(ELEMENT);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             } else {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_ADDITIONS_AT_END; i++) {
                     list.add(ELEMENT);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             }
             
-            long duration = (endTime - startTime) / 1_000;
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -503,14 +584,14 @@ public class LinkedListBenchmark2 {
         }
         
         static long addRandom(List<Object> list, boolean print, Random random) {
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             for (int i = 0; i < Bounds.NUMBER_OF_RANDOM_ADDS; i++) {
                 list.add(random.nextInt(list.size() + 1), ELEMENT);
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -527,14 +608,14 @@ public class LinkedListBenchmark2 {
                                      List<Object> listToAdd,
                                      boolean print) {
                                      
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             for (int i = 0; i < Bounds.NUMBER_OF_COLLECTION_APPENDS; i++) {
                 list.addAll(listToAdd);
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -554,14 +635,14 @@ public class LinkedListBenchmark2 {
                 indices[i] = random.nextInt(indices.length);
             }
             
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             for (int index : indices) {
                 list.get(index);
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -578,15 +659,15 @@ public class LinkedListBenchmark2 {
                                      List<Object> listToInsert,
                                      Random random, 
                                      boolean print) {
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
             
             for (int i = 0; i < Bounds.NUMBER_OF_COLLECTION_INSERTS; i++) {
                 int index = random.nextInt(list.size() + 1);
                 list.addAll(index, listToInsert);
             }
             
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -602,14 +683,14 @@ public class LinkedListBenchmark2 {
         static long iterate(List<Object> list, boolean print) {
             Iterator<Object> iterator = list.iterator();
             
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             while (iterator.hasNext()) {
                 iterator.next();
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -628,7 +709,7 @@ public class LinkedListBenchmark2 {
             
             ListIterator<Object> iterator = list.listIterator();
             
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             while (iterator.hasNext()) {
                 iterator.next();
@@ -641,8 +722,8 @@ public class LinkedListBenchmark2 {
                 }
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -659,14 +740,14 @@ public class LinkedListBenchmark2 {
                                       List<Object> listToPrepend,
                                       boolean print) {
             
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             for (int i = 0; i < Bounds.NUMBER_OF_COLLECTION_APPENDS; i++) {
                 list.addAll(0, listToPrepend);
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -687,24 +768,24 @@ public class LinkedListBenchmark2 {
             
             if (list instanceof Deque) {
                 Deque<Object> deque = (Deque<Object>) list;
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_FIRST_OPS; i++) {
                     deque.removeFirst();
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             } else {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0; i < Bounds.NUMBER_OF_REMOVE_FIRST_OPS; i++) {
                     list.remove(0);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             }
             
-            duration = (endTime - startTime) / 1_000;
+            duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -724,7 +805,7 @@ public class LinkedListBenchmark2 {
             
             if (list instanceof Deque) {
                 Deque<Object> deque = (Deque<Object>) list;
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0;
                         i < Bounds.NUMBER_OF_REMOVE_LAST_OPS 
@@ -733,9 +814,9 @@ public class LinkedListBenchmark2 {
                     deque.removeLast();
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             } else {
-                startTime = System.nanoTime();
+                startTime = microseconds();
                 
                 for (int i = 0; 
                         i < Bounds.NUMBER_OF_REMOVE_LAST_OPS && !list.isEmpty();
@@ -743,10 +824,10 @@ public class LinkedListBenchmark2 {
                     list.remove(list.size() - 1);
                 }
                 
-                endTime = System.nanoTime();
+                endTime = microseconds();
             }
             
-            long duration = (endTime - startTime) / 1_000;
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -762,14 +843,14 @@ public class LinkedListBenchmark2 {
         static long removeRandom(List<Object> list, 
                                  boolean print, 
                                  Random random) {
-            long startTime = System.nanoTime();
+            long startTime = microseconds();
 
             for (int i = 0; i < Bounds.NUMBER_OF_RANDOM_REMOVES; i++) {
                 list.remove(random.nextInt(list.size()));
             }
 
-            long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            long endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -788,9 +869,9 @@ public class LinkedListBenchmark2 {
             long startTime;
             long endTime;
             
-            int requestedSize = (4 * list.size()) / 5;
+            int requestedSize = (3 * list.size()) / 5;
             
-            startTime = System.nanoTime();
+            startTime = microseconds();
             
             while (list.size() > requestedSize) {
                 int fromIndex = random.nextInt(list.size()) - 
@@ -801,8 +882,8 @@ public class LinkedListBenchmark2 {
                 list.subList(fromIndex, toIndex).clear();
             }
             
-            endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1_000;
+            endTime = microseconds();
+            long duration = endTime - startTime;
             
             if (print) {
                 String listTypeName = getListTypeName(list);
@@ -814,5 +895,14 @@ public class LinkedListBenchmark2 {
             
             return duration;
         }
+    }
+    
+    private static long microseconds() {
+        return System.nanoTime() / 1000L;
+    }
+    
+    private static long milliseconds(long microseconds) {
+        return (long)(Math.round((double) microseconds) / 
+                                 (double) 1000.0);
     }
 }
