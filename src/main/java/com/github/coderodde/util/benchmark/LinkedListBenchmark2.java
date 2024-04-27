@@ -4,11 +4,9 @@ import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -18,9 +16,6 @@ public class LinkedListBenchmark2 {
     
     private static final Object ELEMENT = new Object();
     private static final Map<String, Long> DURATION_COUNTER_MAP =
-            new HashMap<>();
-    
-    private static final Map<String, Long> ITERATOR_DURATION_COUNTER_MAP = 
             new HashMap<>();
     
     private static final Map<String, Long> PER_OPERATION_DURATION_COUNTER_MAP = 
@@ -57,8 +52,6 @@ public class LinkedListBenchmark2 {
         static final int APPEND_COLLECTION_SIZE = 10_000;
         static final int INSERT_COLLECTION_SIZE = 3_500;
         static final int REMOVE_RANGE_SIZE = 500;
-        static final double ITERATE_AND_MODIFY_ADD_THRESHOLD = 0.7;
-        static final double ITERATE_AND_MODIFY_REMOVE_THRESHOLD = 0.3;
     }
     
     private static final String[] METHOD_NAMES = {
@@ -91,8 +84,7 @@ public class LinkedListBenchmark2 {
     
     private static void clearDurationCounterMap() {
         for (int i = 0; i < LIST_TYPE_NAMES.length; i++) {
-            DURATION_COUNTER_MAP.put(LIST_TYPE_NAMES[i], 0L);
-            ITERATOR_DURATION_COUNTER_MAP.put(LIST_TYPE_NAMES[i], 0L);
+            DURATION_COUNTER_MAP.put(LIST_TYPE_NAMES[i], 0L);;
         }
     }
     
