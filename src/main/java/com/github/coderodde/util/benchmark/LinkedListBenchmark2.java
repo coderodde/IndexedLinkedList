@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import net.openhft.affinity.AffinityLock;
 import org.apache.commons.collections4.list.TreeList;
 
 public class LinkedListBenchmark2 {
@@ -153,14 +154,14 @@ public class LinkedListBenchmark2 {
     }
     
     public static void main(String[] args) {
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-        clearDurationCounterMap();
-        warmup();
-        benchmark();
-        System.out.println("<<< Total durations >>>");
-        printTotalDurations();
-        System.out.println();
-        System.out.println("<<< Modified iterator >>>");
+        try (AffinityLock al = AffinityLock.acquireLock()) {
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            clearDurationCounterMap();
+            warmup();
+            benchmark();
+            System.out.println("<<< Total durations >>>");
+            printTotalDurations();
+        }
     }
     
     private static void warmup() {
