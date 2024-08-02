@@ -3591,4 +3591,47 @@ public class IndexedLinkedListTest {
 
         return true;
     }   
+    
+    @Test
+    public void getNodeKeepFingerListIntact1() {
+        
+        System.out.println("<<< getNodeKeepFingerListIntact1 >>>");
+        
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        System.out.println("List: " + list);
+        System.out.println("Before finger randomization:");
+        printFingers();
+        
+        Random random = new Random(4L);
+        
+        list.randomizeFingers(random);
+        
+        System.out.println("After finger randomization:");
+        printFingers();
+        System.out.println();
+    } 
+    
+    @Test
+    public void debugFingerGetNode() {
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        Integer datum = list.get(9);
+        
+        assertEquals(Integer.valueOf(9), datum);
+    }
+    
+    private void printFingers() {
+        for (int i = 0; i < list.fingerList.size; i++) {
+            System.out.println(list.fingerList.fingerArray[i]);
+        }
+        
+        System.out.println(
+                "End-sentinel: "+  
+                list.fingerList.fingerArray[list.fingerList.size]);
+    }
 }

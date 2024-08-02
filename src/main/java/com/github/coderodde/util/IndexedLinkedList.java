@@ -6,11 +6,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -498,8 +501,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
-        private Node<E> getNodeKeepFingerListIntact(int elementIndex) {
-            int fingerIndex = getClosestFingerIndex(elementIndex);
+        Node<E> getNodeKeepFingerListIntact(int elementIndex, 
+                                            int fingerIndex) {
+            
             int effectiveFingerIndex = normalize(fingerIndex, 
                                                  elementIndex);
             
@@ -527,17 +531,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param elementIndex the element index.
          * @return the {@code index}th node in the linked list.
          */
-        private Node<E> getNode(int elementIndex) { 
+        Node<E> getNode(int elementIndex) { 
             if (fingerList.size < 3) {
                 // We need at least 3 fingers to do the actual trick:
-                return getNodeKeepFingerListIntact(elementIndex);
+                return getNodeKeepFingerListIntact(
+                        elementIndex,
+                        getClosestFingerIndex(elementIndex));
             }
             
             int fingerIndex = getClosestFingerIndex(elementIndex);
             
             if (fingerIndex == 0) {
                 // There is no required preceding finger:
-                return getNodeKeepFingerListIntact(elementIndex);
+                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
+            } 
+            
+            if (fingerIndex == fingerList.size - 1) {
+                // There is no required succeeding finger:
+                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
             }
             
             Finger a = fingerArray[fingerIndex - 1];
@@ -546,25 +557,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             int diff = c.index - a.index;
             int step = diff / 2;
+            int saveBIndex = b.index;
             
-            Finger finger = fingerArray[fingerIndex];
-            Node<E> fingerNode = finger.node;
+            b.index = a.index + step;
             
             // Rewind the finger b node:
-            int fingerBIndex = b.index;
-            
-            if (fingerBIndex < elementIndex) {
-                for (int i = 0; i != elementIndex - fingerBIndex; i++) {
-                    fingerNode = fingerNode.next;
+            if (saveBIndex < elementIndex) {
+                for (int i = 0; i != elementIndex - saveBIndex; i++) {
+                    b.node = b.node.next;
                 }
             } else {
-                for (int i = 0; i != fingerBIndex - elementIndex; i++) {
-                    fingerNode = fingerNode.prev;
+                for (int i = 0; i != saveBIndex - elementIndex; i++) {
+                    b.node = b.node.prev;
                 }
             }
             
-            // Set the new index for finger b:
-            b.index = a.index + step;
             return b.node;
         }
         
@@ -1517,7 +1524,48 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public void push(E e) {
         addFirst(e);
     }
+    
+    /**
+     * Randomizes the fingers. Used primarily for research. Uses the current 
+     * milliseconds timestamp as the seed.
+     */
+    public void randomizeFingers() {
+        randomizeFingers(System.currentTimeMillis());
+    }
 
+    /**
+     * Randomizes the fingers. Used primarily for research.
+     * 
+     * @param seed the random seed.
+     */
+    public void randomizeFingers(long seed) {
+        randomizeFingers(new Random(seed));
+        
+    }
+    
+    /**
+     * Randomizes the fingers. Used primarily for research.
+     * 
+     * @param random the random number generator object.
+     */
+    public void randomizeFingers(Random random) {
+        final Set<Integer> indexFilter = new HashSet<>();
+        
+        while (indexFilter.size() < fingerList.size) {
+            indexFilter.add(random.nextInt(size));
+        }
+        
+        Integer[] newFingerIndexArray = new Integer[fingerList.size];
+        newFingerIndexArray = indexFilter.toArray(newFingerIndexArray);
+        Arrays.sort(newFingerIndexArray);
+        
+        for (int i = 0; i < fingerList.size; i++) {
+            Finger finger = fingerList.fingerArray[i];
+            finger.index = newFingerIndexArray[i];
+            finger.node = getNodeSlowly(finger.index);
+        }
+    }
+    
     /**
      * Removes and returns the first element. Runs in 
      * \(\mathcal{O}(\sqrt{n})\) time.
@@ -2769,6 +2817,24 @@ static void subListRangeCheck(int fromIndex,
      */
     private int getRecommendedNumberOfFingers() {
         return (int) Math.ceil(Math.sqrt(size));
+    }
+    
+    /**
+     * Accesses the {@code index}th node sequentially without relying on 
+     * fingers. Used in {@link #randomizeFingers()}.
+     * 
+     * @param index the index of the desired node.
+     * 
+     * @return the {@code index}th node.
+     */
+    private Node<E> getNodeSlowly(int index) {
+        Node<E> node = head;
+        
+        for (int i = 0; i < index; i++) {
+            node = node.next;
+        }
+        
+        return node;
     }
     
     /**
