@@ -498,24 +498,74 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
 
+        private Node<E> getNodeKeepFingerListIntact(int elementIndex) {
+            int fingerIndex = getClosestFingerIndex(elementIndex);
+            int effectiveFingerIndex = normalize(fingerIndex, 
+                                                 elementIndex);
+            
+            Finger finger = fingerArray[effectiveFingerIndex];
+            Node<E> node = finger.node;
+            int fingerNodeIndex = finger.index;
+            
+            if (elementIndex < fingerNodeIndex) {
+                for (int i = 0; i != fingerNodeIndex - elementIndex; i++) {
+                    node = node.prev;
+                }
+            } else {
+                for (int i = 0; i != elementIndex - fingerNodeIndex; i++) {
+                    node = node.next;
+                }
+            }
+            
+            return node;
+        }
+        
         /**
          * Returns the {@code i}th node of this linked list. The closest finger 
          * is updated to point to the returned node.
          * 
-         * @param index the element index.
+         * @param elementIndex the element index.
          * @return the {@code index}th node in the linked list.
          */
-        private Node<E> getNode(int index) {
-            Finger finger = fingerArray[getClosestFingerIndex(index)];
-            int steps = finger.index - index;
-
-            if (steps > 0) {
-                finger.rewindLeft(steps);
-            } else {
-                finger.rewindRight(-steps);
+        private Node<E> getNode(int elementIndex) { 
+            if (fingerList.size < 3) {
+                // We need at least 3 fingers to do the actual trick:
+                return getNodeKeepFingerListIntact(elementIndex);
             }
-
-            return finger.node;
+            
+            int fingerIndex = getClosestFingerIndex(elementIndex);
+            
+            if (fingerIndex == 0) {
+                // There is no required preceding finger:
+                return getNodeKeepFingerListIntact(elementIndex);
+            }
+            
+            Finger a = fingerArray[fingerIndex - 1];
+            Finger b = fingerArray[fingerIndex];
+            Finger c = fingerArray[fingerIndex + 1];
+            
+            int diff = c.index - a.index;
+            int step = diff / 2;
+            
+            Finger finger = fingerArray[fingerIndex];
+            Node<E> fingerNode = finger.node;
+            
+            // Rewind the finger b node:
+            int fingerBIndex = b.index;
+            
+            if (fingerBIndex < elementIndex) {
+                for (int i = 0; i != elementIndex - fingerBIndex; i++) {
+                    fingerNode = fingerNode.next;
+                }
+            } else {
+                for (int i = 0; i != fingerBIndex - elementIndex; i++) {
+                    fingerNode = fingerNode.prev;
+                }
+            }
+            
+            // Set the new index for finger b:
+            b.index = a.index + step;
+            return b.node;
         }
         
         /**
