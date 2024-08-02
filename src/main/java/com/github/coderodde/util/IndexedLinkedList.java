@@ -84,7 +84,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * The actual list storage array.
          */
         Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
-                
+        
+        /**
+         * The owner indexed list.
+         */
+        private IndexedLinkedList<E> ownerIndexedList;
+         
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder().append("[");
@@ -110,6 +115,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         int size;
 
+        void setOwnerIndexedList(IndexedLinkedList<E> ownerIndexedList) {
+            this.ownerIndexedList = ownerIndexedList;
+        }
+        
         /**
          * Constructs the empty finger list consisting only of end-of-list 
          * sentinel finger.
@@ -525,6 +534,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
+         * Accesses the {@code elementIndex}th element sequentially. This method
+         * is supposed to be used on very small indexed lists.
+         * 
+         * @param elementIndex the element index.
+         * 
+         * @return {@code elementIndex} the index of the element.
+         */
+        private Node<E> getNodeSlowly(int elementIndex) {
+            return ownerIndexedList.getNodeSlowly(elementIndex);
+        }
+        
+        /**
          * Returns the {@code i}th node of this linked list. The closest finger 
          * is updated to point to the returned node.
          * 
@@ -534,9 +555,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Node<E> getNode(int elementIndex) { 
             if (fingerList.size < 3) {
                 // We need at least 3 fingers to do the actual trick:
-                return getNodeKeepFingerListIntact(
-                        elementIndex,
-                        getClosestFingerIndex(elementIndex));
+                return getNodeSlowly(elementIndex);
             }
             
             int fingerIndex = getClosestFingerIndex(elementIndex);
@@ -880,13 +899,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * The actual finger list. Without {@code private} keyword since it is 
      * accessed in unit tests.
      */
-    transient FingerList<E> fingerList = new FingerList<>();
+    transient FingerList<E> fingerList;
     
     /**
      * Constructs an empty list.
      */
     public IndexedLinkedList() {
-        
+        this.fingerList = new FingerList<>();
+        this.fingerList.setOwnerIndexedList(this);
     }
     
     /**
@@ -2827,7 +2847,7 @@ static void subListRangeCheck(int fromIndex,
      * 
      * @return the {@code index}th node.
      */
-    private Node<E> getNodeSlowly(int index) {
+    public Node<E> getNodeSlowly(int index) {
         Node<E> node = head;
         
         for (int i = 0; i < index; i++) {
