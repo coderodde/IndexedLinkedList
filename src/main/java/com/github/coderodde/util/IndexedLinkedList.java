@@ -542,7 +542,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @return {@code elementIndex} the index of the element.
          */
         private Node<E> getNodeSequentially(int elementIndex) {
-            return ownerIndexedList.getNodeSlowly(elementIndex);
+            return ownerIndexedList.getNodeSequentially(elementIndex);
         }
         
         private Node<E> getPrefixNode(int elementIndex) {
@@ -950,6 +950,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
+         * Copy constructs this finger.
+         * 
+         * @param finger the finger whose state to copy.
+         */
+        Finger(Finger<E> finger) {
+            this.node = finger.node;
+            this.index = finger.index;
+        }
+        
+        /**
          * Returns the index of this finger. Used for research.
          * 
          * @return the index of this finger.
@@ -1310,6 +1320,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         return true;
     }   
+    
+    /**
+     * Returns a deep copy of this list that mimics both the linked list and the
+     * finger list. (Used for unit testing. Normal usage of the class should not
+     * rely on this method.)
+     * 
+     * @return a deep copy of this list.
+     */
+    public IndexedLinkedList<E> copy() {
+        IndexedLinkedList<E> other = new IndexedLinkedList<>(this);
+        int fingerIndex = 0;
+        
+        for (int i = 0; i <= this.fingerList.size; i++) {
+            Finger<E> fingerCopy = new Finger<>(this.fingerList.fingerArray[i]);
+            fingerCopy.node = other.getNodeSequentially(fingerCopy.index);
+            other.fingerList.fingerArray[fingerIndex++] = fingerCopy;
+        }
+        
+        return other;
+    }
     
     /**
      * Packs all the fingers to beginning of this list. Used for research.
@@ -1713,7 +1743,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         for (int i = 0; i < fingerList.size; i++) {
             Finger finger = fingerList.fingerArray[i];
             finger.index = newFingerIndexArray[i];
-            finger.node = getNodeSlowly(finger.index);
+            finger.node = getNodeSequentially(finger.index);
         }
     }
     
@@ -2978,7 +3008,7 @@ static void subListRangeCheck(int fromIndex,
      * 
      * @return the {@code index}th node.
      */
-    public Node<E> getNodeSlowly(int index) {
+    public Node<E> getNodeSequentially(int index) {
         Node<E> node = head;
         
         for (int i = 0; i < index; i++) {

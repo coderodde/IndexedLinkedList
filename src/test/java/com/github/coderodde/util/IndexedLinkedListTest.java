@@ -3595,7 +3595,33 @@ public class IndexedLinkedListTest {
     }   
     
     @Test
-    public void getNodeKeepFingerListIntact1() {
+    public void copy() {
+        
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        Random random = new Random(10L);
+        
+        System.out.println("Fingers before randomization:");
+        printFingers();
+
+        list.randomizeFingers(random);
+        
+        System.out.println("Fingers a randomization:");
+        printFingers();
+        
+        IndexedLinkedList<Integer> copy = list.copy();
+        
+        for (int i = 0; i < 10; i++) {
+            assertEquals(Integer.valueOf(i), copy.get(i));   
+        }
+        
+        System.out.println("copy() done.");
+    }
+    
+    @Test
+    public void getPrefixNode() {
         
         System.out.println("<<< getNodeKeepFingerListIntact1 >>>");
         
@@ -3616,26 +3642,36 @@ public class IndexedLinkedListTest {
         System.out.println();
         
         
+        for (int index = 0; index < 22; index++) {
+            IndexedLinkedList<Integer> tmpList = list.copy();
+            
+            int datum = tmpList.get(index);
+            
+            assertEquals(index, datum);
+        }
+        
+        System.out.println("PASSED!");
+        
         int datum = list.get(10);
         
         assertEquals(10, datum);
-        
-        fail("Fail!");
-        
-        datum = list.get(13);
-        assertEquals(13, datum);
-        
-        datum = list.get(99);
-        assertEquals(99, datum);
-        
-        datum = list.get(0);
-        assertEquals(0, datum);
-        
-//        System.out.println("After accessing the indices 13, 99 and 0:");
-//        printFingers();
 //        
+//        fail("Fail!");
+        
+//        datum = list.get(13);
+//        assertEquals(13, datum);
 //        
-        list.get(1);
+//        datum = list.get(99);
+//        assertEquals(99, datum);
+//        
+//        datum = list.get(0);
+//        assertEquals(0, datum);
+//        
+////        System.out.println("After accessing the indices 13, 99 and 0:");
+////        printFingers();
+////        
+////        
+//        list.get(1);
     } 
     
     //@Test
@@ -3649,7 +3685,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(9), datum);
     }
     
-    private void printFingers() {
+    private void printFingers(IndexedLinkedList<Integer> list) {
         for (int i = 0; i < list.fingerList.size; i++) {
             System.out.println(list.fingerList.fingerArray[i]);
         }
@@ -3657,5 +3693,9 @@ public class IndexedLinkedListTest {
         System.out.println(
                 "End-sentinel: "+  
                 list.fingerList.fingerArray[list.fingerList.size]);
+    }
+    
+    private void printFingers() {
+        printFingers(list);
     }
 }
