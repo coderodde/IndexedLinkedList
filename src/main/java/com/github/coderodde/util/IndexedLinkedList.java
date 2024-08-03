@@ -541,8 +541,53 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * 
          * @return {@code elementIndex} the index of the element.
          */
-        private Node<E> getNodeSlowly(int elementIndex) {
+        private Node<E> getNodeSequentially(int elementIndex) {
             return ownerIndexedList.getNodeSlowly(elementIndex);
+        }
+        
+        private Node<E> getPrefixNode(int elementIndex) {
+            Finger<E> a = fingerArray[0];
+            Finger<E> b = fingerArray[1];
+            Node<E> aNode = a.node;
+            
+            // Put a between b and the beginning of the list:
+            int nextAIndex = b.index / 2;
+            a.index = nextAIndex;
+            
+            if (elementIndex < nextAIndex) {
+                for (int i = 0; i != nextAIndex - elementIndex; i++) {
+                    aNode = aNode.next;
+                }
+            } else {
+                for (int i = 0; i != elementIndex - nextAIndex; i++) {
+                    aNode = aNode.prev;
+                }
+            }
+            
+            a.node = aNode;
+            return aNode;
+        }
+        
+        private Node<E> getSuffixNode(int elementIndex) {
+            Finger<E> a = fingerArray[fingerList.size - 2];
+            Finger<E> b = fingerArray[fingerList.size - 1];
+            Node<E> bNode = b.node;
+            
+            int nextBIndex = (a.index + ownerIndexedList.size) / 2;
+            b.index = nextBIndex;
+            
+            if (elementIndex < nextBIndex) {
+                for (int i = 0; i != nextBIndex - elementIndex; i++) {
+                    bNode = bNode.next;
+                }
+            } else {
+                for (int i = 0; i != elementIndex - nextBIndex; i++) {
+                    bNode = bNode.prev;
+                }
+            }
+            
+            b.node = bNode;
+            return bNode;
         }
         
         /**
@@ -555,19 +600,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Node<E> getNode(int elementIndex) { 
             if (fingerList.size < 3) {
                 // We need at least 3 fingers to do the actual trick:
-                return getNodeSlowly(elementIndex);
+                return getNodeSequentially(elementIndex);
             }
             
-            int fingerIndex = getClosestFingerIndex(elementIndex);
+            int fingerIndex = getFingerIndexImpl(elementIndex);
             
             if (fingerIndex == 0) {
                 // There is no required preceding finger:
-                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
+                return getPrefixNode(elementIndex);
+//                return getHeadNode(elementIndex);
+//                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
             } 
             
-            if (fingerIndex == fingerList.size - 1) {
-                // There is no required succeeding finger:
-                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
+            if (fingerIndex == fingerList.size) {
+                return getSuffixNode(elementIndex);
             }
             
             Finger a = fingerArray[fingerIndex - 1];
@@ -592,6 +638,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             return b.node;
+        }
+        
+        Node<E> getHeadNode(int elementIndex) {
+            Node<E> node = ownerIndexedList.head;
+            
+            for (int i = 0; i != elementIndex; i++) {
+                node = node.next;
+            }
+            
+            return node;
+        }
+        
+        Node<E> getTailNode(int elementIndex) {
+            Node<E> node = ownerIndexedList.tail;
+            
+            for (int i = 0; i != elementIndex; i++) {
+                node = node.prev;
+            }
+            
+            return node;
         }
         
         /**

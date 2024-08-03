@@ -3139,6 +3139,8 @@ public class IndexedLinkedListTest {
         assertEquals(3, list.lastIndexOf(3));
         assertEquals(4, list.lastIndexOf(2));
         assertEquals(5, list.lastIndexOf(1));
+        
+        System.out.println("indexOf: success.");
     }
 
     class MyIntegerConsumer implements Consumer<Integer> {
@@ -3597,7 +3599,7 @@ public class IndexedLinkedListTest {
         
         System.out.println("<<< getNodeKeepFingerListIntact1 >>>");
         
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             list.add(i);
         }
         
@@ -3612,6 +3614,21 @@ public class IndexedLinkedListTest {
         System.out.println("After finger randomization:");
         printFingers();
         System.out.println();
+        
+        int datum = list.get(13);
+        assertEquals(13, datum);
+        
+        datum = list.get(99);
+        assertEquals(99, datum);
+        
+        datum = list.get(0);
+        assertEquals(0, datum);
+        
+//        System.out.println("After accessing the indices 13, 99 and 0:");
+//        printFingers();
+//        
+//        
+        list.get(1);
     } 
     
     @Test
