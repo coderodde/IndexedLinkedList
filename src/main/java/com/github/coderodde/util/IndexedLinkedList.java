@@ -552,20 +552,85 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             // Put a between b and the beginning of the list:
             int nextAIndex = b.index / 2;
+            int saveAIndex = a.index;
+            
             a.index = nextAIndex;
             
-            if (elementIndex < nextAIndex) {
-                for (int i = 0; i != nextAIndex - elementIndex; i++) {
+            if (saveAIndex < nextAIndex) {
+                // Here, we need to rewind to the right:
+                for (int i = saveAIndex; i < nextAIndex; i++) {
                     aNode = aNode.next;
                 }
             } else {
-                for (int i = 0; i != elementIndex - nextAIndex; i++) {
+                // Once here, 'saveAIndex >= nextAIndex'.
+                // We need to rewind to the left:
+                for (int i = nextAIndex; i < saveAIndex; i++) {
                     aNode = aNode.prev;
                 }
             }
             
             a.node = aNode;
-            return aNode;
+            
+//            if (elementIndex < nextAIndex) {
+//                for (int i = 0; i != nextAIndex - elementIndex; i++) {
+//                    aNode = aNode.prev;
+//                }
+//            } else {
+//                for (int i = 0; i != elementIndex - nextAIndex; i++) {
+//                    aNode = aNode.next;
+//                }
+//            }
+            
+            // Go get the proper node:
+            if (elementIndex < nextAIndex) {
+                // Here, the desired element is between the head of the list and
+                // the very first figner:
+                int leftDistance  = elementIndex;
+                int rightDistance = nextAIndex - elementIndex;
+                
+                if (leftDistance < rightDistance) {
+                    Node<E> node = ownerIndexedList.head;
+                    
+                    for (int i = 0; i != elementIndex; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    Node<E> node = aNode;
+                    
+                    for (int i = 0; i != rightDistance; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            } else {
+                // Here, 'elementIndex >= nextAIndex':
+                int leftDistance  = elementIndex - nextAIndex;
+                int rightDistance = b.index - elementIndex;
+                
+                if (leftDistance < rightDistance) {
+                    // Once here, rewind the node reference from aNode to the 
+                    // right:
+                    Node<E> node = aNode;
+                    
+                    for (int i = 0; i != leftDistance; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    // Once here, rewind the node refrence from b to the left:
+                    Node<E> node = b.node;
+                    
+                    for (int i = 0; i != rightDistance; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            }
         }
         
         private Node<E> getSuffixNode(int elementIndex) {
