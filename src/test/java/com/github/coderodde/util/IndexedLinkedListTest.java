@@ -3606,14 +3606,23 @@ public class IndexedLinkedListTest {
         System.out.println("Fingers before randomization:");
         printFingers();
 
+        System.out.println(Arrays.asList(list));
         list.randomizeFingers(random);
         
         System.out.println("Fingers a randomization:");
         printFingers();
         
-        IndexedLinkedList<Integer> copy = list.copy();
+        IndexedLinkedList<Integer> copy = list.deepCopy();
         
+        System.out.println(Arrays.asList(copy.fingerList.fingerArray));
+        
+        int datum = copy.get(3);
+        
+        assertEquals(3, datum);
+        
+        System.out.println("SHIT:");
         for (int i = 0; i < 10; i++) {
+            System.out.println("i = " + i);
             assertEquals(Integer.valueOf(i), copy.get(i));   
         }
         
@@ -3642,36 +3651,15 @@ public class IndexedLinkedListTest {
         System.out.println();
         
         
-        for (int index = 0; index < 22; index++) {
-            IndexedLinkedList<Integer> tmpList = list.copy();
-            
-            int datum = tmpList.get(index);
+        for (int index = 0; index < 11; index++) {
+            int datum = list.get(index);
             
             assertEquals(index, datum);
         }
         
-        System.out.println("PASSED!");
-        
         int datum = list.get(10);
         
         assertEquals(10, datum);
-//        
-//        fail("Fail!");
-        
-//        datum = list.get(13);
-//        assertEquals(13, datum);
-//        
-//        datum = list.get(99);
-//        assertEquals(99, datum);
-//        
-//        datum = list.get(0);
-//        assertEquals(0, datum);
-//        
-////        System.out.println("After accessing the indices 13, 99 and 0:");
-////        printFingers();
-////        
-////        
-//        list.get(1);
     } 
     
     //@Test

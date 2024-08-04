@@ -702,7 +702,52 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
             
-            return b.node;
+            // Go fetch the correct node:
+            if (elementIndex < saveBIndex) {
+                // Here, the desired element is between a and b:
+                int leftDistance  = elementIndex;
+                int rightDistance = saveBIndex - elementIndex;
+                
+                if (leftDistance < rightDistance) {
+                    Node<E> node = ownerIndexedList.head;
+                    
+                    for (int i = 0; i != elementIndex; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    Node<E> node = b.node;
+                    // TODO: Replace saveBIndex - elementIndex with rightDistance?
+                    for (int i = 0; i != saveBIndex - elementIndex; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            } else {
+                // Here, the desired element is between c and b:
+                int leftDistance  = elementIndex - saveBIndex;
+                int rightDistance = c.index - elementIndex;
+                
+                if (leftDistance < rightDistance) {
+                    Node<E> node = b.node;
+                    
+                    for (int i = 0; i != leftDistance; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    Node<E> node = c.node;
+                    
+                    for (int i = 0; i != rightDistance; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            }
         }
         
         Node<E> getHeadNode(int elementIndex) {
@@ -1328,13 +1373,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @return a deep copy of this list.
      */
-    public IndexedLinkedList<E> copy() {
+    public IndexedLinkedList<E> deepCopy() {
         IndexedLinkedList<E> other = new IndexedLinkedList<>(this);
         int fingerIndex = 0;
         
         for (int i = 0; i <= this.fingerList.size; i++) {
             Finger<E> fingerCopy = new Finger<>(this.fingerList.fingerArray[i]);
-            fingerCopy.node = other.getNodeSequentially(fingerCopy.index);
+            fingerCopy.node = this.getNodeSequentially(fingerCopy.index);
             other.fingerList.fingerArray[fingerIndex++] = fingerCopy;
         }
         
