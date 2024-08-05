@@ -724,7 +724,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return getPrefixNode(elementIndex);
             } 
             
-            if (fingerIndex == fingerList.size) {
+            if (fingerIndex >= fingerList.size - 1) {
                 return getSuffixNode(elementIndex);
             }
             
@@ -2638,6 +2638,10 @@ static void subListRangeCheck(int fromIndex,
         int numberOfRangeFingers = fingerList.size()
                                  - fingerPrefixLength 
                                  - fingerSuffixLength;
+        
+        if (numberOfRangeFingers == 0) {
+            return;
+        }
         
         int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
         int startOffset = numberOfElementsPerFinger / 2;

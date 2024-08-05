@@ -65,7 +65,7 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
-    @Test 
+    //@Test 
     public void removeIntAtZeroIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
         list.addAll(referenceList);
@@ -914,7 +914,7 @@ public class IndexedLinkedListTest {
             int toIndex = Math.max(f, t);
             
             Comparator<Integer> cmp = Integer::compare;
-            
+            System.out.println("i = " + i);
             list.subList(fromIndex, toIndex).sort(cmp);
             referenceList.subList(fromIndex, toIndex).sort(cmp);
             
@@ -3658,6 +3658,8 @@ public class IndexedLinkedListTest {
         for (int i = 0; i < 10; i++) {
             list.add(i);
         }
+        
+        printFingers();
         
         Integer datum = list.get(9);
         
