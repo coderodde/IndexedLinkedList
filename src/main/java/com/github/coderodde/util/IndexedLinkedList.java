@@ -571,16 +571,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             a.node = aNode;
             
-//            if (elementIndex < nextAIndex) {
-//                for (int i = 0; i != nextAIndex - elementIndex; i++) {
-//                    aNode = aNode.prev;
-//                }
-//            } else {
-//                for (int i = 0; i != elementIndex - nextAIndex; i++) {
-//                    aNode = aNode.next;
-//                }
-//            }
-            
             // Go get the proper node:
             if (elementIndex < nextAIndex) {
                 // Here, the desired element is between the head of the list and
@@ -638,21 +628,80 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Finger<E> b = fingerArray[fingerList.size - 1];
             Node<E> bNode = b.node;
             
+            int saveBIndex = b.index;
             int nextBIndex = (a.index + ownerIndexedList.size) / 2;
+            
             b.index = nextBIndex;
             
-            if (elementIndex < nextBIndex) {
-                for (int i = 0; i != nextBIndex - elementIndex; i++) {
+            // Rewind the finger 'b' to between 'a' and tail:
+            if (saveBIndex < nextBIndex) {
+                int distance = nextBIndex - saveBIndex;
+                
+                for (int i = 0; i != distance; i++) {
                     bNode = bNode.next;
                 }
             } else {
-                for (int i = 0; i != elementIndex - nextBIndex; i++) {
+                // Here, 'nextBIndex <= saveBIndex':
+                int distance = saveBIndex - nextBIndex;
+                
+                for (int i = 0; i != distance; i++) {
                     bNode = bNode.prev;
                 }
             }
             
             b.node = bNode;
-            return bNode;
+            
+            // Go get the proper node:
+            if (elementIndex < nextBIndex) {
+                // Here, the desired element node is between 'a' and 'b':
+                int leftDistance  = elementIndex - a.index;
+                int rightDistance = nextBIndex - elementIndex;
+                
+                if (leftDistance < rightDistance) {
+                    Node<E> node = a.node;
+                    
+                    for (int i = 0; i != leftDistance; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    Node<E> node = b.node;
+                    
+                    for (int i = 0; i != rightDistance; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            } else {
+                // Here, the desired element node is between 'b' and the tail 
+                // node of the list:
+                int leftDistance  = elementIndex - nextBIndex;
+                int rightDistance = ownerIndexedList.size - elementIndex - 1;
+                
+                if (leftDistance < rightDistance) {
+                    // Once here, rewind the node reference from bNode to the
+                    // right:
+                    Node<E> node = bNode;
+                    
+                    for (int i = 0; i != leftDistance; i++) {
+                        node = node.next;
+                    }
+                    
+                    return node;
+                } else {
+                    // Once here, rewind the node reference from tail to the 
+                    // left:
+                    Node<E> node = ownerIndexedList.tail;
+                    
+                    for (int i = 0; i != rightDistance; i++) {
+                        node = node.prev;
+                    }
+                    
+                    return node;
+                }
+            }
         }
         
         /**
@@ -673,8 +722,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (fingerIndex == 0) {
                 // There is no required preceding finger:
                 return getPrefixNode(elementIndex);
-//                return getHeadNode(elementIndex);
-//                return getNodeKeepFingerListIntact(elementIndex, fingerIndex);
             } 
             
             if (fingerIndex == fingerList.size) {
@@ -688,30 +735,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
             int diff = c.index - a.index;
             int step = diff / 2;
             int saveBIndex = b.index;
+            int nextBIndex = a.index + step;
             
-            b.index = a.index + step;
+            b.index = nextBIndex;
             
             // Rewind the finger b node:
-            if (saveBIndex < elementIndex) {
-                for (int i = 0; i != elementIndex - saveBIndex; i++) {
+            if (saveBIndex < nextBIndex) {
+                for (int i = 0; i != nextBIndex - saveBIndex; i++) {
                     b.node = b.node.next;
                 }
             } else {
-                for (int i = 0; i != saveBIndex - elementIndex; i++) {
+                // Here, 'saveBIndex >= nextBIndex':
+                for (int i = 0; i != saveBIndex - nextBIndex; i++) {
                     b.node = b.node.prev;
                 }
             }
             
             // Go fetch the correct node:
-            if (elementIndex < saveBIndex) {
+            if (elementIndex < nextBIndex) {
                 // Here, the desired element is between a and b:
-                int leftDistance  = elementIndex;
-                int rightDistance = saveBIndex - elementIndex;
+                int leftDistance  = elementIndex - a.index;
+                int rightDistance = b.index - elementIndex;
                 
                 if (leftDistance < rightDistance) {
-                    Node<E> node = ownerIndexedList.head;
+                    Node<E> node = a.node;
                     
-                    for (int i = 0; i != elementIndex; i++) {
+                    for (int i = 0; i != leftDistance; i++) {
                         node = node.next;
                     }
                     
@@ -719,7 +768,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 } else {
                     Node<E> node = b.node;
                     // TODO: Replace saveBIndex - elementIndex with rightDistance?
-                    for (int i = 0; i != saveBIndex - elementIndex; i++) {
+                    for (int i = 0; i != rightDistance; i++) {
                         node = node.prev;
                     }
                     
@@ -727,7 +776,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             } else {
                 // Here, the desired element is between c and b:
-                int leftDistance  = elementIndex - saveBIndex;
+                int leftDistance  = elementIndex - b.index;
                 int rightDistance = c.index - elementIndex;
                 
                 if (leftDistance < rightDistance) {
@@ -748,26 +797,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     return node;
                 }
             }
-        }
-        
-        Node<E> getHeadNode(int elementIndex) {
-            Node<E> node = ownerIndexedList.head;
-            
-            for (int i = 0; i != elementIndex; i++) {
-                node = node.next;
-            }
-            
-            return node;
-        }
-        
-        Node<E> getTailNode(int elementIndex) {
-            Node<E> node = ownerIndexedList.tail;
-            
-            for (int i = 0; i != elementIndex; i++) {
-                node = node.prev;
-            }
-            
-            return node;
         }
         
         /**

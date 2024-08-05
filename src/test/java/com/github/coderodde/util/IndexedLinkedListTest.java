@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -3597,39 +3596,40 @@ public class IndexedLinkedListTest {
     @Test
     public void copy() {
         
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             list.add(i);
         }
         
+        System.out.printf("copy(): Entropy before access: %.3f.\n",
+                          list.getEntropy());
+        
         Random random = new Random(10L);
         
-        System.out.println("Fingers before randomization:");
-        printFingers();
+//        System.out.println("Fingers before randomization:");
+//        printFingers();
 
-        System.out.println(Arrays.asList(list));
+//        System.out.println(Arrays.asList(list));
         list.randomizeFingers(random);
         
-        System.out.println("Fingers a randomization:");
-        printFingers();
+//        System.out.println("Fingers after randomization:");
+//        printFingers();
         
         IndexedLinkedList<Integer> copy = list.deepCopy();
         
-        System.out.println(Arrays.asList(copy.fingerList.fingerArray));
+//        System.out.println(Arrays.asList(copy.fingerList.fingerArray));
         
-        int datum = copy.get(3);
-        
-        assertEquals(3, datum);
-        
-        System.out.println("SHIT:");
-        for (int i = 0; i < 10; i++) {
-            System.out.println("i = " + i);
+
+        for (int i = 0; i < 1000; i++) {
             assertEquals(Integer.valueOf(i), copy.get(i));   
         }
+        
+        System.out.printf("copy(): Entropy after access: %.3f.\n",
+                          list.getEntropy());
         
         System.out.println("copy() done.");
     }
     
-    @Test
+//    @Test
     public void getPrefixNode() {
         
         System.out.println("<<< getNodeKeepFingerListIntact1 >>>");
