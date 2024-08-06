@@ -340,11 +340,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param fromIndex       the index of the leftmost element of the range 
          *                        from which the fingers are moved to the finger 
          *                        prefix.
-         * @param numberOfFingers the number of fingers to move from the range 
-         *                        to the finger prefix.
+         * 
+         * @param numberOfFingersToMove the number of fingers to move from the
+         *                        range to the finger prefix.
          */
-        private void moveFingersToPrefix(int fromIndex, int numberOfFingers) {
-            if (numberOfFingers == 0) {
+        private void moveFingersToPrefix(int fromIndex, 
+                                         int numberOfFingersToMove) {
+            
+            if (numberOfFingersToMove == 0) {
                 return;
             }
             
@@ -354,30 +357,65 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Here, the prefix is empty:
                 moveFingersToPrefixOnEmptyPrefix(
                         fromIndex, 
-                        numberOfFingers);
+                        numberOfFingersToMove);
                 
                 return;
             }
             
-            int i;
+            Finger<E> headFinger = fingerArray[0];
+            int prefixFingers = fingerList.size - numberOfFingersToMove;
             
-            // Find the rightmost finger index after which we can put
-            // 'numberOfFingers' fingers:
-            for (i = fromFingerIndex - 1; i >= 0; --i) {
-                Finger<E> finger = fingerArray[i];
-                
-                if (finger.index + numberOfFingers <= fromIndex) {
-                    break;
-                }
+            headFinger.index = 0;
+            headFinger.node  = ownerIndexedList.head;
+            
+            Finger<E> previousFinger = headFinger;
+            
+            for (int i = 1; i < prefixFingers; i++) {
+                Finger<E> f = fingerArray[i];
+                f.index = i;
+                f.node = previousFinger.node.next;
+                previousFinger = f;
             }
             
-            // Pack the rest of the prefix fingers:
-            for (int j = i + 1, k = 0; k < numberOfFingers; ++j, ++k) {
-                Finger<E> predecessorFinger = fingerArray[j - 1];
-                Finger<E> currentFinger = fingerArray[j];
-                currentFinger.index = predecessorFinger.index + 1;
-                currentFinger.node = predecessorFinger.node.next;
+            
+//            int i;
+//            
+//            // Find the rightmost finger index after which we can put
+//            // 'numberOfFingers' fingers:
+//            for (i = fromFingerIndex - 1; i >= 0; --i) {
+//                Finger<E> finger = fingerArray[i];
+//                
+//                if (finger.index + numberOfFingersToMove <= fromIndex) {
+//                    break;
+//                }
+//            }
+//            
+//            if (i == -1) {
+//                
+//                return;
+//            }
+//            
+//            // Pack the rest of the prefix fingers:
+//            for (int j = i + 1, k = 0; k < numberOfFingersToMove; ++j, ++k) {
+//                Finger<E> predecessorFinger = fingerArray[j - 1];
+//                Finger<E> currentFinger = fingerArray[j];
+//                currentFinger.index = predecessorFinger.index + 1;
+//                currentFinger.node = predecessorFinger.node.next;
+//            }
+        }
+        
+        private Node<E> getPrefixHeadNode(int firstNonPrefixNodeIndex,
+                                          int elementIndex) {
+            
+            Finger<E> finger = fingerArray[firstNonPrefixNodeIndex];
+            Node<E> node = finger.node;
+            int index = finger.index;
+            
+            for (int i = elementIndex; i < index; i++) {
+                node = node.prev;
             }
+            
+            return node;
         }
         
         /**
@@ -508,29 +546,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 predecessorFinger.index = currentFinger.index - 1;
                 predecessorFinger.node = currentFinger.node.prev;
             }
-        }
-
-        Node<E> getNodeKeepFingerListIntact(int elementIndex, 
-                                            int fingerIndex) {
-            
-            int effectiveFingerIndex = normalize(fingerIndex, 
-                                                 elementIndex);
-            
-            Finger finger = fingerArray[effectiveFingerIndex];
-            Node<E> node = finger.node;
-            int fingerNodeIndex = finger.index;
-            
-            if (elementIndex < fingerNodeIndex) {
-                for (int i = 0; i != fingerNodeIndex - elementIndex; i++) {
-                    node = node.prev;
-                }
-            } else {
-                for (int i = 0; i != elementIndex - fingerNodeIndex; i++) {
-                    node = node.next;
-                }
-            }
-            
-            return node;
         }
         
         /**
@@ -3656,10 +3671,19 @@ static void subListRangeCheck(int fromIndex,
             return;
         }
         
+        if (removalSize == 1) {
+            System.out.println("HELLO! :-)");
+            remove(fromIndex);
+            return;
+        }
+        
         if (removalSize == size) {
             clear();
             return;
         }
+        
+        // BUG: 'node(...)' changes a finger!
+        int firstNodeToRemoveIndex = fingerList.getFingerIndexImpl(fromIndex);
         
         Node<E> firstNodeToRemove = node(fromIndex);
         
