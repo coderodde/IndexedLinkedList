@@ -362,29 +362,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return;
             }
             
-//            Finger<E> headFinger = fingerArray[0];
-//            int prefixFingers = fingerList.size - numberOfFingersToMove;
-//            
-//            headFinger.index = 0;
-//            headFinger.node  = ownerIndexedList.head;
-//            
-//            Finger<E> previousFinger = headFinger;
-//            
-//            for (int i = 1; i < prefixFingers; i++) {
-//                Finger<E> f = fingerArray[i];
-//                f.index = i;
-//                f.node = previousFinger.node.next;
-//                previousFinger = f;
-//            }
-//            
-            
-            int targetIndex;
+            int targetIndex = fromFingerIndex - 1;
             
             // Find the rightmost finger index after which we can put
             // 'numberOfFingers' fingers:
-            for (targetIndex = fromFingerIndex - 1; 
-                    targetIndex >= 0; 
-                    targetIndex--) {
+            for (; targetIndex >= 0; 
+                   targetIndex--) {
                 
                 Finger<E> finger = fingerArray[targetIndex];
                 
@@ -394,17 +377,35 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetIndex == -1) {
+                
                 throw new UnsupportedOperationException(
                         "i == 1 in moveFingersToPrefix");
             }
             
+            // How many fingers to move to the left from the body to the prefix:
+            int distance = fingerArray[fromFingerIndex].index
+                         - fingerArray[targetIndex].index;
             
-            // Pack the rest of the prefix fingers:
-            for (int j = targetIndex + 1, k = 0; k < numberOfFingersToMove; ++j, ++k) {
-                Finger<E> predecessorFinger = fingerArray[j - 1];
-                Finger<E> currentFinger = fingerArray[j];
-                currentFinger.index = predecessorFinger.index + 1;
-                currentFinger.node = predecessorFinger.node.next;
+            if (distance >= numberOfFingersToMove) {
+                // Pack the prefix fingers:
+//                for (int idx = targetIndex + 1; idx != )
+                
+                Node<E> node = fingerArray[targetIndex].node;
+                int index    = fingerArray[targetIndex].index;
+                
+                // Just move the body part to the prefix:
+                for (int k = 0; k != numberOfFingersToMove; k++) {
+                    Finger<E> finger = fingerArray[targetIndex + 1 + k];
+                    finger.index = ++index;
+                    node = node.next;
+                    finger.node = node;
+                }
+                
+                System.out.println("fds");
+            } else {
+                // Need to make some space in the prefix:
+                
+                // Just move to the prefix:
             }
         }
         
@@ -3721,7 +3722,7 @@ static void subListRangeCheck(int fromIndex,
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = nextFingerCount
+                int numberOfFingersToMove = fingerList.size
                                           - prefixFingersLength; 
                 
                 // Once here, suffixFreeSpotCount = 0 and 
