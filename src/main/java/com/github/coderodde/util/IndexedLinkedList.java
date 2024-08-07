@@ -362,46 +362,50 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return;
             }
             
-            Finger<E> headFinger = fingerArray[0];
-            int prefixFingers = fingerList.size - numberOfFingersToMove;
+//            Finger<E> headFinger = fingerArray[0];
+//            int prefixFingers = fingerList.size - numberOfFingersToMove;
+//            
+//            headFinger.index = 0;
+//            headFinger.node  = ownerIndexedList.head;
+//            
+//            Finger<E> previousFinger = headFinger;
+//            
+//            for (int i = 1; i < prefixFingers; i++) {
+//                Finger<E> f = fingerArray[i];
+//                f.index = i;
+//                f.node = previousFinger.node.next;
+//                previousFinger = f;
+//            }
+//            
             
-            headFinger.index = 0;
-            headFinger.node  = ownerIndexedList.head;
+            int targetIndex;
             
-            Finger<E> previousFinger = headFinger;
+            // Find the rightmost finger index after which we can put
+            // 'numberOfFingers' fingers:
+            for (targetIndex = fromFingerIndex - 1; 
+                    targetIndex >= 0; 
+                    targetIndex--) {
+                
+                Finger<E> finger = fingerArray[targetIndex];
+                
+                if (finger.index + numberOfFingersToMove <= fromIndex) {
+                    break;
+                }
+            }
             
-            for (int i = 1; i < prefixFingers; i++) {
-                Finger<E> f = fingerArray[i];
-                f.index = i;
-                f.node = previousFinger.node.next;
-                previousFinger = f;
+            if (targetIndex == -1) {
+                throw new UnsupportedOperationException(
+                        "i == 1 in moveFingersToPrefix");
             }
             
             
-//            int i;
-//            
-//            // Find the rightmost finger index after which we can put
-//            // 'numberOfFingers' fingers:
-//            for (i = fromFingerIndex - 1; i >= 0; --i) {
-//                Finger<E> finger = fingerArray[i];
-//                
-//                if (finger.index + numberOfFingersToMove <= fromIndex) {
-//                    break;
-//                }
-//            }
-//            
-//            if (i == -1) {
-//                
-//                return;
-//            }
-//            
-//            // Pack the rest of the prefix fingers:
-//            for (int j = i + 1, k = 0; k < numberOfFingersToMove; ++j, ++k) {
-//                Finger<E> predecessorFinger = fingerArray[j - 1];
-//                Finger<E> currentFinger = fingerArray[j];
-//                currentFinger.index = predecessorFinger.index + 1;
-//                currentFinger.node = predecessorFinger.node.next;
-//            }
+            // Pack the rest of the prefix fingers:
+            for (int j = targetIndex + 1, k = 0; k < numberOfFingersToMove; ++j, ++k) {
+                Finger<E> predecessorFinger = fingerArray[j - 1];
+                Finger<E> currentFinger = fingerArray[j];
+                currentFinger.index = predecessorFinger.index + 1;
+                currentFinger.node = predecessorFinger.node.next;
+            }
         }
         
         private Node<E> getPrefixHeadNode(int firstNonPrefixNodeIndex,
@@ -3682,9 +3686,6 @@ static void subListRangeCheck(int fromIndex,
             return;
         }
         
-        // BUG: 'node(...)' changes a finger!
-        int firstNodeToRemoveIndex = fingerList.getFingerIndexImpl(fromIndex);
-        
         Node<E> firstNodeToRemove = node(fromIndex);
         
         int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
@@ -3739,8 +3740,9 @@ static void subListRangeCheck(int fromIndex,
                 float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
                                          ((float)(prefixSuffixFreeSpotCount));
 
+                // 4, needs to be 8!
                 int numberOfCoveredFingers 
-                        = nextFingerCount 
+                        = fingerList.size
                         - prefixFingersLength
                         - suffixFingersLength;
                 

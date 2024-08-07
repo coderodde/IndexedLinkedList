@@ -65,7 +65,7 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
-    ////@Test 
+    //@Test 
     public void removeIntAtZeroIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
         list.addAll(referenceList);
