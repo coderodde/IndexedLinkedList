@@ -377,9 +377,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetIndex == -1) {
+                Node<E> node = ownerIndexedList.head;
                 
-                throw new UnsupportedOperationException(
-                        "i == 1 in moveFingersToPrefix");
+                for (int i = 0; i != numberOfFingersToMove; i++) {
+                    Finger<E> finger = fingerArray[i];
+                    finger.index = i;
+                    finger.node = node;
+                    node = node.next;
+                }
+                
+                return;
             }
             
             // How many fingers to move to the left from the body to the prefix:
@@ -403,24 +410,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 System.out.println("fds");
             } else {
+                throw new UnsupportedOperationException(
+                        "distance < numberOfFingersToMove");
                 // Need to make some space in the prefix:
                 
                 // Just move to the prefix:
             }
-        }
-        
-        private Node<E> getPrefixHeadNode(int firstNonPrefixNodeIndex,
-                                          int elementIndex) {
-            
-            Finger<E> finger = fingerArray[firstNonPrefixNodeIndex];
-            Node<E> node = finger.node;
-            int index = finger.index;
-            
-            for (int i = elementIndex; i < index; i++) {
-                node = node.prev;
-            }
-            
-            return node;
         }
         
         /**
@@ -3677,7 +3672,6 @@ static void subListRangeCheck(int fromIndex,
         }
         
         if (removalSize == 1) {
-            System.out.println("HELLO! :-)");
             remove(fromIndex);
             return;
         }
@@ -3722,8 +3716,11 @@ static void subListRangeCheck(int fromIndex,
             }
         } else {
             if (suffixFreeSpotCount == 0) {
-                int numberOfFingersToMove = fingerList.size
+                
+                int numberOfFingersToMove = nextFingerCount
                                           - prefixFingersLength; 
+                
+                numberOfFingersToMove = Math.max(numberOfFingersToMove, 0);
                 
                 // Once here, suffixFreeSpotCount = 0 and 
                 // prefixFreeSpotCount > 0. In other words, we are moving a to
@@ -3741,9 +3738,12 @@ static void subListRangeCheck(int fromIndex,
                 float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
                                          ((float)(prefixSuffixFreeSpotCount));
 
-                // 4, needs to be 8!
+                int nextSize = 
+                        getRecommendedNumberOfFingers(
+                                fingerList.ownerIndexedList.size - removalSize);
+                
                 int numberOfCoveredFingers 
-                        = fingerList.size
+                        = nextSize
                         - prefixFingersLength
                         - suffixFingersLength;
                 
