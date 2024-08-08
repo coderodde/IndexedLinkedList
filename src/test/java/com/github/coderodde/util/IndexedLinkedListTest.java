@@ -793,7 +793,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void bruteForceSublistClearOnSmallLists() {
-        long seed = 1662121251715L;
+        long seed = 1662121251795L;
         System.out.println("seed == " + seed);
         Random random = new Random(seed);
         

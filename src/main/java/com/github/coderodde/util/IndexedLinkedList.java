@@ -377,6 +377,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetIndex == -1) {
+                // Here, we need to pack the entire finger prefix at the very 
+                // beginning of the list:
                 Node<E> node = ownerIndexedList.head;
                 
                 for (int i = 0; i != numberOfFingersToMove; i++) {
@@ -395,8 +397,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (distance >= numberOfFingersToMove) {
                 // Pack the prefix fingers:
-//                for (int idx = targetIndex + 1; idx != )
-                
                 Node<E> node = fingerArray[targetIndex].node;
                 int index    = fingerArray[targetIndex].index;
                 
@@ -407,8 +407,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     node = node.next;
                     finger.node = node;
                 }
-                
-                System.out.println("fds");
             } else {
                 throw new UnsupportedOperationException(
                         "distance < numberOfFingersToMove");
@@ -3732,38 +3730,47 @@ static void subListRangeCheck(int fromIndex,
                 fingerList.removeRange(numberOfFingersToMove, 0, removalSize);
                 removeRangeNodes(firstNodeToRemove, removalSize);
             } else {
+                
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
                                               + suffixFreeSpotCount;
 
                 float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
                                          ((float)(prefixSuffixFreeSpotCount));
-
                 int nextSize = 
                         getRecommendedNumberOfFingers(
                                 fingerList.ownerIndexedList.size - removalSize);
                 
-                int numberOfCoveredFingers 
-                        = nextSize
-                        - prefixFingersLength
-                        - suffixFingersLength;
+                int numberOfFingersToRemove = fingerList.size - nextSize;
                 
-                int numberOfFingersOnLeft = 
-                        (int)(prefixLoadFactor * numberOfCoveredFingers);
-
-                int numberOfFingersOnRight = 
-                        numberOfCoveredFingers - numberOfFingersOnLeft;
-
+                int numberOfBodyFingers = fingerList.size 
+                                        - prefixFingersLength 
+                                        - suffixFingersLength;
+                
+                int numberOfBodyFingersAfterRemoval = numberOfBodyFingers 
+                                                    - numberOfFingersToRemove;
+                
+                int numberOfBodyFingersToLeft = 
+                        (int)(numberOfBodyFingersAfterRemoval 
+                            * prefixLoadFactor);
+                
+                int numberOfBodyFingersToRight = numberOfBodyFingersAfterRemoval
+                                               - numberOfBodyFingersToLeft;
+                
+                System.out.println("fdsfds");
+                
                 fingerList.moveFingersToPrefix(fromIndex, 
-                                               numberOfFingersOnLeft);
+                                               numberOfBodyFingersToLeft);
                 
-                fingerList.moveFingersToSuffix(toIndex, numberOfFingersOnRight);
+                fingerList.moveFingersToSuffix(toIndex, 
+                                               numberOfBodyFingersToRight);
 
                 fingerList.removeRange(
-                        prefixFingersLength + numberOfFingersOnLeft,
-                        suffixFingersLength + numberOfFingersOnRight, 
+                        prefixFingersLength + numberOfBodyFingersToLeft,
+                        suffixFingersLength + numberOfBodyFingersToRight, 
                         removalSize);
                 
-                removeRangeNodes(firstNodeToRemove, removalSize);
+                removeRangeNodes(firstNodeToRemove,
+                                 removalSize);
             }
         }
         
