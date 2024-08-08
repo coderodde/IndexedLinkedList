@@ -3851,6 +3851,11 @@ static void subListRangeCheck(int fromIndex,
      */
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
+        
+        for (int i = 0; i != numberOfNodesToRemove; i++) {
+            
+        }
+        
         Node<E> nextNode = node;
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
