@@ -371,7 +371,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 Finger<E> finger = fingerArray[targetIndex];
                 
-                if (finger.index + numberOfFingersToMove <= fromIndex) {
+                if (finger.index + numberOfFingersToMove < fromIndex) {
                     break;
                 }
             }
@@ -394,6 +394,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             // How many fingers to move to the left from the body to the prefix:
             int distance = fingerArray[fromFingerIndex].index
                          - fingerArray[targetIndex].index;
+            //              Need 2!
+            numberOfFingersToMove += fromFingerIndex - 1 - targetIndex;
             
             if (distance >= numberOfFingersToMove) {
                 // Pack the prefix fingers:
@@ -3851,11 +3853,6 @@ static void subListRangeCheck(int fromIndex,
      */
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
-        
-        for (int i = 0; i != numberOfNodesToRemove; i++) {
-            
-        }
-        
         Node<E> nextNode = node;
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
