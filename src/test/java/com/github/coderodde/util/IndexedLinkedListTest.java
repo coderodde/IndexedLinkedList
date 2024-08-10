@@ -792,6 +792,26 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void bruteForceSubListClearFromTo() {
+        List<Integer> data = getIntegerList(100);
+        
+        for (int fromIndex = 0; fromIndex <= 100; fromIndex++) {
+            for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
+                list.clear();
+                list.addAll(data);
+                referenceList.clear();
+                referenceList.addAll(data);
+                
+                list.subList(fromIndex, toIndex).clear();
+                referenceList.subList(fromIndex, toIndex).clear();
+                
+                assertEquals(referenceList, list);
+                list.checkInvarant();
+            }
+        }
+    }
+    
+//    @Test
     public void bruteForceSublistClearOnSmallLists() {
         long seed = 1662121251795L;
         System.out.println("seed == " + seed);
@@ -799,7 +819,7 @@ public class IndexedLinkedListTest {
         
         System.out.println(">>> bruteForceSublistClearOnSmallLists():");
         
-        for (int i = 0; i < 200; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             int size = 1 + random.nextInt(400);
             List<Integer> referenceList = new ArrayList<>(getIntegerList(size));
             list.clear();
@@ -814,7 +834,7 @@ public class IndexedLinkedListTest {
             
             list.checkInvarant();
             assertEquals(referenceList, list);
-        }
+        }  
     }
     
     //@Test
