@@ -794,9 +794,16 @@ public class IndexedLinkedListTest {
     @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
+        int iteration = 0;
         
         for (int fromIndex = 0; fromIndex <= 100; fromIndex++) {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
+                iteration++;
+                
+                System.out.println(
+                        "bruteForceSubListClearFromTo(): iteration = " 
+                                + iteration);
+                
                 list.clear();
                 list.addAll(data);
                 referenceList.clear();
