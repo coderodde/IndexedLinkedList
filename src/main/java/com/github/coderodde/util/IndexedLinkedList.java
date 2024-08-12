@@ -381,7 +381,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // beginning of the list:
                 Node<E> node = ownerIndexedList.head;
                 
-                for (int i = 0; i != numberOfFingersToMove; i++) {
+                // '+ 1' for the first finger:
+                for (int i = 0; i != numberOfFingersToMove + 1; i++) {
                     Finger<E> finger = fingerArray[i];
                     finger.index = i;
                     finger.node = node;

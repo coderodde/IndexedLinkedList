@@ -800,9 +800,9 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println(
-                        "bruteForceSubListClearFromTo(): iteration = " 
-                                + iteration);
+//                System.out.println(
+//                        "bruteForceSubListClearFromTo(): iteration = " 
+//                                + iteration);
                 
                 list.clear();
                 list.addAll(data);
@@ -818,7 +818,7 @@ public class IndexedLinkedListTest {
         }
     }
     
-//    @Test
+    @Test
     public void bruteForceSublistClearOnSmallLists() {
         long seed = 1662121251795L;
         System.out.println("seed == " + seed);
