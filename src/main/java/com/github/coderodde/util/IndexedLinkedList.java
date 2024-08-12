@@ -3755,21 +3755,6 @@ static void subListRangeCheck(int fromIndex,
                                         - suffixFingersLength;
                 
                 if (numberOfBodyFingers == 0) {
-//                    
-//                    
-                    System.out.println("numberOfBodyFingers == 0");
-//                    System.out.println(
-//                            "numberOfFingersToRemove == " 
-//                                    + numberOfFingersToRemove);
-//                    
-//                    System.out.println("---");
-//                    Finger<E> sentinel = 
-//                            fingerList.fingerArray[fingerList.size];
-//                    
-//                    fingerList.fingerArray[fingerList.size - 1] = sentinel;
-//                    fingerList.fingerArray[fingerList.size] = null;
-//                    fingerList.size = fingerList.ownerIndexedList.size;
-//                    sentinel.index--;
 
                     removeRangeNodes(firstNodeToRemove,
                                      removalSize);
