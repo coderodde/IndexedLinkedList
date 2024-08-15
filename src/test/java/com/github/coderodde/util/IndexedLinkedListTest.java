@@ -791,7 +791,7 @@ public class IndexedLinkedListTest {
         list.subList(70, 1000).clear();
     }
     
-    //@Test
+    @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -829,10 +829,10 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-//                System.out.println(
-//                        "bruteForceSubListClearFromTo(): iteration = " 
-//                                + iteration);
-                System.out.println("iteration yeah = " + iteration);
+                System.out.println(
+                        "bruteForceSubListClearFromTo(): iteration = " 
+                                + iteration);
+                
                 list.clear();
                 list.addAll(data);
                 list.randomizeFingers(random);
@@ -849,7 +849,7 @@ public class IndexedLinkedListTest {
         }
     }
     
-    //@Test
+    @Test
     public void bruteForceSublistClearOnSmallLists() {
         long seed = 1662121251795L;
         System.out.println("seed == " + seed);
