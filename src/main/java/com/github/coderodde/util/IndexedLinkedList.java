@@ -500,10 +500,29 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
                 
                 f.index += toMove;
-                i = size - 1;
-                targetFinger = fingerArray[i];
-                targetFingerIndex = i;
-                omittedFingers--;
+                
+                // Compute how many fingers are already in the suffix:
+                int numberOfFingersInSuffix = size - toFingerIndex;
+                
+                // Pack the suffix fingers to the right:
+                for (int k = 0; k < numberOfFingersInSuffix - 1; k++) {
+                    Finger<E> currentFinger  = fingerArray[size - 1 - k];
+                    Finger<E> previousFinger = fingerArray[size - 2 - k];
+                    
+                    previousFinger.index = currentFinger.index - 1;
+                    previousFinger.node  = currentFinger.node.prev;
+                }
+                
+                // Move the body fingers to the suffix:
+                for (int k = 0; k < numberOfFingers; k++) {
+                    Finger<E> currentFinger = fingerArray[size - ]
+                }
+                
+                return;
+//                i = size - 1;
+//                targetFinger = fingerArray[i];
+//                targetFingerIndex = i;
+//                omittedFingers--;
             }
             
             int numberOfActualFingersMoved = omittedFingers
@@ -1330,7 +1349,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 finger = fingerList.get(++fingerCount);
                 
                 if (finger == null) {
-                    break;
+                    throw new IllegalStateException("figner == null");
                 }
             }
             
@@ -3872,7 +3891,7 @@ static void subListRangeCheck(int fromIndex,
      */
     private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
         Node<E> prefixLastNode = node.prev;
-        Node<E> nextNode = node;
+        Node<E> nextNode = null;
         
         for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
             nextNode = node.next;

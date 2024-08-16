@@ -792,6 +792,15 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void removeRangeNodes() {
+        list.addAll(getIntegerList(20));
+        list.subList(5, 10).clear();
+        
+        assertEquals(15, list.size());
+        list.checkInvarant();
+    }
+    
+    @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -866,7 +875,7 @@ public class IndexedLinkedListTest {
             int fromIndex = random.nextInt(size);
             int toIndex = Math.min(size, fromIndex + random.nextInt(size));
             
-            System.out.println("iteration = " + i);
+//            System.out.println("iteration = " + i);
             list.subList(fromIndex, toIndex).clear();
             referenceList.subList(fromIndex, toIndex).clear();
             
