@@ -481,7 +481,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             for (i = toFingerIndex; i < size; ++i) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingers >= toIndex) {
+                if (finger.index - numberOfFingers > toIndex) {
                     targetFinger = finger;
                     targetFingerIndex = i;
                     break;
@@ -493,7 +493,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
-                int toMove = toIndex + numberOfFingers - f.index;
+                
+                int toMove = toIndex + numberOfFingers - f.index + 1;
                 
                 for (int j = 0; j < toMove; ++j) {
                     f.node = f.node.next;
@@ -515,14 +516,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 // Move the body fingers to the suffix:
                 for (int k = 0; k < numberOfFingers; k++) {
-                    Finger<E> currentFinger = fingerArray[size - ]
+                    Finger<E> currentFinger = 
+                            fingerArray[size - numberOfFingersInSuffix - k];
+                    
+                    Finger<E> previousFinger = 
+                            fingerArray[size - numberOfFingersInSuffix - k - 1];
+                    
+                    previousFinger.index = currentFinger.index - 1;
+                    previousFinger.node  = currentFinger.node.prev;
                 }
                 
                 return;
-//                i = size - 1;
-//                targetFinger = fingerArray[i];
-//                targetFingerIndex = i;
-//                omittedFingers--;
             }
             
             int numberOfActualFingersMoved = omittedFingers
@@ -3731,7 +3735,8 @@ static void subListRangeCheck(int fromIndex,
                 // Once here, prefixFreeSpotCount = 0 and 
                 // suffixFreeSpotCount > 0. In other words, we are moving to the
                 // suffix.
-                fingerList.moveFingersToSuffix(toIndex, numberOfFingersToMove);
+                fingerList.moveFingersToSuffix(toIndex,
+                                               numberOfFingersToMove);
                 fingerList.removeRange(0, 
                                        suffixFingersLength
                                                + numberOfFingersToMove, 
@@ -3743,7 +3748,8 @@ static void subListRangeCheck(int fromIndex,
             if (suffixFreeSpotCount == 0) {
                 
                 int numberOfFingersToMove = nextFingerCount
-                                          - prefixFingersLength; 
+                                          - prefixFingersLength
+                                          - 1; 
                 
                 numberOfFingersToMove = Math.max(numberOfFingersToMove, 0);
                 
@@ -3754,8 +3760,12 @@ static void subListRangeCheck(int fromIndex,
                         fromIndex,
                         numberOfFingersToMove);
                 
-                fingerList.removeRange(numberOfFingersToMove, 0, removalSize);
-                removeRangeNodes(firstNodeToRemove, removalSize);
+                fingerList.removeRange(numberOfFingersToMove, 
+                                       0, 
+                                       removalSize);
+                
+                removeRangeNodes(firstNodeToRemove, 
+                                 removalSize);
             } else {
                 
                 int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
