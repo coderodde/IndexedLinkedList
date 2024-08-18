@@ -478,7 +478,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             // Find the leftmost finger index in the suffix before which we can 
             // put 'numberOfFingers' fingers:
-            int m = 1;
+            int m = 0;
             
             for (i = toFingerIndex; i < size; ++i, m++) {
                 Finger<E> finger = fingerArray[i];
