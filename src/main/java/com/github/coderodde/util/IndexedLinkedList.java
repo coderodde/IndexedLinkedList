@@ -478,10 +478,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             // Find the leftmost finger index in the suffix before which we can 
             // put 'numberOfFingers' fingers:
-            for (i = toFingerIndex; i < size; ++i) {
+            int m = 1;
+            
+            for (i = toFingerIndex; i < size; ++i, m++) {
                 Finger<E> finger = fingerArray[i];
                 
-                if (finger.index - numberOfFingers > toIndex) {
+                if (finger.index - numberOfFingers - m > toIndex) {
                     targetFinger = finger;
                     targetFingerIndex = i;
                     break;
@@ -493,14 +495,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (targetFinger == null) {
                 // Here, all the 'numberOfFingers' do not fit. Make some room:
                 Finger<E> f = fingerArray[size - 1];
+                // TODO: Get rid of movements and set numberOfFingers!
+//                int movements = toIndex + numberOfFingers - f.index + 1;
+                int movements = numberOfFingers;
                 
-                int toMove = toIndex + numberOfFingers - f.index + 1;
-                
-                for (int j = 0; j < toMove; ++j) {
+                for (int j = 0; j < movements; ++j) {
                     f.node = f.node.next;
                 }
                 
-                f.index += toMove;
+                f.index += movements;
                 
                 // Compute how many fingers are already in the suffix:
                 int numberOfFingersInSuffix = size - toFingerIndex;
