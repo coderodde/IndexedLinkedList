@@ -848,7 +848,6 @@ public class IndexedLinkedListTest {
                 
                 referenceList.clear();
                 referenceList.addAll(data);
-                
 
                 list.subList(fromIndex, toIndex).clear();
                 referenceList.subList(fromIndex, toIndex).clear();
