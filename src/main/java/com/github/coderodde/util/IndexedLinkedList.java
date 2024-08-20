@@ -555,24 +555,36 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         private void moveFingersToSuffixOnEmptySuffix(int toIndex,
                                                       int numberOfFingers) {
-            int toMove = toIndex 
-                       - fingerArray[size - 1].index 
-                       + numberOfFingers - 1;
-
-            Finger<E> finger = fingerArray[size - 1];
-
-            for (int i = 0; i < toMove; ++i) {
-                finger.node = finger.node.next;
-            }   
-
-            finger.index += toMove;
-
-            for (int i = 1; i < numberOfFingers; ++i) {
-                Finger<E> predecessorFinger = fingerArray[size - i - 1];
-                Finger<E> currentFinger = fingerArray[size - i];
+            Finger<E> currentFinger = fingerArray[size];
+            Node<E> node = ownerIndexedList.tail;
+            
+            for (int i = 0; i != numberOfFingers; i++) {
+                Finger<E> predecessorFinger = fingerArray[size - 1 - i];
                 predecessorFinger.index = currentFinger.index - 1;
-                predecessorFinger.node = currentFinger.node.prev;
+                predecessorFinger.node  = node;
+                currentFinger = predecessorFinger;
+                node = node.prev;
             }
+            
+////            int movements = numberOfFingers;
+//            int movements = toIndex 
+//                          - fingerArray[size - 1].index 
+//                          + numberOfFingers - 1;
+//
+//            Finger<E> finger = fingerArray[size - 1];
+//
+//            for (int i = 0; i < movements; ++i) {
+//                finger.node = finger.node.next;
+//            }   
+//
+//            finger.index += movements;
+//
+//            for (int i = 1; i < numberOfFingers; ++i) {
+//                Finger<E> predecessorFinger = fingerArray[size - i - 1];
+//                Finger<E> currentFinger = fingerArray[size - i];
+//                predecessorFinger.index = currentFinger.index - 1;
+//                predecessorFinger.node = currentFinger.node.prev;
+//            }
         }
         
         /**
