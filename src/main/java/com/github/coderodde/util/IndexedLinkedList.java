@@ -366,12 +366,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             // Find the rightmost finger index after which we can put
             // 'numberOfFingers' fingers:
-            for (; targetIndex >= 0; 
-                   targetIndex--) {
+            for (int rightFingerCount = 0; targetIndex >= 0; 
+                   targetIndex--, rightFingerCount++) {
                 
                 Finger<E> finger = fingerArray[targetIndex];
                 
-                if (finger.index + numberOfFingersToMove < fromIndex) {
+                if (finger.index 
+                        + numberOfFingersToMove 
+                        + rightFingerCount 
+                        < fromIndex) {
+                    
                     break;
                 }
             }
@@ -382,7 +386,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 Node<E> node = ownerIndexedList.head;
                 
                 // '+ 1' for the first finger:
-                for (int i = 0; i != numberOfFingersToMove + 1; i++) {
+                for (int i = 0; 
+                        i != numberOfFingersToMove + fromFingerIndex; 
+                        i++) {
                     Finger<E> finger = fingerArray[i];
                     finger.index = i;
                     finger.node = node;
