@@ -481,7 +481,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             int toFingerIndex = getFingerIndexImpl(toIndex);
-            int movements = numberOfFingers + size - toFingerIndex;
+            
+//            if (toFingerIndex == size) {
+//                
+//                return;
+//            }
+            
+            int movements = Math.max(0, numberOfFingers + size - toFingerIndex);
             
             Node<E> node = ownerIndexedList.tail;
             
@@ -3843,31 +3849,47 @@ static void subListRangeCheck(int fromIndex,
                                                         removalSize);
                 } else {
 
-                    int numberOfBodyFingersAfterRemoval 
-                            = numberOfBodyFingers 
-                            - numberOfFingersToRemove;
+                    if (numberOfFingersToRemove <= numberOfBodyFingers) {
+                        int numberOfBodyFingersAfterRemoval 
+                                = numberOfBodyFingers 
+                                - numberOfFingersToRemove;
 
-                    int numberOfBodyFingersToLeft = 
-                            (int)(numberOfBodyFingersAfterRemoval 
-                                * prefixLoadFactor);
+                        int numberOfBodyFingersToLeft = 
+                                (int)(numberOfBodyFingersAfterRemoval 
+                                    * prefixLoadFactor);
 
-                    int numberOfBodyFingersToRight = 
-                            numberOfBodyFingersAfterRemoval
-                          - numberOfBodyFingersToLeft;
+                        int numberOfBodyFingersToRight = 
+                                numberOfBodyFingersAfterRemoval
+                              - numberOfBodyFingersToLeft;
 
-                    fingerList.moveFingersToPrefix(fromIndex, 
-                                                   numberOfBodyFingersToLeft);
+                        fingerList.moveFingersToPrefix(fromIndex, 
+                                                       numberOfBodyFingersToLeft);
 
-                    fingerList.moveFingersToSuffix(toIndex, 
-                                                   numberOfBodyFingersToRight);
+                        fingerList.moveFingersToSuffix(toIndex, 
+                                                       numberOfBodyFingersToRight);
 
-                    fingerList.removeRange(
-                            prefixFingersLength + numberOfBodyFingersToLeft,
-                            suffixFingersLength + numberOfBodyFingersToRight, 
-                            removalSize);
+                        fingerList.removeRange(
+                                prefixFingersLength + numberOfBodyFingersToLeft,
+                                suffixFingersLength + numberOfBodyFingersToRight, 
+                                removalSize);
 
-                    removeRangeNodes(firstNodeToRemove,
-                                     removalSize);
+                        removeRangeNodes(firstNodeToRemove,
+                                         removalSize);
+                    } else {
+                        if (prefixLoadFactor > 0.5) {
+                            System.out.println("prefix");
+                            // Push body fingers to suffix:
+                            fingerList.moveFingersToSuffix(toIndex,
+                                                           numberOfBodyFingers);
+                        } else {
+                            System.out.println("suffix");
+                            // Push body fingers to prefix:
+                            fingerList.moveFingersToPrefix(fromIndex,
+                                                           numberOfBodyFingers);
+                            
+                            
+                        }
+                    }
                 }
             }
         }
