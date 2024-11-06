@@ -3754,7 +3754,7 @@ static void subListRangeCheck(int fromIndex,
         final Node<E> suffixNode = nodeEnd;
         
         int numberOfCoveredFingers     = 0;
-        int indexOfFirstCoveringFigner = -1;
+        int indexOfFirstCoveringFinger = -1;
         int nodeIndex = fromIndex;
         int fingerIndex = fingerList.getFingerIndexImpl(fromIndex);
         
@@ -3765,8 +3765,8 @@ static void subListRangeCheck(int fromIndex,
             if (finger.index == nodeIndex) {
                 numberOfCoveredFingers++;
                 
-                if (indexOfFirstCoveringFigner == -1) {
-                    indexOfFirstCoveringFigner = fingerIndex;
+                if (indexOfFirstCoveringFinger == -1) {
+                    indexOfFirstCoveringFinger = fingerIndex;
                 }
                 
                 finger = fingerList.get(++fingerIndex);
@@ -3792,21 +3792,45 @@ static void subListRangeCheck(int fromIndex,
             suffixNode.prev = prefixNode;
         }
         
-        fingerList.shiftFingerIndicesToLeft(
-                indexOfFirstCoveringFigner + numberOfCoveredFingers,
-                removeRangeLength);
+        size -= removeRangeLength;
         
-        // Move finger tail to the left:
-        System.arraycopy(
-                fingerList.fingerArray, 
-                indexOfFirstCoveringFigner + numberOfCoveredFingers, 
-                fingerList.fingerArray,
-                indexOfFirstCoveringFigner, 
-                numberOfCoveredFingers);
+        final int fingersToRemove = currentNumberOfFingers 
+                                  - nextNumberOfFingers;
         
-        balanceFingerListAfterRemoval(currentNumberOfFingers,
-                                      nextNumberOfFingers, 
-                                      numberOfCoveredFingers);
+        // Remove fingers starting from the tail:
+        if (indexOfFirstCoveringFinger == -1) {
+            // Once here, there is no fingers pointing to the removed range:
+            for (int i = 0; i < fingersToRemove; i++) {
+                fingerList.removeFinger();
+            }
+            
+            return;
+        } 
+        
+        for (int i = 0;
+                 i < fingerList.size() - indexOfFirstCoveringFinger; 
+                 i++) {
+            
+            fingerList.removeFinger();
+        }
+        
+        final int fingersToAppend = nextNumberOfFingers 
+                                  - indexOfFirstCoveringFinger;
+        
+        Finger<E> previousFinger = 
+                new Finger<>(
+                        fingerList.getNode(fromIndex),
+                        fromIndex);
+        
+        for (int i = 0; i < fingersToAppend; i++) {
+            final Finger<E> currentFinger = 
+                    new Finger<>(
+                            previousFinger.node.next, 
+                            previousFinger.index + 1);
+            
+            fingerList.appendFinger(currentFinger);
+            previousFinger = currentFinger;
+        }
     }
     
     /**
