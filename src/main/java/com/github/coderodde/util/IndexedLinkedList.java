@@ -137,9 +137,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
-            fingerArray[size].index++;
+//            fingerArray[size].index++;
             // Commented out 9.3.2024:
-//            fingerArray[size].index = IndexedLinkedList.this.size;
+            fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
         /**
@@ -3748,6 +3748,9 @@ static void subListRangeCheck(int fromIndex,
         final int nextNumberOfFingers = 
                 getRecommendedNumberOfFingers(size - removeRangeLength);
         
+        final int prefixFingerListLength = 
+                fingerList.getFingerIndexImpl(fromIndex);
+        
         final Node<E> nodeStart  = fingerList.getNode(fromIndex);
         final Node<E> nodeEnd    = fingerList.getNode(toIndex);
         final Node<E> prefixNode = nodeStart.prev; 
@@ -3794,11 +3797,11 @@ static void subListRangeCheck(int fromIndex,
         
         size -= removeRangeLength;
         
-        final int fingersToRemove = currentNumberOfFingers 
-                                  - nextNumberOfFingers;
-        
         // Remove fingers starting from the tail:
         if (numberOfCoveredFingers == 0) {
+            final int fingersToRemove = currentNumberOfFingers 
+                                      - nextNumberOfFingers;
+            
             // Once here, there is no fingers pointing to the removed range:
             for (int i = 0; i < fingersToRemove; i++) {
                 fingerList.removeFinger();
@@ -3817,10 +3820,7 @@ static void subListRangeCheck(int fromIndex,
         final int fingersToAppend = nextNumberOfFingers 
                                   - indexOfFirstCoveringFinger;
         
-        Finger<E> previousFinger =
-                new Finger<>(
-                        nodeEnd.prev,
-                        fingerList.getFingerIndexImpl(toIndex) - 1);
+        Finger<E> previousFinger = new Finger<>(prefixNode, fromIndex - 1);
         
         for (int i = 0; i < fingersToAppend; i++) {
             final Finger<E> currentFinger = 

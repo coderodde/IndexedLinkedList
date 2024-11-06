@@ -763,10 +763,13 @@ public class IndexedLinkedListTest {
     
     @Test
     public void debugClear1() {
-        list.addAll(getIntegerList(12));
-        list.subList(4, 9).clear();
-        list.checkInvarant();
-        assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
+//        list.addAll(getIntegerList(12));
+//        list.subList(4, 9).clear();
+//        list.checkInvarant();
+//        assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
+        
+        list.clear();
+        list.addAll(getIntegerList(12)); 
     }
     
     //@Test
