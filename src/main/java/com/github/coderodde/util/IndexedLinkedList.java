@@ -3807,7 +3807,7 @@ static void subListRangeCheck(int fromIndex,
                 fingerList.removeFinger();
             }
             
-            return;
+            throw new UnsupportedOperationException("numberOfcoveredFingers == 0");
         } 
         
         for (int i = 0;
