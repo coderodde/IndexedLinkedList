@@ -3748,10 +3748,12 @@ static void subListRangeCheck(int fromIndex,
         final int nextNumberOfFingers = 
                 getRecommendedNumberOfFingers(size - removeRangeLength);
         
-        final Node<E> nodeStart = fingerList.getNode(fromIndex);
-        final Node<E> nodeEnd   = fingerList.getNode(toIndex);
+        final Node<E> nodeStart  = fingerList.getNode(fromIndex);
+        final Node<E> nodeEnd    = fingerList.getNode(toIndex);
+        final Node<E> prefixNode = nodeStart.prev; 
+        final Node<E> suffixNode = nodeEnd;
         
-        int numberOfCoveringFingers    = 0;
+        int numberOfCoveredFingers     = 0;
         int indexOfFirstCoveringFigner = -1;
         int nodeIndex = fromIndex;
         int fingerIndex = fingerList.getFingerIndexImpl(fromIndex);
@@ -3761,50 +3763,132 @@ static void subListRangeCheck(int fromIndex,
         for (Node<E> node = nodeStart; node != nodeEnd;) {
             
             if (finger.index == nodeIndex) {
-                numberOfCoveringFingers++;
+                numberOfCoveredFingers++;
                 
                 if (indexOfFirstCoveringFigner == -1) {
-                    indexOfFirstCoveringFigner = fingerIndex++;
+                    indexOfFirstCoveringFigner = fingerIndex;
                 }
+                
+                finger = fingerList.get(++fingerIndex);
             }
             
             final Node<E> nextNode = node.next;
             node.next = null;
             node.prev = null;
+            node.item = null;
             node = nextNode;
+            nodeIndex++;
+        }
+        
+        // Do the actual node unlinking:
+        if (prefixNode == null) {
+            head = suffixNode;
+            suffixNode.prev = null;
+        } else if (suffixNode == null) {
+            tail = prefixNode;
+            prefixNode.next = null;
+        } else {
+            prefixNode.next = suffixNode;
+            suffixNode.prev = prefixNode;
         }
         
         fingerList.shiftFingerIndicesToLeft(
-                indexOfFirstCoveringFigner + numberOfCoveringFingers,
+                indexOfFirstCoveringFigner + numberOfCoveredFingers,
                 removeRangeLength);
         
         // Move finger tail to the left:
         System.arraycopy(
                 fingerList.fingerArray, 
-                indexOfFirstCoveringFigner + numberOfCoveringFingers, 
+                indexOfFirstCoveringFigner + numberOfCoveredFingers, 
                 fingerList.fingerArray,
                 indexOfFirstCoveringFigner, 
-                numberOfCoveringFingers);
+                numberOfCoveredFingers);
         
         balanceFingerListAfterRemoval(currentNumberOfFingers,
                                       nextNumberOfFingers, 
-                                      numberOfCoveringFingers);
+                                      numberOfCoveredFingers);
     }
     
     /**
      * This method is responsible for balancing the number of fingers after 
      * {@code }
      * 
-     * @param currentNumberOfFingers 
-     * @param nextNumberOfFingers 
-     * @param numberOfCoveringFingers 
+     * @param currentNumberOfFingers the number of current fingers.
+     * @param nextNumberOfFingers    the next number of fingers.
+     * @param numberOfCoveredFingers the number of covered fingers.
      */
     private void balanceFingerListAfterRemoval(
             final int currentNumberOfFingers,
             final int nextNumberOfFingers,
-            final int numberOfCoveringFingers) {
+            final int numberOfCoveredFingers) {
         
-//        final int 
+        final int numberOfNonCoveredFingers = currentNumberOfFingers
+                                            - numberOfCoveredFingers;
+        
+        final int delta = nextNumberOfFingers - numberOfNonCoveredFingers;
+        
+        if (delta > 0) {
+            balanceFingerListAppendFingers(delta);
+        } else if (delta < 0) {
+            balanceFingerListRemoveFingers(-delta);
+        }
+    }
+    
+    private void makeRoomAtSuffix(final int numberOfFingers) {
+        int blockStartIndex = fingerList.size() - 1;
+        int numberOfOmittedFingers = 0;
+        
+        for (; blockStartIndex >= 0; 
+               blockStartIndex--) {
+            
+            final Finger<E> currentFinger = fingerList.get(blockStartIndex);
+                
+            if (currentFinger.index < fingerList.size()
+                                    - numberOfFingers 
+                                    - numberOfOmittedFingers) {
+                break;
+            }
+            
+            numberOfOmittedFingers++;
+        }
+        
+        Finger<E> previousFinger = fingerList.get(blockStartIndex);
+        
+        for (int i = 1; i < numberOfFingers; i++) {
+            final Finger<E> currentFinger = 
+                    fingerList.get(blockStartIndex + i + 1);
+            
+            currentFinger.index = previousFinger.index + 1;
+            currentFinger.node  = previousFinger.node.next;
+            
+            previousFinger = currentFinger;
+        }
+    }
+    
+    private void balanceFingerListAppendFingers(
+            final int numberOfFingersToAppend) {
+        makeRoomAtSuffix(numberOfFingersToAppend);
+        
+        final Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
+        
+        int fingerIndex    = lastFinger.index + 1;
+        Node<E> fingerNode = lastFinger.node.next;
+        
+        for (int i = 0; i < numberOfFingersToAppend; i++) {
+            final Finger<E> finger = new Finger<>(fingerNode, 
+                                                  fingerIndex);
+            fingerList.appendFinger(finger);
+            fingerIndex++;
+            fingerNode = fingerNode.next;
+        }
+    }
+    
+    private void balanceFingerListRemoveFingers(
+            final int numberOfFingersToRemove) {
+        
+        for (int i = 0; i < numberOfFingersToRemove; i++) {
+            fingerList.removeFinger();
+        }
     }
     
     /**
