@@ -3744,7 +3744,7 @@ static void subListRangeCheck(int fromIndex,
     
     private void removeRangeImpl(final int fromIndex, final int toIndex) {
         final int removeRangeLength = toIndex - fromIndex;
-        final int currentNumberOfFingers = fingerList.size;
+        final int currentNumberOfFingers = fingerList.size();
         final int nextNumberOfFingers = 
                 getRecommendedNumberOfFingers(size - removeRangeLength);
         
@@ -3798,7 +3798,7 @@ static void subListRangeCheck(int fromIndex,
                                   - nextNumberOfFingers;
         
         // Remove fingers starting from the tail:
-        if (indexOfFirstCoveringFinger == -1) {
+        if (numberOfCoveredFingers == 0) {
             // Once here, there is no fingers pointing to the removed range:
             for (int i = 0; i < fingersToRemove; i++) {
                 fingerList.removeFinger();
@@ -3808,7 +3808,7 @@ static void subListRangeCheck(int fromIndex,
         } 
         
         for (int i = 0;
-                 i < fingerList.size() - indexOfFirstCoveringFinger; 
+                 i < currentNumberOfFingers - indexOfFirstCoveringFinger; 
                  i++) {
             
             fingerList.removeFinger();
@@ -3817,10 +3817,10 @@ static void subListRangeCheck(int fromIndex,
         final int fingersToAppend = nextNumberOfFingers 
                                   - indexOfFirstCoveringFinger;
         
-        Finger<E> previousFinger = 
+        Finger<E> previousFinger =
                 new Finger<>(
-                        fingerList.getNode(fromIndex),
-                        fromIndex);
+                        nodeEnd.prev,
+                        fingerList.getFingerIndexImpl(toIndex) - 1);
         
         for (int i = 0; i < fingersToAppend; i++) {
             final Finger<E> currentFinger = 
