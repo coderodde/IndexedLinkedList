@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,7 +64,7 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
-    //@Test 
+    //@Test // Passes.
     public void removeIntAtZeroIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
         list.addAll(referenceList);
@@ -73,13 +72,15 @@ public class IndexedLinkedListTest {
         while (!referenceList.isEmpty()) {
             referenceList.remove(0);
             list.remove(0);
+            list.checkInvarant();
             assertEquals(referenceList, list);
         }
         
+        list.checkInvarant();
         assertEquals(referenceList, list);
     }
     
-    //@Test 
+    //@Test // Passes.
     public void removeIntAtLastIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));
         list.addAll(referenceList);
@@ -87,13 +88,15 @@ public class IndexedLinkedListTest {
         while (!referenceList.isEmpty()) {
             referenceList.remove(referenceList.size() - 1);
             list.remove(list.size() - 1);
+            list.checkInvarant();
             assertEquals(referenceList, list);
         }
         
+        list.checkInvarant();
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void singleElementListIterator() {
         ListIterator<Integer> referenceListIterator = 
                 referenceList.listIterator();
@@ -160,9 +163,11 @@ public class IndexedLinkedListTest {
         myListIterator.remove();
         
         assertEquals(referenceList, list);
+        
+        list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void twoElementsListIterator() {
         ListIterator<Integer> referenceListIterator = 
                 referenceList.listIterator();
@@ -285,26 +290,11 @@ public class IndexedLinkedListTest {
         
         assertEquals(referenceListIterator.hasPrevious(), 
                      myListIterator.hasPrevious());
+        
+        list.checkInvarant();
     }
     
-    //@Test
-    public void slideTest() {
-        list.addAll(Arrays.asList(1, 2, 5, 3, 4, 5));
-            
-        list.fingerList.fingerArray[0].index = 1;
-        list.fingerList.fingerArray[1].index = 3;
-        list.fingerList.fingerArray[2].index = 5;
-        
-        list.fingerList.fingerArray[0].node = list.head.next;
-        list.fingerList.fingerArray[1].node = list.head.next.next.next;
-        list.fingerList.fingerArray[2].node = list.head.next.next.next.next.next;
-        
-        list.remove(4);
-        
-        System.out.println(list.fingerList.toString());
-    }
-    
-    //@Test(expected = IllegalStateException.class)
+    //@Test(expected = IllegalStateException.class) // Passes.
     public void breakInvariant1() {
         list.add(11);
         list.add(12);
@@ -316,7 +306,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test(expected = IllegalStateException.class)
+    //@Test(expected = IllegalStateException.class) // Passes.
     public void breakInvariant2() {
         list.add(11);
         list.add(12);
@@ -328,7 +318,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test(expected = IllegalStateException.class)
+    //@Test(expected = IllegalStateException.class) // Passes.
     public void breakInvariant3() {
         list.add(11);
         list.add(12);
@@ -340,7 +330,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test(expected = IllegalStateException.class)
+    //@Test(expected = IllegalStateException.class) // Passes.
     public void breakInvariant4() {
         list.add(11);
         list.add(12);
@@ -349,7 +339,8 @@ public class IndexedLinkedListTest {
         
         list.checkInvarant();
     }
-    //@Test(expected = IllegalStateException.class)
+    
+    //@Test(expected = IllegalStateException.class) // Passes.
     public void breakInvariant5() {
         list.add(11);
         list.add(12);
@@ -368,7 +359,7 @@ public class IndexedLinkedListTest {
         assertEquals("[Node; item = 12]", node.toString());
     }
     
-    //@Test
+    //@Test // Passes.
     public void debugAdjustOnRemoveFirst() {
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         list.fingerList.fingerArray[0].index = 0;
@@ -384,34 +375,38 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void addFirstLarge() {
         List<Integer> l = getIntegerList(1000);
         
         for (int i = 0; i < l.size(); i++) {
             list.addFirst(l.get(i));
+            list.checkInvarant();
         }
         
         Collections.reverse(l);
         assertTrue(listsEqual(list, l));
+        list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void addAllAtIndexLarge() {
         Random random = new Random(1003L);
-        List<Integer> referenceList = new ArrayList<>();
+        referenceList.clear();
         
         for (int i = 0; i < 100; ++i) {
             int index = random.nextInt(list.size() + 1);
             List<Integer> coll = getIntegerList(random.nextInt(100));
             list.addAll(index, coll);
+            list.checkInvarant();
             referenceList.addAll(index, coll);
         }
         
+        list.checkInvarant();
         assertTrue(listsEqual(list, referenceList));
     }
     
-    //@Test
+    //@Test // Passes.
     public void constructAdd() {
         List<String> l = new IndexedLinkedList<>(Arrays.asList("a", "b", "c"));
         
@@ -422,26 +417,29 @@ public class IndexedLinkedListTest {
         assertEquals("c", l.get(2));
     }
 
-    //@Test
+    //@Test // Passes.
     public void contains() {
-        assertFalse(list.contains(Integer.valueOf(1)));
-        assertFalse(list.contains(Integer.valueOf(2)));
-        assertFalse(list.contains(Integer.valueOf(3)));
+        assertFalse(list.contains(1));
+        assertFalse(list.contains(2));
+        assertFalse(list.contains(3));
         
         assertEquals(0, list.size());
         assertTrue(list.isEmpty());
         
+        list.checkInvarant();
         list.addAll(Arrays.asList(1, 2, 3));
         
         assertEquals(3, list.size());
         assertFalse(list.isEmpty());
         
-        assertTrue(list.contains(Integer.valueOf(1)));
-        assertTrue(list.contains(Integer.valueOf(2)));
-        assertTrue(list.contains(Integer.valueOf(3)));
+        assertTrue(list.contains(1));
+        assertTrue(list.contains(2));
+        assertTrue(list.contains(3));
+        
+        list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void descendingIterator() {
         list.addAll(Arrays.asList(1, 2, 3));
         Iterator<Integer> iterator = list.descendingIterator();
@@ -458,13 +456,15 @@ public class IndexedLinkedListTest {
         assertFalse(iterator.hasNext());
     }
     
-    //@Test
+    //@Test // Passes.
     public void descendingIteratorRemove1() {
         list.addAll(Arrays.asList(1, 2, 3));
         Iterator<Integer> iterator = list.descendingIterator();
         
+        list.checkInvarant();
         iterator.next();
         iterator.remove();
+        list.checkInvarant();
         
         assertEquals(2, list.size());
         
@@ -477,7 +477,7 @@ public class IndexedLinkedListTest {
         assertFalse(iterator.hasNext());
     }
     
-    //@Test
+    //@Test // Passes.
     public void descendingIteratorForEachRemaining() {
         list.addAll(Arrays.asList(1, 2, 3, -1, -2, -3));
         Iterator<Integer> iterator = list.descendingIterator();
@@ -503,16 +503,18 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(2), consumer.list.get(1));
         assertEquals(Integer.valueOf(1), consumer.list.get(2));
     }
-    
-//@Test
+        
+    //@Test // Passes.
     public void subListClearOnEmptyPrefix() {
         list.addAll(getIntegerList(100));
+        list.checkInvarant();
         list.get(10);
         list.subList(5, 100).clear();
         list.checkInvarant();
+        assertEquals(Arrays.asList(0, 1, 2, 3, 4), list);
     }
     
-//@Test
+    @Test
     public void removeFirstUntilEmpty() {
         list.addAll(getIntegerList(10));
         
@@ -593,8 +595,9 @@ public class IndexedLinkedListTest {
         }
         
         list.subList(0, 500).clear();
-        
+        list.checkInvarant();
         list.subList(20411, 20911).clear();
+        list.checkInvarant();
         assertEquals(39000, list.size());
     }
     
@@ -679,7 +682,7 @@ public class IndexedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
-//@Test
+    //@Test
     public void sublistClear2() {
         int fromIndex = 10;
         int toIndex = 990;
@@ -701,7 +704,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//@Test
+    //@Test
     public void sublistClear3() {
         int size = 1_000_000;
         int fromIndex = 10;
@@ -768,15 +771,15 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
         
-//        list.clear();
-//        list.addAll(getIntegerList(12));
-//        list.fingerList.fingerArray[1] = new Finger(list.fingerList.getNode(6), 6);
-//        
-//        list.subList(1, 6).clear();
-//        list.checkInvarant();
+        list.clear();
+        list.addAll(getIntegerList(12));
+        list.fingerList.fingerArray[1] = new Finger(list.fingerList.getNode(6), 6);
+        
+        list.subList(1, 6).clear();
+        list.checkInvarant();
     }
     
-    @Test
+    //@Test
     public void debugClear2() {
         list.addAll(getIntegerList(10));
         list.subList(0, 4).clear();
@@ -817,7 +820,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    ////@Test
+    //@Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -3405,7 +3408,7 @@ public class IndexedLinkedListTest {
     //@Test
     public void bruteforceSpliterator() {
         list.addAll(getIntegerList(1_000_000));
-        Collections.<Integer>shuffle(list);
+        Collections.<Integer>shuffle(list, new Random(13));
 
         List<Integer> newList = 
                list.parallelStream()
@@ -3532,7 +3535,7 @@ public class IndexedLinkedListTest {
         } 
     }
     
-    ////@Test
+    //@Test
     public void contractAdaptsToMinimumCapacity() {
         list.addAll(getIntegerList(1000_000));
         list.subList(10, 1000_000 - 10).clear();

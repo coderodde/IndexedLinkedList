@@ -2419,7 +2419,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fromIndex the leftmost element index in the range over which to 
      *                  distribute the fingers.
      * @param toIndex   the one past the rightmost element index in the range 
-     *                  over which to disribute the fingers.
+     *                  over which to distribute the fingers.
      */
     void distributeFingers(int fromIndex, int toIndex) {
         int rangeLength = toIndex - fromIndex;
@@ -3519,8 +3519,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             for (int i = 0; i < fingersToRemove; i++) {
                 fingerList.removeFinger();
             }
-            
-            throw new UnsupportedOperationException("numberOfcoveredFingers == 0");
+            System.out.println("CATCH ME!");
+            return;
         } 
         
         for (int i = 0;
@@ -3591,6 +3591,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         for (int i = 0; i < numberOfElementsToRemove; i++) {
             removeLast();
         }
+        
+        spreadFingers(head, 
+                      fingerList.size(), 
+                      0,
+                      size / fingerList.size(),
+                      0);
         
         fingerList.fingerArray[fingerList.size()].index = 
                 saveListSize - numberOfElementsToRemove;
