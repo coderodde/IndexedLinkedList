@@ -128,8 +128,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             enlargeFingerArrayIfNeeded(size + 1);
             fingerArray[size] = fingerArray[size - 1];
             fingerArray[size - 1] = finger;
-//            fingerArray[size].index++;
-            // Commented out 9.3.2024:
             fingerArray[size].index = IndexedLinkedList.this.size;
         }
 
@@ -439,7 +437,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Node<E> bNode = b.node;
             
             int saveBIndex = b.index;
-            int nextBIndex = 
+            int nextBIndex = // TODO: Simplify.
                     a.index + (IndexedLinkedList.this.size - a.index) / 2;
             
             b.index = nextBIndex;
@@ -864,34 +862,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return "[Finger; index = " + index + 
                     ", item = " + ((node == null) ? "null" : node.item) + 
                     "]";
-        }
-
-        /**
-         * Moves this finger {@code steps} position to the left.
-         * 
-         * @param steps the number of steps to rewind.
-         */
-        void rewindLeft(int steps) {
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
-
-            index -= steps;
-            this.node = node;
-        }
-
-        /**
-         * Moves this finger {@code steps} position to the right.
-         * 
-         * @param steps the number of steps to rewind.
-         */
-        void rewindRight(int steps) {
-            for (int i = 0; i < steps; i++) {
-                node = node.next;
-            }
-
-            index += steps;
-            this.node = node;
         }
     }
     
@@ -1338,6 +1308,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
             
     /**
+     * TODO: Remove.
      * Returns the finger list.
      * 
      * @return the finger list.
@@ -1395,6 +1366,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Returns the index of the leftmost {@code obj}, or {@code -1} if 
      * {@code obj} does not appear in this list. Runs in worst-case linear time.
      * 
+     * @param obj the object to search.
+     * 
      * @return the index of the leftmost {@code obj}, or {@code -1} if 
      *         {@code obj} does not appear in this list.
      * 
@@ -1428,6 +1401,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Returns the index of the rightmost {@code obj}, or {@code -1} if 
      * {@code obj} does not appear in this list. Runs in worst-case linear time.
+     * 
+     * @param obj the object to search.
      * 
      * @return the index of the rightmost {@code obj}, or {@code -1} if
      *         {@code obj} does not appear in this list.
@@ -1657,6 +1632,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Removes the leftmost occurrence of {@code o} in this list. Runs in worst-
      * case \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for iterating 
      * the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the fingers.
+     * 
+     * @param o the object to remove.
      * 
      * @return {@code true} only if {@code o} was located in this list and, 
      *         thus, removed.
@@ -2042,7 +2019,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param toIndex   the ending, exclusive index.
      * @param size      the size of the target list.
      */
-static void subListRangeCheck(int fromIndex, 
+    static void subListRangeCheck(int fromIndex, 
                                   int toIndex, 
                                   int size) {
         if (fromIndex < 0) {
@@ -2490,7 +2467,7 @@ static void subListRangeCheck(int fromIndex,
     }
     
     /**
-     * Distributes evenly all the figners over this list.
+     * Distributes evenly all the fingers over this list.
      */
     private void distributeAllFingers() {
         distributeFingers(0, size);
@@ -2906,7 +2883,7 @@ static void subListRangeCheck(int fromIndex,
      * 
      * @return the {@code index}th node.
      */
-    public Node<E> getNodeSequentially(int index) {
+    private Node<E> getNodeSequentially(int index) {
         Node<E> node = head;
         
         for (int i = 0; i < index; i++) {
@@ -3602,7 +3579,6 @@ static void subListRangeCheck(int fromIndex,
         removeRangeImpl(fromIndex, toIndex);
     }
     
-    
     /**
      * Unlinks the nodes in the range {@code [fromIndex, ..., size - 1]}.
      * 
@@ -3618,108 +3594,6 @@ static void subListRangeCheck(int fromIndex,
         
         fingerList.fingerArray[fingerList.size()].index = 
                 saveListSize - numberOfElementsToRemove;
-    }
-    
-    /**
-     * Removes the unnecessary fingers when the prefix and the suffix are empty.
-     * 
-     * @param node        the first node of the removed range.
-     * @param fromIndex   the index of {@code node}.
-     * @param removalSize the number of elements being removed.
-     */
-    void removeRangeNoPrefixNoSuffix(Node<E> node,
-                                     int fromIndex, 
-                                     int removalSize) {
-        int nextListLength = IndexedLinkedList.this.size - removalSize;
-        int nextFingerListLength =
-                getRecommendedNumberOfFingers(nextListLength);
-
-        int fingersToRemove = fingerList.size() - nextFingerListLength;
-        int firstFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
-        int fingerCount = 0;
-        
-        Finger<E> finger1 = fingerList.get(firstFingerIndex);
-        Finger<E> finger2 = fingerList.get(firstFingerIndex + 1);
-        Node<E> prefixLastNode = node.prev;
-        Node<E> nextNode = node;
-        
-        for (int i = 0; i < removalSize - 1; ++i) {
-            Finger<E> f = fingerList.get(firstFingerIndex + fingerCount);
-            
-            if (finger1 == f && fingersToRemove != 0) {
-                fingersToRemove--;
-                fingerCount++;
-                finger1 = finger2;
-                finger2 = fingerList.get(firstFingerIndex + fingerCount);
-            }
-            
-            nextNode = node.next;
-            node.next = null;
-            node.prev = null;
-            node.item = null;
-            node = nextNode;
-        }
-
-        Node<E> suffixFirstNode = nextNode.next;
-        nextNode.next = null;
-        nextNode.prev = null;
-        nextNode.item = null;
-        
-        if (fingersToRemove != 0) {
-            // Count the last finger:
-            fingerCount++;
-        }
-
-        if (prefixLastNode != null) {
-            prefixLastNode.next = null;
-            tail = prefixLastNode;
-        } else {
-            suffixFirstNode.prev = null;
-            head = suffixFirstNode;
-        }
-        
-        fingerList.removeFingerRange(
-                firstFingerIndex, 
-                fingerList.size() - firstFingerIndex - fingerCount, 
-                removalSize);
-    }
-    
-    /**
-     * Unlinks the {@code numberOfNodesToRemove} consecutive nodes starting from 
-     * {@code node}.
-     * 
-     * @param node                  the staring node of the range to remove.
-     * @param numberOfNodesToRemove the number of nodes to remove.
-     */
-    private void removeRangeNodes(Node<E> node, int numberOfNodesToRemove) {
-        Node<E> prefixLastNode = node.prev;
-        Node<E> nextNode = null;
-        
-        for (int i = 0; i < numberOfNodesToRemove - 1; ++i) {
-            nextNode = node.next;
-            node.next = null;
-            node.prev = null;
-            node.item = null;
-            node = nextNode;
-        }
-        
-        Node<E> suffixFirstNode = nextNode.next;
-        nextNode.next = null;
-        nextNode.prev = null;
-        nextNode.item = null;
-        
-        if (prefixLastNode != null) {
-            if (suffixFirstNode == null) {
-                prefixLastNode.next = null;
-                tail = prefixLastNode;
-            } else {
-                prefixLastNode.next = suffixFirstNode;
-                suffixFirstNode.prev = prefixLastNode;
-            }
-        } else {
-            suffixFirstNode.prev = null;
-            head = suffixFirstNode;
-        }
     }
     
     /**
