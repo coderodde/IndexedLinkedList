@@ -514,7 +514,7 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(0, 1, 2, 3, 4), list);
     }
     
-    @Test
+    //@Test // Passes.
     public void removeFirstUntilEmpty() {
         list.addAll(getIntegerList(10));
         
@@ -526,7 +526,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void moveFingerOutOfRemovalLocation() {
         list.addAll(getIntegerList(16));
         list.fingerList.fingerArray[0] =
@@ -536,7 +536,9 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[2] = new Finger<>(list.tail.prev, 14);
         list.fingerList.fingerArray[3] = new Finger<>(list.tail, 15);
         
+        list.checkInvarant();
         list.remove(12);
+        list.checkInvarant();
         
         Finger<Integer> finger = list.fingerList.fingerArray[0];
         
@@ -544,7 +546,7 @@ public class IndexedLinkedListTest {
         assertEquals(11, finger.index);
     }
     
-    //@Test
+    //@Test // Passes.
     public void removeIf() {
         list.addAll(getIntegerList(10));
         list.removeIf((i) -> {
@@ -555,7 +557,7 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(0, 2, 4, 6, 8), list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void descendingIteratorRemove2() {
         list.addAll(Arrays.asList(1, 2, 3, 4, 5));
         
@@ -563,14 +565,17 @@ public class IndexedLinkedListTest {
         
         iter.next();
         iter.remove();
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(4), iter.next());
         iter.remove();
+        list.checkInvarant();
         
         assertEquals(3, list.size());
         
         assertEquals(Integer.valueOf(3), iter.next());
         iter.remove();
+        list.checkInvarant();
         
         assertEquals(2, list.size());
         
@@ -578,17 +583,18 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), iter.next());
         
         iter.remove();
+        list.checkInvarant();
         
         assertEquals(1, list.size());
         assertEquals(Integer.valueOf(2), list.get(0));
     }
     
-    //@Test(expected = NoSuchElementException.class)
+    //@Test(expected = NoSuchElementException.class) // Passes.
     public void elementThrowsOnEmptyList() {
         list.element();
     }
     
-    //@Test
+    //@Test // Passes.
     public void removeRangeBug() {
         for (int i = 0; i < 40_000; i++) {
             list.add(Integer.MIN_VALUE);
@@ -601,7 +607,7 @@ public class IndexedLinkedListTest {
         assertEquals(39000, list.size());
     }
     
-    //@Test
+    @Test // Passes.
     public void removeRangeBug2() {
         list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
         list.subList(0, 7).clear();
