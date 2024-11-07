@@ -84,11 +84,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * The actual list storage array.
          */
         Finger<E>[] fingerArray = new Finger[INITIAL_CAPACITY];
-        
-        /**
-         * The owner indexed list.
-         */
-        private IndexedLinkedList<E> ownerIndexedList;
          
         @Override
         public String toString() {
@@ -114,10 +109,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * {@code F.index = size}.
          */
         int size;
-
-        void setOwnerIndexedList(IndexedLinkedList<E> ownerIndexedList) {
-            this.ownerIndexedList = ownerIndexedList;
-        }
         
         /**
          * Constructs the empty finger list consisting only of end-of-list 
@@ -334,299 +325,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         /**
-         * Moves {@code numberOfFingers} fingers to the prefix starting from the
-         * element at the index {@code fromIndex + 1}.
-         * 
-         * @param fromIndex       the index of the leftmost element of the range 
-         *                        from which the fingers are moved to the finger 
-         *                        prefix.
-         * 
-         * @param numberOfFingersToMove the number of fingers to move from the
-         *                        range to the finger prefix.
-         */
-        private void moveFingersToPrefix(int fromIndex, 
-                                         int numberOfFingersToMove) {
-            
-            if (numberOfFingersToMove == 0) {
-                return;
-            }
-            
-            int fromFingerIndex = getFingerIndexImpl(fromIndex);
-            
-            if (fromFingerIndex == 0) {
-                // Here, the prefix is empty:
-                moveFingersToPrefixOnEmptyPrefix(
-                        fromIndex, 
-                        numberOfFingersToMove);
-                
-                return;
-            }
-            
-            int targetIndex = fromFingerIndex - 1;
-            
-            // Find the rightmost finger index after which we can put
-            // 'numberOfFingers' fingers:
-            for (int rightFingerCount = 0; targetIndex >= 0; 
-                   targetIndex--, rightFingerCount++) {
-                
-                Finger<E> finger = fingerArray[targetIndex];
-                
-                if (finger.index 
-                        + numberOfFingersToMove 
-                        + rightFingerCount 
-                        < fromIndex) {
-                    
-                    break;
-                }
-            }
-            
-            if (targetIndex == -1) {
-                // Here, we need to pack the entire finger prefix at the very 
-                // beginning of the list:
-                Node<E> node = ownerIndexedList.head;
-                
-                for (int i = 0; 
-                        i != numberOfFingersToMove + fromFingerIndex; 
-                        i++) {
-                    Finger<E> finger = fingerArray[i];
-                    finger.index = i;
-                    finger.node = node;
-                    node = node.next;
-                }
-                
-                return;
-            }
-            
-            Node<E> node = ownerIndexedList.head;
-            Finger<E> predecessorFinger = fingerArray[0];
-            
-            predecessorFinger.index = 0;
-            predecessorFinger.node = node;
-            node = node.next;
-            
-            for (int i = 1; i < fromFingerIndex + numberOfFingersToMove; i++) {
-                Finger<E> nextFinger = fingerArray[i];
-                nextFinger.index = i;
-                nextFinger.node = node;
-                node = node.next;
-            }
-            
-            // How many fingers to move to the left from the body to the prefix:
-//            int distance = fingerArray[fromFingerIndex].index
-//                         - fingerArray[targetIndex].index;
-//            
-//            numberOfFingersToMove += fromFingerIndex - 1 - targetIndex;
-//            
-//            if (distance >= numberOfFingersToMove) {
-//                // Pack the prefix fingers:
-//                Node<E> node = fingerArray[targetIndex].node;
-//                int index    = fingerArray[targetIndex].index;
-//                
-//                // Just move the body part to the prefix:
-//                for (int k = 0; k != numberOfFingersToMove; k++) {
-//                    Finger<E> finger = fingerArray[targetIndex + 1 + k];
-//                    finger.index = ++index;
-//                    node = node.next;
-//                    finger.node = node;
-//                }
-//            } else {
-//                throw new UnsupportedOperationException(
-//                        "distance < numberOfFingersToMove");
-//                // Need to make some space in the prefix:
-//                
-//                // Just move to the prefix:
-//            }
-        }
-        
-        /**
-         * Move {@code numberOfFingers} fingers to the empty prefix.
-         * 
-         * @param fromIndex       the index of the leftmost element of the range 
-         *                        from which the fingers are moved to the finger 
-         *                        prefix.
-         * @param numberOfFingers the number of fingers to move from the range 
-         *                        to the finger prefix.
-         */
-        private void moveFingersToPrefixOnEmptyPrefix(int fromIndex,
-                                                      int numberOfFingers) {
-            Finger<E> firstFinger = fingerArray[0];
-            int toMove = firstFinger.index - fromIndex + numberOfFingers - 1;
-
-            for (int i = 0; i < toMove; ++i) {
-                firstFinger.node = firstFinger.node.prev;
-            }
-
-            firstFinger.index -= toMove;
-
-            for (int i = 1; i < numberOfFingers; ++i) {
-                Finger<E> previousFinger = fingerArray[i - 1];
-                Finger<E> currentFinger = fingerArray[i];
-                currentFinger.node = previousFinger.node.next;
-                currentFinger.index = previousFinger.index + 1;
-            }
-        }
-        
-        /**
-         * Moves {@code numberOfFingers} fingers to the suffix starting in 
-         * {@code toIndex}.
-         * 
-         * @param toIndex               the first element index of the finger 
-         *                              suffix.
-         * @param numberOfFingers the number of fingers to move to the 
-         *                              finger suffix.
-         */
-        private void moveFingersToSuffix(int toIndex, int numberOfFingers) {
-            if (numberOfFingers == 0) {
-                return;
-            }
-            
-            int toFingerIndex = getFingerIndexImpl(toIndex);
-            
-//            if (toFingerIndex == size) {
-//                
-//                return;
-//            }
-            
-            int movements = Math.max(0, numberOfFingers + size - toFingerIndex);
-            
-            Node<E> node = ownerIndexedList.tail;
-            
-            for (int i = 0; i != movements; i++) {
-                Finger<E> predecessorFinger = fingerArray[size - 1 - i];
-                predecessorFinger.node  = node;
-                predecessorFinger.index = ownerIndexedList.size - 1 - i;
-                node = node.prev;
-                
-            }
-//            if (numberOfFingers == 0) {
-//                return;
-//            }
-//            
-//            int toFingerIndex = getFingerIndexImpl(toIndex);
-//            
-//            if (toFingerIndex == fingerList.size) {
-//                // Here, the suffix is empty:
-//                moveFingersToSuffixOnEmptySuffix(toIndex, 
-//                                                 numberOfFingers);
-//                return;
-//            }
-//            
-//            int i;
-//            int omittedFingers = 0;
-//            int targetFingerIndex = -1;
-//            Finger<E> targetFinger = null;
-//            
-//            // Find the leftmost finger index in the suffix before which we can 
-//            // put 'numberOfFingers' fingers:
-//            int m = 0;
-//            
-//            for (i = toFingerIndex; i < size; ++i, m++) {
-//                Finger<E> finger = fingerArray[i];
-//                
-//                if (finger.index - numberOfFingers - m > toIndex) {
-//                    targetFinger = finger;
-//                    targetFingerIndex = i;
-//                    break;
-//                }
-//                
-//                omittedFingers++;
-//            }
-//            
-//            if (targetFinger == null) {
-//                // Here, all the 'numberOfFingers' do not fit. Make some room:
-//                Finger<E> f = fingerArray[size - 1];
-////                int movements = toIndex + numberOfFingers - f.index + 1;
-//                int movements = numberOfFingers;
-//                // Here, I need movements == 2:
-//                for (int j = 0; j < movements; ++j) {
-//                    f.node = f.node.next;
-//                }
-//                
-//                f.index += movements;
-//                
-//                // Compute how many fingers are already in the suffix:
-//                int numberOfFingersInSuffix = size - toFingerIndex;
-//                
-//                // Pack the suffix fingers to the right:
-//                for (int k = 0; k < numberOfFingersInSuffix - 1; k++) {
-//                    Finger<E> currentFinger  = fingerArray[size - 1 - k];
-//                    Finger<E> previousFinger = fingerArray[size - 2 - k];
-//                    
-//                    previousFinger.index = currentFinger.index - 1;
-//                    previousFinger.node  = currentFinger.node.prev;
-//                }
-//                
-//                // Move the body fingers to the suffix:
-//                for (int k = 0; k < numberOfFingers; k++) {
-//                    Finger<E> currentFinger = 
-//                            fingerArray[size - numberOfFingersInSuffix - k];
-//                    
-//                    Finger<E> previousFinger = 
-//                            fingerArray[size - numberOfFingersInSuffix - k - 1];
-//                    
-//                    previousFinger.index = currentFinger.index - 1;
-//                    previousFinger.node  = currentFinger.node.prev;
-//                }
-//                
-//                return;
-//            }
-//            
-//            int numberOfActualFingersMoved = omittedFingers
-//                                           + numberOfFingers;
-//            
-//            for (int k = 0; k < numberOfActualFingersMoved; k++) {
-//                Finger<E> predecessorFinger = 
-//                        fingerArray[targetFingerIndex - k - 1];
-//                
-//                Finger<E> currentFinger = fingerArray[targetFingerIndex - k];
-//                predecessorFinger.index = currentFinger.index - 1;
-//                predecessorFinger.node = currentFinger.node.prev;
-//            }
-        }
-
-        /**
-         * Move {@code numberOfFingers} fingers to the empty suffix.
-         * 
-         * @param toIndex         the leftmost element index of the finger 
-         *                        suffix.
-         * @param numberOfFingers the number of fingers to move to the finger   
-         *                        suffix.
-         */
-        private void moveFingersToSuffixOnEmptySuffix(int toIndex,
-                                                      int numberOfFingers) {
-            Finger<E> currentFinger = fingerArray[size];
-            Node<E> node = ownerIndexedList.tail;
-            
-            for (int i = 0; i != numberOfFingers; i++) {
-                Finger<E> predecessorFinger = fingerArray[size - 1 - i];
-                predecessorFinger.index = currentFinger.index - 1;
-                predecessorFinger.node  = node;
-                currentFinger = predecessorFinger;
-                node = node.prev;
-            }
-            
-////            int movements = numberOfFingers;
-//            int movements = toIndex 
-//                          - fingerArray[size - 1].index 
-//                          + numberOfFingers - 1;
-//
-//            Finger<E> finger = fingerArray[size - 1];
-//
-//            for (int i = 0; i < movements; ++i) {
-//                finger.node = finger.node.next;
-//            }   
-//
-//            finger.index += movements;
-//
-//            for (int i = 1; i < numberOfFingers; ++i) {
-//                Finger<E> predecessorFinger = fingerArray[size - i - 1];
-//                Finger<E> currentFinger = fingerArray[size - i];
-//                predecessorFinger.index = currentFinger.index - 1;
-//                predecessorFinger.node = currentFinger.node.prev;
-//            }
-        }
-        
-        /**
          * Accesses the {@code elementIndex}th element sequentially. This method
          * is supposed to be used on very small indexed lists.
          * 
@@ -635,9 +333,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @return {@code elementIndex} the index of the element.
          */
         private Node<E> getNodeSequentially(int elementIndex) {
-            return ownerIndexedList.getNodeSequentially(elementIndex);
+            return (Node<E>) IndexedLinkedList
+                    .this
+                    .getNodeSequentially(elementIndex);
         }
         
+        /**
+         * Normalizes the first finger and returns the {@code elementIndex}th
+         * node.
+         * 
+         * @param elementIndex the index of the desired element.
+         * 
+         * @return the node corresponding to the {@code elementIndex}th 
+         *         position. 
+         */
         private Node<E> getPrefixNode(int elementIndex) {
             Finger<E> a = fingerArray[0];
             Finger<E> b = fingerArray[1];
@@ -672,7 +381,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 int rightDistance = nextAIndex - elementIndex;
                 
                 if (leftDistance < rightDistance) {
-                    Node<E> node = ownerIndexedList.head;
+                    Node<E> node = (Node<E>) IndexedLinkedList.this.head;
                     
                     for (int i = 0; i != elementIndex; i++) {
                         node = node.next;
@@ -716,13 +425,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+        /**
+         * Returns the {@code elementIndex}th node and normalizes the last 
+         * finger.
+         * 
+         * @param elementIndex the index of the desired element.
+         * 
+         * @return the {@code elementIndex}th node. 
+         */
         private Node<E> getSuffixNode(int elementIndex) {
             Finger<E> a = fingerArray[fingerList.size - 2];
             Finger<E> b = fingerArray[fingerList.size - 1];
             Node<E> bNode = b.node;
             
             int saveBIndex = b.index;
-            int nextBIndex = (a.index + ownerIndexedList.size) / 2;
+            int nextBIndex = 
+                    a.index + (IndexedLinkedList.this.size - a.index) / 2;
             
             b.index = nextBIndex;
             
@@ -771,7 +489,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Here, the desired element node is between 'b' and the tail 
                 // node of the list:
                 int leftDistance  = elementIndex - nextBIndex;
-                int rightDistance = ownerIndexedList.size - elementIndex - 1;
+                int rightDistance = IndexedLinkedList.this.size - elementIndex;
                 
                 if (leftDistance < rightDistance) {
                     // Once here, rewind the node reference from bNode to the
@@ -786,7 +504,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 } else {
                     // Once here, rewind the node reference from tail to the 
                     // left:
-                    Node<E> node = ownerIndexedList.tail;
+                    Node<E> node = (Node<E>) IndexedLinkedList.this.tail;
                     
                     for (int i = 0; i != rightDistance; i++) {
                         node = node.prev;
@@ -1215,7 +933,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     public IndexedLinkedList() {
         this.fingerList = new FingerList<>();
-        this.fingerList.setOwnerIndexedList(this);
     }
     
     /**
@@ -1388,7 +1105,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         if (sentinelFinger.index != this.size) {
             throw new IllegalStateException(
-                    "sentinelFinger.index != this.size");
+                    "sentinelFinger.index != this.size. (" 
+                            + sentinelFinger.index 
+                            + " != " 
+                            + this.size 
+                            + ")");
         }
         
         if (sentinelFinger.node != null) {
@@ -3229,6 +2950,17 @@ static void subListRangeCheck(int fromIndex,
     }
     
     /**
+     * Increases the size of this list by {@code m} elements and modifies the
+     * modification count.
+     * 
+     * @param m the size add-on. 
+     */
+    private void increaseSize(final int m) {
+        size += m;
+        ++modCount;
+    }
+    
+    /**
      * Returns the index of the leftmost occurrence of the object {@code o} in
      * the range {@code this[start ... end - 1]}.   
      * 
@@ -3742,14 +3474,18 @@ static void subListRangeCheck(int fromIndex,
         }
     }
     
+    /**
+     * The main range removal method. Unlinks the range
+     * {@code [fromIndex, ..., toIndex]} and fixes the finger list.
+     * 
+     * @param fromIndex the starting, inclusive index of the range to remove.
+     * @param toIndex the ending, exclusive index of the range to remove.
+     */
     private void removeRangeImpl(final int fromIndex, final int toIndex) {
         final int removeRangeLength = toIndex - fromIndex;
         final int currentNumberOfFingers = fingerList.size();
         final int nextNumberOfFingers = 
                 getRecommendedNumberOfFingers(size - removeRangeLength);
-        
-        final int prefixFingerListLength = 
-                fingerList.getFingerIndexImpl(fromIndex);
         
         final Node<E> nodeStart  = fingerList.getNode(fromIndex);
         final Node<E> nodeEnd    = fingerList.getNode(toIndex);
@@ -3820,7 +3556,7 @@ static void subListRangeCheck(int fromIndex,
         final int fingersToAppend = nextNumberOfFingers 
                                   - indexOfFirstCoveringFinger;
         
-        Finger<E> previousFinger = new Finger<>(prefixNode, fromIndex - 1);
+        Finger<E> previousFinger = new Finger<>(prefixNode == null ? head : prefixNode, fromIndex - 1);
         
         for (int i = 0; i < fingersToAppend; i++) {
             final Finger<E> currentFinger = 
@@ -3830,88 +3566,6 @@ static void subListRangeCheck(int fromIndex,
             
             fingerList.appendFinger(currentFinger);
             previousFinger = currentFinger;
-        }
-    }
-    
-    /**
-     * This method is responsible for balancing the number of fingers after 
-     * {@code }
-     * 
-     * @param currentNumberOfFingers the number of current fingers.
-     * @param nextNumberOfFingers    the next number of fingers.
-     * @param numberOfCoveredFingers the number of covered fingers.
-     */
-    private void balanceFingerListAfterRemoval(
-            final int currentNumberOfFingers,
-            final int nextNumberOfFingers,
-            final int numberOfCoveredFingers) {
-        
-        final int numberOfNonCoveredFingers = currentNumberOfFingers
-                                            - numberOfCoveredFingers;
-        
-        final int delta = nextNumberOfFingers - numberOfNonCoveredFingers;
-        
-        if (delta > 0) {
-            balanceFingerListAppendFingers(delta);
-        } else if (delta < 0) {
-            balanceFingerListRemoveFingers(-delta);
-        }
-    }
-    
-    private void makeRoomAtSuffix(final int numberOfFingers) {
-        int blockStartIndex = fingerList.size() - 1;
-        int numberOfOmittedFingers = 0;
-        
-        for (; blockStartIndex >= 0; 
-               blockStartIndex--) {
-            
-            final Finger<E> currentFinger = fingerList.get(blockStartIndex);
-                
-            if (currentFinger.index < fingerList.size()
-                                    - numberOfFingers 
-                                    - numberOfOmittedFingers) {
-                break;
-            }
-            
-            numberOfOmittedFingers++;
-        }
-        
-        Finger<E> previousFinger = fingerList.get(blockStartIndex);
-        
-        for (int i = 1; i < numberOfFingers; i++) {
-            final Finger<E> currentFinger = 
-                    fingerList.get(blockStartIndex + i + 1);
-            
-            currentFinger.index = previousFinger.index + 1;
-            currentFinger.node  = previousFinger.node.next;
-            
-            previousFinger = currentFinger;
-        }
-    }
-    
-    private void balanceFingerListAppendFingers(
-            final int numberOfFingersToAppend) {
-        makeRoomAtSuffix(numberOfFingersToAppend);
-        
-        final Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
-        
-        int fingerIndex    = lastFinger.index + 1;
-        Node<E> fingerNode = lastFinger.node.next;
-        
-        for (int i = 0; i < numberOfFingersToAppend; i++) {
-            final Finger<E> finger = new Finger<>(fingerNode, 
-                                                  fingerIndex);
-            fingerList.appendFinger(finger);
-            fingerIndex++;
-            fingerNode = fingerNode.next;
-        }
-    }
-    
-    private void balanceFingerListRemoveFingers(
-            final int numberOfFingersToRemove) {
-        
-        for (int i = 0; i < numberOfFingersToRemove; i++) {
-            fingerList.removeFinger();
         }
     }
     
@@ -3929,6 +3583,7 @@ static void subListRangeCheck(int fromIndex,
         }
         
         if (removalSize == 1) {
+            // TODO: modCount update?
             remove(fromIndex);
             return;
         }
@@ -3938,167 +3593,31 @@ static void subListRangeCheck(int fromIndex,
             return;
         }
         
-        removeRangeImpl(fromIndex, toIndex);
+        if (toIndex == this.size) {
+            removeRangeSuffixImpl(fromIndex);
+            size -= (size - fromIndex);
+            return;
+        }
         
-//        Node<E> firstNodeToRemove = node(fromIndex);
-//        
-//        int nextFingerCount = getRecommendedNumberOfFingers(size - removalSize);
-//        int prefixSize = fromIndex;
-//        int suffixSize = size - toIndex;
-//        int prefixFingersLength = fingerList.getFingerIndexImpl(fromIndex);
-//        int suffixFingersLength = fingerList.size - 
-//                                  fingerList.getFingerIndexImpl(toIndex);
-//        
-//        int prefixFreeSpotCount = prefixSize - prefixFingersLength;
-//        int suffixFreeSpotCount = suffixSize - suffixFingersLength;
-//
-//        if (prefixFreeSpotCount == 0) {
-//            if (suffixFreeSpotCount == 0) {
-//                removeRangeNoPrefixNoSuffix(firstNodeToRemove,
-//                                            fromIndex, 
-//                                            removalSize);
-//            } else {
-//                int numberOfFingersToMove = nextFingerCount 
-//                                          - prefixFingersLength
-//                                          - suffixFingersLength;
-//                
-//                // Once here, prefixFreeSpotCount = 0 and 
-//                // suffixFreeSpotCount > 0. In other words, we are moving to the
-//                // suffix.
-//                fingerList.moveFingersToSuffix(toIndex,
-//                                               numberOfFingersToMove);
-//                fingerList.removeFingerRange(0, 
-//                                       suffixFingersLength
-//                                               + numberOfFingersToMove, 
-//                                       removalSize);
-//                
-//                removeRangeNodes(firstNodeToRemove, removalSize);
-//            }
-//        } else {
-//            if (suffixFreeSpotCount == 0) {
-//                
-//                int numberOfFingersToMove = nextFingerCount
-//                                          - prefixFingersLength
-//                                          - 1; 
-//                
-//                numberOfFingersToMove = Math.max(numberOfFingersToMove, 0);
-//                
-//                // Once here, suffixFreeSpotCount = 0 and 
-//                // prefixFreeSpotCount > 0. In other words, we are moving a to
-//                // prefix:
-//                fingerList.moveFingersToPrefix(
-//                        fromIndex,
-//                        numberOfFingersToMove);
-//                
-//                fingerList.removeFingerRange(numberOfFingersToMove, 
-//                                       0, 
-//                                       removalSize);
-//                
-//                removeRangeNodes(firstNodeToRemove, 
-//                                 removalSize);
-//            } else {
-//                
-//                int prefixSuffixFreeSpotCount = prefixFreeSpotCount 
-//                                              + suffixFreeSpotCount;
-//
-//                float prefixLoadFactor = ((float)(prefixFreeSpotCount)) /
-//                                         ((float)(prefixSuffixFreeSpotCount));
-//                int nextSize = 
-//                        getRecommendedNumberOfFingers(
-//                                fingerList.ownerIndexedList.size - removalSize);
-//                
-//                int numberOfFingersToRemove = fingerList.size - nextSize;
-//                
-//                int numberOfBodyFingers = fingerList.size 
-//                                        - prefixFingersLength 
-//                                        - suffixFingersLength;
-//                
-//                if (numberOfBodyFingers == 0) {
-//
-//                    removeRangeNodes(firstNodeToRemove,
-//                                     removalSize);
-//                    
-//                    int startFingerIndex = 
-//                            fingerList.getFingerIndexImpl(toIndex);
-//                    
-//                    fingerList.shiftFingerIndicesToLeft(startFingerIndex, 
-//                                                        removalSize);
-//                } else {
-//
-//                    if (numberOfFingersToRemove <= numberOfBodyFingers) {
-//                        int numberOfBodyFingersAfterRemoval 
-//                                = numberOfBodyFingers 
-//                                - numberOfFingersToRemove;
-//
-//                        int numberOfBodyFingersToLeft = 
-//                                (int)(numberOfBodyFingersAfterRemoval 
-//                                    * prefixLoadFactor);
-//
-//                        int numberOfBodyFingersToRight = 
-//                                numberOfBodyFingersAfterRemoval
-//                              - numberOfBodyFingersToLeft;
-//
-//                        fingerList.moveFingersToPrefix(fromIndex, 
-//                                                       numberOfBodyFingersToLeft);
-//
-//                        fingerList.moveFingersToSuffix(toIndex, 
-//                                                       numberOfBodyFingersToRight);
-//
-//                        fingerList.removeFingerRange(
-//                                prefixFingersLength + numberOfBodyFingersToLeft,
-//                                suffixFingersLength + numberOfBodyFingersToRight, 
-//                                removalSize);
-//
-//                        removeRangeNodes(firstNodeToRemove,
-//                                         removalSize);
-//                    } else {
-//                        if (prefixFreeSpotCount >= numberOfFingersToRemove) {
-//                            System.out.println("prefixFreeSpotCount >= numberOfFingersToRemove");
-//                            
-//                        } else {
-//                            return;
-//                        }
-//                        
-//                        if (prefixLoadFactor > 0.5f) {
-//                            System.out.println("prefix");
-//                            // Push body fingers to suffix:
-//                            fingerList.moveFingersToSuffix(toIndex,
-//                                                           numberOfBodyFingers);
-//                        } else {
-//                            System.out.println("suffix");
-//                            // Push body fingers to prefix:
-////                            fingerList.moveFingersToPrefix(fromIndex,
-////                                                           numberOfBodyFingers);
-//
-//                            int suffixLength = numberOfFingersToRemove
-//                                             - numberOfBodyFingers;
-//                            
-//                            
-//                            
-//                            // Move 'numberOfBodyFinger' fingers to the prefix:
-//                            
-//                            
-//                            
-//                            fingerList.removeFingerRange(
-//                                    0,
-//                                    numberOfBodyFingers, 
-//                                    removalSize);
-//                            
-//                            fingerList.removeFingerRange(
-//                                    suffixSize,
-//                                    fingerList.size - suffixLength,
-//                                    removalSize);
-//                            
-//                            removeRangeNodes(firstNodeToRemove, 
-//                                             removalSize);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        
-//        modCount++;
-//        size -= removalSize;
+        removeRangeImpl(fromIndex, toIndex);
+    }
+    
+    
+    /**
+     * Unlinks the nodes in the range {@code [fromIndex, ..., size - 1]}.
+     * 
+     * @param fromIndex the tarting inclusive index of the range to remove.
+     */
+    private void removeRangeSuffixImpl(final int fromIndex) {
+        int numberOfElementsToRemove = size - fromIndex;
+        int saveListSize = size;
+        
+        for (int i = 0; i < numberOfElementsToRemove; i++) {
+            removeLast();
+        }
+        
+        fingerList.fingerArray[fingerList.size()].index = 
+                saveListSize - numberOfElementsToRemove;
     }
     
     /**
