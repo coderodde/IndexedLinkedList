@@ -681,7 +681,7 @@ public class IndexedLinkedListTest {
         }
     }
     
-    @Test
+    //@Test // Passes.
     public void sublistClear1() {
         list.addAll(getIntegerList(100));
         list.checkInvarant();
@@ -693,7 +693,7 @@ public class IndexedLinkedListTest {
         assertEquals(0, sublist.size());
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClear2() {
         int fromIndex = 10;
         int toIndex = 990;
@@ -709,13 +709,14 @@ public class IndexedLinkedListTest {
     private void checkSubList(int size, int fromIndex, int toIndex) {
         List<Integer> referenceList = getIntegerList(size);
         list.addAll(referenceList);
+        list.checkInvarant();
         referenceList.subList(fromIndex, toIndex).clear();
         list.subList(fromIndex, toIndex).clear();
         list.checkInvarant();
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClear3() {
         int size = 1_000_000;
         int fromIndex = 10;
@@ -723,7 +724,7 @@ public class IndexedLinkedListTest {
         checkSubList(size, fromIndex, toIndex);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClear4() {
         int size = 1_000;
         int fromIndex = 10;
@@ -731,7 +732,7 @@ public class IndexedLinkedListTest {
         checkSubList(size, fromIndex, toIndex);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClear5() {
         int size = 100;
         int fromIndex = 10;
@@ -739,7 +740,7 @@ public class IndexedLinkedListTest {
         checkSubList(size, fromIndex, toIndex);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClearLeftOfSmall() {
         list.add(1);
         list.add(2);
@@ -751,7 +752,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClearRightOfSmall() {
         list.add(1);
         list.add(2);
@@ -763,7 +764,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(0));
     }
     
-    //@Test
+    @Test
     public void sublistClearRightOfSmall2() {
         List<Integer> referenceList = new ArrayList<>(getIntegerList(20));
         list.addAll(referenceList);

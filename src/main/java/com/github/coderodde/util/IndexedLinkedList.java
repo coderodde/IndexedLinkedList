@@ -487,7 +487,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Here, the desired element node is between 'b' and the tail 
                 // node of the list:
                 int leftDistance  = elementIndex - nextBIndex;
-                int rightDistance = IndexedLinkedList.this.size - elementIndex;
+                int rightDistance = IndexedLinkedList.this.size 
+                                  - elementIndex 
+                                  - 1;
                 
                 if (leftDistance < rightDistance) {
                     // Once here, rewind the node reference from bNode to the
@@ -1067,7 +1069,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                 + right.index 
                                 + " = fingerList[" 
                                 + (i + 1) 
-                                + "]");
+                                + "].index");
             }
         }
         
@@ -1094,6 +1096,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         while (node != null) {
             tentativeSize++;
+//            System.out.println("Shit (" + tentativeSize + "): " + node);
             
             if (finger.node == node) {
                 finger = fingerList.get(++fingerCount);
@@ -3538,14 +3541,39 @@ public class IndexedLinkedList<E> implements Deque<E>,
         final int fingersToAppend = nextNumberOfFingers 
                                   - indexOfFirstCoveringFinger;
         
-        Node<E> node = prefixNode == null ? head : prefixNode;
-        int index = fromIndex;
+        if (fingersToAppend == 0) {
+            System.out.println("<<< fingersToAppend == 0 >>>");
+            return;
+        }
+        
+        if (indexOfFirstCoveringFinger == 0) {
+            System.out.println("<<< indexOfFirstCoveringFinger == 0 >>>");
+            
+            Node<E> node = head;
+            int index = 0;
+            
+            for (int i = 0; i < fingersToAppend; i++) {
+                final Finger<E> newFinger = new Finger<>(node, index);
+                fingerList.appendFinger(newFinger);
+                node = node.next;
+                index++;
+            }
+            
+            return;
+        }
+        
+        final int lastFingerIndex = indexOfFirstCoveringFinger - 1;
+        Finger<E> previousFinger = fingerList.get(lastFingerIndex);
         
         for (int i = 0; i < fingersToAppend; i++) {
-            Finger<E> newFinger = new Finger<>(node, index);
-            fingerList.appendFinger(newFinger);
-            node = node.next;
-            index++;
+            
+            final Finger<E> currentFinger =
+                    new Finger<>(
+                            previousFinger.node.next, 
+                            previousFinger.index + 1);
+            
+            fingerList.appendFinger(currentFinger);
+            previousFinger = currentFinger;
         }
     }
     
