@@ -833,7 +833,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test
+    //@Test // Passes.
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -858,9 +858,11 @@ public class IndexedLinkedListTest {
                 assertEquals(referenceList, list);
             }
         }
+        
+        System.out.println("bruteForceSubListClearFromTo passed.");
     }
     
-//@Test
+    @Test
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(13L);
         
@@ -872,7 +874,7 @@ public class IndexedLinkedListTest {
                 iteration++;
                 
                 System.out.println(
-                        "bruteForceSubListClearFromTo(): iteration = " 
+                        "bruteForceSubListClearFromToWithRandomization(): iteration = " 
                                 + iteration);
                 
                 list.clear();

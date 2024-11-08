@@ -3527,6 +3527,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.getFingerIndexImpl(fromIndex),
                     removeRangeLength);
             
+            fingerList.get(fingerList.size()).index = size;
+            
             System.out.println("CATCH ME!"); // TODO: REMOVE
             return;
         } 
