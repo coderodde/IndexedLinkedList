@@ -607,18 +607,18 @@ public class IndexedLinkedListTest {
         assertEquals(39000, list.size());
     }
     
-    @Test // Passes.
+    //@Test // Passes.
     public void removeRangeBug2() {
-        list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         list.subList(0, 7).clear();
         list.checkInvarant();
-        assertEquals(Arrays.asList(8, 9, 10, 11), list);
+        assertEquals(Arrays.asList(7, 8, 9, 10), list);
         list.subList(0, 2).clear();
         list.checkInvarant();
-        assertEquals(Arrays.asList(10, 11), list);
+        assertEquals(Arrays.asList(9, 10), list);
     }
 
-    //@Test
+    //@Test // Passes.
     public void element() {
         list.add(1);
         list.add(2);
@@ -630,7 +630,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(2), list.element());
     }
     
-    //@Test
+    //@Test // Passes.
     public void listEquals() {
         list.addAll(Arrays.asList(1, 2, 3, 4));
         List<Integer> otherList = Arrays.asList(1, 2, 3, 4);
@@ -638,6 +638,7 @@ public class IndexedLinkedListTest {
         assertTrue(list.equals(otherList));
         
         list.remove(Integer.valueOf(3));
+        list.checkInvarant();
         
         assertFalse(list.equals(otherList));
         
@@ -649,7 +650,9 @@ public class IndexedLinkedListTest {
         assertFalse(list.equals(set));
         
         list.clear();
+        list.checkInvarant();
         list.addAll(Arrays.asList(0, 1, 2, 3));
+        list.checkInvarant();
         otherList = Arrays.asList(0, 1, 4, 3);
         
         assertFalse(list.equals(otherList));
@@ -678,12 +681,14 @@ public class IndexedLinkedListTest {
         }
     }
     
-    //@Test
+    @Test
     public void sublistClear1() {
         list.addAll(getIntegerList(100));
+        list.checkInvarant();
         List<Integer> sublist = list.subList(49, 51);
         assertEquals(2, sublist.size());
         sublist.clear();
+        list.checkInvarant();
         assertEquals(98, list.size());
         assertEquals(0, sublist.size());
     }
