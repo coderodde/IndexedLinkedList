@@ -3546,34 +3546,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return;
         }
         
-        if (indexOfFirstCoveringFinger == 0) {
-            System.out.println("<<< indexOfFirstCoveringFinger == 0 >>>");
+        Node<E> tmpNode = head;
+        int tmpIndex = 0;
+        final int lastPrefixFingerIndex = indexOfFirstCoveringFinger - 1;
+        
+        if (lastPrefixFingerIndex >= 0) {
             
-            Node<E> node = head;
-            int index = 0;
-            
-            for (int i = 0; i < fingersToAppend; i++) {
-                final Finger<E> newFinger = new Finger<>(node, index);
-                fingerList.appendFinger(newFinger);
-                node = node.next;
-                index++;
+            for (int i = 0; i <= lastPrefixFingerIndex; i++) {
+                final Finger<E> f = fingerList.get(i);
+                f.index = i;
+                f.node = tmpNode;
+                tmpNode = tmpNode.next;
             }
             
-            return;
+            tmpIndex = indexOfFirstCoveringFinger;
         }
         
-        final int lastFingerIndex = indexOfFirstCoveringFinger - 1;
-        Finger<E> previousFinger = fingerList.get(lastFingerIndex);
-        
         for (int i = 0; i < fingersToAppend; i++) {
-            
-            final Finger<E> currentFinger =
-                    new Finger<>(
-                            previousFinger.node.next, 
-                            previousFinger.index + 1);
-            
-            fingerList.appendFinger(currentFinger);
-            previousFinger = currentFinger;
+            final Finger<E> f = new Finger<>(tmpNode, tmpIndex++);
+            fingerList.appendFinger(f);
+            tmpNode = tmpNode.next;
         }
     }
     
@@ -3654,6 +3646,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
+    }
+    
+    /**
+     * Scrolls the input node {@code scrolls} positions towards the head of the
+     * linked list and returns the reached node.
+     * 
+     * @param startNode the node from which to start the scrolling.
+     * @param scrolls   the number of positions to scroll.
+     * @return          the reached node.
+     */
+    private Node<E> scrollNodeToLeft(Node<E> startNode, int scrolls) {
+        for (int i = 0; i < scrolls; i++) {
+            startNode = startNode.prev;
+        }
+        
+        return startNode;
     }
     
     /**
