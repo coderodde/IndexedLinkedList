@@ -764,7 +764,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(0));
     }
     
-    @Test
+    //@Test // Passes.
     public void sublistClearRightOfSmall2() {
         List<Integer> referenceList = new ArrayList<>(getIntegerList(20));
         list.addAll(referenceList);
@@ -776,7 +776,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void debugClear1() {
         list.addAll(getIntegerList(12));
         list.subList(4, 9).clear();
@@ -791,7 +791,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes. 
     public void debugClear2() {
         list.addAll(getIntegerList(10));
         list.subList(0, 4).clear();
@@ -809,7 +809,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void subListClear2Fingers3Nodes_1() {
         list.addAll(Arrays.asList(0, 1, 2));
         list.subList(0, 1).clear();
@@ -817,13 +817,14 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(1, 2), list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sublistClear6() {
         list.addAll(getIntegerList(1000));
         list.subList(70, 1000).clear();
+        list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void removeRangeNodes() {
         list.addAll(getIntegerList(20));
         list.subList(5, 10).clear();
@@ -832,7 +833,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -841,9 +842,9 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-//                System.out.println(
-//                        "bruteForceSubListClearFromTo(): iteration = " 
-//                                + iteration);
+                System.out.println(
+                        "bruteForceSubListClearFromTo(): iteration = " 
+                                + iteration);
                 
                 list.clear();
                 list.addAll(data);
@@ -851,10 +852,10 @@ public class IndexedLinkedListTest {
                 referenceList.addAll(data);
                 
                 list.subList(fromIndex, toIndex).clear();
+                list.checkInvarant();
                 referenceList.subList(fromIndex, toIndex).clear();
                 
                 assertEquals(referenceList, list);
-                list.checkInvarant();
             }
         }
     }
