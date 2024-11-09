@@ -888,10 +888,7 @@ public class IndexedLinkedListTest {
     @Test // Passes.
     public void bruteForceSublistClearOnSmallLists() {
         long seed = 1662121251795L;
-        System.out.println("seed == " + seed);
         Random random = new Random(seed);
-        
-        System.out.println(">>> bruteForceSublistClearOnSmallLists():");
         
         for (int i = 0; i < 1000; ++i) {
             int size = 1 + random.nextInt(400);
@@ -902,7 +899,6 @@ public class IndexedLinkedListTest {
             int fromIndex = random.nextInt(size);
             int toIndex = Math.min(size, fromIndex + random.nextInt(size));
             
-//            System.out.println("iteration = " + i);
             list.subList(fromIndex, toIndex).clear();
             referenceList.subList(fromIndex, toIndex).clear();
             
@@ -1591,10 +1587,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(4), iterator.previous());
         
         list.checkInvarant();
-        System.out.println("------------");
-        System.out.println(list);
         iterator.remove(); // subList = <3, 6, 7, 8>
-        System.out.println(list);
         list.checkInvarant();// [1, 2, 3, 6, 7, 8, 9]
         
         assertEquals(Integer.valueOf(6), iterator.next());
@@ -3980,46 +3973,23 @@ public class IndexedLinkedListTest {
             list.add(i);
         }
         
-        System.out.printf("copy(): Original entropy: %.3f.\n",
-                          list.getEntropy());
-        
         Random random = new Random(10L);
         list.randomizeFingers(random);
-        
-        System.out.printf("copy(): Entropy after randomization: %.3f.\n",
-                          list.getEntropy());
         
         for (int i = 0; i < 1000; i++) {
             assertEquals(Integer.valueOf(i), list.get(i));   
         }
-        
-        System.out.printf("copy(): Entropy after access: %.3f.\n",
-                          list.getEntropy());
-        
-        System.out.println("copy() done.");
     }
     
     @Test
     public void getPrefixNode() {
-        
-        System.out.println("<<< getNodeKeepFingerListIntact1 >>>");
-        
         for (int i = 0; i < 1000; i++) {
             list.add(i);
         }
         
-        System.out.println("List: " + list);
-        System.out.println("Before finger randomization:");
-        printFingers();
-        
         Random random = new Random(4L);
         
         list.randomizeFingers(random);
-        
-        System.out.println("After finger randomization:");
-        printFingers();
-        System.out.println();
-        
         
         for (int index = 0; index < 11; index++) {
             int datum = list.get(index);
@@ -4038,24 +4008,8 @@ public class IndexedLinkedListTest {
             list.add(i);
         }
         
-        printFingers();
-        
         Integer datum = list.get(9);
         
         assertEquals(Integer.valueOf(9), datum);
-    }
-    
-    private void printFingers(IndexedLinkedList<Integer> list) {
-        for (int i = 0; i < list.fingerList.size; i++) {
-            System.out.println(list.fingerList.fingerArray[i]);
-        }
-        
-        System.out.println(
-                "End-sentinel: "+  
-                list.fingerList.fingerArray[list.fingerList.size]);
-    }
-    
-    private void printFingers() {
-        printFingers(list);
     }
 }
