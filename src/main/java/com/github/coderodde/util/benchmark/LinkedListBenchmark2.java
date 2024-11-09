@@ -154,6 +154,9 @@ public class LinkedListBenchmark2 {
     }
     
     public static void main(String[] args) {
+        deleteRange();
+        System.exit(0);
+        
         try (AffinityLock al = AffinityLock.acquireLock()) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             clearDurationCounterMap();
@@ -162,6 +165,43 @@ public class LinkedListBenchmark2 {
             System.out.println("<<< Total durations >>>");
             printTotalDurations();
         }
+    }
+    
+    private static void deleteRange() {
+        System.out.println("deleteRange():");
+        final List<Object> indexedList = new IndexedLinkedList<>();
+        final List<Object> treeList    = new TreeList<>();
+        final Object obj = new Object();
+        final int N = 50_000_000;
+        
+        for (int i = 0; i < N; i++) {
+            indexedList.add(obj);
+        }
+        
+        System.out.println("Indexed list data loaded.");
+        
+        long start = System.currentTimeMillis();
+        indexedList.subList(100_000, N - 100_000).clear();
+        long end = System.currentTimeMillis();
+        
+        indexedList.clear();
+        System.gc();
+        
+        System.out.println("indexed list: " + (end - start) + " millis.");
+        
+        for (int i = 0; i < N; i++) {
+            treeList.add(obj);
+        }
+        
+        System.out.println("Tree list data loaded.");
+        
+        start = System.currentTimeMillis();
+        treeList.subList(100_000, N - 100_000).clear();
+        end = System.currentTimeMillis();
+        
+        System.out.println("tree list:    " + (end - start) + " millis.");
+        treeList.clear();
+        System.gc();
     }
     
     private static void warmup() {
