@@ -2619,6 +2619,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int nextIndex;
         
         /**
+         * The flag indicating that the previous iterator move to the left.
+         */
+        private boolean previousMoveToLeft;
+        
+        /**
          * The expected modification count. Package-private for the sake of unit 
          * testing.
          */
@@ -2664,6 +2669,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturned = next;
             next = next.next;
             nextIndex++;
+            previousMoveToLeft = false;
             return lastReturned.item;
         }
 
@@ -2696,6 +2702,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             lastReturned = next = (next == null) ? tail : next.prev;
             nextIndex--;
+            previousMoveToLeft = true;
             return lastReturned.item;
         }
 
@@ -2744,7 +2751,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             Node<E> lastNext = lastReturned.next;
-            int removalIndex = nextIndex - 1;
+            int removalIndex = previousMoveToLeft ? nextIndex : nextIndex - 1;
             removeObjectImpl(lastReturned, removalIndex);
             
             if (next == lastReturned) {

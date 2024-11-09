@@ -1590,8 +1590,11 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(4), iterator.previous());
         
         list.checkInvarant();
+        System.out.println("------------");
+        System.out.println(list);
         iterator.remove(); // subList = <3, 6, 7, 8>
-        list.checkInvarant();
+        System.out.println(list);
+        list.checkInvarant();// [1, 2, 3, 6, 7, 8, 9]
         
         assertEquals(Integer.valueOf(6), iterator.next());
         assertEquals(Integer.valueOf(7), iterator.next());
@@ -1599,6 +1602,12 @@ public class IndexedLinkedListTest {
         
         assertFalse(iterator.hasNext());
         assertTrue(iterator.hasPrevious());
+    }
+    
+    @Test
+    public void debugRemoveAtFigner() {
+        list.addAll(Arrays.asList(1, 2, 3, 4, 6, 7, 8, 9));
+        
     }
     
     @Test
