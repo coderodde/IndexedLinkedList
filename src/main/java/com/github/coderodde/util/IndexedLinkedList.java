@@ -1796,7 +1796,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
         for (Node<E> x = tail; x != null; x = x.prev, index--) {
             if (Objects.equals(o, x.item)) {
-                removeObjectImpl(x, index);
+                if (index == size - 1) {
+                    removeLast();
+                } else {
+                    removeObjectImpl(x, index);
+                }
+                    
                 return true;
             }
         }

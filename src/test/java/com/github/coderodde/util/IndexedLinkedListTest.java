@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -669,7 +670,7 @@ public class IndexedLinkedListTest {
 
             @Override
             public Integer next() {
-                return Integer.valueOf(0);
+                return 0;
             }
         }
         
@@ -1899,11 +1900,11 @@ public class IndexedLinkedListTest {
         }
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test(expected = IllegalStateException.class)
     public void listEqualsThrowsOnBadIterator() {
         DummyList dummyList = new DummyList();
         list.addAll(Arrays.asList(0, 0));
-        list.equals(dummyList);
+        listsEqual(list, dummyList);
     }
     
     @Test
@@ -2242,13 +2243,12 @@ public class IndexedLinkedListTest {
         }
     }
     
-    // TODO: deal with the equals(Object)!
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void badThisIterator() {
-        List<Integer> arrayList = Arrays.asList(3, 3);
+        list.addAll(Arrays.asList(3, 2));
         BadList badList = new BadList();
         badList.addAll(Arrays.asList(3, 3));
-        badList.equals(arrayList);
+        Assert.assertNotEquals(badList, list);
     }
     
     @Test
@@ -2912,17 +2912,17 @@ public class IndexedLinkedListTest {
     public void removeFirstLastOccurrence() {
         IndexedLinkedList<Integer> l = new IndexedLinkedList<>();
         
-        list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3));
+        list.addAll(Arrays.asList(1, 2, 3, 1, 2, 3)); // <1, 2, 3, 1, 2, 3>
         list.checkInvarant();
         l.addAll(list);
         
-        list.removeFirstOccurrence(2);
+        list.removeFirstOccurrence(2); // <1, 3, 1, 2, 3>
         list.checkInvarant();
         l.removeFirstOccurrence(2);
         
         assertTrue(listsEqual(list, l));
         
-        list.removeLastOccurrence(3);
+        list.removeLastOccurrence(3); // <1, 3, 1, 2>
         list.checkInvarant();
         l.removeLastOccurrence(3);
         
