@@ -81,7 +81,27 @@ final class FingerList<E> {
      * end-of-list sentinel finger {@code F} for which {@code F.index = size}.
      */
     int size;
+    
+    /**
+     * Adjusts the finger list after removing the first finger.
+     */
+    void adjustOnRemoveFirst() {
+        int lastPrefixIndex = Integer.MAX_VALUE;
 
+        for (int i = 0; i < size; ++i) {
+            Finger<E> finger = fingerArray[i];
+
+            if (finger.index != i) {
+                lastPrefixIndex = i;
+                break;
+            } else {
+                finger.node = finger.node.next;
+            }
+        }
+
+        shiftFingerIndicesToLeftOnceAll(lastPrefixIndex);
+    }
+    
     /**
      * Appends the input finger to the tail of the finger list.
      *
@@ -105,58 +125,6 @@ final class FingerList<E> {
         fingerArray = new Finger[INITIAL_CAPACITY];
         fingerArray[0] = new Finger<>(null, 0);
         size = 0;
-    }
-
-    /**
-     * Returns {@code index}th finger.
-     *
-     * @param index the index of the target finger.
-     * @return the {@code index}th finger.
-     */
-    Finger<E> get(int index) {
-        return fingerArray[index];
-    }
-
-    /**
-     * Returns the index of the finger that is closest to the
-     * {@code elementIndex}th list element.
-     *
-     * @param elementIndex the target element index.
-     * @return the index of the finger that is closest to the
-     * {@code elementIndex}th element.
-     */
-    int getClosestFingerIndex(int elementIndex) {
-        return normalize(getFingerIndexImpl(elementIndex), elementIndex);
-    }
-
-    /**
-     * Returns the number of fingers in this finger list not counting the
-     * end-of-finger-list finger.
-     *
-     * @return the number of fingers in this finger list.
-     */
-    public int size() {
-        return size;
-    }
-
-    /**
-     * Adjusts the finger list after removing the first finger.
-     */
-    void adjustOnRemoveFirst() {
-        int lastPrefixIndex = Integer.MAX_VALUE;
-
-        for (int i = 0; i < size; ++i) {
-            Finger<E> finger = fingerArray[i];
-
-            if (finger.index != i) {
-                lastPrefixIndex = i;
-                break;
-            } else {
-                finger.node = finger.node.next;
-            }
-        }
-
-        shiftFingerIndicesToLeftOnceAll(lastPrefixIndex);
     }
 
     /**
@@ -204,6 +172,28 @@ final class FingerList<E> {
             fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
         }
     }
+    
+    /**
+     * Returns {@code index}th finger.
+     *
+     * @param index the index of the target finger.
+     * @return the {@code index}th finger.
+     */
+    Finger<E> get(int index) {
+        return fingerArray[index];
+    }
+
+    /**
+     * Returns the index of the finger that is closest to the
+     * {@code elementIndex}th list element.
+     *
+     * @param elementIndex the target element index.
+     * @return the index of the finger that is closest to the
+     * {@code elementIndex}th element.
+     */
+    int getClosestFingerIndex(int elementIndex) {
+        return normalize(getFingerIndexImpl(elementIndex), elementIndex);
+    }
 
     /**
      * Returns the finger index {@code i}, such that
@@ -237,243 +227,7 @@ final class FingerList<E> {
 
         return idx;
     }
-
-    /**
-     * Inserts the input finger into the finger list such that the entire finger
-     * list is sorted by indices.
-     *
-     * @param finger the finger to insert.
-     */
-    void insertFingerAndShiftOnceToRight(Finger<E> finger) {
-        enlargeFingerArrayIfNeeded(size + 2);
-        int beforeFingerIndex = getFingerIndexImpl(finger.index);
-        System.arraycopy(
-                fingerArray,
-                beforeFingerIndex,
-                fingerArray,
-                beforeFingerIndex + 1,
-                size + 1 - beforeFingerIndex);
-
-        ++size;
-
-        // Shift fingerArray[beforeFingerIndex + 1 ... size] one position to 
-        // the right (towards larger index values):
-        shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
-        fingerArray[beforeFingerIndex] = finger;
-    }
-
-    /**
-     * Make sure we can insert {@code roomSize} fingers starting from
-     * {@code fingerIndex}, shifting all the fingers starting from
-     * {@code numberOfNodes} to the right.
-     *
-     * @param fingerIndex the finger index of the first finger in the shifted
-     * finger slice.
-     * @param roomSize the number of free spots requested.
-     * @param numberOfNodes the shift amount of the moved fingers.
-     */
-    void makeRoomAtIndex(int fingerIndex,
-                         int roomSize,
-                         int numberOfNodes) {
-
-        shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
-        size += roomSize;
-        enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
-        // sentinel.
-        System.arraycopy(fingerArray,
-                fingerIndex,
-                fingerArray,
-                fingerIndex + roomSize,
-                size - roomSize - fingerIndex + 1);
-    }
-
-//    /**
-//     * Accesses the {@code elementIndex}th element sequentially. This method is
-//     * supposed to be used on very small indexed lists.
-//     *
-//     * @param elementIndex the element index.
-//     *
-//     * @return {@code elementIndex} the index of the element.
-//     */
-//    private Node<E> getNodeSequentially(int elementIndex) {
-//        return (Node<E>) list.getgetNodeSequentially(elementIndex);
-//    }
-
-    /**
-     * Normalizes the first finger and returns the {@code elementIndex}th node.
-     *
-     * @param elementIndex the index of the desired element.
-     *
-     * @return the node corresponding to the {@code elementIndex}th position.
-     */
-    private Node<E> getPrefixNode(int elementIndex) {
-        Finger<E> a = fingerArray[0];
-        Finger<E> b = fingerArray[1];
-        Node<E> aNode = a.node;
-
-        // Put a between b and the beginning of the list:
-        int nextAIndex = b.index / 2;
-        int saveAIndex = a.index;
-
-        a.index = nextAIndex;
-
-        if (saveAIndex < nextAIndex) {
-            // Here, we need to rewind to the right:
-            for (int i = saveAIndex; i < nextAIndex; i++) {
-                aNode = aNode.next;
-            }
-        } else {
-            // Once here, 'saveAIndex >= nextAIndex'.
-            // We need to rewind to the left:
-            for (int i = nextAIndex; i < saveAIndex; i++) {
-                aNode = aNode.prev;
-            }
-        }
-
-        a.node = aNode;
-
-        // Go get the proper node:
-        if (elementIndex < nextAIndex) {
-            // Here, the desired element is between the head of the list and
-            // the very first figner:
-            int leftDistance = elementIndex;
-            int rightDistance = nextAIndex - elementIndex;
-
-            if (leftDistance < rightDistance) {
-                Node<E> node = (Node<E>) list.head;
-
-                for (int i = 0; i != elementIndex; i++) {
-                    node = node.next;
-                }
-
-                return node;
-            } else {
-                Node<E> node = aNode;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
-            }
-        } else {
-            // Here, 'elementIndex >= nextAIndex':
-            int leftDistance = elementIndex - nextAIndex;
-            int rightDistance = b.index - elementIndex;
-
-            if (leftDistance < rightDistance) {
-                // Once here, rewind the node reference from aNode to the 
-                // right:
-                Node<E> node = aNode;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
-            } else {
-                // Once here, rewind the node refrence from b to the left:
-                Node<E> node = b.node;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
-            }
-        }
-    }
-
-    /**
-     * Returns the {@code elementIndex}th node and normalizes the last finger.
-     *
-     * @param elementIndex the index of the desired element.
-     *
-     * @return the {@code elementIndex}th node.
-     */
-    private Node<E> getSuffixNode(int elementIndex) {
-        Finger<E> a = fingerArray[size - 2];
-        Finger<E> b = fingerArray[size - 1];
-        Node<E> bNode = b.node;
-
-        int saveBIndex = b.index;
-        int nextBIndex
-                = // TODO: Simplify.
-                a.index + (list.size - a.index) / 2;
-
-        b.index = nextBIndex;
-
-        // Rewind the finger 'b' to between 'a' and tail:
-        if (saveBIndex < nextBIndex) {
-            int distance = nextBIndex - saveBIndex;
-
-            for (int i = 0; i != distance; i++) {
-                bNode = bNode.next;
-            }
-        } else {
-            // Here, 'nextBIndex <= saveBIndex':
-            int distance = saveBIndex - nextBIndex;
-
-            for (int i = 0; i != distance; i++) {
-                bNode = bNode.prev;
-            }
-        }
-
-        b.node = bNode;
-
-        // Go get the proper node:
-        if (elementIndex < nextBIndex) {
-            // Here, the desired element node is between 'a' and 'b':
-            int leftDistance = elementIndex - a.index;
-            int rightDistance = nextBIndex - elementIndex;
-
-            if (leftDistance < rightDistance) {
-                Node<E> node = a.node;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
-            } else {
-                Node<E> node = b.node;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
-            }
-        } else {
-            // Here, the desired element node is between 'b' and the tail 
-            // node of the list:
-            int leftDistance = elementIndex - nextBIndex;
-            int rightDistance = list.size - elementIndex - 1;
-
-            if (leftDistance < rightDistance) {
-                // Once here, rewind the node reference from bNode to the
-                // right:
-                Node<E> node = bNode;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
-            } else {
-                // Once here, rewind the node reference from tail to the 
-                // left:
-                Node<E> node = list.tail;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
-            }
-        }
-    }
-
+    
     /**
      * Returns the {@code i}th node of this linked list. The closest finger is
      * updated to point to the returned node.
@@ -568,7 +322,231 @@ final class FingerList<E> {
             }
         }
     }
+    
+    /**
+     * Normalizes the first finger and returns the {@code elementIndex}th node.
+     *
+     * @param elementIndex the index of the desired element.
+     *
+     * @return the node corresponding to the {@code elementIndex}th position.
+     */
+    private Node<E> getPrefixNode(int elementIndex) {
+        Finger<E> a = fingerArray[0];
+        Finger<E> b = fingerArray[1];
+        Node<E> aNode = a.node;
 
+        // Put a between b and the beginning of the list:
+        int nextAIndex = b.index / 2;
+        int saveAIndex = a.index;
+
+        a.index = nextAIndex;
+
+        if (saveAIndex < nextAIndex) {
+            // Here, we need to rewind to the right:
+            for (int i = saveAIndex; i < nextAIndex; i++) {
+                aNode = aNode.next;
+            }
+        } else {
+            // Once here, 'saveAIndex >= nextAIndex'.
+            // We need to rewind to the left:
+            for (int i = nextAIndex; i < saveAIndex; i++) {
+                aNode = aNode.prev;
+            }
+        }
+
+        a.node = aNode;
+
+        // Go get the proper node:
+        if (elementIndex < nextAIndex) {
+            // Here, the desired element is between the head of the list and
+            // the very first figner:
+            int leftDistance = elementIndex;
+            int rightDistance = nextAIndex - elementIndex;
+
+            if (leftDistance < rightDistance) {
+                Node<E> node = (Node<E>) list.head;
+
+                for (int i = 0; i != elementIndex; i++) {
+                    node = node.next;
+                }
+
+                return node;
+            } else {
+                Node<E> node = aNode;
+
+                for (int i = 0; i != rightDistance; i++) {
+                    node = node.prev;
+                }
+
+                return node;
+            }
+        } else {
+            // Here, 'elementIndex >= nextAIndex':
+            int leftDistance = elementIndex - nextAIndex;
+            int rightDistance = b.index - elementIndex;
+
+            if (leftDistance < rightDistance) {
+                // Once here, rewind the node reference from aNode to the 
+                // right:
+                Node<E> node = aNode;
+
+                for (int i = 0; i != leftDistance; i++) {
+                    node = node.next;
+                }
+
+                return node;
+            } else {
+                // Once here, rewind the node refrence from b to the left:
+                Node<E> node = b.node;
+
+                for (int i = 0; i != rightDistance; i++) {
+                    node = node.prev;
+                }
+
+                return node;
+            }
+        }
+    }
+    
+    /**
+     * Returns the {@code elementIndex}th node and normalizes the last finger.
+     *
+     * @param elementIndex the index of the desired element.
+     *
+     * @return the {@code elementIndex}th node.
+     */
+    private Node<E> getSuffixNode(int elementIndex) {
+        Finger<E> a = fingerArray[size - 2];
+        Finger<E> b = fingerArray[size - 1];
+        Node<E> bNode = b.node;
+
+        int saveBIndex = b.index;
+        int nextBIndex
+                = // TODO: Simplify.
+                a.index + (list.size - a.index) / 2;
+
+        b.index = nextBIndex;
+
+        // Rewind the finger 'b' to between 'a' and tail:
+        if (saveBIndex < nextBIndex) {
+            int distance = nextBIndex - saveBIndex;
+
+            for (int i = 0; i != distance; i++) {
+                bNode = bNode.next;
+            }
+        } else {
+            // Here, 'nextBIndex <= saveBIndex':
+            int distance = saveBIndex - nextBIndex;
+
+            for (int i = 0; i != distance; i++) {
+                bNode = bNode.prev;
+            }
+        }
+
+        b.node = bNode;
+
+        // Go get the proper node:
+        if (elementIndex < nextBIndex) {
+            // Here, the desired element node is between 'a' and 'b':
+            int leftDistance = elementIndex - a.index;
+            int rightDistance = nextBIndex - elementIndex;
+
+            if (leftDistance < rightDistance) {
+                Node<E> node = a.node;
+
+                for (int i = 0; i != leftDistance; i++) {
+                    node = node.next;
+                }
+
+                return node;
+            } else {
+                Node<E> node = b.node;
+
+                for (int i = 0; i != rightDistance; i++) {
+                    node = node.prev;
+                }
+
+                return node;
+            }
+        } else {
+            // Here, the desired element node is between 'b' and the tail 
+            // node of the list:
+            int leftDistance = elementIndex - nextBIndex;
+            int rightDistance = list.size - elementIndex - 1;
+
+            if (leftDistance < rightDistance) {
+                // Once here, rewind the node reference from bNode to the
+                // right:
+                Node<E> node = bNode;
+
+                for (int i = 0; i != leftDistance; i++) {
+                    node = node.next;
+                }
+
+                return node;
+            } else {
+                // Once here, rewind the node reference from tail to the 
+                // left:
+                Node<E> node = list.tail;
+
+                for (int i = 0; i != rightDistance; i++) {
+                    node = node.prev;
+                }
+
+                return node;
+            }
+        }
+    }
+
+    /**
+     * Inserts the input finger into the finger list such that the entire finger
+     * list is sorted by indices.
+     *
+     * @param finger the finger to insert.
+     */
+    void insertFingerAndShiftOnceToRight(Finger<E> finger) {
+        enlargeFingerArrayIfNeeded(size + 2);
+        int beforeFingerIndex = getFingerIndexImpl(finger.index);
+        System.arraycopy(
+                fingerArray,
+                beforeFingerIndex,
+                fingerArray,
+                beforeFingerIndex + 1,
+                size + 1 - beforeFingerIndex);
+
+        ++size;
+
+        // Shift fingerArray[beforeFingerIndex + 1 ... size] one position to 
+        // the right (towards larger index values):
+        shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
+        fingerArray[beforeFingerIndex] = finger;
+    }
+    
+    /**
+     * Make sure we can insert {@code roomSize} fingers starting from
+     * {@code fingerIndex}, shifting all the fingers starting from
+     * {@code numberOfNodes} to the right.
+     *
+     * @param fingerIndex the finger index of the first finger in the shifted
+     * finger slice.
+     * @param roomSize the number of free spots requested.
+     * @param numberOfNodes the shift amount of the moved fingers.
+     */
+    void makeRoomAtIndex(int fingerIndex,
+                         int roomSize,
+                         int numberOfNodes) {
+
+        shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
+        size += roomSize;
+        enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
+        // sentinel.
+        System.arraycopy(fingerArray,
+                fingerIndex,
+                fingerArray,
+                fingerIndex + roomSize,
+                size - roomSize - fingerIndex + 1);
+    }
+    
     /**
      * Makes sure that the returned finger index {@code i} points to the closest
      * finger in the finger array.
@@ -624,40 +602,6 @@ final class FingerList<E> {
         fingerArray[size] = fingerArray[size + 1];
         fingerArray[size + 1] = null;
         fingerArray[size].index = list.size;
-    }
-
-    /**
-     * Removes the finger range {@code [prefixSize, size - suffixSize]} from the
-     * finger list.
-     *
-     * @param prefixSize the length of the prefix that remains in this finger
-     * list.
-     * @param suffixSize the length of the suffix that remains in this finger
-     * list.
-     * @param nodesToRemove the number of nodes that are to be removed.
-     */
-    private void removeFingerRange(int prefixSize,
-            int suffixSize,
-            int nodesToRemove) {
-
-        int fingersToRemove = size - prefixSize - suffixSize;
-
-        shiftFingerIndicesToLeft(size - suffixSize, nodesToRemove);
-
-        System.arraycopy(fingerArray,
-                size - suffixSize,
-                fingerArray,
-                prefixSize,
-                suffixSize + 1);
-
-        size -= fingersToRemove;
-        contractFingerArrayIfNeeded(size);
-
-        Arrays.fill(fingerArray,
-                size + 1,
-                Math.min(fingerArray.length,
-                        size + 1 + fingersToRemove),
-                null);
     }
 
     /**
@@ -717,5 +661,15 @@ final class FingerList<E> {
      */
     void shiftFingerIndicesToRightOnce(int startIndex) {
         shiftFingerIndicesToRight(startIndex, 1);
+    }
+    
+    /**
+     * Returns the number of fingers in this finger list not counting the
+     * end-of-finger-list finger.
+     *
+     * @return the number of fingers in this finger list.
+     */
+    int size() {
+        return size;
     }
 }

@@ -69,7 +69,7 @@ final class Finger<E> {
     public int getIndex() {
         return index;
     }
-
+    
     /**
      * Returns the textual representation of this finger.
      *
