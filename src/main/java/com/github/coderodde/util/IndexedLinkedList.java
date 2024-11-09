@@ -2770,6 +2770,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerList.appendFinger(f);
             tmpNode = tmpNode.next;
         }
+        
+        modCount++;
     }
     
     /**
@@ -2786,7 +2788,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (removalSize == 1) {
-            // TODO: modCount update?
             remove(fromIndex);
             return;
         }
@@ -2799,6 +2800,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (toIndex == this.size) {
             removeRangeSuffixImpl(fromIndex);
             size -= (size - fromIndex);
+            modCount++;
             return;
         }
         

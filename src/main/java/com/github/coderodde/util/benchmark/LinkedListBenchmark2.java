@@ -66,7 +66,7 @@ public class LinkedListBenchmark2 {
         "RemoveFromBeginning",
         "RemoveFromEnd",
         "RemoveRandom",
-//        "RemoveRange",
+        "RemoveRange",
     };
     
     private static final String[] LIST_TYPE_NAMES = {
