@@ -1096,7 +1096,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         while (node != null) {
             tentativeSize++;
-//            System.out.println("Shit (" + tentativeSize + "): " + node);
             
             if (finger.node == node) {
                 finger = fingerList.get(++fingerCount);
@@ -3417,6 +3416,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             removeFinger();
         }
         
+        fingerList.get(fingerList.size()).index = size;
         return returnValue;
     }
     
@@ -3529,8 +3529,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     removeRangeLength);
             
             fingerList.get(fingerList.size()).index = size;
-            
-            System.out.println("CATCH ME!"); // TODO: REMOVE
             return;
         } 
         
@@ -3545,7 +3543,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                   - indexOfFirstCoveringFinger;
         
         if (fingersToAppend == 0) {
-            System.out.println("<<< fingersToAppend == 0 >>>");
             return;
         }
         
