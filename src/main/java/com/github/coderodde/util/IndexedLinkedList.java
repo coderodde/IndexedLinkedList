@@ -226,6 +226,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @param e the element to add.
      */
+    @Override
     public void addLast(E e) {
         linkLast(e);
     }
@@ -398,8 +399,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int fingerIndex = 0;
         
         for (int i = 0; i <= this.fingerList.size; i++) {
-            Finger<E> fingerCopy = new Finger<>(this.fingerList.fingerArray[i]);
-            fingerCopy.node = this.getNodeSequentially(fingerCopy.index);
+            Finger<E> fingerCopy = new Finger<>(fingerList.fingerArray[i]);
+            fingerCopy.node = getNodeSequentially(fingerCopy.index);
             other.fingerList.fingerArray[fingerIndex++] = fingerCopy;
         }
         
@@ -506,16 +507,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         sum /= size;
         return Math.max(0.0, 1.0 - sum);
-    }
-            
-    /**
-     * TODO: Remove.
-     * Returns the finger list.
-     * 
-     * @return the finger list.
-     */
-    public FingerList<E> getFingerList() {
-        return fingerList;
     }
     
     /**
@@ -783,16 +774,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public void randomizeFingers() {
         randomizeFingers(System.currentTimeMillis());
     }
-
-    /**
-     * Randomizes the fingers. Used primarily for research.
-     * 
-     * @param seed the random seed.
-     */
-    public void randomizeFingers(long seed) {
-        randomizeFingers(new Random(seed));
-        
-    }
     
     /**
      * Randomizes the fingers. Used primarily for research.
@@ -815,6 +796,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             finger.index = newFingerIndexArray[i];
             finger.node = getNodeSequentially(finger.index);
         }
+    }
+
+    /**
+     * Randomizes the fingers. Used primarily for research.
+     * 
+     * @param seed the random seed.
+     */
+    public void randomizeFingers(long seed) {
+        randomizeFingers(new Random(seed));
+        
     }
     
     /**
@@ -1103,6 +1094,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param toIndex the largest index, exclusive.
      * @return the sublist view.
      */
+    @Override
     public List<E> subList(int fromIndex, int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
         return new EnhancedSubList(this, fromIndex, toIndex);
