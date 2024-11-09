@@ -1635,12 +1635,16 @@ public class IndexedLinkedListTest {
         
         assertEquals(Arrays.asList(4, 5), subList);
         
+        list.checkInvarant();
         subList.remove(1);
+        list.checkInvarant();
         
         assertEquals(Arrays.asList(4), subList);
         assertEquals(Arrays.asList(1, 2, 3, 4, 6, 7), list);
         
+        list.checkInvarant();
         subList.remove(0);
+        list.checkInvarant();
         
         assertEquals(Arrays.asList(), subList);
         assertEquals(Arrays.asList(1, 2, 3, 6, 7), list);
@@ -1688,6 +1692,8 @@ public class IndexedLinkedListTest {
             return i % 2 == 1; // Remove odd integers.
         });
         
+        list.checkInvarant();
+        
         // subList = <2, 4, 8>
         assertEquals(Arrays.asList(2, 4, 8), subList);
         assertEquals(Arrays.asList(1, 5, 2, 4, 8, 10, 4), list);
@@ -1699,6 +1705,7 @@ public class IndexedLinkedListTest {
         List<Integer> subList = list.subList(2, 8);
         // subList = <5, 1, 8, 2, 9, 0>
         subList.replaceAll((i) -> { return i * 2; });
+        list.checkInvarant();
         
         assertEquals(Arrays.asList(10, 2, 16, 4, 18, 0), subList);
         assertEquals(Arrays.asList(4, 4, 10, 2, 16, 4, 18, 0, 1, 3), list);
@@ -1716,13 +1723,17 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(2, 5, 4), subList);
         assertEquals(Arrays.asList(3, 10, 2, 5, 4, 7, 4), list);
         
+        list.checkInvarant();
         list.clear();
+        list.checkInvarant();
         
         list.addAll(Arrays.asList(1, 3, 2, 1, 2, 3, 3, 1, 2, 0, 0));
         subList = list.subList(1, 6);
         // subList = <3, 2, 1, 2, 3>
         
+        list.checkInvarant();
         subList.retainAll(Arrays.asList(3, 4, 5));
+        list.checkInvarant();
         // subList = <3, 3>
         assertEquals(Arrays.asList(3, 3), subList);
         assertEquals(Arrays.asList(1, 3, 3, 3, 1, 2, 0, 0), list);
@@ -1733,8 +1744,11 @@ public class IndexedLinkedListTest {
         list.addAll(Arrays.asList(1, 2, 3, 4, 5));
         List<Integer> subList = list.subList(1, 4);
         // subList = <2, 3, 4>
+        list.checkInvarant();
         subList.set(0, 10);
+        list.checkInvarant();
         subList.set(2, 11);
+        list.checkInvarant();
         
         assertEquals(Arrays.asList(10, 3, 11), subList);
         assertEquals(Arrays.asList(1, 10, 3, 11, 5), list);
@@ -1753,6 +1767,8 @@ public class IndexedLinkedListTest {
         List<Integer> referenceList = new ArrayList<>(list);
         
         list.subList(10, 80).sort(Integer::compare);
+        list.checkInvarant();
+        
         referenceList.subList(10, 80).sort(Integer::compare);
         
         assertEquals(referenceList, list);
@@ -1842,7 +1858,7 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(8, 9, 5, 6, 7), clone);
     }
     
-//@Test
+    //@Test
     public void debugContractFingerArrayIfNeeded() {
         list.addAll(getIntegerList(15_877)); // 128 finger spots occupied.
         assertEquals(127, list.getFingerListSize());
@@ -1865,15 +1881,15 @@ public class IndexedLinkedListTest {
             int fromIndex = Math.min(f, t);
             int toIndex = Math.max(f, t);
             
-            list.subList(fromIndex, toIndex).clear();
-            referenceList.subList(fromIndex, toIndex).clear();
-            
             list.checkInvarant();
+            list.subList(fromIndex, toIndex).clear();
+            list.checkInvarant();
+            referenceList.subList(fromIndex, toIndex).clear();
             assertEquals(referenceList, list);
         }
     }
     
-//@Test(expected = IllegalStateException.class) 
+    //@Test(expected = IllegalStateException.class) 
     public void listEqualsThrowsOnBadIterator() {
         DummyList dummyList = new DummyList();
         list.addAll(Arrays.asList(0, 0));
@@ -1884,11 +1900,14 @@ public class IndexedLinkedListTest {
     public void offer() {
         assertTrue(list.equals(Arrays.asList()));
         
+        list.checkInvarant();
         list.offer(1);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(1)));
         
         list.offer(2);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(1, 2)));
     }
@@ -1897,11 +1916,14 @@ public class IndexedLinkedListTest {
     public void offerFirst() {
         assertTrue(list.equals(Arrays.asList()));
         
+        list.checkInvarant();
         list.offerFirst(1);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(1)));
         
         list.offerFirst(2);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(2, 1)));
     }
@@ -1910,11 +1932,14 @@ public class IndexedLinkedListTest {
     public void offerLast() {
         assertTrue(list.equals(Arrays.asList()));
         
+        list.checkInvarant();
         list.offerLast(1);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(1)));
         
         list.offerLast(2);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(1, 2)));
     }
@@ -1924,14 +1949,17 @@ public class IndexedLinkedListTest {
         assertNull(list.peek());
         
         list.addLast(0);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(0), list.peek());
         
         list.addLast(1);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(0), list.peek());
     
-        list.addFirst(Integer.valueOf(-1));
+        list.addFirst(-1);
+        list.checkInvarant();
 
         assertEquals(Integer.valueOf(-1), list.peek());
     }
@@ -2016,7 +2044,7 @@ public class IndexedLinkedListTest {
     }
     
     //@Test
-    public void removeEntrieRange() {
+    public void removeEntryRange() {
         list.addAll(Arrays.asList(1, 2, 3));
         list.removeRange(0, 3);
     }
@@ -2064,11 +2092,15 @@ public class IndexedLinkedListTest {
     public void peekFirst() {
         assertNull(list.peek());
         
+        list.checkInvarant();
         list.addLast(0);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(0), list.peekFirst());
         
+        list.checkInvarant();
         list.addFirst(1);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(1), list.peekFirst());
     
@@ -2082,14 +2114,19 @@ public class IndexedLinkedListTest {
         assertNull(list.peek());
         
         list.addLast(0);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(0), list.peekLast());
         
+        list.checkInvarant();
         list.addLast(1);
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(1), list.peekLast());
     
+        list.checkInvarant();
         list.addLast(2);
+        list.checkInvarant();
 
         assertEquals(Integer.valueOf(2), list.peekLast());
     }
@@ -2099,10 +2136,14 @@ public class IndexedLinkedListTest {
         assertNull(list.poll());
         
         list.addAll(Arrays.asList(1, 2, 3));
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(1), list.poll());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(2), list.poll());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(3), list.poll());
+        list.checkInvarant();
     }
     
     //@Test
@@ -2111,9 +2152,13 @@ public class IndexedLinkedListTest {
         
         list.addAll(Arrays.asList(1, 2, 3));
         
+        list.checkInvarant();
         assertEquals(Integer.valueOf(1), list.pollFirst());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(2), list.pollFirst());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(3), list.pollFirst());
+        list.checkInvarant();
     }
     
     //@Test
@@ -2122,9 +2167,13 @@ public class IndexedLinkedListTest {
         
         list.addAll(Arrays.asList(1, 2, 3));
         
+        list.checkInvarant();
         assertEquals(Integer.valueOf(3), list.pollLast());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(2), list.pollLast());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(1), list.pollLast());
+        list.checkInvarant();
     }
     
     //@Test(expected = NoSuchElementException.class)
@@ -2136,20 +2185,28 @@ public class IndexedLinkedListTest {
     public void pop() {
         list.addAll(Arrays.asList(1, 2, 3));
         
+        list.checkInvarant();
         assertEquals(Integer.valueOf(1), list.pop());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(2), list.pop());
+        list.checkInvarant();
         assertEquals(Integer.valueOf(3), list.pop());
+        list.checkInvarant();
     }
     
     //@Test
     public void push() {
         list.push(1);
+        list.checkInvarant();
         list.push(2);
+        list.checkInvarant();
         list.push(3);
+        list.checkInvarant();
         
         assertTrue(list.equals(Arrays.asList(3, 2, 1)));
     }
     
+    // TODO: Find where to apply.
     class BadList extends IndexedLinkedList<Integer> {
         
         class BadListIterator implements Iterator<Integer> {
@@ -2161,7 +2218,7 @@ public class IndexedLinkedListTest {
 
             @Override
             public Integer next() {
-                return Integer.valueOf(3);
+                return 3;
             }
         }
         
@@ -2176,24 +2233,25 @@ public class IndexedLinkedListTest {
     }
     
     // TODO: deal with the equals(Object)!
-////@Test(expected = IllegalStateException.class) 
-//    public void badThisIterator() {
-//        List<Integer> arrayList = Arrays.asList(3, 3);
-//        BadList badList = new BadList();
-//        badList.addAll(Arrays.asList(3, 3));
-//        badList.equals(arrayList);
-//    }
+    @Test(expected = IllegalStateException.class) 
+    public void badThisIterator() {
+        List<Integer> arrayList = Arrays.asList(3, 3);
+        BadList badList = new BadList();
+        badList.addAll(Arrays.asList(3, 3));
+        badList.equals(arrayList);
+    }
     
     //@Test
     public void removeFirstOccurrenceOfNull() {
         list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
         
         assertTrue(list.removeFirstOccurrence(null));
-        
+        list.checkInvarant();
         // Remove the last null value:
         list.set(3, 10);
         
         assertFalse(list.removeFirstOccurrence(null));
+        list.checkInvarant();
     }
     
     //@Test
@@ -2201,11 +2259,13 @@ public class IndexedLinkedListTest {
         list.addAll(Arrays.asList(1, 2, null, 4, null, 6));
         
         assertTrue(list.removeLastOccurrence(null));
+        list.checkInvarant();
         
         // Remove the last null value:
         list.set(2, 10);
         
         assertFalse(list.removeLastOccurrence(null));
+        list.checkInvarant();
     }
     
     //@Test
@@ -2219,6 +2279,7 @@ public class IndexedLinkedListTest {
         }
         
         list.addAll(arrayList);
+        list.checkInvarant();
         
         for (int i = 0; i < 20_000; i++) {
             assertEquals(Integer.valueOf(i), list.get(i));
@@ -2228,15 +2289,22 @@ public class IndexedLinkedListTest {
     //@Test
     public void smallListRemoveFirstFinger() {
         list.add(0);
+        list.checkInvarant();
         list.add(1);
+        list.checkInvarant();
         list.remove(0);
+        list.checkInvarant();
     }
     
     //@Test
     public void smallListRemoveSecondFinger() {
+        list.checkInvarant();
         list.add(0);
+        list.checkInvarant();
         list.add(1);
+        list.checkInvarant();
         list.remove(1);
+        list.checkInvarant();
     }
     
     //@Test
@@ -2304,9 +2372,9 @@ public class IndexedLinkedListTest {
     
     //@Test(expected = IndexOutOfBoundsException.class) 
     public void checkPositionIndxThrowsOnTooLargeIndex() {
-        list.add(Integer.valueOf(0));
+        list.add(0);
         
-        list.add(2, Integer.valueOf(1));
+        list.add(2, 1);
     }
     
     //@Test(expected = NoSuchElementException.class)
@@ -2324,7 +2392,9 @@ public class IndexedLinkedListTest {
         list.addAll(Arrays.asList(10, 20));
         assertEquals(Integer.valueOf(10), list.getFirst());
         
+        list.checkInvarant();
         list.removeFirst();
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(20), list.getFirst());
     }
@@ -2368,9 +2438,12 @@ public class IndexedLinkedListTest {
         Iterator<Integer> iter = list.iterator();
         
         iter.next();
+        list.checkInvarant();
         iter.remove();
+        list.checkInvarant();
         iter.next();
         iter.remove();
+        list.checkInvarant();
         
         assertEquals(0, list.size());
         assertFalse(iter.hasNext());
@@ -2385,7 +2458,9 @@ public class IndexedLinkedListTest {
         Iterator<Integer> iter = list.iterator();
         
         iter.next();
+        list.checkInvarant();
         iter.remove();
+        list.checkInvarant();
         iter.next();
         iter.next();
     }
@@ -2397,7 +2472,9 @@ public class IndexedLinkedListTest {
         ListIterator<Integer> iter = list.listIterator(1);
         
         iter.next();
+        list.checkInvarant();
         iter.remove();
+        list.checkInvarant();
         iter.set(10);
     }
     
@@ -2565,7 +2642,9 @@ public class IndexedLinkedListTest {
         list.addAll(Arrays.asList(10, 20));
         assertEquals(Integer.valueOf(20), list.getLast());
         
+        list.checkInvarant();
         list.removeLast();
+        list.checkInvarant();
         
         assertEquals(Integer.valueOf(10), list.getLast());
     }
@@ -2600,6 +2679,7 @@ public class IndexedLinkedListTest {
         assertEquals(0, list.size());
 
         list.add(1);
+        list.checkInvarant();
 
         assertEquals(1, list.size());
         assertFalse(list.isEmpty());
@@ -2607,6 +2687,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(0));
 
         list.add(2);
+        list.checkInvarant();
 
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
@@ -2621,6 +2702,7 @@ public class IndexedLinkedListTest {
         assertEquals(0, list.size());
 
         list.addFirst(1);
+        list.checkInvarant();
 
         assertEquals(1, list.size());
         assertFalse(list.isEmpty());
@@ -2628,6 +2710,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(0));
 
         list.addFirst(2);
+        list.checkInvarant();
 
         assertEquals(2, list.size());
         assertFalse(list.isEmpty());
@@ -2662,19 +2745,25 @@ public class IndexedLinkedListTest {
     //@Test
     public void addIndexAndElement() {
         list.add(0, 1);
+        list.checkInvarant();
+        
         assertEquals(Integer.valueOf(1), list.get(0));
 
         list.add(0, 2);
+        list.checkInvarant();
+        
         assertEquals(Integer.valueOf(2), list.get(0));
         assertEquals(Integer.valueOf(1), list.get(1));
 
         list.add(2, 10);
+        list.checkInvarant();
 
         assertEquals(Integer.valueOf(2), list.get(0));
         assertEquals(Integer.valueOf(1), list.get(1));
         assertEquals(Integer.valueOf(10), list.get(2));
 
         list.add(2, 100);
+        list.checkInvarant();
 
         assertEquals(Integer.valueOf(2), list.get(0));
         assertEquals(Integer.valueOf(1), list.get(1));
@@ -2688,6 +2777,7 @@ public class IndexedLinkedListTest {
         c.add(100);
 
         list.addAll(c);
+        list.checkInvarant();
 
         assertFalse(list.isEmpty());
         assertEquals(1, list.size());
@@ -2713,9 +2803,13 @@ public class IndexedLinkedListTest {
     //@Test
     public void addCollectionAtIndex() {
         list.addAll(0, Arrays.asList(2, 3)); // setAll
+        list.checkInvarant();
         list.addAll(0, Arrays.asList(0, 1)); // prependAll
+        list.checkInvarant();
         list.addAll(4, Arrays.asList(6, 7)); // appendAll
+        list.checkInvarant();
         list.addAll(4, Arrays.asList(4, 5)); // insertAll
+        list.checkInvarant();
 
         for (int i = 0; i < list.size(); i++) {
             assertEquals(Integer.valueOf(i), list.get(i));
@@ -2728,18 +2822,23 @@ public class IndexedLinkedListTest {
 
         // [0, 1, 2, 3, 4]
         assertEquals(Integer.valueOf(0), list.remove(0));
+        list.checkInvarant();
         // [1, 2, 3, 4]
         assertEquals(Integer.valueOf(4), list.remove(3));
+        list.checkInvarant();
         // [1, 2, 3]
         assertEquals(Integer.valueOf(2), list.remove(1));
+        list.checkInvarant();
         // [1, 3]
         assertEquals(Integer.valueOf(1), list.remove(0));
+        list.checkInvarant();
         // [3]
         assertEquals(Integer.valueOf(3), list.remove(0));
+        list.checkInvarant();
         // []
     }
 
-    //@Test // shadowed
+    //@Test
     public void basicIteratorUsage() {
         for (int i = 0; i < 1000; i++) {
             list.add(i);
@@ -2762,21 +2861,25 @@ public class IndexedLinkedListTest {
         List<Integer> referenceList = new ArrayList<>(list);
         
         list.removeFirst();
+        list.checkInvarant();
         referenceList.remove(0);
         
         assertTrue(listsEqual(list, referenceList));
         
         list.removeFirst();
+        list.checkInvarant();
         referenceList.remove(0);
         
         assertTrue(listsEqual(list, referenceList));
         
         list.removeLast();
+        list.checkInvarant();
         referenceList.remove(referenceList.size() - 1);
         
         assertTrue(listsEqual(list, referenceList));
         
         list.removeLast();
+        list.checkInvarant();
         referenceList.remove(referenceList.size() - 1);
         
         assertTrue(listsEqual(list, referenceList));
