@@ -3885,6 +3885,54 @@ public class IndexedLinkedListTest {
         }
     }
 
+    @Test
+    public void bruteForceRemoveFirstOccurrence() {
+        final Random random = new Random(13L);
+        
+        for (int i = 0; i < 100; i++) {
+            list.add(random.nextInt(30));
+        }
+        
+        final LinkedList<Integer> referenceList = new LinkedList<>(list);
+        
+        while (!list.isEmpty()) {
+            final int target = random.nextInt(40);
+            
+            assertEquals(referenceList, list);
+            
+            list.removeFirstOccurrence(target);
+            list.checkInvarant();
+            
+            referenceList.removeFirstOccurrence(target);
+            
+            assertEquals(referenceList, list);
+        }
+    }
+
+    @Test
+    public void bruteForceRemoveLastOccurrence() {
+        final Random random = new Random(13L);
+        
+        for (int i = 0; i < 100; i++) {
+            list.add(random.nextInt(30));
+        }
+        
+        final LinkedList<Integer> referenceList = new LinkedList<>(list);
+        
+        while (!list.isEmpty()) {
+            final int target = random.nextInt(40);
+            
+            assertEquals(referenceList, list);
+            
+            list.removeLastOccurrence(target);
+            list.checkInvarant();
+            
+            referenceList.removeLastOccurrence(target);
+            
+            assertEquals(referenceList, list);
+        }
+    }
+    
     private static List<Integer> getIntegerList(int length) {
         List<Integer> list = new ArrayList<>(length);
 
