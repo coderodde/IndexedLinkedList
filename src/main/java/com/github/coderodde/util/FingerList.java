@@ -24,6 +24,7 @@
 package com.github.coderodde.util;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * This inner class implements the finger list data structure for managing list
@@ -56,6 +57,35 @@ final class FingerList<E> {
     FingerList(IndexedLinkedList<E> list) {
         this.list = list;
         this.fingerArray[0] = new Finger<>(null, 0);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        
+        if (o == this) {
+            return true;
+        }
+        
+        if (!o.getClass().equals(this.getClass())) {
+            return false;
+        }
+        
+        final FingerList<E> other = (FingerList<E>) o;
+        
+        if (size != other.size) {
+            return false;
+        }
+        
+        for (int i = 0; i < size; i++) {
+            if (!Objects.equals(fingerArray[i], other.fingerArray[i])) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @Override

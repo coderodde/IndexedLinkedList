@@ -80,6 +80,15 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
+    @Test
+    public void deepCopy() {
+        list.addAll(getIntegerList(26));
+        list.randomizeFingers(11L);
+        final IndexedLinkedList<Integer> copy = list.deepCopy();
+        assertTrue(listsEqual(list, copy));
+        assertEquals(list.fingerList, copy.fingerList);
+    }
+    
     @Test // Passes.
     public void removeIntAtLastIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));

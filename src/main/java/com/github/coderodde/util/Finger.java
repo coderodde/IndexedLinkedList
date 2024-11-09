@@ -23,6 +23,8 @@
  */
 package com.github.coderodde.util;
 
+import java.util.Objects;
+
 /**
  * This static inner class implements the actual finger.
  *
@@ -68,6 +70,26 @@ final class Finger<E> {
      */
     public int getIndex() {
         return index;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        
+        if (o == this) {
+            return true;
+        }
+        
+        if (!o.getClass().equals(this.getClass())) {
+            return false;
+        }
+        
+        final Finger<E> other = (Finger<E>) o;
+        
+        return Objects.equals(index, other.index) &&
+               Objects.equals(node, other.node);
     }
     
     /**

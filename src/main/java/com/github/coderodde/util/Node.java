@@ -23,6 +23,8 @@
  */
 package com.github.coderodde.util;
 
+import java.util.Objects;
+
 /**
  * This static inner class implements the actual linked list node.
  *
@@ -54,6 +56,32 @@ final class Node<E> {
      */
     Node(E item) {
         this.item = item;
+    }
+    
+    /**
+     * Returns {@code true} if and only if the input object is another node with
+     * the same item.
+     * 
+     * @param o the object to test.
+     * 
+     * @return {@code true} iff the two nodes are the same. 
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        
+        if (o == this) {
+            return true;
+        }
+        
+        if (!getClass().equals(o.getClass())) {
+            return false;
+        }
+        
+        final Node<E> other = (Node<E>) o;
+        return Objects.equals(this.item, other.item);
     }
 
     /**
