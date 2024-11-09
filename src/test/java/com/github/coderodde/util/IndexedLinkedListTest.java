@@ -842,10 +842,6 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println(
-                        "bruteForceSubListClearFromTo(): iteration = " 
-                                + iteration);
-                
                 list.clear();
                 list.addAll(data);
                 referenceList.clear();
@@ -858,13 +854,11 @@ public class IndexedLinkedListTest {
                 assertEquals(referenceList, list);
             }
         }
-        
-        System.out.println("bruteForceSubListClearFromTo passed.");
     }
     
-    @Test
+    //@Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
-        Random random = new Random(13L);
+        Random random = new Random(666L);
         
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -872,10 +866,6 @@ public class IndexedLinkedListTest {
         for (int fromIndex = 0; fromIndex <= 100; fromIndex++) {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
-                
-                System.out.println(
-                        "bruteForceSubListClearFromToWithRandomization(): iteration = " 
-                                + iteration);
                 
                 list.clear();
                 list.addAll(data);
@@ -893,7 +883,7 @@ public class IndexedLinkedListTest {
         }
     }
     
-    //@Test
+    //@Test // Passes.
     public void bruteForceSublistClearOnSmallLists() {
         long seed = 1662121251795L;
         System.out.println("seed == " + seed);
@@ -919,21 +909,21 @@ public class IndexedLinkedListTest {
         }  
     }
     
-    //@Test
+    //@Test // Passes.
     public void debugRemoveRange() {
         list.addAll(getIntegerList(15));
         list.subList(6, 11).clear();
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void debugSmallSublistClear1() {
         list.addAll(getIntegerList(14));
         list.subList(3, 7).clear();
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void optmize() {
         list.addAll(getIntegerList(100));
         Random random = new Random(100L);
@@ -947,7 +937,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    //@Test
+    //@Test // Passes.
     public void removeFromRange() {
         list.addAll(getIntegerList(10));
         List<Integer> referenceList = new ArrayList<>(list);
@@ -961,7 +951,9 @@ public class IndexedLinkedListTest {
         subList2.remove(Integer.valueOf(0));
         
         // Remove from IndexedLinkedList:
+        list.checkInvarant();
         subList1.remove(Integer.valueOf(0));
+        list.checkInvarant();
         
         assertEquals(subList2, subList1);
         
@@ -979,7 +971,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
     public void sort() {
         Random random = new Random(1L);
         
@@ -1001,7 +993,18 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    //@Test
+    //@Test // Passes.
+    public void distributeFingersOnSmallerList() {
+        list.addAll(getIntegerList(20));
+        final Random random = new Random(13);
+        Collections.shuffle(list, random);
+        list.randomizeFingers(random);
+        
+        list.distributeFingers(5, list.size() - 3);
+        list.checkInvarant();
+    }
+    
+    //@Test // Passes.
     public void sortSubLists() {
         Random random = new Random(12L);
         
@@ -1018,20 +1021,23 @@ public class IndexedLinkedListTest {
             int toIndex = Math.max(f, t);
             
             Comparator<Integer> cmp = Integer::compare;
-            System.out.println("i = " + i);
+            list.checkInvarant();
             list.subList(fromIndex, toIndex).sort(cmp);
+            list.checkInvarant();
             referenceList.subList(fromIndex, toIndex).sort(cmp);
             
             assertEquals(referenceList, list);
         }
     }
     
-    //@Test
+    @Test // Passes.
     public void sortSubListOfSubList() {
         list.addAll(Arrays.asList(4, 1, 0, 2, 6, 8, 4, 1, 3));
         List<Integer> referenceList = new ArrayList<>(list);
         Comparator<Integer> cmp = Integer::compare;
+        list.checkInvarant();
         list.subList(1, 7).subList(1, 4).sort(cmp);
+        list.checkInvarant();
         referenceList.subList(1, 7).subList(1, 4).sort(cmp);
         assertEquals(referenceList, list);
     }

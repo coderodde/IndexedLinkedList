@@ -2444,14 +2444,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
-        int startOffset = numberOfElementsPerFinger / 2;
-        int index = fromIndex + startOffset;
+        int index = fromIndex;
         
         Node<E> node = node(fromIndex);
-        node = scrollNodeToRight(node, startOffset);
         
         for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
-            Finger<E> finger = fingerList.get(i);
+            Finger<E> finger = fingerList.get(i + fingerPrefixLength);
             finger.node = node;
             finger.index = index;
             
@@ -2464,8 +2462,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Since we cannot advance node to the right, we need to deal with the
         // last (non-sentinel) finger manually:
-        Finger<E> lastFinger = fingerList.get(fingerList.size() - 1);
-        lastFinger.node = node;
+        Finger<E> lastFinger =
+                fingerList.get(
+                        numberOfRangeFingers - 1 + fingerPrefixLength);
+        
+        lastFinger.node  = node;
         lastFinger.index = index;
     }
     
