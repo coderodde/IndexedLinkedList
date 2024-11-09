@@ -16,8 +16,6 @@
  */
 package com.github.coderodde.util;
 
-import com.github.coderodde.util.IndexedLinkedList.Finger;
-import com.github.coderodde.util.IndexedLinkedList.Node;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +23,7 @@ import org.junit.Test;
 public class FingerListTest {
 
     private final IndexedLinkedList<Integer> list = new IndexedLinkedList<>();
-    private final IndexedLinkedList<Integer>.FingerList<Integer> fl = 
-            list.fingerList;
+    private final FingerList<Integer> fl = list.fingerList;
     
     @Before
     public void setUp() {
