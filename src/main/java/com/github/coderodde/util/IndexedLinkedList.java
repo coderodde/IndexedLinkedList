@@ -2399,15 +2399,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Once here, the only free spots are at the very beginning of the
         // finger list:
-        for (int i = 0; i < fingerList.size(); ++i) {
+        for (int i = 0; i <= fingerIndex; ++i) {
             Finger<E> fngr = fingerList.get(i);
             fngr.index--;
             fngr.node = fngr.node.prev;
         }
         
-        // The end-of-finger-list node has no Finger<E>.node defined. Take it 
-        // outside of the above loop and decrement its index manually: 
-        fingerList.get(fingerList.size()).index--;
+        fingerList.shiftFingerIndicesToLeft(fingerIndex + 1, 1);
     }
     
     /**
@@ -2987,11 +2985,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Finger<E> fingerRight = fingerList.get(j);
             
             if (fingerLeft.index + 1 < fingerRight.index) {
-                for (int i = fingerIndex; i > 0; --i) {
-                    Finger<E> fngr = fingerList.get(i);
+                for (int k = j; k <= fingerIndex; k++) {
+                    Finger<E> fngr = fingerList.get(k);
                     fngr.node = fngr.node.prev;
                     fngr.index--;
                 }
+                    
+//                for (int i = fingerIndex; i > 0; --i) {
+//                    Finger<E> fngr = fingerList.get(i);
+//                    fngr.node = fngr.node.prev;
+//                    fngr.index--;
+//                }
                 
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 return true;

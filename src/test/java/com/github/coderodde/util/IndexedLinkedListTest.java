@@ -4019,4 +4019,58 @@ public class IndexedLinkedListTest {
         
         assertEquals(Integer.valueOf(9), datum);
     }
+    
+    @Test
+    public void listIteratorRemove() {
+        list.addAll(getIntegerList(100));
+        referenceList.addAll(list);
+        
+        final Random random = new Random(13L);
+        final int initialIndex = random.nextInt(list.size() + 1);
+        
+        final ListIterator<Integer> listIterator = 
+                list.listIterator(initialIndex);
+        
+        final ListIterator<Integer> referenceListIterator = 
+                referenceList.listIterator(initialIndex);
+        
+        boolean previousMove = false;
+        
+        while (!list.isEmpty()) {
+            
+            final int coin = random.nextInt(3);
+            
+            switch (coin) {
+                case 0:
+                    if (listIterator.hasPrevious()) {
+                        listIterator.previous();
+                        referenceListIterator.previous();
+                        previousMove = true;
+                    }
+                    
+                    break;
+                    
+                case 1:
+                    if (listIterator.hasNext()) {
+                        listIterator.next();
+                        referenceListIterator.next();
+                        previousMove = true;
+                    }
+                    
+                    break;
+                    
+                case 2:
+                    if (previousMove) {
+                        previousMove = false;
+                        list.checkInvarant();
+                        listIterator.remove();
+                        list.checkInvarant();
+                        referenceListIterator.remove();
+                        assertEquals(referenceList, list);
+                    }
+                    
+                    break;
+            }
+        }
+    }
 }

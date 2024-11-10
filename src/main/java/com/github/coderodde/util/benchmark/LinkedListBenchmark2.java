@@ -154,8 +154,8 @@ public class LinkedListBenchmark2 {
     }
     
     public static void main(String[] args) {
-        deleteRange();
-        System.exit(0);
+//        deleteRange();
+//        System.exit(0);
         
         try (AffinityLock al = AffinityLock.acquireLock()) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
