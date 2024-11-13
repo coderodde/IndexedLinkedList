@@ -451,9 +451,7 @@ final class FingerList<E> {
         Node<E> bNode = b.node;
 
         int saveBIndex = b.index;
-        int nextBIndex
-                = // TODO: Simplify.
-                a.index + (list.size - a.index) / 2;
+        int nextBIndex = (a.index + list.size) / 2;
 
         b.index = nextBIndex;
 
@@ -562,19 +560,19 @@ final class FingerList<E> {
      * @param roomSize the number of free spots requested.
      * @param numberOfNodes the shift amount of the moved fingers.
      */
-    void makeRoomAtIndex(int fingerIndex,
-                         int roomSize,
-                         int numberOfNodes) {
+        void makeRoomAtIndex(int fingerIndex,
+                             int roomSize,
+                             int numberOfNodes) {
 
         shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
         size += roomSize;
         enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
         // sentinel.
         System.arraycopy(fingerArray,
-                fingerIndex,
-                fingerArray,
-                fingerIndex + roomSize,
-                size - roomSize - fingerIndex + 1);
+                         fingerIndex,
+                         fingerArray,
+                         fingerIndex + roomSize,
+                         size - roomSize - fingerIndex + 1);
     }
     
     /**

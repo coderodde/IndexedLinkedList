@@ -2326,6 +2326,7 @@ public class IndexedLinkedListTest {
         }
         
         list.addAll(l);
+        list.checkInvarant();
         
         l = new ArrayList<>();
         
@@ -2334,6 +2335,7 @@ public class IndexedLinkedListTest {
         }
         
         list.addAll(0, l);
+        list.checkInvarant();
         
         int index = 0;
         

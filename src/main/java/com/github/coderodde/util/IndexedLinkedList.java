@@ -2447,7 +2447,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void prependAll(Collection<? extends E> c) {
         Iterator<? extends E> iterator = c.iterator();
-        Node<E> oldFirst = head;
+        Node<E> oldHead = head;
         head = new Node<>(iterator.next());
 
         Node<E> prevNode = head;
@@ -2459,8 +2459,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             prevNode = newNode;
         }
 
-        prevNode.next = oldFirst;
-        oldFirst.prev = prevNode;
+        prevNode.next = oldHead;
+        oldHead.prev = prevNode;
 
         int sz = c.size();
         modCount++;
@@ -2852,22 +2852,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Scrolls the input node {@code scrolls} positions towards the head of the
-     * linked list and returns the reached node.
-     * 
-     * @param startNode the node from which to start the scrolling.
-     * @param scrolls   the number of positions to scroll.
-     * @return          the reached node.
-     */
-    private Node<E> scrollNodeToLeft(Node<E> startNode, int scrolls) {
-        for (int i = 0; i < scrolls; i++) {
-            startNode = startNode.prev;
-        }
-        
-        return startNode;
-    }
-    
-    /**
      * Scrolls the input node {@code scrolls} positions towards the tail of the
      * linked list and returns the reached node.
      * 
@@ -2990,13 +2974,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fngr.node = fngr.node.prev;
                     fngr.index--;
                 }
-                    
-//                for (int i = fingerIndex; i > 0; --i) {
-//                    Finger<E> fngr = fingerList.get(i);
-//                    fngr.node = fngr.node.prev;
-//                    fngr.index--;
-//                }
-                
+                   
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 return true;
             }
