@@ -2806,6 +2806,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (fingersToRemove == 0) {
             System.out.println("fingersToRemove == 0");
             
+            if (coveredFingers > 0) {
+                System.out.println("    coveredFingers > 0");
+                
+                int fingerPrefixLength = fromFingerIndex;
+                int fingerSuffixLength = fingerList.size() - toFingerIndex;
+                
+                int listPrefixFreeSpots = fromIndex;
+                int listSuffixFreeSpots = size - toIndex;
+                
+                int freeFingerPrefixSpots = listPrefixFreeSpots
+                                          - fingerPrefixLength;
+                
+                int freeFingerSuffixSpots = listSuffixFreeSpots 
+                                          - fingerSuffixLength;
+                
+                int freeSpots = freeFingerPrefixSpots + 
+                                freeFingerSuffixSpots;
+                
+                float leftRatio = (float)(freeFingerPrefixSpots) / 
+                                  (float)(freeSpots);
+                
+                int leftCoveredFingers = 
+                        (int)(leftRatio * freeFingerPrefixSpots);
+                
+                int rightCoveredFingers = freeFingerPrefixSpots
+                                        - leftCoveredFingers;
+                
+                shiftCoveredFingersToPrefix(leftCoveredFingers,
+                                            fromFingerIndex);
+                
+                shiftCoveredFignersToSuffix(rightCoveredFingers,
+                                            toFingerIndex);
+                
+                return;
+            }
+            
             Node<E> startNode = fingerList.getNodeNoFingersFix(fromIndex);
             Node<E> endNode = fingerList.getNodeNoFingersFix(toIndex);
             
@@ -2839,6 +2875,75 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  fromFingerIndex,
                                  coveredFingers);
         }
+    }
+    
+    /**
+     * Moves the {@code leftCoveredFingers} covered fingers to the finger list
+     * prefix.
+     * 
+     * @param leftCoveredFingers number of covered fingers going to the finger
+     *                           list prefix.
+     * @param fromFingerIndex    the index of the leftmost finger to shift.
+     */
+    private void shiftCoveredFingersToPrefix(int leftCoveredFingers,
+                                             int fromFingerIndex) {
+        if (leftCoveredFingers == 0) {
+            System.out.println("leftCoveredFingers == 0");
+            return;
+        }
+        
+        int freeFingerSpotsSoFar = 0;
+        int i = fromFingerIndex;
+        
+        for (; i > 0; i--) {
+            Finger<E> f1 = fingerList.get(i);
+            Finger<E> f2 = fingerList.get(i - 1);
+            int diff = f1.index - f2.index - 1;
+            freeFingerSpotsSoFar += diff;
+            
+            if (freeFingerSpotsSoFar >= leftCoveredFingers) {
+                break;
+            }
+        }
+        
+        // Do the actual shifting:
+        Finger<E> previousFinger = fingerList.get(i);
+        
+        for (int j = 0; j < leftCoveredFingers; j++) {
+            Finger<E> currentFinger = fingerList.get(i - j);
+            currentFinger.index = previousFinger.index - 1;
+            currentFinger.node  = previousFinger.node.prev;
+            previousFinger = currentFinger;
+        }
+    }
+    
+    private void shiftCoveredFignersToSuffix(int rightCoveredFingers,
+                                             int toFingerIndex) {
+        if (rightCoveredFingers == 0) {
+            System.out.println("rightCoveredFingers == 0");
+            return;
+        }
+        
+        int freeFingerSpotsSoFar = 0;
+        int i = toFingerIndex;
+        
+        for (; i < fingerList.size(); i++) {
+            Finger<E> f1 = fingerList.get(i);
+            Finger<E> f2 = fingerList.get(i + 1);
+            int diff = f2.index - f1.index - 1;
+            freeFingerSpotsSoFar += diff;
+            
+            if (freeFingerSpotsSoFar >= rightCoveredFingers) {
+                break;
+            }
+        }
+        
+        Finger<E> previousFinger = fingerList.get(i);
+        
+//        for (int j = 0; j < rightCoveredFingers; j++) {
+//            Finger<E> currentFinger = fingerList.get(i + j);
+//            currentFinger.index
+//        }
     }
     
     private void deleteNodeRange(Node<E> startNode, Node<E> endNode) {
