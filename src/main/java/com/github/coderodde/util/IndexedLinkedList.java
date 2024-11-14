@@ -2795,14 +2795,107 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return;
         }
         
-        if (toIndex == this.size) {
-            removeRangeSuffixImpl(fromIndex);
-            size -= (size - fromIndex);
+        int fromFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
+        int toFingerIndex   = fingerList.getFingerIndexImpl(toIndex);
+        
+        int coveredFingers = toFingerIndex - fromFingerIndex;
+        int fingersToRemove = getRecommendedNumberOfFingers() 
+                            - getRecommendedNumberOfFingers(
+                                    size - removalSize);
+        
+        if (fingersToRemove == 0) {
+            System.out.println("fingersToRemove == 0");
+            
+            Node<E> startNode = fingerList.getNodeNoFingersFix(fromIndex);
+            Node<E> endNode   = fingerList.getNodeNoFingersFix(toIndex).prev;
+            
+            fingerList.shiftFingerIndicesToLeft(toFingerIndex,
+                                                removalSize);
+            
+            deleteNodeRange(startNode, 
+                            endNode);
+            
             modCount++;
+            size -= removalSize;
             return;
         }
         
-        removeRangeImpl(fromIndex, toIndex);
+        if (fingersToRemove < coveredFingers) {
+            System.out.println("fingersToRemove < coveredFingers");
+            removeRangeImplCase1();
+        } else if (fingersToRemove > coveredFingers) {
+            System.out.println("fingersToRemove > coveredFingers");
+            removeRangeImplCase2();
+        } else {
+            System.out.println("fingersToRemove == coveredFingers");
+            // Here, fingersToRemove == coveredFingers:
+            removeRangeImplCase3(removalSize,
+                                 fromFingerIndex,
+                                 coveredFingers);
+        }
+    }
+    
+    private void deleteNodeRange(Node<E> startNode, Node<E> endNode) {
+        Node<E> currentNode = startNode;
+        Node<E> nextNode;
+        
+        Node<E> prevStartNode = startNode.prev;
+        Node<E> nextEndNode   = endNode.next;
+        
+        // Get rid of all the nodes in the removed range:
+        do {
+            nextNode = currentNode.next;
+            currentNode.item = null;
+            currentNode.prev = null;
+            currentNode.next = null;
+            currentNode = nextNode;
+        } while (currentNode != nextEndNode);
+        
+        // Stitch the list:
+        if (prevStartNode == null) {
+            head = nextEndNode;
+            nextEndNode.prev = null;
+        } else if (nextEndNode == null) {
+            tail = prevStartNode;
+            prevStartNode.next = null;
+        } else {
+            prevStartNode.next = nextEndNode;
+            nextEndNode.prev = prevStartNode;
+        }
+    }
+    
+    private void removeRangeImplCase1() {
+        
+    }
+    
+    private void removeRangeImplCase2() {
+        
+    }
+    
+    private void removeRangeImplCase3(int removalLength,
+                                      int fromFingerIndex,
+                                      int coveredFingers) {
+        
+        // 1. Shift fingers[fromFingerIndex + coveredFingers, ..., f.size] to
+        //    figners[fromIndex, ..., f.size - coveredFingers]:
+        System.arraycopy(
+                fingerList.fingerArray, 
+                fromFingerIndex + coveredFingers, 
+                fingerList.fingerArray, 
+                fromFingerIndex, 
+                coveredFingers);
+        
+        int leftovers = fingerList.size() - fromFingerIndex - coveredFingers;
+        
+        Arrays.fill(fingerList.fingerArray, 
+                    fingerList.size - leftovers, 
+                    fingerList.size, 
+                    null);
+        
+        fingerList.size -= leftovers;
+        fingerList.contractFingerArrayIfNeeded(fingerList.size + 1);
+        fingerList.shiftFingerIndicesToLeft(fromFingerIndex,
+                                            removalLength);
     }
     
     /**

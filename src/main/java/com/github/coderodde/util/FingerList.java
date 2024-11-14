@@ -165,7 +165,7 @@ final class FingerList<E> {
      * @param nextSize the requested size not counting the end-of-finger-list
      * sentinel finger.
      */
-    private void contractFingerArrayIfNeeded(int nextSize) {
+    void contractFingerArrayIfNeeded(int nextSize) {
         // Can we contract at least once?
         if ((nextSize + 1) * 4 < fingerArray.length
                 && fingerArray.length > 2 * INITIAL_CAPACITY) {
@@ -256,6 +256,24 @@ final class FingerList<E> {
         }
 
         return idx;
+    }
+    
+    Node<E> getNodeNoFingersFix(int index) {
+        Finger finger = fingerArray[getClosestFingerIndex(index)];
+        int steps = finger.index - index;
+        Node<E> node = finger.node;
+        
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                node = node.prev;
+            }
+        } else {
+            for (int i = 0; i < -steps; i++) {
+                node = node.next;
+            }
+        }
+
+        return node;
     }
     
     /**
@@ -641,6 +659,27 @@ final class FingerList<E> {
      */
     void setFinger(int index, Finger<E> finger) {
         fingerArray[index] = finger;
+    }
+    
+    /**
+     * Sets all the leftmost {@code indices.length] fingers to the specified 
+     * indices.
+     * 
+     * @param indices the target indices.
+     */
+    void setFingers(int... indices) {
+        Arrays.sort(indices);
+        int fingerIndex = 0;
+        
+        for (final int index : indices) {
+            final Finger<E> finger = fingerArray[fingerIndex++];
+            finger.index = index;
+            finger.node = getNodeSequentially(index);
+        }
+    }
+    
+    private Node<E> getNodeSequentially(final int index) {
+        return list.getNodeSequentially(index);
     }
 
     /**

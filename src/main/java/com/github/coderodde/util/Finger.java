@@ -71,27 +71,27 @@ final class Finger<E> {
     public int getIndex() {
         return index;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
             return false;
         }
-        
+
         if (o == this) {
             return true;
         }
-        
+
         if (!o.getClass().equals(this.getClass())) {
             return false;
         }
-        
+
         final Finger<E> other = (Finger<E>) o;
-        
-        return Objects.equals(index, other.index) &&
-               Objects.equals(node, other.node);
+
+        return Objects.equals(index, other.index)
+                && Objects.equals(node, other.node);
     }
-    
+
     /**
      * Returns the textual representation of this finger.
      *
@@ -102,5 +102,31 @@ final class Finger<E> {
         return "[Finger; index = " + index
                 + ", item = " + ((node == null) ? "null" : node.item)
                 + "]";
+    }
+
+    /**
+     * Moves this finger {@code steps} position to the left.
+     *
+     * @param steps the number of steps to rewind.
+     */
+    void rewindLeft(int steps) {
+        for (int i = 0; i < steps; i++) {
+            node = node.prev;
+        }
+
+        index -= steps;
+    }
+
+    /**
+     * Moves this finger {@code steps} position to the right.
+     *
+     * @param steps the number of steps to rewind.
+     */
+    void rewindRight(int steps) {
+        for (int i = 0; i < steps; i++) {
+            node = node.next;
+        }
+
+        index += steps;
     }
 }
