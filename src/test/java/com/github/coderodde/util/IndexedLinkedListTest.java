@@ -879,6 +879,34 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
+    @Test
+    public void removeRangeSmall2() {
+        list.addAll(getIntegerList(9));
+        list.fingerList.setFingers(4, 6, 7);
+        list.checkInvarant();
+        referenceList.addAll(list);
+        
+        list.subList(0, 3).clear();
+        list.checkInvarant();
+        referenceList.subList(0, 3).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void removeRangeSmall3() {
+        list.addAll(getIntegerList(9));
+        list.fingerList.setFingers(1, 2, 4);
+        list.checkInvarant();
+        referenceList.addAll(list);
+        
+        list.subList(6, 9).clear();
+        list.checkInvarant();
+        referenceList.subList(6, 9).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
     //@Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(666L);

@@ -2807,7 +2807,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             System.out.println("fingersToRemove == 0");
             
             Node<E> startNode = fingerList.getNodeNoFingersFix(fromIndex);
-            Node<E> endNode   = fingerList.getNodeNoFingersFix(toIndex).prev;
+            Node<E> endNode = fingerList.getNodeNoFingersFix(toIndex);
+            
+            if (endNode == null) {
+                endNode = tail;
+            } else {
+                endNode = endNode.prev;
+            }
             
             fingerList.shiftFingerIndicesToLeft(toFingerIndex,
                                                 removalSize);
@@ -2856,8 +2862,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             head = nextEndNode;
             nextEndNode.prev = null;
         } else if (nextEndNode == null) {
-            tail = prevStartNode;
             prevStartNode.next = null;
+            tail = prevStartNode;
         } else {
             prevStartNode.next = nextEndNode;
             nextEndNode.prev = prevStartNode;
