@@ -2946,9 +2946,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = node.next;
         }
         
-        fingerList.shiftFingerIndicesToLeft(
-                fromFingerIndex + leftCoveredFingers,
-                removalLength);
+//        fingerList.shiftFingerIndicesToLeft(
+//                fromFingerIndex + leftCoveredFingers,
+//                removalLength);
     }
     
     private void shiftCoveredFignersToSuffix(int rightCoveredFingers,
