@@ -2836,7 +2836,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 // Shift the fingers to prefix and/or suffix:
                 shiftCoveredFingersToPrefix(leftCoveredFingers,
-                                            fromFingerIndex);
+                                            fromFingerIndex,
+                                            removalLength);
                 
                 shiftCoveredFignersToSuffix(rightCoveredFingers,
                                             toFingerIndex,
@@ -2893,7 +2894,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fromFingerIndex    the index of the leftmost finger to shift.
      */
     private void shiftCoveredFingersToPrefix(int leftCoveredFingers,
-                                             int fromFingerIndex) {
+                                             int fromFingerIndex,
+                                             int removalLength) {
         if (leftCoveredFingers == 0) {
             System.out.println("leftCoveredFingers == 0");
             return;
@@ -2922,6 +2924,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             currentFinger.node  = previousFinger.node.prev;
             previousFinger = currentFinger;
         }
+        
+        fingerList.get(i + 1).rewindLeft(leftCoveredFingers);
+//        fingerList.shiftFingerIndicesToLeft(i + 2, removalLength);
     }
     
     private void shiftCoveredFignersToSuffix(int rightCoveredFingers,

@@ -907,7 +907,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void removeRangeSmall4() {
         list.addAll(getIntegerList(9));
         list.fingerList.setFingers(2, 4, 7);
@@ -931,6 +931,20 @@ public class IndexedLinkedListTest {
         list.subList(11, 13).clear();
         list.checkInvarant();
         referenceList.subList(11, 13).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void removeRangeMedium2() {
+        list.addAll(getIntegerList(100));
+        list.fingerList.setFingers(5, 15, 25, 35, 45, 55, 60, 61, 62, 63);
+        list.checkInvarant();
+        referenceList.addAll(list);
+        
+        list.subList(61, 63).clear();
+        list.checkInvarant();
+        referenceList.subList(61, 63).clear();
         
         assertEquals(referenceList, list);
     }
