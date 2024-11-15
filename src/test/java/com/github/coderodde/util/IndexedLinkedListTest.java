@@ -921,6 +921,20 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
+    @Test
+    public void removeRangeMedium1() {
+        list.addAll(getIntegerList(100));
+        list.fingerList.setFingers(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
+        list.checkInvarant();
+        referenceList.addAll(list);
+        
+        list.subList(11, 13).clear();
+        list.checkInvarant();
+        referenceList.subList(11, 13).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
     //@Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(666L);
