@@ -2924,8 +2924,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Do the actual shifting:
         // Shift the space in prefix:
         Finger<E> previousFinger = fingerList.get(i);
-        Node<E> node = previousFinger.node.next;
         previousFinger.rewindLeft(leftCoveredFingers);
+        Node<E> node = previousFinger.node.next;
         
         for (int k = 1; k < leftCoveredFingers; k++) {
             Finger<E> f = fingerList.get(i + k);
@@ -2945,7 +2945,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             auxFinger.node = node;
             node = node.next;
         }
-////        fingerList.shiftFingerIndicesToLeft(i + 2, removalLength);
+        
+        fingerList.shiftFingerIndicesToLeft(
+                fromFingerIndex + leftCoveredFingers,
+                removalLength);
     }
     
     private void shiftCoveredFignersToSuffix(int rightCoveredFingers,

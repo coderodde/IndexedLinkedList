@@ -921,7 +921,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void removeRangeMedium1() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingers(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
@@ -935,7 +935,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void removeRangeMedium2() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingers(5, 15, 25, 35, 45, 55, 60, 61, 62, 63);
@@ -949,7 +949,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void removeRangePrefix1() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingers(0, 1, 2, 3, 10, 20, 30, 40, 50, 70);
