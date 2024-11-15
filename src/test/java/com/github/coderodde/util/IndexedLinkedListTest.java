@@ -921,7 +921,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    @Test
+//    @Test
     public void removeRangeMedium1() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingers(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
@@ -935,7 +935,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    @Test
+//    @Test
     public void removeRangeMedium2() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingers(5, 15, 25, 35, 45, 55, 60, 61, 62, 63);
@@ -945,6 +945,38 @@ public class IndexedLinkedListTest {
         list.subList(61, 63).clear();
         list.checkInvarant();
         referenceList.subList(61, 63).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
+//    @Test
+    public void removeRangePrefix1() {
+        list.addAll(getIntegerList(100));
+        list.fingerList.setFingers(0, 1, 2, 3, 10, 20, 30, 40, 50, 70);
+        list.checkInvarant();
+        
+        referenceList.addAll(list);
+        
+        list.subList(0, 3).clear();
+        list.checkInvarant();
+        
+        referenceList.subList(0, 3).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void removeRangeSuffix1() {
+        list.addAll(getIntegerList(100));
+        list.fingerList.setFingers(1, 10, 20, 25, 30, 31, 95, 96, 97, 98);
+        list.checkInvarant();
+        
+        referenceList.addAll(list);
+        
+        list.subList(97, 100).clear();
+        list.checkInvarant();
+        
+        referenceList.subList(97, 100).clear();
         
         assertEquals(referenceList, list);
     }

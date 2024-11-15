@@ -2832,7 +2832,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 // Grab the node range to unlink/delete:
                 Node<E> start = fingerList.getNodeNoFingersFix(fromIndex);
-                Node<E> end   = fingerList.getNodeNoFingersFix(toIndex).prev;
+                Node<E> end   = fingerList.getNodeNoFingersFix(toIndex);
+                
+                if (end == null) {
+                    end = tail;
+                } else {
+                    end = end.prev;
+                }
                 
                 // Shift the fingers to prefix and/or suffix:
                 shiftCoveredFingersToPrefix(leftCoveredFingers,
@@ -2916,17 +2922,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         // Do the actual shifting:
+        // Shift the space in prefix:
         Finger<E> previousFinger = fingerList.get(i);
+        Node<E> node = previousFinger.node.next;
+        previousFinger.rewindLeft(leftCoveredFingers);
         
-        for (int j = 0; j < leftCoveredFingers; j++) {
-            Finger<E> currentFinger = fingerList.get(i - j);
-            currentFinger.index = previousFinger.index - 1;
-            currentFinger.node  = previousFinger.node.prev;
-            previousFinger = currentFinger;
+        for (int k = 1; k < leftCoveredFingers; k++) {
+            Finger<E> f = fingerList.get(i + k);
+            f.index = previousFinger.index + k;
+            f.node = node;
+            node = node.next;
         }
         
-        fingerList.get(i + 1).rewindLeft(leftCoveredFingers);
-//        fingerList.shiftFingerIndicesToLeft(i + 2, removalLength);
+        // Shift covered fingers to prefix:
+        Finger<E> finger = fingerList.get(fromFingerIndex);
+        finger.rewindLeft(leftCoveredFingers);
+        node = finger.node.next;
+        
+        for (int k = 1; k < leftCoveredFingers; k++) {
+            Finger<E> auxFinger = fingerList.get(fromFingerIndex + k);
+            auxFinger.index = finger.index + k;
+            auxFinger.node = node;
+            node = node.next;
+        }
+////        fingerList.shiftFingerIndicesToLeft(i + 2, removalLength);
     }
     
     private void shiftCoveredFignersToSuffix(int rightCoveredFingers,
