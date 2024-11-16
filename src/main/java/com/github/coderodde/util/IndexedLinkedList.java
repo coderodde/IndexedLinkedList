@@ -3079,55 +3079,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       int fromFingerIndex,
                                       int coveredFingers) {
         
-        for (int i = 0; i < coveredFingers; i++) {
-            fingerList.fingerArray[i + fromFingerIndex] = 
-                    fingerList.fingerArray[i + fromFingerIndex 
-                                             + coveredFingers];
-        }
+        System.arraycopy(fingerList.fingerArray,
+                         fromFingerIndex + coveredFingers,
+                         fingerList.fingerArray,
+                         fromFingerIndex,
+                         coveredFingers + 1);
         
-        int suffixLength = fingerList.size() - coveredFingers 
-                                             - fromFingerIndex;
-        
-        fingerList.setFinger(fromFingerIndex + coveredFingers, 
-                             fingerList.get(fingerList.size()));
-        
-        for (int i = 0; i < suffixLength; i++) {
-            fingerList.fingerArray[fingerList.size() - i] = null;
-        }
+        Arrays.fill(fingerList.fingerArray,
+                    fromFingerIndex + coveredFingers + 1, 
+                    fingerList.size() + 1,
+                    null);
         
         fingerList.size -= coveredFingers;
         fingerList.contractFingerArrayIfNeeded(fingerList.size);
         fingerList.shiftFingerIndicesToLeft(fromFingerIndex,
                                             removalLength);
-        
-//        
-//        // 1. Shift fingers[fromFingerIndex + coveredFingers, ..., f.size] to
-//        //    figners[fromIndex, ..., f.size - coveredFingers]:
-//        
-//        System.arraycopy(
-//                fingerList.fingerArray, 
-//                fromFingerIndex + coveredFingers, 
-//                fingerList.fingerArray, 
-//                fromFingerIndex, 
-//                coveredFingers);
-//        
-//        int leftovers = fingerList.size() - fromFingerIndex - coveredFingers;
-//        
-////        Arrays.fill(fingerList.fingerArray, 
-////                    fingerList.size - leftovers, 
-////                    fingerList.size, 
-////                    null);
-//        
-//        for (int i = 0; i < leftovers; i++) {
-//            fingerList.fingerArray[fromFingerIndex + i] = 
-//                    fingerList.fingerArray
-//                    [fromFingerIndex + i + coveredFingers];
-//        }
-//        
-//        fingerList.size -= leftovers;
-//        fingerList.contractFingerArrayIfNeeded(fingerList.size + 1);
-//        fingerList.shiftFingerIndicesToLeft(fromFingerIndex,
-//                                            removalLength);
     }
     
     /**
