@@ -667,7 +667,7 @@ final class FingerList<E> {
      * 
      * @param indices the target indices.
      */
-    void setFingers(int... indices) {
+    void setFingerIndices(int... indices) {
         Arrays.sort(indices);
         int fingerIndex = 0;
         

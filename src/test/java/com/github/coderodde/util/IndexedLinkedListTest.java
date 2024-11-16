@@ -868,7 +868,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeSmall1() {
         list.addAll(getIntegerList(9));
-        list.fingerList.setFingers(0, 1, 7);
+        list.fingerList.setFingerIndices(0, 1, 7);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -882,7 +882,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeSmall2() {
         list.addAll(getIntegerList(9));
-        list.fingerList.setFingers(4, 6, 7);
+        list.fingerList.setFingerIndices(4, 6, 7);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -896,7 +896,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeSmall3() {
         list.addAll(getIntegerList(9));
-        list.fingerList.setFingers(1, 2, 4);
+        list.fingerList.setFingerIndices(1, 2, 4);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -910,7 +910,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeSmall4() {
         list.addAll(getIntegerList(9));
-        list.fingerList.setFingers(2, 4, 7);
+        list.fingerList.setFingerIndices(2, 4, 7);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -924,7 +924,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeMedium1() {
         list.addAll(getIntegerList(100));
-        list.fingerList.setFingers(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
+        list.fingerList.setFingerIndices(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -938,7 +938,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeMedium2() {
         list.addAll(getIntegerList(100));
-        list.fingerList.setFingers(5, 15, 25, 35, 45, 55, 60, 61, 62, 63);
+        list.fingerList.setFingerIndices(5, 15, 25, 35, 45, 55, 60, 61, 62, 63);
         list.checkInvarant();
         referenceList.addAll(list);
         
@@ -952,7 +952,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangePrefix1() {
         list.addAll(getIntegerList(100));
-        list.fingerList.setFingers(0, 1, 2, 3, 10, 20, 30, 40, 50, 70);
+        list.fingerList.setFingerIndices(0, 1, 2, 3, 10, 20, 30, 40, 50, 70);
         list.checkInvarant();
         
         referenceList.addAll(list);
@@ -968,7 +968,7 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeSuffix1() {
         list.addAll(getIntegerList(100));
-        list.fingerList.setFingers(1, 10, 20, 25, 30, 31, 95, 96, 97, 98);
+        list.fingerList.setFingerIndices(1, 10, 20, 25, 30, 31, 95, 96, 97, 98);
         list.checkInvarant();
         
         referenceList.addAll(list);
@@ -977,6 +977,22 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         
         referenceList.subList(97, 100).clear();
+        
+        assertEquals(referenceList, list);
+    }
+    
+    @Test
+    public void removeRangeEqualFingersCoveringFingers() {
+        list.addAll(getIntegerList(25));
+        list.fingerList.setFingerIndices(1, 10, 11, 21, 23);
+        list.checkInvarant();
+        
+        referenceList.addAll(list);
+        
+        list.subList(5, 21).clear();
+        list.checkInvarant();
+        
+        referenceList.subList(5, 21).clear();
         
         assertEquals(referenceList, list);
     }

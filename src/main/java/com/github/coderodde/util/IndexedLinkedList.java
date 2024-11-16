@@ -2842,14 +2842,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 
                 // Shift the fingers to prefix and/or suffix:
                 shiftCoveredFingersToPrefix(leftCoveredFingers,
-                                            fromFingerIndex,
-                                            toFingerIndex,
-                                            removalLength);
+                                            fromFingerIndex);
                 
-                shiftCoveredFignersToSuffix(rightCoveredFingers,
+                shiftCoveredFignersToSuffix(rightCoveredFingers, 
                                             toFingerIndex,
-                                            toIndex,
-                                            removalLength);
+                                            toIndex);
                 
                 fingerList.shiftFingerIndicesToLeft(
                         toFingerIndex - rightCoveredFingers, 
@@ -2883,19 +2880,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return;
         }
         
+        Node<E> start = fingerList.getNodeNoFingersFix(fromIndex);
+        Node<E> end   = fingerList.getNodeNoFingersFix(toIndex);
+        
+        if (end == null) {
+            end = tail;
+        } else {
+            end = end.prev;
+        }
+        
         if (fingersToRemove < coveredFingers) {
             System.out.println("fingersToRemove < coveredFingers");
-            removeRangeImplCase1();
+            removeRangeImplCase4();
         } else if (fingersToRemove > coveredFingers) {
             System.out.println("fingersToRemove > coveredFingers");
-            removeRangeImplCase2();
+            removeRangeImplCase5();
         } else {
             System.out.println("fingersToRemove == coveredFingers");
             // Here, fingersToRemove == coveredFingers:
-            removeRangeImplCase3(removalLength,
+            removeRangeImplCase6(removalLength,
                                  fromFingerIndex,
                                  coveredFingers);
         }
+        
+        unlinkNodeRange(start, end);
+        size -= removalLength;
+        modCount++;
     }
     
     /**
@@ -2907,9 +2917,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fromFingerIndex    the index of the leftmost finger to shift.
      */
     private void shiftCoveredFingersToPrefix(int leftCoveredFingers,
-                                             int fromFingerIndex,
-                                             int toFingerIndex,
-                                             int removalLength) {
+                                             int fromFingerIndex) {
         if (leftCoveredFingers == 0) {
             System.out.println("leftCoveredFingers == 0");
             return;
@@ -2953,15 +2961,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
             auxFinger.node = node;
             node = node.next;
         }
-        
-//        fingerList.shiftFingerIndicesToLeft(toFingerIndex,
-//                                            removalLength);
     }
     
+    /**
+     * Shifts {@code rightCoveredFingers} fingers to the prefix.
+     * 
+     * @param rightCoveredFingers the number of fingers to shift.
+     * @param toFingerIndex       the largest and closest finger index.
+     * @param toIndex             the removal range exclusive end index.
+     */
     private void shiftCoveredFignersToSuffix(int rightCoveredFingers,
                                              int toFingerIndex,
-                                             int toIndex,
-                                             int removalLength) {
+                                             int toIndex) {
         if (rightCoveredFingers == 0) {
             System.out.println("rightCoveredFingers == 0");
             return;
@@ -3005,10 +3016,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             currentFinger.node = node;
             node = node.next;
         }
-        
-//        fingerList.get(i).rewindRight(rightCoveredFingers);
-//        fingerList.shiftFingerIndicesToLeft(fingerIndex, 
-//                                            removalLength);
     }
     
     private void unlinkNodeRange(Node<E> startNode, Node<E> endNode) {
@@ -3040,38 +3047,67 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private void removeRangeImplCase1() {
+    private void removeRangeImplCase4() {
         
     }
     
-    private void removeRangeImplCase2() {
+    private void removeRangeImplCase5() {
         
     }
     
-    private void removeRangeImplCase3(int removalLength,
+    private void removeRangeImplCase6(int removalLength,
                                       int fromFingerIndex,
                                       int coveredFingers) {
         
-        // 1. Shift fingers[fromFingerIndex + coveredFingers, ..., f.size] to
-        //    figners[fromIndex, ..., f.size - coveredFingers]:
-        System.arraycopy(
-                fingerList.fingerArray, 
-                fromFingerIndex + coveredFingers, 
-                fingerList.fingerArray, 
-                fromFingerIndex, 
-                coveredFingers);
+        for (int i = 0; i < coveredFingers; i++) {
+            fingerList.fingerArray[i + fromFingerIndex] = 
+                    fingerList.fingerArray[i + fromFingerIndex 
+                                             + coveredFingers];
+        }
         
-        int leftovers = fingerList.size() - fromFingerIndex - coveredFingers;
+        int suffixLength = fingerList.size() - coveredFingers 
+                                             - fromFingerIndex;
         
-        Arrays.fill(fingerList.fingerArray, 
-                    fingerList.size - leftovers, 
-                    fingerList.size, 
-                    null);
+        fingerList.setFinger(fromFingerIndex + coveredFingers, 
+                             fingerList.get(fingerList.size()));
         
-        fingerList.size -= leftovers;
-        fingerList.contractFingerArrayIfNeeded(fingerList.size + 1);
+        for (int i = 0; i < suffixLength; i++) {
+            fingerList.fingerArray[fingerList.size() - i] = null;
+        }
+        
+        fingerList.size -= coveredFingers;
+        fingerList.contractFingerArrayIfNeeded(fingerList.size);
         fingerList.shiftFingerIndicesToLeft(fromFingerIndex,
                                             removalLength);
+        
+//        
+//        // 1. Shift fingers[fromFingerIndex + coveredFingers, ..., f.size] to
+//        //    figners[fromIndex, ..., f.size - coveredFingers]:
+//        
+//        System.arraycopy(
+//                fingerList.fingerArray, 
+//                fromFingerIndex + coveredFingers, 
+//                fingerList.fingerArray, 
+//                fromFingerIndex, 
+//                coveredFingers);
+//        
+//        int leftovers = fingerList.size() - fromFingerIndex - coveredFingers;
+//        
+////        Arrays.fill(fingerList.fingerArray, 
+////                    fingerList.size - leftovers, 
+////                    fingerList.size, 
+////                    null);
+//        
+//        for (int i = 0; i < leftovers; i++) {
+//            fingerList.fingerArray[fromFingerIndex + i] = 
+//                    fingerList.fingerArray
+//                    [fromFingerIndex + i + coveredFingers];
+//        }
+//        
+//        fingerList.size -= leftovers;
+//        fingerList.contractFingerArrayIfNeeded(fingerList.size + 1);
+//        fingerList.shiftFingerIndicesToLeft(fromFingerIndex,
+//                                            removalLength);
     }
     
     /**
