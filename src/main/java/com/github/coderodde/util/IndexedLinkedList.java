@@ -3018,6 +3018,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * Unlinks the node range {@code [startNode, ..., endNode]}, both inclusive 
+     * from this indexed list.
+     * '
+     * @param startNode the start node of the range.
+     * @param endNode   the end node of the range.
+     */
     private void unlinkNodeRange(Node<E> startNode, Node<E> endNode) {
         Node<E> currentNode = startNode;
         Node<E> nextNode;
@@ -3047,14 +3054,27 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    /**
+     * The case 4 of the range removal procedure.
+     */
     private void removeRangeImplCase4() {
         
     }
     
+    /**
+     * The case 5 of the range removal procedure.
+     */
     private void removeRangeImplCase5() {
         
     }
     
+    /**
+     * Case 6 of the range removal procedure.
+     * 
+     * @param removalLength   the number of elements to remove.
+     * @param fromFingerIndex the from index of the finger in the removed range.
+     * @param coveredFingers  the number of covering fingers.
+     */
     private void removeRangeImplCase6(int removalLength,
                                       int fromFingerIndex,
                                       int coveredFingers) {

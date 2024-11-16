@@ -258,6 +258,14 @@ final class FingerList<E> {
         return idx;
     }
     
+    /**
+     * Access the {@code index}th node without modifying the fingers unlike 
+     * {@link #getNode(int)}. 
+     * 
+     * @param index the index of the desired node.
+     * 
+     * @return the {@code index}th node.
+     */
     Node<E> getNodeNoFingersFix(int index) {
         Finger finger = fingerArray[getClosestFingerIndex(index)];
         int steps = finger.index - index;
@@ -662,7 +670,7 @@ final class FingerList<E> {
     }
     
     /**
-     * Sets all the leftmost {@code indices.length] fingers to the specified 
+     * Sets all the leftmost {@code indices.length} fingers to the specified 
      * indices.
      * 
      * @param indices the target indices.
@@ -678,6 +686,14 @@ final class FingerList<E> {
         }
     }
     
+    /**
+     * Accesses the {@code index}th node sequentially without using fingers and 
+     * modifying the fingers.
+     * 
+     * @param index the index of the desired node.
+     * 
+     * @return {@code index} node. 
+     */
     private Node<E> getNodeSequentially(final int index) {
         return list.getNodeSequentially(index);
     }
