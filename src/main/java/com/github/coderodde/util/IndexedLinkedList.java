@@ -3072,14 +3072,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int listSuffixLength = size - toIndex;
         
         int numberOfFingersInPrefix = fingerList.getFingerIndexImpl(fromIndex);
-        int numberOfFignersInSuffix = fingerList.size() 
+        int numberOfFingersInSuffix = fingerList.size() 
                                     - fingerList.getFingerIndexImpl(toIndex);
         
         int freeFingerSpotsInPrefix = listPrefixLength 
                                     - numberOfFingersInPrefix;
         
         int freeFingerSpotsInSuffix = listSuffixLength
-                                    - numberOfFignersInSuffix;
+                                    - numberOfFingersInSuffix;
         
         int totalFreeSpots = freeFingerSpotsInPrefix + freeFingerSpotsInSuffix;
         

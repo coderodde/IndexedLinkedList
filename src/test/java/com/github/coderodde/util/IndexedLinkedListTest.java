@@ -997,6 +997,15 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
+    @Test
+    public void removeRangeCase4() {
+        list.addAll(getIntegerList(100));
+        
+        list.fingerList.setFingerIndices(1, 3, 5, 50, 51, 52, 95, 96, 98, 99);
+        
+        list.subList(10, 80).clear();
+    }
+    
     //@Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(666L);
