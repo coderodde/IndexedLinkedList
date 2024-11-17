@@ -2889,11 +2889,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             end = end.prev;
         }
         
-        if (fingersToRemove < coveredFingers) {
-            System.out.println("fingersToRemove < coveredFingers");
-            removeRangeImplCase4();
-        } else if (fingersToRemove > coveredFingers) {
+        if (fingersToRemove > coveredFingers) {
             System.out.println("fingersToRemove > coveredFingers");
+            
+            removeRangeImplCase4(fromIndex, 
+                                 toIndex,
+                                 fingersToRemove,
+                                 coveredFingers);
+            
+        } else if (fingersToRemove < coveredFingers) {
+            System.out.println("fingersToRemove < coveredFingers");
             removeRangeImplCase5();
         } else {
             System.out.println("fingersToRemove == coveredFingers");
@@ -3055,9 +3060,41 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * The case 4 of the range removal procedure.
+     * The case 4 of the range removal procedure. In this case, the number of 
+     * fingers to remove is higher than the number of covered fingers.
      */
-    private void removeRangeImplCase4() {
+    private void removeRangeImplCase4(int fromIndex,
+                                      int toIndex,
+                                      int numberOfFingersToRemove,
+                                      int numberOfCoveredFingers) {
+        
+        int listPrefixLength = fromIndex;
+        int listSuffixLength = size - toIndex;
+        
+        int numberOfFingersInPrefix = fingerList.getFingerIndexImpl(fromIndex);
+        int numberOfFignersInSuffix = fingerList.size() 
+                                    - fingerList.getFingerIndexImpl(toIndex);
+        
+        int freeFingerSpotsInPrefix = listPrefixLength 
+                                    - numberOfFingersInPrefix;
+        
+        int freeFingerSpotsInSuffix = listSuffixLength
+                                    - numberOfFignersInSuffix;
+        
+        int totalFreeSpots = freeFingerSpotsInPrefix + freeFingerSpotsInSuffix;
+        
+        float leftRatio = (float)(freeFingerSpotsInPrefix) 
+                        / (float)(totalFreeSpots);
+        
+        int totalNumberOfFingersToMove = numberOfFingersToRemove 
+                                       - numberOfCoveredFingers;
+        
+        int numberOfFingersToMoveToPrefix = 
+                (int)(leftRatio * totalNumberOfFingersToMove);
+        
+        int numberOfFingersToMoveToSuffix = 
+                totalNumberOfFingersToMove - numberOfFingersToMoveToPrefix;
+        
         
     }
     
