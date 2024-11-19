@@ -1012,6 +1012,23 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
+    @Test
+    public void removeRangeCase5() {
+        list.addAll(getIntegerList(100));
+        referenceList.addAll(list);
+        referenceList.subList(6, 90).clear(); // rangelen = 84. 4 fingers, 6
+                                              // off away.
+        list.fingerList.setFingerIndices(
+                10, 20, 30, 40, 50, 51, 52, 60, 93, 94);
+        
+        list.checkInvarant();
+        
+        list.subList(6, 90).clear();
+        list.checkInvarant();
+        
+        assertEquals(referenceList, list);
+    }
+    
     //@Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(666L);
