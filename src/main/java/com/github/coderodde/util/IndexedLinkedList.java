@@ -2990,7 +2990,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         System.out.println(">>> fingers < covered");
         
         int removalLength = toIndex - fromIndex;
-        
         int coveredFingers = toFingerIndex - fromFingerIndex;
         int numberOfFingersToMove = coveredFingers - fingersToRemove;
         
@@ -3027,12 +3026,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          toFingerIndex - numberOfFingersToMoveToSuffix, 
                          fingerList.fingerArray, 
                          fromFingerIndex + numberOfFingersToMoveToPrefix, 
-                         fingersToRemove - numberOfFingersToMove);
+                         fingersToRemove - numberOfFingersToMove + 1);
         
-//        fingerList.get(fingerList.size()).index = size;
-//        fingerList.get(fingerList.size()).node = null;
+        Arrays.fill(fingerList.fingerArray, 
+                    toFingerIndex - numberOfFingersToMoveToSuffix - 1,
+                    fingerList.size() + 1,
+                    null);
         
-        throw new UnsupportedOperationException("funky");
+        fingerList.size -= fingersToRemove;
+        fingerList.shiftFingerIndicesToLeft(
+                fromFingerIndex + numberOfFingersToMoveToPrefix, 
+                removalLength);
+        System.out.println("yeah");
+//        throw new UnsupportedOperationException("funky");
     }
     
     /**
