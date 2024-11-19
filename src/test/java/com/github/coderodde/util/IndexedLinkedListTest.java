@@ -922,7 +922,7 @@ public class IndexedLinkedListTest {
     }
     
     @Test
-    public void removeRangeMedium1() {
+        public void removeRangeMedium1() {
         list.addAll(getIntegerList(100));
         list.fingerList.setFingerIndices(1, 10, 11, 12, 13, 40, 50, 90, 92, 93);
         list.checkInvarant();
@@ -1000,10 +1000,16 @@ public class IndexedLinkedListTest {
     @Test
     public void removeRangeCase4() {
         list.addAll(getIntegerList(100));
+        referenceList.addAll(list);
+        referenceList.subList(10, 80).clear();
         
         list.fingerList.setFingerIndices(1, 3, 5, 50, 51, 52, 95, 96, 98, 99);
+        list.checkInvarant();
         
         list.subList(10, 80).clear();
+        list.checkInvarant();
+        
+        assertEquals(referenceList, list);
     }
     
     //@Test // Passes.

@@ -2893,9 +2893,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             System.out.println("fingersToRemove > coveredFingers");
             
             removeRangeImplCase4(fromIndex, 
-                                 toIndex,
                                  fingersToRemove,
-                                 coveredFingers);
+                                 removalLength);
             
         } else if (fingersToRemove < coveredFingers) {
             System.out.println("fingersToRemove < coveredFingers");
@@ -3064,45 +3063,34 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * fingers to remove is higher than the number of covered fingers.
      */
     private void removeRangeImplCase4(int fromIndex,
-                                      int toIndex,
                                       int numberOfFingersToRemove,
-                                      int numberOfCoveredFingers) {
+                                      int removalLength) {
         
-        int listPrefixLength = fromIndex;
-        int listSuffixLength = size - toIndex;
+        int fromFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
         
-        int numberOfFingersInPrefix = fingerList.getFingerIndexImpl(fromIndex);
-        int numberOfFingersInSuffix = fingerList.size() 
-                                    - fingerList.getFingerIndexImpl(toIndex);
+        System.arraycopy(fingerList.fingerArray,
+                         fromFingerIndex + numberOfFingersToRemove, 
+                         fingerList.fingerArray,
+                         fromFingerIndex, 
+                         numberOfFingersToRemove);
         
-        int freeFingerSpotsInPrefix = listPrefixLength 
-                                    - numberOfFingersInPrefix;
+        Arrays.fill(fingerList.fingerArray,
+                    fingerList.size() - numberOfFingersToRemove + 1,
+                    fingerList.size() + 1,
+                    null);
         
-        int freeFingerSpotsInSuffix = listSuffixLength
-                                    - numberOfFingersInSuffix;
-        
-        int totalFreeSpots = freeFingerSpotsInPrefix + freeFingerSpotsInSuffix;
-        
-        float leftRatio = (float)(freeFingerSpotsInPrefix) 
-                        / (float)(totalFreeSpots);
-        
-        int totalNumberOfFingersToMove = numberOfFingersToRemove 
-                                       - numberOfCoveredFingers;
-        
-        int numberOfFingersToMoveToPrefix = 
-                (int)(leftRatio * totalNumberOfFingersToMove);
-        
-        int numberOfFingersToMoveToSuffix = 
-                totalNumberOfFingersToMove - numberOfFingersToMoveToPrefix;
-        
-        
+        fingerList.size -= numberOfFingersToRemove;
+        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
+                                            removalLength);
     }
     
     /**
-     * The case 5 of the range removal procedure.
+     * The case 5 of the range removal procedure. Here, the number of fingers to
+     * remove is less than the number of covered fingers.
      */
     private void removeRangeImplCase5() {
-        
+        System.out.println(">>> fingers < covered");
+        throw new UnsupportedOperationException("funky");
     }
     
     /**
