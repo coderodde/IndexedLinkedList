@@ -3044,40 +3044,67 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             fingerSpotsSoFar += diff;
             
-            if (fingerSpotsSoFar >= toFingerIndex) {
+            // Two iterations:
+            if (fingerSpotsSoFar >= fingersToRemove) {
                 break;
             }
         }
         
-        Finger<E> previousFinger = fingerList.get(targetFingerIndex);
+        // Save the finger to move to the head:
+        Finger<E> saveFinger = new Finger<>(fingerList.get(targetFingerIndex));
         
         for (int i = targetFingerIndex - 1; i >= 0; i--) {
-            Finger<E> currentFinger = fingerList.get(i);
-            currentFinger.index = previousFinger.index - 1;
-            currentFinger.node = previousFinger.node.prev;
-            previousFinger = currentFinger;
+            Finger<E> finger = fingerList.get(i);
+            fingerList.setFinger(i + 1, finger);
         }
         
-        int suffixFingersToRemove = this.numberOfCoveringFingersInSuffix 
-                                  - this.numberOfCoveringFingersInPrefix 
-                                  - fingersToRemove;
-        System.arraycopy(
-                fingerList.fingerArray,
-                fingerList.size(), 
-                fingerList.fingerArray, 
-                fingerList.size() - suffixFingersToRemove, 
-                suffixFingersToRemove);
+        fingerList.setFinger(0, saveFinger);
         
-        Arrays.fill(
-                fingerList.fingerArray, 
-                fingerList.size() - suffixFingersToRemove + 1,
-                fingerList.size() + 1, 
-                null);
+        for (int i = 0; i < targetFingerIndex; i++) {
+            fingerList.get(i + 1).index = fingerList.get(i).index + 1;
+            fingerList.get(i + 1).node  = fingerList.get(i).node.next;
+        }
         
-        fingerList.size -= fingersToRemove;
-        fingerList.contractFingerArrayIfNeeded(fingerList.size());
-        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
-                                            removalLength);
+//        Finger<E> previousFinger = fingerList.get(targetFingerIndex);
+//        Node<E> saveNode = previousFinger.node.prev;
+//        int saveIndex    = previousFinger.index - 1;
+//        
+//        // Scatter targetFingerIndex fingers:
+//        for (int i = 0; i < numberOfCoveringFingersInSuffix; i++) {
+//            Finger<E> currentFinger = fingerList.get(i);
+//            currentFinger.index = saveIndex;
+//            currentFinger.node  = saveNode;
+//            saveIndex--;
+//            saveNode = saveNode.prev;
+//        }
+//        
+//        for (int i = targetFingerIndex - 1; i >= 0; i--) {
+//            Finger<E> currentFinger = fingerList.get(i);
+//            currentFinger.index = previousFinger.index - 1;
+//            currentFinger.node = previousFinger.node.prev;
+//            previousFinger = currentFinger;
+//        }
+//        
+//        int suffixFingersToRemove = this.numberOfCoveringFingersInSuffix 
+//                                  - this.numberOfCoveringFingersInPrefix 
+//                                  - fingersToRemove;
+//        System.arraycopy(
+//                fingerList.fingerArray,
+//                fingerList.size(), 
+//                fingerList.fingerArray, 
+//                fingerList.size() - suffixFingersToRemove, 
+//                suffixFingersToRemove);
+//        
+//        Arrays.fill(
+//                fingerList.fingerArray, 
+//                fingerList.size() - suffixFingersToRemove + 1,
+//                fingerList.size() + 1, 
+//                null);
+//        
+//        fingerList.size -= fingersToRemove;
+//        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+//        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
+//                                            removalLength);
 //        
 //        System.out.println(suffixFingersToRemove + " " + this.numberOfCoveringFingersInSuffix);
 //        shiftCoveredFingersToSuffix(
