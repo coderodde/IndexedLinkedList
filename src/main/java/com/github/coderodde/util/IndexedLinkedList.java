@@ -3065,6 +3065,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerList.get(i + 1).node  = fingerList.get(i).node.next;
         }
         
+        System.arraycopy(
+                fingerList.fingerArray, 
+                fingerList.size(), 
+                fingerList.fingerArray, 
+                fingerList.size() - fingersToRemove,
+                fingersToRemove);
+        
+        Arrays.fill(
+                fingerList.fingerArray, 
+                fingerList.size() - fingersToRemove + 1, 
+                fingerList.size() + 1,
+                null);
+        
+        fingerList.size -= fingersToRemove;
+        fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersInPrefix,
+                                            removalLength);
+        
+        
+        System.out.println("yes");
+        
 //        Finger<E> previousFinger = fingerList.get(targetFingerIndex);
 //        Node<E> saveNode = previousFinger.node.prev;
 //        int saveIndex    = previousFinger.index - 1;
