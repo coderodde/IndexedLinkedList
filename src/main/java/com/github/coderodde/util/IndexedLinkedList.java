@@ -3024,6 +3024,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         System.out.println(">>> fingers < covered");
         
         int removalLength = toIndex - fromIndex;
+        int coveredFingers = toFingerIndex
+                           - fromFingerIndex;
         
         this.loadFingerCoverageCounters(
                 fromFingerIndex, 
@@ -3048,6 +3050,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (fingerSpotsSoFar >= fingersToRemove) {
                 break;
             }
+        }
+        
+        if (targetFingerIndex == fingerList.size()) { // TODO: this.numberOfCoveringFingersINSuffix?
+            int numberOfFingersToMove = fingerList.size()
+                                      - fingersToRemove 
+                                      - this.numberOfCoveringFingersInPrefix;
+            
+            Node<E> node = tail;
+            int index = IndexedLinkedList.this.size - 1;
+            
+            for (int i = 0; i < numberOfFingersToMove; i++) {
+                Finger<E> finger = fingerList.get(fingerList.size() - 1 - i);
+                
+                finger.index = index;
+                finger.node = node;
+                
+                node = node.prev;
+                index--;
+            }
+            
+            System.arraycopy(
+                    fingerList.fingerArray, 
+                    fingerList.size() - numberOfFingersToMove,
+                    fingerList.fingerArray, 
+                    0, 
+                    numberOfFingersToMove + 1);
+            
+            Arrays.fill(
+                    fingerList.fingerArray, 
+                    numberOfFingersToMove + 1,
+                    fingerList.size() + 1,
+                    null);
+            
+            fingerList.size -= fingersToRemove;
+            fingerList.shiftFingerIndicesToLeft(0, removalLength);
+            return;
         }
         
         // Save the finger to move to the head:
@@ -3081,9 +3119,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.size -= fingersToRemove;
         fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersInPrefix,
                                             removalLength);
-        
-        
-        System.out.println("yes");
         
 //        Finger<E> previousFinger = fingerList.get(targetFingerIndex);
 //        Node<E> saveNode = previousFinger.node.prev;
