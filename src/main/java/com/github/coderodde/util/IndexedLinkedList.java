@@ -2371,7 +2371,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void loadFingerCoverageCounters(int fromFingerIndex,
                                             int toFingerIndex,
                                             int fromIndex,
-                                            int toIndex) {
+                                            int toIndex,
+                                            int fingersToRemove) {
         
         int coveredFingers = toFingerIndex - fromFingerIndex;
         
@@ -2393,7 +2394,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         float leftRatio = (float)(freeFingerPrefixSpots) / 
                           (float)(freeSpots);
 
-        int leftCoveredFingers  = (int)(leftRatio * coveredFingers);
+        int leftCoveredFingers  = (int)(leftRatio *
+                                       (coveredFingers - fingersToRemove));
         int rightCoveredFingers = coveredFingers - leftCoveredFingers;
 
         this.numberOfCoveringFingersInPrefix = leftCoveredFingers;
@@ -2763,7 +2765,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (coveredFingers > 0) {
 //                System.out.println("    coveredFingers > 0");
                 
-                this.loadFingerCoverageCounters(fromFingerIndex, toFingerIndex, fromIndex, toIndex);
+                this.loadFingerCoverageCounters(
+                        fromFingerIndex,
+                        toFingerIndex, 
+                        fromIndex, 
+                        toIndex, 
+                        fingersToRemove);
 
                 // Shift the fingers to prefix and/or suffix:
                 shiftCoveredFingersToPrefix(
@@ -3024,7 +3031,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fromFingerIndex, 
                 toFingerIndex,
                 fromIndex, 
-                toIndex);
+                toIndex,
+                fingersToRemove);
         
         int fingerSpotsSoFar = 0;
         int targetFingerIndex = toFingerIndex;
@@ -3081,17 +3089,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (numberOfCoveringFingersInPrefix > 0) {
                 index = fromIndex - 1;
-                node  = fingerList.getNode(fromIndex).prev;
+                node  = fingerList.getNode(index);
                 
                 for (int i = 0; i < numberOfCoveringFingersInPrefix; i++) {
                     Finger<E> finger = 
                             fingerList.get(
                                     numberOfCoveringFingersInPrefix - 1 - i);
                     
-                    finger.index = index;
+                    finger.index = index--;
                     finger.node = node;
-                    
-                    index--;
                     node = node.prev;
                 }
                 
