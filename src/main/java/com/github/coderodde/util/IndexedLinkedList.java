@@ -2373,11 +2373,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                             int fromIndex,
                                             int toIndex) {
         
-        int removalLength = toIndex - fromIndex;
-        int fingersToRemove = 
-                getRecommendedNumberOfFingers() -
-                getRecommendedNumberOfFingers(size - removalLength);
-        
         int coveredFingers = toFingerIndex - fromFingerIndex;
         
         int fingerPrefixLength = fromFingerIndex;
@@ -3024,8 +3019,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         System.out.println(">>> fingers < covered");
         
         int removalLength = toIndex - fromIndex;
-        int coveredFingers = toFingerIndex
-                           - fromFingerIndex;
         
         this.loadFingerCoverageCounters(
                 fromFingerIndex, 
@@ -3053,6 +3046,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (targetFingerIndex == fingerList.size()) { // TODO: this.numberOfCoveringFingersINSuffix?
+            System.out.println("targetFignerIndex == fingerList.size()");
             int numberOfFingersToMove = fingerList.size()
                                       - fingersToRemove 
                                       - this.numberOfCoveringFingersInPrefix;
@@ -3074,17 +3068,39 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.fingerArray, 
                     fingerList.size() - numberOfFingersToMove,
                     fingerList.fingerArray, 
-                    0, 
+                    numberOfCoveringFingersInPrefix, 
                     numberOfFingersToMove + 1);
             
             Arrays.fill(
                     fingerList.fingerArray, 
-                    numberOfFingersToMove + 1,
+                    numberOfFingersToMove + numberOfCoveringFingersInPrefix + 1,
                     fingerList.size() + 1,
                     null);
             
             fingerList.size -= fingersToRemove;
-            fingerList.shiftFingerIndicesToLeft(0, removalLength);
+            
+            if (numberOfCoveringFingersInPrefix > 0) {
+                index = fromIndex - 1;
+                node  = fingerList.getNode(fromIndex).prev;
+                
+                for (int i = 0; i < numberOfCoveringFingersInPrefix; i++) {
+                    Finger<E> finger = 
+                            fingerList.get(
+                                    numberOfCoveringFingersInPrefix - 1 - i);
+                    
+                    finger.index = index;
+                    finger.node = node;
+                    
+                    index--;
+                    node = node.prev;
+                }
+                
+                fingerList.shiftFingerIndicesToLeft(fromIndex, 
+                                                    removalLength);
+            } else {
+                fingerList.shiftFingerIndicesToLeft(0, removalLength);
+            }
+            
             return;
         }
         
