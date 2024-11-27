@@ -2826,7 +2826,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             // Here, fingersToRemove == coveredFingers:
             removeRangeImplCase6(removalLength,
                                  fromFingerIndex,
-                                 coveredFingers);
+                                 coveredFingers,
+                                 fingersToRemove);
         }
         
         unlinkNodeRange(this.removeRangeStartNode,
@@ -3220,16 +3221,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void removeRangeImplCase6(int removalLength,
                                       int fromFingerIndex,
-                                      int coveredFingers) {
+                                      int coveredFingers,
+                                      int fingersToRemove) {
         
         System.arraycopy(fingerList.fingerArray,
                          fromFingerIndex + coveredFingers,
                          fingerList.fingerArray,
                          fromFingerIndex,
-                         coveredFingers + 1);
+                         fingerList.size() -
+                                 fingersToRemove -
+                                 this.numberOfCoveringFingersInPrefix);
         
         Arrays.fill(fingerList.fingerArray,
-                    fromFingerIndex + coveredFingers + 1, 
+                    fingerList.size() - fingersToRemove + 1, 
                     fingerList.size() + 1,
                     null);
         
