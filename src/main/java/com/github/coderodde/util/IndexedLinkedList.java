@@ -3059,7 +3059,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       - fingersToRemove 
                                       - this.numberOfCoveringFingersInPrefix;
             
-            Node<E> node = tail;
+            Node<E> node = tail; // TODO: Optimize?
             int index = IndexedLinkedList.this.size - 1;
             
             for (int i = 0; i < numberOfFingersToMove; i++) {
@@ -3101,8 +3101,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     node = node.prev;
                 }
                 
-                fingerList.shiftFingerIndicesToLeft(fromIndex, 
-                                                    removalLength);
+//                fingerList.shiftFingerIndicesToLeft(fromIndex, 
+//                                                    removalLength);
+                fingerList.shiftFingerIndicesToLeft(
+                        numberOfCoveringFingersInPrefix,
+                        removalLength);
             } else {
                 fingerList.shiftFingerIndicesToLeft(0, removalLength);
             }
