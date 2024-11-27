@@ -2394,10 +2394,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         float leftRatio = (float)(freeFingerPrefixSpots) / 
                           (float)(freeSpots);
 
-        int leftCoveredFingers  = (int)(leftRatio *
-                                       (coveredFingers - fingersToRemove));
+        int remainingFingers = fingerList.size() - fingersToRemove;
         
-        int rightCoveredFingers = coveredFingers - leftCoveredFingers;
+        int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
+        int rightCoveredFingers = (int)((1.0f - leftRatio) * remainingFingers);
 
         this.numberOfCoveringFingersInPrefix = leftCoveredFingers;
         this.numberOfCoveringFingersInSuffix = rightCoveredFingers;
@@ -3115,7 +3115,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (targetFingerIndex == fingerList.size()) { // TODO: this.numberOfCoveringFingersINSuffix?
             System.out.println("targetFignerIndex == fingerList.size()");
             int numberOfFingersToMove = fingerList.size()
-                                      - fingersToRemove 
+                                      - fingersToRemove
                                       - this.numberOfCoveringFingersInPrefix;
             
             Node<E> node = tail; // TODO: Optimize?
