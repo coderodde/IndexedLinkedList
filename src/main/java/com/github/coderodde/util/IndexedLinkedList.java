@@ -3232,9 +3232,40 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-//        if (targetFingerIndex == fingerList.size()) {
-//            System.out.println("OH YeAH");
-//        }
+        if (targetFingerIndex == fingerList.size()) {
+            System.out.println("OH YeAH");
+            int index = IndexedLinkedList.this.size - 1;
+            int remainingFingers = fingerList.size() - fingersToRemove;
+            Node<E> node = tail;
+            
+            for (int i = 0; i < remainingFingers; i++) {
+                Finger<E> finger = fingerList.get(fingerList.size() - 1 - i);
+                finger.index = index--;
+                finger.node = node;
+                node = node.prev;
+            }
+            
+            System.arraycopy(
+                    fingerList.fingerArray,
+                    fingerList.size() - remainingFingers,
+                    fingerList.fingerArray,
+                    0,
+                    remainingFingers + 1);
+            
+            Arrays.fill(
+                    fingerList.fingerArray, 
+                    remainingFingers + 1,
+                    fingerList.size() + 1, 
+                    null);
+            
+            fingerList.size -= fingersToRemove;
+            fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
+                                                removalLength);
+
+            fingerList.contractFingerArrayIfNeeded(fingerList.size());
+            
+            return;
+        }
         
         Finger<E> finger = fingerList.get(targetFingerIndex);
         int index = finger.index - 1;
@@ -3247,11 +3278,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = node.prev;
         }
         
-        System.arraycopy(fingerList.fingerArray, 
-                         fingerList.size(), 
-                         fingerList.fingerArray,
-                         fingerList.size() - fingersToRemove,
-                         fingersToRemove);
+        System.arraycopy(
+                fingerList.fingerArray,
+                fingerList.size(),
+                fingerList.fingerArray,
+                fingerList.size() - fingersToRemove,
+                fingersToRemove);
         
         Arrays.fill(
                 fingerList.fingerArray, 
@@ -3264,7 +3296,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                             removalLength);
         
         fingerList.contractFingerArrayIfNeeded(fingerList.size());
-        System.out.println("eyfeds");
 //        
 //        int targetFingerIndex = toFingerIndex;
 //        int fingerSpotsCountedSoFar = fingerList.get(fromFingerIndex).index
