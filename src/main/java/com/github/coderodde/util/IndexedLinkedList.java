@@ -3126,6 +3126,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                        int toIndex,
                                        int fingersToRemove) {
         
+        int removalLength = toIndex - fromIndex;
         int index = fromIndex - 1;
         Node<E> node = fingerList.getNode(index);
         
@@ -3160,9 +3161,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                     + i);
             
             finger.index = index++;
-            finger.node = node.next;
+            finger.node = node;
             node = node.next;
         }
+        
+        Arrays.fill(
+                fingerList.fingerArray,
+                fromFingerIndex + numberOfCoveringFingersToPrefix + 1, 
+                fingerList.size() + 1,
+                null);
+
+        Finger<E> newEndSentinelFinger = 
+                new Finger<>(
+                        null,
+                        IndexedLinkedList.this.size);
+        
+        fingerList.size -= fingersToRemove;
+        
+        fingerList.setFinger(fingerList.size(),
+                             newEndSentinelFinger);
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+        fingerList.shiftFingerIndicesToLeft(
+                fromFingerIndex + numberOfCoveringFingersToPrefix, 
+                removalLength);
         
 //        int removalLength = toIndex - fromIndex;
 //        int targetFingerIndex = 1;

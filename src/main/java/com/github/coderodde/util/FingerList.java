@@ -168,9 +168,9 @@ final class FingerList<E> {
     void contractFingerArrayIfNeeded(int nextSize) {
         // Can we contract at least once?
         if ((nextSize + 1) * 4 < fingerArray.length
-                && fingerArray.length > INITIAL_CAPACITY) {//TODO: 2?
+                && fingerArray.length > INITIAL_CAPACITY) {
 
-            int nextCapacity = fingerArray.length / 4;
+            int nextCapacity = fingerArray.length / 2;
 
             // Good, we can. But can we keep on splitting in half the 
             // capacity any further?
