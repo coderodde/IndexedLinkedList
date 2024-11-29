@@ -3212,57 +3212,80 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                        int fingersToRemove) {
         
         int removalLength = toIndex - fromIndex;
-        int targetFingerIndex = toFingerIndex;
-        int fingerSpotsCountedSoFar = 0;
-                
-        for (; targetFingerIndex < fingerList.size(); 
+        int targetFingerIndex = 1;
+        int fingerSpotsSoFar = fingerList.get(0).index;
+        
+        for (; targetFingerIndex < fingerList.size();
                targetFingerIndex++) {
             
-            Finger<E> f1 = fingerList.get(targetFingerIndex);
-            Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
+            Finger<E> finger1 = fingerList.get(targetFingerIndex - 1);
+            Finger<E> finger2 = fingerList.get(targetFingerIndex);
             
-            int difference = f2.index 
-                           - f1.index 
+            int difference = finger2.index 
+                           - finger1.index
                            - 1;
             
-            fingerSpotsCountedSoFar += difference;
+            fingerSpotsSoFar += difference;
             
-            if (fingerSpotsCountedSoFar >= numberOfCoveringFingersToSuffix) {
+            if (fingerSpotsSoFar >= toIndex) {
                 break;
             }
         }
-        
-        // Move targetFingerIndex + 1 first fingers to safety:
-        Finger<E> sentinelFinger = fingerList.get(targetFingerIndex + 1);
-        int index = sentinelFinger.index - 1;
-        Node<E> node = sentinelFinger.node.prev;
-        
-        for (int i = 0; i <= targetFingerIndex; i++) {
-            Finger<E> finger = fingerList.get(targetFingerIndex - i);
-            finger.index = index--;
-            finger.node = node;
-            node = node.prev;
-        }
-        
-        // Remove unneccessary fingers from the tail of this indexed list:
-        System.arraycopy(
-                fingerList.fingerArray,
-                fingerList.size(),
-                fingerList.fingerArray,
-                fingerList.size() - fingersToRemove,
-                fingersToRemove);
-        
-        Arrays.fill(
-                fingerList.fingerArray, 
-                fingerList.size() + 1 - fingersToRemove,
-                fingerList.size() + 1, 
-                null);
-        
-        fingerList.size -= fingersToRemove;
-        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
-                                            removalLength);
-        
-        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+//        
+//        int targetFingerIndex = toFingerIndex;
+//        int fingerSpotsCountedSoFar = fingerList.get(fromFingerIndex).index
+//                                    - fromFingerIndex;
+//                
+//        for (; targetFingerIndex < fingerList.size(); 
+//               targetFingerIndex++) {
+//            
+//            Finger<E> f1 = fingerList.get(targetFingerIndex);
+//            Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
+//            
+//            int difference = f2.index 
+//                           - f1.index 
+//                           - 1;
+//            
+//            fingerSpotsCountedSoFar += difference;
+//            
+//            if (fingerSpotsCountedSoFar >= numberOfCoveringFingersToSuffix) {
+//                break;
+//            }
+//        }
+//        
+//        // Move targetFingerIndex + 1 first fingers to safety:
+//        Finger<E> sentinelFinger = fingerList.get(targetFingerIndex);
+//        int index = sentinelFinger.index - 1;
+//        Node<E> node = sentinelFinger.node == null ? 
+//                       tail : 
+//                       sentinelFinger.node.prev;
+//        
+//        for (int i = 0; i < targetFingerIndex; i++) {
+//            Finger<E> finger = fingerList.get(targetFingerIndex - i);
+//            finger.index = index--;
+//            finger.node = node;
+//            node = node.prev;
+//        }
+//        
+//        // Remove unneccessary fingers from the tail of this indexed list:
+//        System.arraycopy(
+//                fingerList.fingerArray,
+//                fingerList.size(),
+//                fingerList.fingerArray,
+//                fingerList.size() - fingersToRemove,
+//                fingersToRemove);
+//        
+//        Arrays.fill(
+//                fingerList.fingerArray, 
+//                fingerList.size() + 1 - fingersToRemove,
+//                fingerList.size() + 1, 
+//                null);
+//        
+//        fingerList.size -= fingersToRemove;
+//        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
+//                                            removalLength);
+//        
+//        fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
     
     /**
