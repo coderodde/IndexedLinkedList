@@ -3099,14 +3099,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         } else {
             if (this.numberOfCoveringFingersToSuffix > 0) {
+                // Here, this.numberOfCoveringFingersInPrefix == 0 and
+                //       this.numberOfCoveringFingersInSuffix > 0
                 System.out.println("=>");
                 removeRangeImplCase5C(fromFingerIndex,
                                       toFingerIndex,
                                       fromIndex,
                                       toIndex,
                                       fingersToRemove);
-                // Here, this.numberOfCoveringFingersInPrefix == 0 and
-                //       this.numberOfCoveringFingersInSuffix > 0
             } else {
                 System.out.println("==");
                 // Here, this.numberOfCoveringFingersInPrefix == 0 and
@@ -3188,15 +3188,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     "targetFingerIndex == fingerList.size()");
         }
         
-        finger = fingerList.get(targetFingerIndex);
-        index = finger.index + 1;
-        node = finger.node.next;
+        finger = fingerList.get(targetFingerIndex - 1);
+        index = finger.index - 1;
+        node = finger.node.prev;
         
         for (int i = 0; i < numberOfCoveringFingersToSuffix; i++) {
-            Finger<E> f = fingerList.get(toFingerIndex + i);
-            f.index = index++;
+            Finger<E> f = fingerList.get(toFingerIndex - i - 1);
+            f.index = index--;
             f.node = node;
-            node = node.next;
+            node = node.prev;
         }
     }
     
@@ -3212,7 +3212,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                        int fingersToRemove) {
         
         int removalLength = toIndex - fromIndex;
-        int targetFingerIndex = Math.max(0, toFingerIndex - 1);
+        int targetFingerIndex = toFingerIndex;
         int fingerSpotsCountedSoFar = 0;
                 
         for (; targetFingerIndex < fingerList.size(); 
