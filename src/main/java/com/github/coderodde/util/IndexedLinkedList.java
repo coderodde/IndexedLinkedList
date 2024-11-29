@@ -3126,6 +3126,119 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                        int toIndex,
                                        int fingersToRemove) {
         
+        int index = fromIndex - 1;
+        Node<E> node = fingerList.getNode(index);
+        
+        for (int i = 0; 
+                 i < numberOfCoveringFingersToPrefix + fromFingerIndex;
+                 i++) {
+            
+            Finger<E> finger =
+                    fingerList.get(
+                            numberOfCoveringFingersToPrefix 
+                                    + fromFingerIndex 
+                                    - 1 
+                                    - i);
+            
+            finger.index = index--;
+            finger.node = node;
+            node = node.prev;
+        }
+        
+        int remainingFingers = fingerList.size() - toFingerIndex;
+        index = toIndex;
+        node = fingerList.getNode(index);
+        
+        for (int i = 0; 
+                 i < numberOfCoveringFingersToSuffix + remainingFingers;
+                 i++) {
+            
+            Finger<E> finger =
+                    fingerList.get(
+                            numberOfCoveringFingersToPrefix
+                                    + fromFingerIndex 
+                                    + i);
+            
+            finger.index = index++;
+            finger.node = node.next;
+            node = node.next;
+        }
+        
+//        int removalLength = toIndex - fromIndex;
+//        int targetFingerIndex = 1;
+//        int fingerSpotsSoFar = fingerList.get(0).index;
+//        
+//        for (; targetFingerIndex < fingerList.size(); 
+//               targetFingerIndex++) {
+//            
+//            Finger<E> finger1 = fingerList.get(targetFingerIndex - 1);
+//            Finger<E> finger2 = fingerList.get(targetFingerIndex);
+//            
+//            int difference = finger2.index
+//                           - finger1.index
+//                           - 1;
+//            
+//            fingerSpotsSoFar += difference;
+//            
+//            if (fingerSpotsSoFar >= this.numberOfCoveringFingersToPrefix) {
+//                break;
+//            }
+//        }
+//        
+//        if (targetFingerIndex == fingerList.size()) {
+//            System.out.println("targetFingerIndex == fingerList.size()");
+////            int index = IndexedLinkedList.this.size - 1;
+////            int remainingFingers = fingerList.size() - fingersToRemove;
+////            Node<E> node = tail;
+////            
+////            for (int i = 0; i < remainingFingers; i++) {
+////                Finger<E> finger = fingerList.get(fingerList.size() - 1 - i);
+////                finger.index = index--;
+////                finger.node = node;
+////                node = node.prev;
+////            }
+////            
+////            System.arraycopy(
+////                    fingerList.fingerArray,
+////                    fingerList.size() - remainingFingers,
+////                    fingerList.fingerArray,
+////                    0,
+////                    remainingFingers + 1);
+////            
+////            Arrays.fill(
+////                    fingerList.fingerArray, 
+////                    remainingFingers + 1,
+////                    fingerList.size() + 1, 
+////                    null);
+////            
+////            fingerList.size -= fingersToRemove;
+////            fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
+////                                                removalLength);
+////
+////            fingerList.contractFingerArrayIfNeeded(fingerList.size());
+//            return;
+//        } else {
+//            Finger<E> targetFinger = fingerList.get(targetFingerIndex);
+//            int index = fromIndex - 1;
+//            Node<E> node = fingerList.getNode(index);
+//            
+//            for (int i = 0; i < numberOfCoveringFingersToPrefix; i++) {
+//                Finger<E> finger = 
+//                        fingerList.get(numberOfCoveringFingersToPrefix - 1 - i);
+//                
+//                finger.index = index--;
+//                finger.node = node;
+//                node = node.prev;
+//            }
+//            
+//            System.out.println("hello there");
+//        }
+//        
+//        if (true) {
+//            System.out.println("");
+//            
+//        }
+        /*
         int removalLength = toIndex - fromIndex;
         int targetFingerIndex = Math.max(0, fromFingerIndex - 1);
         int fingersSpotsCountedSoFar = 0;
@@ -3197,7 +3310,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             f.index = index--;
             f.node = node;
             node = node.prev;
-        }
+        }*/
     }
     
     /**

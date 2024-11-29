@@ -168,7 +168,7 @@ final class FingerList<E> {
     void contractFingerArrayIfNeeded(int nextSize) {
         // Can we contract at least once?
         if ((nextSize + 1) * 4 < fingerArray.length
-                && fingerArray.length > 2 * INITIAL_CAPACITY) {
+                && fingerArray.length > INITIAL_CAPACITY) {//TODO: 2?
 
             int nextCapacity = fingerArray.length / 4;
 
