@@ -3232,9 +3232,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+//        if (targetFingerIndex == fingerList.size()) {
+//            System.out.println("OH YeAH");
+//        }
+        
         Finger<E> finger = fingerList.get(targetFingerIndex);
         int index = finger.index - 1;
-        Node<E> node = finger.node.prev;
+        Node<E> node = finger.node == null ? tail : finger.node.prev;
         
         for (int i = 0; i < targetFingerIndex; i++) {
             Finger<E> f = fingerList.get(targetFingerIndex - 1 - i);
