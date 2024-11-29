@@ -3093,9 +3093,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       fingersToRemove);
                 
             } else {
-                System.out.println(">=");
                 // Here, this.numberOfCoveringFingersInPrefix > 0 and
                 //       this.numberOfCoveringFingersInSuffix == 0    
+                System.out.println(">=");
+                removeRangeImplCase5B(fromFingerIndex,
+                                      toFingerIndex,
+                                      fromIndex,
+                                      toIndex,
+                                      fingersToRemove);
             }
         } else {
             if (this.numberOfCoveringFingersToSuffix > 0) {
@@ -3333,6 +3338,64 @@ public class IndexedLinkedList<E> implements Deque<E>,
             f.node = node;
             node = node.prev;
         }*/
+    }
+    
+    /**
+     * Implements the range removal for the case where there are fingers going
+     * to prefix only.
+     * 
+     * @param fromFingerIndex
+     * @param toFingerIndex
+     * @param fromIndex
+     * @param toIndex
+     * @param fingersToRemove 
+     */
+    private void removeRangeImplCase5B(int fromFingerIndex,
+                                       int toFingerIndex,
+                                       int fromIndex,
+                                       int toIndex,
+                                       int fingersToRemove) {
+        System.out.println("hello !");
+        
+        int removalLength = toIndex - fromIndex;
+        int index = fromIndex - 1;
+        Node<E> node = fingerList.getNode(index);
+        
+        for (int i = 0; 
+                 i < numberOfCoveringFingersToPrefix + fromFingerIndex; 
+                 i++) {
+            
+            Finger<E> finger = 
+                    fingerList.get(
+                            numberOfCoveringFingersToPrefix 
+                                    + fromFingerIndex
+                                    - 1 
+                                    - i);
+            
+            finger.index = index--;
+            finger.node = node;
+            node = node.prev;
+        }
+        
+        Arrays.fill(
+                fingerList.fingerArray, 
+                fromFingerIndex + numberOfCoveringFingersToPrefix + 1, 
+                fingerList.size() + 1, 
+                null);
+        
+        Finger<E> newEndSentinelFinger =
+                new Finger<>(
+                        null,
+                        IndexedLinkedList.this.size);
+        
+        fingerList.size -= fingersToRemove;
+        fingerList.setFinger(fingerList.size(), 
+                             newEndSentinelFinger);
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+        fingerList.shiftFingerIndicesToLeft(
+                fromFingerIndex + numberOfCoveringFingersToPrefix, 
+                removalLength);
     }
     
     /**
