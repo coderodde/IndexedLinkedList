@@ -3176,8 +3176,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             index = toIndex;
             node = fingerList.getNode(index);
             
-            for (int i = 0; i < numberOfCoveringFingersToSuffix; i++) {
-                Finger<E> finger = fingerList.get(numberOfCoveringFingersToPrefix + i);
+            for (int i = 0; 
+                     i < numberOfCoveringFingersToSuffix - fromFingerIndex; 
+                     i++) {
+                
+                Finger<E> finger = fingerList.get(numberOfCoveringFingersToPrefix + i + fromFingerIndex);
                 finger.index = index++;
                 finger.node = node;
                 node = node.next;
