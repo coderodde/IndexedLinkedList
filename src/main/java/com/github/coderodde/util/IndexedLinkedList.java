@@ -3033,7 +3033,77 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         if (this.numberOfCoveringFingersToPrefix > 0 &&
             this.numberOfCoveringFingersToSuffix > 0) {
-            throw new IllegalStateException("BOTH");
+            
+            int index = fromIndex - 1;
+            Node<E> node = fingerList.getNode(index);
+            
+            for (int i = 0; i < numberOfCoveringFingersToPrefix; i++) {
+                Finger<E> finger = 
+                        fingerList.get(numberOfCoveringFingersToPrefix - 1 - i);
+                
+                finger.index = index--;
+                finger.node = node;
+                node = node.prev;
+            }
+            
+            int targetFingerIndex = toFingerIndex;
+            int fingerSpotsSoFar = fingerList.get(toFingerIndex).index 
+                                 - toIndex;
+            
+            for (; targetFingerIndex < fingerList.size(); 
+                   targetFingerIndex++) {
+                
+                Finger<E> finger1 = fingerList.get(targetFingerIndex);
+                Finger<E> finger2 = fingerList.get(targetFingerIndex + 1);
+                
+                int difference = finger2.index
+                               - finger1.index
+                               - 1;
+                
+                fingerSpotsSoFar += difference;
+                
+                if (fingerSpotsSoFar >= removalLength) {
+                    break;
+                }
+            }
+            
+            if (targetFingerIndex == fingerList.size()) {
+                throw new IllegalStateException("fdsfds fds f");
+            }
+            
+            Finger<E> targetFinger = fingerList.get(targetFingerIndex);
+            index = targetFinger.index - 1;
+            node = targetFinger.node.prev;
+            
+            for (int i = targetFingerIndex - 1; 
+                     i >= numberOfCoveringFingersToPrefix; 
+                     i--) {
+                
+                Finger<E> finger = fingerList.get(i);
+                finger.index = index--;
+                finger.node = node;
+                node = node.prev;
+            }
+            
+            fingerList.shiftFingerIndicesToLeft(
+                    numberOfCoveringFingersToPrefix, 
+                    removalLength);
+            
+            System.out.println("yes!");
+            
+//            index = toIndex;
+//            node = fingerList.getNode(index);
+//            
+//            for (int i = 0; i < numberOfCoveringFingersToSuffix; i++) {
+//                Finger<E> finger = 
+//                        fingerList.get(numberOfCoveringFingersToPrefix + i);
+//                
+//                finger.index = index++;
+//                finger.node = node;
+//                node = node.next;
+//            }
+            
+            
         } else if (this.numberOfCoveringFingersToPrefix > 0) {
             throw new IllegalStateException("numberOfCoveringFingersInPrefix > 0");
         } else {
