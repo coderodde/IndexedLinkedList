@@ -3211,14 +3211,33 @@ public class IndexedLinkedList<E> implements Deque<E>,
         node = fingerList.getNode(index);
         
         for (int i = 0; 
-                 i < numberOfCoveringFingersToSuffix + remainingFingers;
+                 i < numberOfCoveringFingersToSuffix;
                  i++) {
             
-            Finger<E> finger = fingerList.get(toFingerIndex + i);
+            Finger<E> finger = fingerList.get(numberOfCoveringFingersToPrefix + i);
             finger.index = index++;
             finger.node = node;
             node = node.next;
         }
+        
+        int endSentinelIndex = numberOfCoveringFingersToPrefix
+                             + numberOfCoveringFingersToSuffix;
+        
+        fingerList.get(endSentinelIndex).index = IndexedLinkedList.this.size;
+        fingerList.get(endSentinelIndex).node = null;
+        
+        Arrays.fill(
+                fingerList.fingerArray, 
+                endSentinelIndex + 1, 
+                fingerList.size() + 1, 
+                null);
+        
+        fingerList.size -= fingersToRemove;
+        fingerList.shiftFingerIndicesToLeft(
+                numberOfCoveringFingersToPrefix, 
+                removalLength);
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
         
 //        index = toIndex;
 //        node = fingerList.getNode(index);
@@ -3238,26 +3257,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
 //            node = node.next;
 //        }
         
-        Arrays.fill(
-                fingerList.fingerArray,
-                fromFingerIndex + numberOfCoveringFingersToPrefix + 1, 
-                fingerList.size() + 1,
-                null);
-
-        Finger<E> newEndSentinelFinger = 
-                new Finger<>(
-                        null,
-                        IndexedLinkedList.this.size);
-        
-        fingerList.size -= fingersToRemove;
-        
-        fingerList.setFinger(fingerList.size(),
-                             newEndSentinelFinger);
-        
-        fingerList.contractFingerArrayIfNeeded(fingerList.size());
-        fingerList.shiftFingerIndicesToLeft(
-                fromFingerIndex + numberOfCoveringFingersToPrefix, 
-                removalLength);
+//        Arrays.fill(
+//                fingerList.fingerArray,
+//                fromFingerIndex + numberOfCoveringFingersToPrefix + 1, 
+//                fingerList.size() + 1,
+//                null);
+//
+//        Finger<E> newEndSentinelFinger = 
+//                new Finger<>(
+//                        null,
+//                        IndexedLinkedList.this.size);
+//        
+//        fingerList.size -= fingersToRemove;
+//        
+//        fingerList.setFinger(fingerList.size(),
+//                             newEndSentinelFinger);
+//        
+//        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+//        fingerList.shiftFingerIndicesToLeft(
+//                fromFingerIndex + numberOfCoveringFingersToPrefix, 
+//                removalLength);
         
 //        int removalLength = toIndex - fromIndex;
 //        int targetFingerIndex = 1;
