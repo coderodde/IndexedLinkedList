@@ -3982,7 +3982,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          fingerList.fingerArray,
                          fromFingerIndex,
                          fingerList.size() 
-                                 - fingersToRemove 
                                  - this.numberOfCoveringFingersToPrefix 
                                  + 1);
         
