@@ -3610,19 +3610,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         Arrays.fill(
                 fingerList.fingerArray, 
-                fromFingerIndex + numberOfCoveringFingersToPrefix, 
+                numberOfCoveringFingersToPrefix + 1, 
                 fingerList.size() + 1, 
                 null);
         
-        Finger<E> newEndSentinelFinger =
-                new Finger<>(
-                        null,
-                        IndexedLinkedList.this.size);
+        Finger<E> endSentinelFinger = 
+                fingerList.get(numberOfCoveringFingersToPrefix);
+        
+        endSentinelFinger.node = null;
+        endSentinelFinger.index = IndexedLinkedList.this.size;
         
         fingerList.size -= fingersToRemove;
-        fingerList.setFinger(fingerList.size(), 
-                             newEndSentinelFinger);
-        
         fingerList.contractFingerArrayIfNeeded(fingerList.size());
         fingerList.shiftFingerIndicesToLeft(
                 numberOfCoveringFingersToPrefix, 
