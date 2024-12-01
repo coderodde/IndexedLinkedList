@@ -3947,7 +3947,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Case 6 of the range removal procedure.
+     * Case 6 of the range removal procedure in which both the number of covered
+     * and removed fingers are the same.
      * 
      * @param removalLength   the number of elements to remove.
      * @param fromFingerIndex the from index of the finger in the removed range.
@@ -3962,9 +3963,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          fromFingerIndex + coveredFingers,
                          fingerList.fingerArray,
                          fromFingerIndex,
-                         fingerList.size() -
-                                 fingersToRemove -
-                                 this.numberOfCoveringFingersToPrefix);
+                         fingerList.size() 
+                                 - fingersToRemove 
+                                 - this.numberOfCoveringFingersToPrefix 
+                                 + 1);
         
         Arrays.fill(fingerList.fingerArray,
                     fingerList.size() - fingersToRemove + 1, 
