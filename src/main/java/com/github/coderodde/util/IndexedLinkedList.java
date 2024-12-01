@@ -3076,7 +3076,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             fingerList.get(
                                     fingerList.size()
                                             - numberOfCoveringFingersToSuffix
-                                            - i);
+                                            + i);
                     
                     finger.index = index++;
                     finger.node = node;
