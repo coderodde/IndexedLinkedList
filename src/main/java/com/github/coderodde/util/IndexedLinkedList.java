@@ -3068,7 +3068,27 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (targetFingerIndex == fingerList.size()) {
-                throw new IllegalStateException("fdsfds fds f");
+                index = toIndex;
+                node = fingerList.getNode(index);
+                
+                for (int i = 0; i < numberOfCoveringFingersToSuffix; i++) {
+                    Finger<E> finger = 
+                            fingerList.get(
+                                    fingerList.size()
+                                            - numberOfCoveringFingersToSuffix
+                                            - i);
+                    
+                    finger.index = index++;
+                    finger.node = node;
+                    node = node.next;
+                }
+                
+                fingerList.shiftFingerIndicesToLeft(
+                        numberOfCoveringFingersToPrefix, 
+                        removalLength);
+                
+                fingerList.contractFingerArrayIfNeeded(fingerList.size());
+                return;
             }
             
             Finger<E> targetFinger = fingerList.get(targetFingerIndex);
