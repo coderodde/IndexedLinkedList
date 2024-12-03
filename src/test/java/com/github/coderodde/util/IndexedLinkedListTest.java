@@ -851,15 +851,19 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("[[ iteration = " + iteration + " ]]");
-                
                 list.clear();
                 list.addAll(data);
                 referenceList.clear();
                 referenceList.addAll(data);
                 
-                list.subList(fromIndex, toIndex).clear();
-                list.checkInvarant();
+                try {
+                    list.subList(fromIndex, toIndex).clear();
+                    list.checkInvarant();
+                } catch (final Exception ex) {
+                    System.out.println("[[ iteration = " + iteration + " ]]");
+                    fail(ex.getMessage());
+                }
+                    
                 referenceList.subList(fromIndex, toIndex).clear();
                 
                 assertEquals(referenceList, list);

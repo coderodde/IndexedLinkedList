@@ -3161,7 +3161,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else {
             // Here, this.numberOfCoveringFingersInSuffix > 0:
             int targetFingerIndex = toFingerIndex;
-            int freeSpotsSoFar = 0;
+            int freeSpotsSoFar = fingerList.get(toFingerIndex).index - toIndex - toFingerIndex;
             
             for (; targetFingerIndex < fingerList.size();
                    targetFingerIndex++) {
