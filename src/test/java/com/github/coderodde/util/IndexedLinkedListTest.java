@@ -1031,7 +1031,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    ////@Test // Passes.
+    @Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
         Random random = new Random(666L);
         
@@ -1041,6 +1041,8 @@ public class IndexedLinkedListTest {
         for (int fromIndex = 0; fromIndex <= 100; fromIndex++) {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
+                
+                System.out.println("<< iter = " + iteration + ">>");
                 
                 list.clear();
                 list.addAll(data);
