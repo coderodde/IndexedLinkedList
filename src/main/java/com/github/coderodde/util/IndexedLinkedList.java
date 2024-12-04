@@ -2817,8 +2817,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
 //            System.out.println("fingersToRemove > coveredFingers");
             
             removeRangeImplCase4(fromIndex, 
+                                 toIndex,
                                  fingersToRemove,
-                                 removalLength);
+                                 removalLength,
+                                 fromFingerIndex,
+                                 toFingerIndex);
             
         } else if (fingersToRemove < coveredFingers) {
 //            System.out.println("fingersToRemove < coveredFingers");
@@ -2999,21 +3002,60 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * fingers to remove is higher than the number of covered fingers.
      */
     private void removeRangeImplCase4(int fromIndex,
+                                      int toIndex,
                                       int numberOfFingersToRemove,
-                                      int removalLength) {
+                                      int removalLength,
+                                      int fromFingerIndex,
+                                      int toFingerIndex) {
         
-        int fromFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
+        System.arraycopy(
+                fingerList.fingerArray,
+                fingerList.size() - numberOfFingersToRemove,
+                fingerList.fingerArray,
+                fingerList.size() - numberOfFingersToRemove - toFingerIndex - 1,
+                numberOfFingersToRemove + 1);
         
-        System.arraycopy(fingerList.fingerArray,
-                         fromFingerIndex + numberOfFingersToRemove, 
-                         fingerList.fingerArray,
-                         fromFingerIndex, 
-                         numberOfFingersToRemove);
+        Arrays.fill(
+                fingerList.fingerArray,
+                fingerList.size() + 1 - numberOfFingersToRemove,
+                fingerList.size() + 1,
+                null);
         
-        Arrays.fill(fingerList.fingerArray,
-                    fingerList.size() - numberOfFingersToRemove + 1,
-                    fingerList.size() + 1,
-                    null);
+        int targetFingerIndex = fromFingerIndex;
+        int fingerSpotsSoFar = fingerList.get(fromFingerIndex).index 
+                             - fromFingerIndex
+                             - fromIndex;
+        
+        for (; targetFingerIndex < fingerList.size(); 
+               targetFingerIndex++) {
+            
+            Finger<E> f1 = fingerList.get(targetFingerIndex);
+            Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
+            
+            int difference = f2.index
+                           - f1.index
+                           - 1;
+            
+            fingerSpotsSoFar += difference;
+            
+            if (fingerSpotsSoFar >= removalLength) {
+                break;
+            }
+        }
+        
+        if (targetFingerIndex == fingerList.size()) {
+            throw new UnsupportedOperationException("hellowka");
+        }
+        
+        int index = toIndex;
+        Node<E> node = fingerList.getNode(index);
+        
+        for (int i = fromFingerIndex; i <= toFingerIndex; i++) {
+            Finger<E> finger = fingerList.get(i - fromFingerIndex);
+            finger.index = index++;
+            finger.node = node;
+            node = node.next;
+        }
         
         fingerList.size -= numberOfFingersToRemove;
         fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
