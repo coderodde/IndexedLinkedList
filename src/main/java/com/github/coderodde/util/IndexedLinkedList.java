@@ -3207,23 +3207,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             for (; targetFingerIndex < fingerList.size();
                    targetFingerIndex++) {
+                
                 Finger<E> f1 = fingerList.get(targetFingerIndex);
                 Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
-                int diff = f2.index - f1.index - 1;
-                freeSpotsSoFar += diff;
+                
+                int difference = f2.index 
+                               - f1.index 
+                               - 1;
+                
+                freeSpotsSoFar += difference;
                 
                 if (freeSpotsSoFar >= removalLength) {
                     break;
                 }
             }
             
-            Finger<E> finger = fingerList.get(targetFingerIndex);
+            Finger<E> finger = fingerList.get(targetFingerIndex + 1);
             
             for (int i = 0; 
-                     i < targetFingerIndex - fromFingerIndex;
+                     i < targetFingerIndex - fromFingerIndex + 1;
                      i++) {
                 
-                Finger<E> f = fingerList.get(targetFingerIndex - 1 - i);
+                Finger<E> f = fingerList.get(targetFingerIndex - i);
                 f.index = finger.index - 1;
                 f.node = finger.node.prev;
                 finger = f;
