@@ -4060,11 +4060,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          fingerList.fingerArray,
                          fromFingerIndex,
                          fingerList.size() 
-                                 - this.numberOfCoveringFingersToPrefix 
+                                 - fingersToRemove 
                                  + 1);
         
         Arrays.fill(fingerList.fingerArray,
-                    fingerList.size() - fingersToRemove + 1, 
+                    fingerList.size() + 1 - fingersToRemove, 
                     fingerList.size() + 1,
                     null);
         
