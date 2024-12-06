@@ -3786,9 +3786,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     null);
             
             fingerList.size -= fingersToRemove;
-            fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
-                                                removalLength);
-
+            fingerList.shiftFingerIndicesToLeft(0, removalLength);
             fingerList.contractFingerArrayIfNeeded(fingerList.size());
             
             return;
