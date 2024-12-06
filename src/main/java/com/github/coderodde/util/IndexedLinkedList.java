@@ -3078,7 +3078,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             this.numberOfCoveringFingersToSuffix > 0) {
             
             int index = fromIndex - 1;
-            Node<E> node = fingerList.getNode(index);
+            Node<E> node = fingerList.getNodeNoFingersFix(index);
             
             for (int i = 0; i < numberOfCoveringFingersToPrefix; i++) {
                 Finger<E> finger = 
@@ -3090,7 +3090,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             int targetFingerIndex = toFingerIndex;
-            int fingerSpotsSoFar = fingerList.get(toFingerIndex).index 
+            int fingerSpotsSoFar = fingerList.get(toFingerIndex).index
                                  - toIndex;
             
             for (; targetFingerIndex < fingerList.size(); 
@@ -3106,6 +3106,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerSpotsSoFar += difference;
                 
                 if (fingerSpotsSoFar >= removalLength) {
+                    targetFingerIndex++;
                     break;
                 }
             }
