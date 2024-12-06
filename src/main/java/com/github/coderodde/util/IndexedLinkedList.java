@@ -2386,8 +2386,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int freeFingerSuffixSpots = listSuffixFreeSpots 
                                   - fingerSuffixLength;
 
-        int freeSpots = freeFingerPrefixSpots + 
-                        freeFingerSuffixSpots;
+        int freeSpots = freeFingerPrefixSpots
+                      + freeFingerSuffixSpots;
 
         float leftRatio = (float)(freeFingerPrefixSpots) / 
                           (float)(freeSpots);
@@ -3012,7 +3012,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerList.fingerArray,
                 fingerList.size() - numberOfFingersToRemove,
                 fingerList.fingerArray,
-                fingerList.size() - numberOfFingersToRemove - toFingerIndex - 1,
+                fingerList.size() - 2 * numberOfFingersToRemove,
                 numberOfFingersToRemove + 1);
         
         Arrays.fill(
@@ -3048,18 +3048,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         int index = toIndex;
-        Node<E> node = fingerList.getNode(index);
+        Node<E> node = fingerList.getNodeNoFingersFix(index);
         
-        for (int i = fromFingerIndex; i <= toFingerIndex; i++) {
-            Finger<E> finger = fingerList.get(i - fromFingerIndex);
+        for (int i = targetFingerIndex; i >= 0; i--) {
+            Finger<E> finger = fingerList.get(targetFingerIndex - i);
             finger.index = index++;
             finger.node = node;
             node = node.next;
         }
         
         fingerList.size -= numberOfFingersToRemove;
-        fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
-                                            removalLength);
+        fingerList.shiftFingerIndicesToLeft(0, removalLength);
     }
     
     private void removeRangeImplCase2(final int fromFingerIndex,
