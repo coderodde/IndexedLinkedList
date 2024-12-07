@@ -3007,6 +3007,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       int removalLength,
                                       int fromFingerIndex,
                                       int toFingerIndex) {
+        int index = toIndex;
+        Node<E> node = fingerList.getNodeNoFingersFix(index);
         
         System.arraycopy(
                 fingerList.fingerArray,
@@ -3020,6 +3022,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerList.size() + 1 - numberOfFingersToRemove,
                 fingerList.size() + 1,
                 null);
+        
+        if (toFingerIndex == fingerList.size()) {
+            for (int i = fingerList.size() - 2 * numberOfFingersToRemove, k = 0;
+                     k < numberOfFingersToRemove; 
+                     k++, i++) {
+                
+                Finger<E> finger = fingerList.get(i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
+            
+            fingerList.size -= numberOfFingersToRemove;
+            fingerList.shiftFingerIndicesToLeft(
+                    fingerList.size() - numberOfFingersToRemove, 
+                    removalLength);
+            return;
+        }
         
         int targetFingerIndex = fromFingerIndex;
         int fingerSpotsSoFar = fingerList.get(fromFingerIndex).index 
@@ -3047,8 +3067,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             throw new UnsupportedOperationException("hellowka");
         }
         
-        int index = toIndex;
-        Node<E> node = fingerList.getNodeNoFingersFix(index);
+        index = toIndex;
+        node = fingerList.getNodeNoFingersFix(index);
         
         for (int i = targetFingerIndex; i >= 0; i--) {
             Finger<E> finger = fingerList.get(targetFingerIndex - i);
