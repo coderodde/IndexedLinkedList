@@ -851,7 +851,7 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("[[ iteration = " + iteration + " ]]");
+//                System.out.println("[[ iteration = " + iteration + " ]]");
                 
                 list.clear();
                 list.addAll(data);
@@ -1032,7 +1032,34 @@ public class IndexedLinkedListTest {
     }
     
     @Test // Passes.
-    public void bruteForceSubListClearFromToWithRandomization() {
+    public void bruteForceSubListClearFromToWithRandomization666() {
+        Random random = new Random(666L);
+        
+        List<Integer> data = getIntegerList(100);
+        int iteration = 0;
+        
+        for (int fromIndex = 0; fromIndex <= 100; fromIndex++) {
+            for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
+                iteration++;
+                
+                list.clear();
+                list.addAll(data);
+                list.randomizeFingers(random);
+                
+                referenceList.clear();
+                referenceList.addAll(data);
+                
+                list.subList(fromIndex, toIndex).clear();
+                referenceList.subList(fromIndex, toIndex).clear();
+                
+                assertEquals(referenceList, list);
+                list.checkInvarant();
+            }
+        }
+    }
+    
+    @Test // Passes.
+    public void bruteForceSubListClearFromToWithRandomization13() {
         Random random = new Random(13L);
         
         List<Integer> data = getIntegerList(100);
@@ -1042,7 +1069,7 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("<< iter = " + iteration + ">>");
+                System.out.println("{{>> iteration = " + iteration + " <<}}");
                 
                 list.clear();
                 list.addAll(data);
