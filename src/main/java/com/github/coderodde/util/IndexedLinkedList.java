@@ -3030,9 +3030,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         index = toIndex;
         node = fingerList.getNodeNoFingersFix(index);
         
-        for (int i = 0; i < numberOfCoveringFingersToSuffix  // TODO: - num..ToPrefix?
-                          - numberOfFingersToRemove; 
-                 i++) {
+        for (int i = 0; i < numberOfCoveringFingersToSuffix; i++) {
 
             Finger<E> finger = 
                     fingerList.get(numberOfCoveringFingersToPrefix + i);
@@ -3042,24 +3040,43 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = node.next;
         }
         
-        System.arraycopy(fingerList.fingerArray, 
-                         numberOfCoveringFingersToPrefix 
-                                 + numberOfCoveringFingersToSuffix ,
-//                                 - numberOfFingersToRemove,
-                         fingerList.fingerArray,
-                         numberOfCoveringFingersToPrefix 
-                                 + numberOfCoveringFingersToSuffix
-                                 - numberOfFingersToRemove,
-                         numberOfFingersToRemove + 1);
+        Finger<E> endOfListSentinelFinger = fingerList.get(fingerList.size());
         
-        Arrays.fill(fingerList.fingerArray,
-                    fingerList.size() + 1 - numberOfFingersToRemove, 
-                    fingerList.size() + 1,
-                    null);
+        fingerList.setFinger(
+                numberOfCoveringFingersToPrefix 
+                        + numberOfCoveringFingersToSuffix,
+                endOfListSentinelFinger);
+        
+        Arrays.fill(
+                fingerList.fingerArray,
+                numberOfCoveringFingersToPrefix 
+                        + numberOfCoveringFingersToSuffix 
+                        + 1, 
+                fingerList.size() + 1, 
+                null);
         
         fingerList.size -= numberOfFingersToRemove;
         fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersToPrefix, 
                                             removalLength);
+        
+//        System.arraycopy(fingerList.fingerArray, 
+//                         numberOfCoveringFingersToPrefix 
+//                                 + numberOfCoveringFingersToSuffix ,
+////                                 - numberOfFingersToRemove,
+//                         fingerList.fingerArray,
+//                         numberOfCoveringFingersToPrefix 
+//                                 + numberOfCoveringFingersToSuffix
+//                                 - numberOfFingersToRemove,
+//                         numberOfFingersToRemove + 1);
+//        
+//        Arrays.fill(fingerList.fingerArray,
+//                    fingerList.size() + 1 - numberOfFingersToRemove, 
+//                    fingerList.size() + 1,
+//                    null);
+//        
+//        fingerList.size -= numberOfFingersToRemove;
+//        fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersToPrefix, 
+//                                            removalLength);
         
 //        int idx1 = toIndex;
 //        Node<E> node11 = fingerList.getNodeNoFingersFix(idx1);

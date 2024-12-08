@@ -851,21 +851,17 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
+                System.out.println("[[ iteration = " + iteration + " ]]");
+                
                 list.clear();
                 list.addAll(data);
                 referenceList.clear();
                 referenceList.addAll(data);
                 
-                try {
-                    list.subList(fromIndex, toIndex).clear();
-                    list.checkInvarant();
-                } catch (final Exception ex) {
-                    System.out.println("[[ iteration = " + iteration + " ]]");
-                    fail(ex.getMessage());
-                }
+                list.subList(fromIndex, toIndex).clear();
+                list.checkInvarant();
                     
                 referenceList.subList(fromIndex, toIndex).clear();
-                
                 assertEquals(referenceList, list);
             }
         }
@@ -1037,7 +1033,7 @@ public class IndexedLinkedListTest {
     
     @Test // Passes.
     public void bruteForceSubListClearFromToWithRandomization() {
-        Random random = new Random(666L);
+        Random random = new Random(13L);
         
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
