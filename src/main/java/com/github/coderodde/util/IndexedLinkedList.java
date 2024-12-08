@@ -3007,78 +3007,132 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       int removalLength,
                                       int fromFingerIndex,
                                       int toFingerIndex) {
-        int index = toIndex;
+        
+        loadFingerCoverageCounters(
+                fromFingerIndex, 
+                toFingerIndex, 
+                fromIndex, 
+                toIndex, 
+                numberOfFingersToRemove);
+        
+        int index = fromIndex - 1;
         Node<E> node = fingerList.getNodeNoFingersFix(index);
         
-        System.arraycopy(
-                fingerList.fingerArray,
-                fingerList.size() - numberOfFingersToRemove,
-                fingerList.fingerArray,
-                fingerList.size() - 2 * numberOfFingersToRemove,
-                numberOfFingersToRemove + 1);
-        
-        Arrays.fill(
-                fingerList.fingerArray,
-                fingerList.size() + 1 - numberOfFingersToRemove,
-                fingerList.size() + 1,
-                null);
-        
-        if (toFingerIndex == fingerList.size()) {
-            for (int i = fingerList.size() - 2 * numberOfFingersToRemove, k = 0;
-                     k < numberOfFingersToRemove; 
-                     k++, i++) {
-                
-                Finger<E> finger = fingerList.get(i);
-                finger.index = index++;
-                finger.node = node;
-                node = node.next;
-            }
+        for (int i = 0; i < numberOfCoveringFingersToPrefix; i++) {
+            Finger<E> finger =
+                    fingerList.get(numberOfCoveringFingersToPrefix - 1 - i);
             
-            fingerList.size -= numberOfFingersToRemove;
-            fingerList.shiftFingerIndicesToLeft(
-                    fingerList.size() - numberOfFingersToRemove, 
-                    removalLength);
-            return;
-        }
-        
-        int targetFingerIndex = fromFingerIndex;
-        int fingerSpotsSoFar = fingerList.get(fromFingerIndex).index 
-                             - fromFingerIndex
-                             - fromIndex;
-        
-        for (; targetFingerIndex < fingerList.size(); 
-               targetFingerIndex++) {
-            
-            Finger<E> f1 = fingerList.get(targetFingerIndex);
-            Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
-            
-            int difference = f2.index
-                           - f1.index
-                           - 1;
-            
-            fingerSpotsSoFar += difference;
-            
-            if (fingerSpotsSoFar >= removalLength) {
-                break;
-            }
-        }
-        
-        if (targetFingerIndex == fingerList.size()) {
-            throw new UnsupportedOperationException("hellowka");
+            finger.index = index--;
+            finger.node = node;
+            node = node.prev;
         }
         
         index = toIndex;
         node = fingerList.getNodeNoFingersFix(index);
         
-        for (int i = targetFingerIndex; i >= 0; i--) {
-            Finger<E> finger = fingerList.get(targetFingerIndex - i);
+        for (int i = 0; i < numberOfCoveringFingersToSuffix  // TODO: - num..ToPrefix?
+                          - numberOfFingersToRemove; 
+                 i++) {
+
+            Finger<E> finger = 
+                    fingerList.get(numberOfCoveringFingersToPrefix + i);
+            
             finger.index = index++;
             finger.node = node;
             node = node.next;
         }
         
+        System.arraycopy(fingerList.fingerArray, 
+                         numberOfCoveringFingersToPrefix 
+                                 + numberOfCoveringFingersToSuffix ,
+//                                 - numberOfFingersToRemove,
+                         fingerList.fingerArray,
+                         numberOfCoveringFingersToPrefix 
+                                 + numberOfCoveringFingersToSuffix
+                                 - numberOfFingersToRemove,
+                         numberOfFingersToRemove + 1);
+        
+        Arrays.fill(fingerList.fingerArray,
+                    fingerList.size() + 1 - numberOfFingersToRemove, 
+                    fingerList.size() + 1,
+                    null);
+        
         fingerList.size -= numberOfFingersToRemove;
-        fingerList.shiftFingerIndicesToLeft(0, removalLength);
+        fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersToPrefix, 
+                                            removalLength);
+        
+//        int idx1 = toIndex;
+//        Node<E> node11 = fingerList.getNodeNoFingersFix(idx1);
+//        
+//        System.arraycopy(
+//                fingerList.fingerArray,
+//                fingerList.size() - numberOfFingersToRemove,
+//                fingerList.fingerArray,
+//                fingerList.size() - 2 * numberOfFingersToRemove,
+//                numberOfFingersToRemove + 1);
+//        
+//        Arrays.fill(
+//                fingerList.fingerArray,
+//                fingerList.size() + 1 - numberOfFingersToRemove,
+//                fingerList.size() + 1,
+//                null);
+//        
+//        if (toFingerIndex == fingerList.size()) {
+//            for (int i = fingerList.size() - 2 * numberOfFingersToRemove, k = 0;
+//                     k < numberOfFingersToRemove; 
+//                     k++, i++) {
+//                
+//                Finger<E> finger = fingerList.get(i);
+//                finger.index = idx1++;
+//                finger.node = node11;
+//                node11 = node11.next;
+//            }
+//            
+//            fingerList.size -= numberOfFingersToRemove;
+//            fingerList.shiftFingerIndicesToLeft(
+//                    fingerList.size() - numberOfFingersToRemove, 
+//                    removalLength);
+//            return;
+//        }
+//        
+//        int targetFingerIndex = fromFingerIndex;
+//        int fingerSpotsSoFar = fingerList.get(fromFingerIndex).index 
+//                             - fromFingerIndex
+//                             - fromIndex;
+//        
+//        for (; targetFingerIndex < fingerList.size(); 
+//               targetFingerIndex++) {
+//            
+//            Finger<E> f1 = fingerList.get(targetFingerIndex);
+//            Finger<E> f2 = fingerList.get(targetFingerIndex + 1);
+//            
+//            int difference = f2.index
+//                           - f1.index
+//                           - 1;
+//            
+//            fingerSpotsSoFar += difference;
+//            
+//            if (fingerSpotsSoFar >= removalLength) {
+//                break;
+//            }
+//        }
+//        
+//        if (targetFingerIndex == fingerList.size()) {
+//            throw new UnsupportedOperationException("hellowka");
+//        }
+//        
+//        idx1 = toIndex;
+//        node11 = fingerList.getNodeNoFingersFix(idx1);
+//        
+//        for (int i = targetFingerIndex; i >= 0; i--) {
+//            Finger<E> finger = fingerList.get(targetFingerIndex - i);
+//            finger.index = idx1++;
+//            finger.node = node11;
+//            node11 = node11.next;
+//        }
+//        
+//        fingerList.size -= numberOfFingersToRemove;
+//        fingerList.shiftFingerIndicesToLeft(0, removalLength);
     }
     
     private void removeRangeImplCase2(final int fromFingerIndex,
