@@ -3660,39 +3660,53 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
-        for (int i = 0; 
-                 i < numberOfCoveringFingersToPrefix; 
-                 i++) {
-            
-            Finger<E> finger = 
-                    fingerList.get(
-                            numberOfCoveringFingersToPrefix 
-//                                    + fromFingerIndex
-                                    - 1 
-                                    - i);
-            
-            finger.index = index--;
-            finger.node = node;
-            node = node.prev;
-        }
+        Finger<E> endOfFingerListSentinel = fingerList.get(fingerList.size());
         
-        Arrays.fill(
-                fingerList.fingerArray, 
-                numberOfCoveringFingersToPrefix + 1, 
-                fingerList.size() + 1, 
-                null);
+        fingerList.setFinger(fingerList.size() - fingersToRemove,
+                             endOfFingerListSentinel);
         
-        Finger<E> endSentinelFinger = 
-                fingerList.get(numberOfCoveringFingersToPrefix);
-        
-        endSentinelFinger.node = null;
-        endSentinelFinger.index = IndexedLinkedList.this.size;
+        Arrays.fill(fingerList.fingerArray,
+                    fingerList.size() - fingersToRemove + 1, 
+                    fingerList.size() + 1, 
+                    null);
         
         fingerList.size -= fingersToRemove;
-        fingerList.contractFingerArrayIfNeeded(fingerList.size());
-        fingerList.shiftFingerIndicesToLeft(
-                numberOfCoveringFingersToPrefix, 
-                removalLength);
+        fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersToPrefix,
+                                            removalLength);
+        
+//        for (int i = 0; 
+//                 i < numberOfCoveringFingersToPrefix; 
+//                 i++) {
+//            
+//            Finger<E> finger = 
+//                    fingerList.get(
+//                            numberOfCoveringFingersToPrefix 
+////                                    + fromFingerIndex
+//                                    - 1 
+//                                    - i);
+//            
+//            finger.index = index--;
+//            finger.node = node;
+//            node = node.prev;
+//        }
+//        
+//        Arrays.fill(
+//                fingerList.fingerArray, 
+//                numberOfCoveringFingersToPrefix + 1, 
+//                fingerList.size() + 1, 
+//                null);
+//        
+//        Finger<E> endSentinelFinger = 
+//                fingerList.get(numberOfCoveringFingersToPrefix);
+//        
+//        endSentinelFinger.node = null;
+//        endSentinelFinger.index = IndexedLinkedList.this.size;
+//        
+//        fingerList.size -= fingersToRemove;
+//        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+//        fingerList.shiftFingerIndicesToLeft(
+//                numberOfCoveringFingersToPrefix, 
+//                removalLength);
     }
     
     /**
