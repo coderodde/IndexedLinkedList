@@ -3643,6 +3643,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int removalLength = toIndex - fromIndex;
         
         if (toFingerIndex == fingerList.size()) {
+//            System.out.println("bye");
             int index = fromIndex - 1;
             Node<E> node = fingerList.getNodeNoFingersFix(index);
             
@@ -3665,30 +3666,77 @@ public class IndexedLinkedList<E> implements Deque<E>,
             fingerList.setFinger(fingerList.size() - fingersToRemove, 
                                  endOfFingerListSentinel);
             
+            Arrays.fill(fingerList.fingerArray, 
+                        fingerList.size() + 1 - fingersToRemove, 
+                        fingerList.size() + 1,
+                        null);
+            
             fingerList.size -= fingersToRemove;
             fingerList.shiftFingerIndicesToLeft(numberOfCoveringFingersToPrefix,
                                                 removalLength);
             return;
         }
+//        } else if (fromFingerIndex == 0) {
+//            System.out.println("yo man");
+//            int index = fromIndex - 1;
+//            Node<E> node = fingerList.getNodeNoFingersFix(index);
+//            
+//            for (int i = 0; i < numberOfCoveringFingersToPrefix; i++) {
+//                Finger<E> finger = fingerList.get(fromFingerIndex - i);
+//                finger.index = index--;
+//                finger.node = node;
+//                node = node.prev;
+//            }
+//            
+//            index = toIndex;
+//            node = fingerList.getNodeNoFingersFix(index);
+//            
+//            for (int i = toFingerIndex; i < fingerList.size(); i++) {
+//                Finger<E> finger = fingerList.get(fingerList.size() - i);
+//                finger.index = index++;
+//                finger.node = node;
+//                node = node.next;
+//            }
+//            
+//            fingerList.setFinger(fingerList.size() - fingersToRemove, 
+//                                 fingerList.get(fingerList.size()));
+//            
+//            Arrays.fill(fingerList.fingerArray,
+//                        fingerList.size() + 1 - fingersToRemove, 
+//                        fingerList.size() + 1,
+//                        null);
+//            
+//            fingerList.size -= fingersToRemove;
+//            fingerList.shiftFingerIndicesToLeft(fromFingerIndex + 1, 
+//                                                removalLength);
+//            return;
+//        }
         
-        int numberOfFingersToMove = numberOfCoveringFingersToPrefix;
         int index = fromIndex - 1;
         Node<E> node = fingerList.getNodeNoFingersFix(index);
-        int index2 = toIndex;
-        Node<E> node2 = fingerList.getNodeNoFingersFix(index2);
+        int numberOfFingersToMove = Math.min(numberOfCoveringFingersToPrefix,
+                                             fromFingerIndex + 1);
         
         for (int i = 0; i < numberOfFingersToMove; i++) {
-            if (i <= fromFingerIndex) {
-                Finger<E> finger = fingerList.get(fromFingerIndex - i);
-                finger.index = index--;
-                finger.node = node;
-                node = node.prev;
-            } else {
-                Finger<E> finger = fingerList.get(fromFingerIndex + i);
-                finger.index = index2++;
-                finger.node = node2;
-                node2 = node2.next;
-            }
+            Finger<E> finger = 
+                    fingerList.get(numberOfFingersToMove - i - 1);
+            
+            finger.index = index--;
+            finger.node = node;
+            node = node.prev;
+        }
+        
+        numberOfFingersToMove = numberOfCoveringFingersToPrefix 
+                              - numberOfFingersToMove;
+        
+        index = toIndex;
+        node = fingerList.getNodeNoFingersFix(index);
+        
+        for (int i = 0; i < numberOfFingersToMove; i++) {
+            Finger<E> finger = fingerList.get(numberOfFingersToMove + i);
+            finger.index = index++;
+            finger.node = node;
+            node = node.next;
         }
         
         Finger<E> endOfFingerListSentinel = fingerList.get(fingerList.size());
