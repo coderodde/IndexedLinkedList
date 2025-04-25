@@ -160,11 +160,10 @@
                     <compilerArgs>
                         <arg>-g</arg>
                     </compilerArgs>
-                    <source>20</source>
-                    <target>20</target>
+                    <source>8</source>
+                    <target>8</target>
                     <debug>true</debug>
                     <debuglevel>lines,vars,source</debuglevel>
-                    <compilerArgument>--add-opens=java.base/java.util=ALL-UNNAMED</compilerArgument>
                 </configuration>
             </plugin>
 

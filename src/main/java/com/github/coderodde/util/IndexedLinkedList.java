@@ -2768,28 +2768,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                      toIndex,
                                      removalLength,
                                      fingersToRemove);
-//                
-//                this.loadFingerCoverageCounters(
-//                        fromFingerIndex,
-//                        toFingerIndex, 
-//                        fromIndex, 
-//                        toIndex, 
-//                        fingersToRemove);
-//
-//                // Shift the fingers to prefix and/or suffix:
-//                shiftCoveredFingersToPrefix(
-//                        this.numberOfCoveringFingersInPrefix,
-//                        fromFingerIndex);
-//                
-//                shiftCoveredFingersToSuffix(
-//                        this.numberOfCoveringFingersInSuffix,
-//                        toFingerIndex,
-//                        toIndex);
-//                
-//                fingerList.shiftFingerIndicesToLeft(
-//                        toFingerIndex - this.numberOfCoveringFingersInSuffix,
-//                        removalLength);
-                
+              
                 // Unlink the actual nodes:
                 unlinkNodeRange(this.removeRangeStartNode,
                                 this.removeRangeEndNode);
@@ -3714,10 +3693,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int index = fromIndex - 1;
         Node<E> node = fingerList.getNodeNoFingersFix(index);
-        int numberOfFingersToMove = Math.min(numberOfCoveringFingersToPrefix,
-                                             fromFingerIndex + 1);
+//        int numberOfFingersToMove = Math.min(numberOfCoveringFingersToPrefix,
+//                                             fromFingerIndex + 1);
+        int numberOfFingersToMove = fromFingerIndex + 1;
         
-        for (int i = 0; i < numberOfFingersToMove; i++) {
+//        for (int i = 0; i < numberOfFingersToMove; i++) {
+        for (int i = 0; i < this.numberOfCoveringFingersToPrefix; i++) {
             Finger<E> finger = 
                     fingerList.get(numberOfFingersToMove - i - 1);
             
