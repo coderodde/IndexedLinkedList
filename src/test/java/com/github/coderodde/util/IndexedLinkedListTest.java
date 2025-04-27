@@ -4278,19 +4278,21 @@ public class IndexedLinkedListTest {
                                     int fingersToRemove)*/
     @Test
     public void loadFingerCoverageCounters1() {
-        list.clear();
-        for (int i = 0; i < 10; i++) {
-            list.add(i);
-        }
-        
-        list.fingerList.setFingerIndices(0, 2, 4, 5);
-        
-        list.subList(3, 6).clear();
-        
-        list.fingerList.size = 10;
+        list.size = 10;
+        list.fingerList.size = 4;
         list.loadFingerCoverageCounters(2, 4, 3, 6, 1);
         assertEquals(0, list.numberOfCoveringFingersToPrefix);
         assertEquals(1, list.numberOfCoveringFingersToSuffix);
         System.out.println("loadFingerCoverageCounters1 done!");
+    }
+    
+    @Test
+    public void loadFingerCoverageCounters2() {
+        list.size = 100;
+        list.fingerList.size = 10;
+        list.loadFingerCoverageCounters(0, 9, 1, 99, 8);
+        assertEquals(1, list.numberOfCoveringFingersToPrefix);
+        assertEquals(0, list.numberOfCoveringFingersToSuffix);
+        System.out.println("loadFingerCoverageCounters2 done!");
     }
 }
