@@ -112,12 +112,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Caches the number of fingers covering in the prefix.
      */
-    private transient int numberOfCoveringFingersToPrefix;
+    transient int numberOfCoveringFingersToPrefix;
     
     /**
      * Caches the number of fingers covering in the suffix.
      */
-    private transient int numberOfCoveringFingersToSuffix;
+    transient int numberOfCoveringFingersToSuffix;
     
     /**
      * Constructs an empty list.
@@ -2368,11 +2368,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private void loadFingerCoverageCounters(int fromFingerIndex,
-                                            int toFingerIndex,
-                                            int fromIndex,
-                                            int toIndex,
-                                            int fingersToRemove) {
+    void loadFingerCoverageCounters(int fromFingerIndex,
+                                    int toFingerIndex,
+                                    int fromIndex,
+                                    int toIndex,
+                                    int fingersToRemove) {
         
         int fingerPrefixLength = fromFingerIndex;
         int fingerSuffixLength = fingerList.size() - toFingerIndex;
@@ -2392,7 +2392,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         float leftRatio = (float)(freeFingerPrefixSpots) / 
                           (float)(freeSpots);
 
-        int remainingFingers = fingerList.size() - fingersToRemove;
+        int removalRangeLength = toFingerIndex 
+                               - fromFingerIndex;
+        
+        int remainingFingers   = removalRangeLength
+                               - fingersToRemove;
         
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
         int rightCoveredFingers = remainingFingers - leftCoveredFingers;
