@@ -601,13 +601,30 @@ final class FingerList<E> {
                          size - roomSize - fingerIndex + 1);
     }
     
-    void makeRoomAtPrefix(int fromIndex, int numberOfFingers) {
-        int numberOfResidentFingers = getFingerIndexImpl(fromIndex) 
-                                    - numberOfFingers;
+    void makeRoomAtPrefix(int fromIndex, 
+                          int fromFingerIndex,
+                          int numberOfFingers) {
+        int prefixLength = fromIndex;
+        int fingerSpotsSoFar = get(0).index;
+        int targetFingerIndex = 1;
         
-//        if (num)
-//        
-//        Finger<E> finger = this.get(numberOfFingers)
+        for (; targetFingerIndex < fromFingerIndex; ++targetFingerIndex) {
+            
+            Finger<E> finger1 = get(targetFingerIndex - 1);
+            Finger<E> finger2 = get(targetFingerIndex);
+            
+            int difference = finger2.index
+                           - finger1.index
+                           - 1;
+            
+            fingerSpotsSoFar += difference;
+            
+            if (fingerSpotsSoFar >= numberOfFingers) {
+                break;
+            }
+        }
+        
+        
     }
     
     void makeRoomAtSuffix(int toIndex, int numberOfFingers) {

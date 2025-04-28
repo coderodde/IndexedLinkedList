@@ -4305,4 +4305,17 @@ public class IndexedLinkedListTest {
         assertEquals(2, list.numberOfCoveringFingersToSuffix);
         System.out.println("loadFingerCoverageCounters3 done!");
     }
+    
+    @Test
+    public void makeRoomAtPrefix1() {
+        list.clear();
+        
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        list.fingerList.setFingerIndices(2, 4, 6, 7);
+        
+        list.fingerList.makeRoomAtPrefix(4, 1, 2);
+    }
 }
