@@ -4295,4 +4295,14 @@ public class IndexedLinkedListTest {
         assertEquals(0, list.numberOfCoveringFingersToSuffix);
         System.out.println("loadFingerCoverageCounters2 done!");
     }
+    
+    @Test
+    public void loadFingerCoverageCounters3() {
+        list.size = 22;
+        list.fingerList.size = 5;
+        list.loadFingerCoverageCounters(0, 5, 13, 18, 0);
+        assertEquals(3, list.numberOfCoveringFingersToPrefix);
+        assertEquals(2, list.numberOfCoveringFingersToSuffix);
+        System.out.println("loadFingerCoverageCounters3 done!");
+    }
 }
