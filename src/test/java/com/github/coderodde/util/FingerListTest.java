@@ -145,4 +145,38 @@ public class FingerListTest {
         
         assertEquals(insertionFinger, fl.get(1));
     }
+    
+//    @Test
+    public void makeRoomAtPrefix1() {
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        list.fingerList.setFingerIndices(6, 7, 8, 9);
+        
+        list.fingerList.makeRoomAtPrefix(5, 0, 3);
+        
+        Finger<Integer> finger0 = list.fingerList.fingerArray[0];
+        Finger<Integer> finger1 = list.fingerList.fingerArray[1];
+        Finger<Integer> finger2 = list.fingerList.fingerArray[2];
+        
+        assertEquals(2, finger0.index);
+        assertEquals(3, finger1.index);
+        assertEquals(4, finger2.index);
+        
+        System.out.println("makeRoomAtPrefix1 passed!");
+    }
+    
+    @Test
+    public void makeRoomAtPrefixAux() {
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        
+        list.fingerList.makeRoomAtPrefix(4, 0, 0);
+        
+        list.fingerList.setFingerIndices(1, 3, 8, 9);
+        
+        list.fingerList.makeRoomAtPrefix(4, 2, 2);
+    }
 }

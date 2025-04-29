@@ -601,7 +601,23 @@ final class FingerList<E> {
                          size - roomSize - fingerIndex + 1);
     }
     
-    void makeRoomAtPrefix(int fromIndex, 
+    void makeRoomAtPrefix(int fromIndex,
+                          int numberOfFingersInPrefix,
+                          int numberOfFingersToMoveToPrefix) {
+        
+        if (numberOfFingersInPrefix > 0) {
+            int freeFingerSpotsSoFar = fromIndex 
+                                     - get(numberOfFingersInPrefix - 1).index 
+                                     - 1;
+            
+            int index1 = numberOfFingersInPrefix - 2;
+            int index2 = numberOfFingersInPrefix - 1;
+            
+//            for (int i = index2)
+        } 
+    }
+    
+    void makeRoomAtPrefixOld(int fromIndex, 
                           int fromFingerIndex,
                           int numberOfFingers) {
         int prefixLength = fromIndex;
