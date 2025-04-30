@@ -644,13 +644,11 @@ final class FingerList<E> {
                 node = node.next;
             }
         } else {
-            Finger<E> startFinger = get(targetFingerIndex);
+            Finger<E> startFinger = get(targetFingerIndex - 1);
             int index = startFinger.index;
             Node<E> node = startFinger.node;
             
-            for (int i = targetFingerIndex + 1;
-                    i < numberOfFingersInPrefix; 
-                    i++) {
+            for (int i = targetFingerIndex; i < numberOfFingersInPrefix; i++) {
                 
                 Finger<E> finger = get(i);
                 node = node.next;

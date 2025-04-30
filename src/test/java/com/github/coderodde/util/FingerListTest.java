@@ -194,7 +194,7 @@ public class FingerListTest {
         list.fingerList.makeRoomAtPrefix(4, 2, 1);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
-        expectedList.fingerList.setFingerIndices(1, 2, 3, 8);
+        expectedList.fingerList.setFingerIndices(1, 2, 5, 8);
         
         assertTrue(list.strongEquals(expectedList));
         
@@ -210,7 +210,7 @@ public class FingerListTest {
         list.fingerList.makeRoomAtPrefix(5, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
-        expectedList.fingerList.setFingerIndices(1, 4, 6, 9);
+        expectedList.fingerList.setFingerIndices(1, 2, 6, 9);
         
         assertTrue(list.strongEquals(expectedList));
         
