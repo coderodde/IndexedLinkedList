@@ -16,7 +16,9 @@
  */
 package com.github.coderodde.util;
 
+import java.util.List;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -147,7 +149,7 @@ public class FingerListTest {
     }
     
 //    @Test
-    public void makeRoomAtPrefix1() {
+    public void makeRoomAtPrefix1Old() {
         for (int i = 0; i < 10; i++) {
             list.add(i);
         }
@@ -164,19 +166,70 @@ public class FingerListTest {
         assertEquals(3, finger1.index);
         assertEquals(4, finger2.index);
         
+        System.out.println("makeRoomAtPrefix1Oldl passed!");
+    }
+    
+    @Test
+    public void makeRoomAtPrefix1() {
+        
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(1, 3, 4, 6);
+        list.fingerList.makeRoomAtPrefix(4, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(0, 1, 4, 6);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
         System.out.println("makeRoomAtPrefix1 passed!");
     }
     
     @Test
-    public void makeRoomAtPrefixAux() {
-        for (int i = 0; i < 10; i++) {
-            list.add(i);
-        }
+    public void makeRoomAtPrefix2() {
         
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(1, 3, 5, 8);
+        list.fingerList.makeRoomAtPrefix(4, 2, 1);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(1, 2, 3, 8);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtPrefix2 passed!");
+    }
+    
+    @Test
+    public void makeRoomAtPrefix3() {
+        
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(1, 4, 6, 9);
+        list.fingerList.makeRoomAtPrefix(5, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(1, 4, 6, 9);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtPrefix3 passed!");
+    }
+    
+    @Test
+    public void makeRoomAtPrefixAux() {
+        loadList(10);
         list.fingerList.makeRoomAtPrefix(4, 0, 0);
         
         list.fingerList.setFingerIndices(1, 3, 8, 9);
         
         list.fingerList.makeRoomAtPrefix(4, 2, 2);
+    }
+    
+    private void loadList(int size) {
+        for (int i = 0; i < size; i++) {
+            list.add(i);
+        }
     }
 }

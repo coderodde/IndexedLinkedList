@@ -605,42 +605,59 @@ final class FingerList<E> {
                           int numberOfFingersInPrefix,
                           int numberOfFingersToMoveToPrefix) {
         
-        if (numberOfFingersInPrefix > 0) {
-            int freeFingerSpotsSoFar = fromIndex 
-                                     - get(numberOfFingersInPrefix - 1).index 
-                                     - 1;
-            
-            int index1 = numberOfFingersInPrefix - 2;
-            int index2 = numberOfFingersInPrefix - 1;
-            
-//            for (int i = index2)
-        } 
-    }
-    
-    void makeRoomAtPrefixOld(int fromIndex, 
-                          int fromFingerIndex,
-                          int numberOfFingers) {
-        int prefixLength = fromIndex;
-        int fingerSpotsSoFar = get(0).index;
-        int targetFingerIndex = 1;
-        
-        for (; targetFingerIndex < fromFingerIndex; ++targetFingerIndex) {
-            
-            Finger<E> finger1 = get(targetFingerIndex - 1);
-            Finger<E> finger2 = get(targetFingerIndex);
-            
-            int difference = finger2.index
-                           - finger1.index
-                           - 1;
-            
-            fingerSpotsSoFar += difference;
-            
-            if (fingerSpotsSoFar >= numberOfFingers) {
-                break;
-            }
+        if (numberOfFingersInPrefix == 0) {
+            // Here, no fingers in the prefix to move.
+            return;
         }
         
+        int targetFingerIndex = numberOfFingersInPrefix - 1;
+        int freeFingerSpotsSoFar = fromIndex - get(targetFingerIndex).index - 1;
         
+        for (; targetFingerIndex > 0; targetFingerIndex--) {
+           Finger<E> finger1 = get(targetFingerIndex - 1);
+           Finger<E> finger2 = get(targetFingerIndex);
+           
+           int distance = finger2.index
+                        - finger1.index
+                        - 1;
+           
+           freeFingerSpotsSoFar += distance;
+           
+           if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
+               break;
+           }
+        }
+        
+        if (freeFingerSpotsSoFar < numberOfFingersToMoveToPrefix) {
+            // Once here, we need to move the leftmost prefix finger to the 
+            // left.
+            int index = fromIndex 
+                      - numberOfFingersInPrefix 
+                      - numberOfFingersToMoveToPrefix;
+            
+            Node<E> node = getNode(index);
+            
+            for (int i = 0; i < numberOfFingersInPrefix; i++) {
+                Finger<E> finger = get(i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
+        } else {
+            Finger<E> startFinger = get(targetFingerIndex);
+            int index = startFinger.index;
+            Node<E> node = startFinger.node;
+            
+            for (int i = targetFingerIndex + 1;
+                    i < numberOfFingersInPrefix; 
+                    i++) {
+                
+                Finger<E> finger = get(i);
+                node = node.next;
+                finger.node = node;
+                finger.index = ++index;
+            }
+        }
     }
     
     void makeRoomAtSuffix(int toIndex, int numberOfFingers) {

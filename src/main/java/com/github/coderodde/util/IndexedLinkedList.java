@@ -1107,6 +1107,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * 
+     */
+    public boolean strongEquals(final IndexedLinkedList<E> otherList) {
+        return equals(otherList) && fingerList.equals(otherList.fingerList);
+    }
+    
+    /**
      * Returns a sublist view 
      * {@code list[fromIndex, fromIndex + 1, ..., toIndex - 1]}.
      * 
