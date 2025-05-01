@@ -144,6 +144,30 @@ final class FingerList<E> {
         fingerArray[size - 1] = finger;
         fingerArray[size].index = list.size;
     }
+    
+    /**
+     * Pushes {@code numberOfFingersToMoveToPrefix} fingers to the prefix with
+     * {@code numberOfFingersInPrefix} fingers.
+     * 
+     * @param fromIndex                     the index of the leftmost element to 
+     *                                      remove.
+     * @param numberOfFingersInPrefix       the number of fingers already in the
+     *                                      prefix.
+     * @param numberOfFingersToMoveToPrefix the number of fingers we need to
+     *                                      move to the prefix.
+     */
+    void arrangePrefix(int fromIndex,
+                       int numberOfFingersInPrefix,
+                       int numberOfFingersToMoveToPrefix) {
+        
+        makeRoomAtPrefix(fromIndex,
+                         numberOfFingersInPrefix, 
+                         numberOfFingersToMoveToPrefix);
+        
+        pushCoveredFingersToPrefix(fromIndex, 
+                                   numberOfFingersInPrefix,
+                                   numberOfFingersToMoveToPrefix);
+    }
 
     /**
      * Clears entirely this finger list. Only the end-of-finger-list finger
@@ -209,7 +233,7 @@ final class FingerList<E> {
      * @param index the index of the target finger.
      * @return the {@code index}th finger.
      */
-    Finger<E> get(int index) {
+    Finger<E> getFinger(int index) {
         return fingerArray[index];
     }
 
@@ -611,11 +635,11 @@ final class FingerList<E> {
         }
         
         int targetFingerIndex = numberOfFingersInPrefix - 1;
-        int freeFingerSpotsSoFar = fromIndex - get(targetFingerIndex).index - 1;
+        int freeFingerSpotsSoFar = fromIndex - getFinger(targetFingerIndex).index - 1;
         
         for (; targetFingerIndex > 0; targetFingerIndex--) {
-           Finger<E> finger1 = get(targetFingerIndex - 1);
-           Finger<E> finger2 = get(targetFingerIndex);
+           Finger<E> finger1 = getFinger(targetFingerIndex - 1);
+           Finger<E> finger2 = getFinger(targetFingerIndex);
            
            int distance = finger2.index
                         - finger1.index
@@ -638,19 +662,19 @@ final class FingerList<E> {
             Node<E> node = getNode(index);
             
             for (int i = 0; i < numberOfFingersInPrefix; i++) {
-                Finger<E> finger = get(i);
+                Finger<E> finger = getFinger(i);
                 finger.index = index++;
                 finger.node = node;
                 node = node.next;
             }
         } else {
-            Finger<E> startFinger = get(targetFingerIndex - 1);
+            Finger<E> startFinger = getFinger(targetFingerIndex - 1);
             int index = startFinger.index;
             Node<E> node = startFinger.node;
             
             for (int i = targetFingerIndex; i < numberOfFingersInPrefix; i++) {
                 
-                Finger<E> finger = get(i);
+                Finger<E> finger = getFinger(i);
                 node = node.next;
                 finger.node = node;
                 finger.index = ++index;
@@ -706,6 +730,45 @@ final class FingerList<E> {
         System.arraycopy(fingerArray, 0, fingerArray, 1, size + 1);
         fingerArray[0] = finger;
         size++;
+    }
+    
+    /**
+     * Pushes {@code numberOfFingersToPush} to the finger prefix.
+     * 
+     * @param fromIndex             
+     * @param numberOfPrefixFingers
+     * @param numberOfFingersToPush 
+     */
+    void pushCoveredFingersToPrefix(int fromIndex,
+                                    int numberOfPrefixFingers,
+                                    int numberOfFingersToPush) {
+        if (numberOfPrefixFingers == 0) {
+            int index = fromIndex - 1;
+            Node<E> node = getNode(index);
+            
+            for (int i = numberOfFingersToPush - 1; i >= 0; i--) {
+                Finger<E> finger = getFinger(i);
+                finger.index = index--;
+                finger.node = node;
+                node = node.prev;
+            }
+        } else {
+            Finger<E> rightmostPrefixFinger = 
+                    getFinger(numberOfPrefixFingers - 1);
+            
+            int index = rightmostPrefixFinger.index + 1;
+            Node<E> node = rightmostPrefixFinger.node.next;
+            
+            for (int i = numberOfPrefixFingers; 
+                    i < numberOfPrefixFingers + numberOfFingersToPush;
+                    i++) {
+                
+                Finger<E> finger = getFinger(i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
+        }
     }
 
     /**

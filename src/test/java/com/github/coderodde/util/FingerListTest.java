@@ -56,31 +56,31 @@ public class FingerListTest {
         fl.fingerArray[4].index = 8;
         fl.fingerArray[4].node = new Node<>(Integer.valueOf(1000));
         
-        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(0));
+        Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(0));
         assertEquals(0, finger.index);
         assertEquals(Integer.valueOf(0), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(1));
+        finger = fl.getFinger(fl.getClosestFingerIndex(1));
         assertEquals(1, finger.index);
         assertEquals(Integer.valueOf(1), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(2));
+        finger = fl.getFinger(fl.getClosestFingerIndex(2));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(3));
+        finger = fl.getFinger(fl.getClosestFingerIndex(3));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(4));
+        finger = fl.getFinger(fl.getClosestFingerIndex(4));
         assertEquals(3, finger.index);
         assertEquals(Integer.valueOf(3), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(5));
+        finger = fl.getFinger(fl.getClosestFingerIndex(5));
         assertEquals(6, finger.index);
         assertEquals(Integer.valueOf(6), finger.node.item);
         
-        finger = fl.get(fl.getClosestFingerIndex(6));
+        finger = fl.getFinger(fl.getClosestFingerIndex(6));
         assertEquals(6, finger.index);
         assertEquals(Integer.valueOf(6), finger.node.item);
     }
@@ -96,7 +96,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
         
-        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(0));
+        Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(0));
         assertEquals(insertionFinger.index, finger.index);
         
         assertEquals(5, fl.size());
@@ -116,7 +116,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
 
-        Finger<Integer> finger = fl.get(fl.getClosestFingerIndex(6));
+        Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(6));
         assertEquals(insertionFinger.index, finger.index);
         
         assertEquals(4, fl.size());
@@ -132,7 +132,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
         
-        assertEquals(insertionFinger, fl.get(1));
+        assertEquals(insertionFinger, fl.getFinger(1));
     }
     
 //    @Test
@@ -145,7 +145,7 @@ public class FingerListTest {
         
 //        fl.insertFinger(insertionFinger);
         
-        assertEquals(insertionFinger, fl.get(1));
+        assertEquals(insertionFinger, fl.getFinger(1));
     }
     
 //    @Test
@@ -225,6 +225,36 @@ public class FingerListTest {
         list.fingerList.setFingerIndices(1, 3, 8, 9);
         
         list.fingerList.makeRoomAtPrefix(4, 2, 2);
+    }
+    
+    @Test
+    public void arrangePrefix1() {
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(1, 3, 5, 8);
+        list.fingerList.arrangePrefix(4, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(0, 1, 2, 3);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("arrangePrefix1 passed!");
+    }
+    
+    @Test
+    public void arrangePrefix2() {
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(5, 6, 8, 9);
+        list.fingerList.arrangePrefix(5, 0, 4);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(1, 2, 3, 4);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("arrangePrefix2 passed!");
     }
     
     private void loadList(int size) {
