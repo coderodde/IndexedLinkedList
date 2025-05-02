@@ -635,21 +635,25 @@ final class FingerList<E> {
         }
         
         int targetFingerIndex = numberOfFingersInPrefix - 1;
-        int freeFingerSpotsSoFar = fromIndex - getFinger(targetFingerIndex).index - 1;
+        int freeFingerSpotsSoFar = fromIndex 
+                                 - getFinger(targetFingerIndex).index
+                                 - 1;
         
-        for (; targetFingerIndex > 0; targetFingerIndex--) {
-           Finger<E> finger1 = getFinger(targetFingerIndex - 1);
-           Finger<E> finger2 = getFinger(targetFingerIndex);
-           
-           int distance = finger2.index
-                        - finger1.index
-                        - 1;
-           
-           freeFingerSpotsSoFar += distance;
-           
-           if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
-               break;
-           }
+        if (freeFingerSpotsSoFar < numberOfFingersToMoveToPrefix) {
+            for (; targetFingerIndex > 0; targetFingerIndex--) {
+               Finger<E> finger1 = getFinger(targetFingerIndex - 1);
+               Finger<E> finger2 = getFinger(targetFingerIndex);
+
+               int distance = finger2.index
+                            - finger1.index
+                            - 1;
+
+               freeFingerSpotsSoFar += distance;
+
+               if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
+                   break;
+               }
+            }
         }
         
         if (freeFingerSpotsSoFar < numberOfFingersToMoveToPrefix) {
@@ -682,8 +686,44 @@ final class FingerList<E> {
         }
     }
     
-    void makeRoomAtSuffix(int toIndex, int numberOfFingers) {
+    void makeRoomAtSuffix(int toIndex,
+                          int numberOfFingersInSuffix,
+                          int numberOfFingersToMoveToSuffix) {
         
+        if (numberOfFingersInSuffix == 0) {
+            // Here, no fingers in the suffix to move.
+            return;
+        }
+        
+        int targetFingerIndex = getFingerIndexImpl(toIndex) 
+                              - numberOfFingersInSuffix;
+        
+        int freeFingerSpotsSoFar = toIndex 
+                                 - getFinger(targetFingerIndex).index
+                                 - numberOfFingersInSuffix;
+        
+        for (; targetFingerIndex < size - 1; targetFingerIndex++) {
+            Finger<E> finger1 = getFinger(targetFingerIndex);
+            Finger<E> finger2 = getFinger(targetFingerIndex + 1);
+            
+            int distance = finger2.index 
+                         - finger1.index 
+                         - 1;
+            
+            freeFingerSpotsSoFar += distance;
+            
+            if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
+                break;
+            }
+        }
+        
+        if (freeFingerSpotsSoFar < numberOfFingersToMoveToSuffix) {
+            // Once here, we need to move the rightmost suffix finger to the 
+            // right.
+            
+        } else {
+//            Finger<E> startFinger = getFinger(size - num);
+        }
     }
     
     /**
