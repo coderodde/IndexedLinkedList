@@ -238,7 +238,15 @@ public class FingerListTest {
         loadList(10);
         
         list.fingerList.setFingerIndices(4, 6, 8, 9);
-        list.fingerList.makeRoomAtSuffix(10, 3, 1);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(4, 6, 8, 9);
+        System.out.println(list.fingerList);
+        System.out.println(expectedList.fingerList);
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtSuffix1 passed!");
     }
     
     @Test

@@ -80,7 +80,7 @@ final class FingerList<E> {
         }
         
         for (int i = 0; i < size; i++) {
-            if (!Objects.equals(fingerArray[i], other.fingerArray[i])) {
+            if (!fingerArray[i].equals(other.fingerArray[i])) {
                 return false;
             }
         }
@@ -695,34 +695,51 @@ final class FingerList<E> {
             return;
         }
         
-        int targetFingerIndex = getFingerIndexImpl(toIndex) 
-                              - numberOfFingersInSuffix;
+        int targetFingerIndex = size - numberOfFingersInSuffix;
+        int freeFingerSpotsSoFar = getFinger(targetFingerIndex).index 
+                                 - toIndex;
         
-        int freeFingerSpotsSoFar = toIndex 
-                                 - getFinger(targetFingerIndex).index
-                                 - numberOfFingersInSuffix;
-        
-        for (; targetFingerIndex < size - 1; targetFingerIndex++) {
-            Finger<E> finger1 = getFinger(targetFingerIndex);
-            Finger<E> finger2 = getFinger(targetFingerIndex + 1);
-            
-            int distance = finger2.index 
-                         - finger1.index 
-                         - 1;
-            
-            freeFingerSpotsSoFar += distance;
-            
-            if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
-                break;
+        if (freeFingerSpotsSoFar < numberOfFingersToMoveToSuffix) {
+            for (; targetFingerIndex < size - 1; targetFingerIndex++) {
+                Finger<E> finger1 = getFinger(targetFingerIndex);
+                Finger<E> finger2 = getFinger(targetFingerIndex + 1);
+
+                int distance = finger2.index 
+                             - finger1.index 
+                             - 1;
+
+                freeFingerSpotsSoFar += distance;
+
+                if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
+                    break;
+                }
             }
         }
         
         if (freeFingerSpotsSoFar < numberOfFingersToMoveToSuffix) {
             // Once here, we need to move the rightmost suffix finger to the 
             // right.
+            int index = size 
+                      - numberOfFingersInSuffix 
+                      - numberOfFingersToMoveToSuffix;
             
+            Node<E> node = getNode(index);
+            
+            for (int i = 0; i < numberOfFingersInSuffix; i++) {
+                Finger<E> finger = getFinger(size - i - 1);
+                
+            }
         } else {
-//            Finger<E> startFinger = getFinger(size - num);
+            Finger<E> startFinger = getFinger(targetFingerIndex);
+            int index = startFinger.index + 1;
+            Node<E> node = startFinger.node.next;
+            
+            for (int i = targetFingerIndex + 1; i < size; i++) {
+                Finger<E> finger = getFinger(i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
         }
     }
     
