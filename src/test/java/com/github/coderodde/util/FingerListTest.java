@@ -249,20 +249,34 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix5 passed!");
     }
     
-//    @Test
+    @Test
     public void makeRoomAtSuffix1() {
         loadList(10);
         
-        list.fingerList.setFingerIndices(4, 6, 8, 9);
+        list.fingerList.setFingerIndices(3, 4, 8, 9);
         list.fingerList.makeRoomAtSuffix(6, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
-        expectedList.fingerList.setFingerIndices(4, 6, 8, 9);
-        System.out.println(list.fingerList);
-        System.out.println(expectedList.fingerList);
+        expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
+        
         assertTrue(list.strongEquals(expectedList));
         
         System.out.println("makeRoomAtSuffix1 passed!");
+    }
+    
+    @Test
+    public void makeRoomAtSuffix2() {
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(3, 4, 7, 9);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtSuffix2 passed!");
     }
     
     @Test

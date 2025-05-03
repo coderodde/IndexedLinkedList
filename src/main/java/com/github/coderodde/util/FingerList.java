@@ -665,7 +665,7 @@ final class FingerList<E> {
                       - numberOfFingersInPrefix 
                       - numberOfFingersToMoveToPrefix;
             
-            Node<E> node = getNode(index);
+            Node<E> node = getNodeNoFingersFix(index);
             
             for (int i = 0; i < numberOfFingersInPrefix; i++) {
                 Finger<E> finger = getFinger(i);
@@ -699,37 +699,41 @@ final class FingerList<E> {
         
         int targetFingerIndex = size - numberOfFingersInSuffix;
         int freeFingerSpotsSoFar = getFinger(targetFingerIndex).index 
-                                 - toIndex;
+                                 - toIndex
+                                 - 1;
         
-        if (freeFingerSpotsSoFar < numberOfFingersToMoveToSuffix) {
-            for (; targetFingerIndex < size - 1; targetFingerIndex++) {
-                Finger<E> finger1 = getFinger(targetFingerIndex);
-                Finger<E> finger2 = getFinger(targetFingerIndex + 1);
+        if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
+            return;
+        }
+        
+        for (; targetFingerIndex < size - 1; targetFingerIndex++) {
+            Finger<E> finger1 = getFinger(targetFingerIndex);
+            Finger<E> finger2 = getFinger(targetFingerIndex + 1);
 
-                int distance = finger2.index 
-                             - finger1.index 
-                             - 1;
+            int distance = finger2.index 
+                         - finger1.index 
+                         - 1;
 
-                freeFingerSpotsSoFar += distance;
+            freeFingerSpotsSoFar += distance;
 
-                if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
-                    break;
-                }
+            if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
+                break;
             }
         }
         
         if (freeFingerSpotsSoFar < numberOfFingersToMoveToSuffix) {
             // Once here, we need to move the rightmost suffix finger to the 
             // right.
-            int index = size 
-                      - numberOfFingersInSuffix 
-                      - numberOfFingersToMoveToSuffix;
+            int index = list.size
+                      - numberOfFingersInSuffix;
             
-            Node<E> node = getNode(index);
+            Node<E> node = getNodeNoFingersFix(index);
             
             for (int i = 0; i < numberOfFingersInSuffix; i++) {
                 Finger<E> finger = getFinger(size - i - 1);
-                
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
             }
         } else {
             Finger<E> startFinger = getFinger(targetFingerIndex);
