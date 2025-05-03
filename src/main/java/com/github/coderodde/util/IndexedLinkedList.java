@@ -2078,7 +2078,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         Iterator<?> otherIterator = other.iterator();
         
-        for (Node<E> node = node(from); from < to; from++, node = node.next) {
+        for (Node<E> node = nodeNoFingerFixing(from); 
+                from < to; 
+                from++, node = node.next) {
+            
             if (!otherIterator.hasNext() || 
                     !Objects.equals(node.item, otherIterator.next())) {
                 return false;
@@ -2517,6 +2520,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private Node<E> node(int elementIndex) {
          return fingerList.getNode(elementIndex);
+    }
+    
+    /**
+     * Returns the node at index {@code elementIndex}. Unlike 
+     * {@link #node(int)}, this method does no relocate fingers.
+     * 
+     * @param elementIndex the index of the target element.
+     * @return the node containing the target element.
+     */
+    private Node<E> nodeNoFingerFixing(int elementIndex) {
+        return fingerList.getNodeNoFingersFix(elementIndex);
     }
     
     /**

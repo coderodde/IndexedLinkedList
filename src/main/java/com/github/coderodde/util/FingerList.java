@@ -639,21 +639,23 @@ final class FingerList<E> {
                                  - getFinger(targetFingerIndex).index
                                  - 1;
         
-        if (freeFingerSpotsSoFar < numberOfFingersToMoveToPrefix) {
-            for (; targetFingerIndex > 0; targetFingerIndex--) {
-               Finger<E> finger1 = getFinger(targetFingerIndex - 1);
-               Finger<E> finger2 = getFinger(targetFingerIndex);
+        if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
+            return;
+        }
+        
+        for (; targetFingerIndex > 0; targetFingerIndex--) {
+           Finger<E> finger1 = getFinger(targetFingerIndex - 1);
+           Finger<E> finger2 = getFinger(targetFingerIndex);
 
-               int distance = finger2.index
-                            - finger1.index
-                            - 1;
+           int distance = finger2.index
+                        - finger1.index
+                        - 1;
 
-               freeFingerSpotsSoFar += distance;
+           freeFingerSpotsSoFar += distance;
 
-               if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
-                   break;
-               }
-            }
+           if (freeFingerSpotsSoFar >= numberOfFingersToMoveToPrefix) {
+               break;
+           }
         }
         
         if (freeFingerSpotsSoFar < numberOfFingersToMoveToPrefix) {

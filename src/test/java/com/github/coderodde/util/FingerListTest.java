@@ -234,6 +234,22 @@ public class FingerListTest {
     }
     
     @Test
+    public void makeRoomAtPrefix5() {
+        
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(0, 2, 6, 8);
+        list.fingerList.makeRoomAtPrefix(5, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(0, 2, 6, 8);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtPrefix5 passed!");
+    }
+    
+//    @Test
     public void makeRoomAtSuffix1() {
         loadList(10);
         
