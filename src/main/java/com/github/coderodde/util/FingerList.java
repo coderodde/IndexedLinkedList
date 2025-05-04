@@ -168,6 +168,19 @@ final class FingerList<E> {
                                    numberOfFingersInPrefix,
                                    numberOfFingersToMoveToPrefix);
     }
+    
+    void arrangeSuffix(int toIndex,
+                       int numberOfFingersInSuffix,
+                       int numberOfFingetsToMoveToSuffix) {
+        
+        makeRoomAtSuffix(toIndex,
+                         numberOfFingersInSuffix, 
+                         numberOfFingetsToMoveToSuffix);
+        
+        pushCoveredFingersToSuffix(toIndex,
+                                   numberOfFingersInSuffix, 
+                                   numberOfFingersInSuffix);
+    }
 
     /**
      * Clears entirely this finger list. Only the end-of-finger-list finger
@@ -851,7 +864,18 @@ final class FingerList<E> {
                 node = node.next;
             }
         } else {
+            Finger<E> leftmostSuffixFinger = 
+                    getFinger(size - numberOfSuffixFingers);
             
+            int index = leftmostSuffixFinger.index;
+            Node<E> node = leftmostSuffixFinger.node;
+            
+            for (int i = size - numberOfSuffixFingers; i < size; i++) {
+                Finger<E> finger = getFinger(i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
         }
     }
 
