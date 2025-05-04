@@ -801,16 +801,16 @@ final class FingerList<E> {
     /**
      * Pushes {@code numberOfFingersToPush} to the finger prefix.
      * 
-     * @param fromIndex             
-     * @param numberOfPrefixFingers
-     * @param numberOfFingersToPush 
+     * @param fromIndex             the starting index of the range to delete.
+     * @param numberOfPrefixFingers the number of fingers in the prefix.
+     * @param numberOfFingersToPush the number of fingers to move to the prefix.
      */
     void pushCoveredFingersToPrefix(int fromIndex,
                                     int numberOfPrefixFingers,
                                     int numberOfFingersToPush) {
         if (numberOfPrefixFingers == 0) {
             int index = fromIndex - 1;
-            Node<E> node = getNode(index);
+            Node<E> node = getNodeNoFingersFix(index);
             
             for (int i = numberOfFingersToPush - 1; i >= 0; i--) {
                 Finger<E> finger = getFinger(i);
@@ -834,6 +834,24 @@ final class FingerList<E> {
                 finger.node = node;
                 node = node.next;
             }
+        }
+    }
+    
+    void pushCoveredFingersToSuffix(int toIndex,
+                                    int numberOfSuffixFingers,
+                                    int numberOfFingersToPush) {
+        if (numberOfSuffixFingers == 0) {
+            int index = toIndex;
+            Node<E> node = getNodeNoFingersFix(index);
+            
+            for (int i = 0; i < numberOfFingersToPush; i++) {
+                Finger<E> finger = getFinger(size - numberOfFingersToPush + i);
+                finger.index = index++;
+                finger.node = node;
+                node = node.next;
+            }
+        } else {
+            
         }
     }
 
