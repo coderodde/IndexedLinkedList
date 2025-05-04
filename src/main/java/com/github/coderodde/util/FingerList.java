@@ -699,8 +699,7 @@ final class FingerList<E> {
         
         int targetFingerIndex = size - numberOfFingersInSuffix;
         int freeFingerSpotsSoFar = getFinger(targetFingerIndex).index 
-                                 - toIndex
-                                 - 1;
+                                 - toIndex;
         
         if (freeFingerSpotsSoFar >= numberOfFingersToMoveToSuffix) {
             return;
@@ -730,21 +729,25 @@ final class FingerList<E> {
             Node<E> node = getNodeNoFingersFix(index);
             
             for (int i = 0; i < numberOfFingersInSuffix; i++) {
-                Finger<E> finger = getFinger(size - i - 1);
+                Finger<E> finger =
+                        getFinger(size - numberOfFingersInSuffix + i);
+                
                 finger.index = index++;
                 finger.node = node;
                 node = node.next;
             }
         } else {
-            Finger<E> startFinger = getFinger(targetFingerIndex);
-            int index = startFinger.index + 1;
-            Node<E> node = startFinger.node.next;
+            Finger<E> startFinger = getFinger(targetFingerIndex + 1);
+            int index = startFinger.index - 1;
+            Node<E> node = startFinger.node.prev;
             
-            for (int i = targetFingerIndex + 1; i < size; i++) {
+            for (int i = size - targetFingerIndex; 
+                    i > size - numberOfFingersInSuffix - 1; 
+                    i--) {
                 Finger<E> finger = getFinger(i);
-                finger.index = index++;
+                finger.index = index--;
                 finger.node = node;
-                node = node.next;
+                node = node.prev;
             }
         }
     }

@@ -280,6 +280,36 @@ public class FingerListTest {
     }
     
     @Test
+    public void makeRoomAtSuffix3() {
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(3, 4, 7, 8);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtSuffix3 passed!");
+    }
+    
+    @Test
+    public void makeRoomAtSuffix4() {
+        loadList(10);
+        
+        list.fingerList.setFingerIndices(3, 4, 7, 8);
+        list.fingerList.makeRoomAtSuffix(6, 0, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(3, 4, 7, 8);
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtSuffix4 passed!");
+    }
+    
+    @Test
     public void arrangePrefix1() {
         loadList(10);
         
