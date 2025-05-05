@@ -371,6 +371,24 @@ public class FingerListTest {
         System.out.println("pushCoveredFingersToSuffix2 passed!");
     }
     
+    @Test
+    public void arrange1() {
+        loadList(100);
+        
+        list.fingerList.setFingerIndices(5, 14, 15, 25, 26, 39, 49, 85, 86, 99);
+        list.fingerList.arrangePrefix(17, 3, 2);
+        list.fingerList.arrangeSuffix(83, 3, 2);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(
+                5, 13, 14, 15, 16, 83, 84, 85, 86, 99
+        );
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("arrange1");
+    }
+    
     private void loadList(int size) {
         for (int i = 0; i < size; i++) {
             list.add(i);

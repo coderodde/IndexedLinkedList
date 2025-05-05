@@ -179,7 +179,7 @@ final class FingerList<E> {
         
         pushCoveredFingersToSuffix(toIndex,
                                    numberOfFingersInSuffix, 
-                                   numberOfFingersInSuffix);
+                                   numberOfFingetsToMoveToSuffix);
     }
 
     /**
@@ -692,12 +692,35 @@ final class FingerList<E> {
             Node<E> node = startFinger.node;
             
             for (int i = targetFingerIndex; i < numberOfFingersInPrefix; i++) {
-                
                 Finger<E> finger = getFinger(i);
                 node = node.next;
                 finger.node = node;
                 finger.index = ++index;
             }
+//            Finger<E> startFinger = getFinger(targetFingerIndex);
+//            int numberOfShiftsOfStartFinger = numberOfFingersInPrefix
+//                                            - targetFingerIndex;
+//            
+//            int index = startFinger.index;
+//            Node<E> node = getNodeNoFingersFix(index);
+//            
+//            for (int i = 0; i < numberOfShiftsOfStartFinger; i++) {
+//                startFinger.index = --index;
+//                node = node.prev;
+//                startFinger.node = node;
+//            }
+//            
+//            index = startFinger.index + 1;
+//            node = getNodeNoFingersFix(index);
+//            
+//            for (int idx = targetFingerIndex + 1; 
+//                    targetFingerIndex > 0;
+//                    targetFingerIndex--, idx++) {
+//                Finger<E> finger = getFinger(idx);
+//                finger.index = index++;
+//                finger.node = node;
+//                node = node.next;
+//            }
         }
     }
     
