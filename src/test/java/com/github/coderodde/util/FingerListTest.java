@@ -250,6 +250,27 @@ public class FingerListTest {
     }
     
     @Test
+    public void makeRoomAtPrefix6() {
+        
+        loadList(101);
+        
+        list.fingerList.setFingerIndices(
+                1, 3, 6, 10, 15, 29, 54, 57, 69, 72, 100
+        );
+        
+        list.fingerList.makeRoomAtPrefix(12, 4, 5);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(
+                1, 3, 4, 5, 15, 29, 54, 57, 69, 72, 100
+        );
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("makeRoomAtPrefix6 passed!");
+    }
+    
+    @Test
     public void makeRoomAtSuffix1() {
         loadList(10);
         
@@ -340,6 +361,27 @@ public class FingerListTest {
     }
     
     @Test
+    public void arrangePrefix3() {
+        
+        loadList(101);
+        
+        list.fingerList.setFingerIndices(
+                1, 3, 6, 10, 15, 29, 54, 57, 69, 72, 100
+        );
+        
+        list.fingerList.arrangePrefix(12, 4, 5);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(
+                1, 3, 4, 5, 6, 7, 8, 9, 10, 72, 100
+        );
+        
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("arrangePrefix3 passed!");
+    }
+    
+    @Test
     public void pushCoveredFingersToSuffix1() {
         
         loadList(10);
@@ -381,7 +423,7 @@ public class FingerListTest {
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(
-                5, 13, 14, 15, 16, 83, 84, 85, 86, 99
+                5, 6, 7, 8, 9, 83, 84, 85, 86, 99
         );
         
         assertTrue(list.strongEquals(expectedList));
