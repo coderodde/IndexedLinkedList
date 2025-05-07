@@ -399,14 +399,14 @@ public class FingerListTest {
     
     @Test
     public void pushCoveredFingersToSuffix2() {
-        
+       
         loadList(10);
         
-        list.fingerList.setFingerIndices(1, 3, 4, 5);
+        list.fingerList.setFingerIndices(1, 3, 6, 9);
         list.fingerList.pushCoveredFingersToSuffix(4, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
-        expectedList.fingerList.setFingerIndices(1, 3, 4, 5);
+        expectedList.fingerList.setFingerIndices(4, 5, 6, 9);
         
         assertTrue(list.strongEquals(expectedList));
         
@@ -428,7 +428,20 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("arrange1");
+        System.out.println("arrange1 passed!");
+    }
+    
+    @Test
+    public void removeFingersOnDeleteRange1() {
+        loadList(100);
+        
+        list.fingerList.removeFingersOnDeleteRange(3, 4, 20);
+        
+        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
+        expectedList.fingerList.setFingerIndices(0, 1, 4, 29, 44, 61);
+        assertTrue(list.strongEquals(expectedList));
+        
+        System.out.println("removeFingersOnDeleteRange1 passed!");
     }
     
     private void loadList(int size) {

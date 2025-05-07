@@ -2067,7 +2067,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param to    the ending, exclusive index of the range in this list.
      * 
      * @return {@code true} if and only if {@code other} equals 
-     *         {@code this[from ... to - 1]}.
+     *         {@code this[from ... to - 1]}.   
      */
     private boolean equalsRange(List<?> other, int from, int to) {
         int rangeLength = to - from;
@@ -3226,34 +3226,51 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 toIndex, 
                 fingersToRemove);
         
-        if (this.numberOfCoveringFingersToPrefix > 0) {
-            if (this.numberOfCoveringFingersToSuffix > 0) {
-                removeRangeImplCase5A(fromFingerIndex,
-                                      toFingerIndex,
-                                      fromIndex,
-                                      toIndex,
-                                      fingersToRemove);
-                
-            } else {
-                // Here, this.numberOfCoveringFingersInPrefix > 0 and
-                //       this.numberOfCoveringFingersInSuffix == 0  
-                removeRangeImplCase5B(fromFingerIndex,
-                                      toFingerIndex,
-                                      fromIndex,
-                                      toIndex,
-                                      fingersToRemove);
-            }
-        } else {
-            if (this.numberOfCoveringFingersToSuffix > 0) {
-                // Here, this.numberOfCoveringFingersInPrefix == 0 and
-                //       this.numberOfCoveringFingersInSuffix > 0
-                removeRangeImplCase5C(fromFingerIndex,
-                                      toFingerIndex,
-                                      fromIndex,
-                                      toIndex,
-                                      fingersToRemove);
-            }
-        }
+        int numberOfFingersInPrefix = fromFingerIndex;
+        int numberOfFingersInSuffix = fingerList.size() - toFingerIndex;
+        
+        fingerList.arrangePrefix(fromIndex,
+                                 numberOfFingersInPrefix,
+                                 this.numberOfCoveringFingersToPrefix);
+        
+        fingerList.arrangeSuffix(toIndex, 
+                                 numberOfFingersInSuffix,
+                                 this.numberOfCoveringFingersToSuffix);
+        
+        int removalRangeLength = toIndex - fromIndex;
+        
+        fingerList.removeFingersOnDeleteRange(fromFingerIndex,
+                                              fingersToRemove, 
+                                              removalRangeLength);
+//        
+//        if (this.numberOfCoveringFingersToPrefix > 0) {
+//            if (this.numberOfCoveringFingersToSuffix > 0) {
+//                removeRangeImplCase5A(fromFingerIndex,
+//                                      toFingerIndex,
+//                                      fromIndex,
+//                                      toIndex,
+//                                      fingersToRemove);
+//                
+//            } else {
+//                // Here, this.numberOfCoveringFingersInPrefix > 0 and
+//                //       this.numberOfCoveringFingersInSuffix == 0  
+//                removeRangeImplCase5B(fromFingerIndex,
+//                                      toFingerIndex,
+//                                      fromIndex,
+//                                      toIndex,
+//                                      fingersToRemove);
+//            }
+//        } else {
+//            if (this.numberOfCoveringFingersToSuffix > 0) {
+//                // Here, this.numberOfCoveringFingersInPrefix == 0 and
+//                //       this.numberOfCoveringFingersInSuffix > 0
+//                removeRangeImplCase5C(fromFingerIndex,
+//                                      toFingerIndex,
+//                                      fromIndex,
+//                                      toIndex,
+//                                      fingersToRemove);
+//            }
+//        }
     }
     
     /**

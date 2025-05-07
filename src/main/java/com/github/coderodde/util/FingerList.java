@@ -869,6 +869,7 @@ final class FingerList<E> {
             int index = leftmostSuffixFinger.index;
             Node<E> node = leftmostSuffixFinger.node;
             
+            // TODO: Check this bound!
             for (int i = 0; i < numberOfFingersToPush; i++) {
                 Finger<E> finger = 
                         getFinger(size - numberOfSuffixFingers - 1 - i);
@@ -889,6 +890,32 @@ final class FingerList<E> {
         fingerArray[size] = fingerArray[size + 1];
         fingerArray[size + 1] = null;
         fingerArray[size].index = list.size;
+    }
+    
+    void removeFingersOnDeleteRange(int fromFingerIndex,
+                                    int numberOfFingersToRemove,
+                                    int removalRangeLength) {
+        
+        if (numberOfFingersToRemove != 0) {
+            
+            System.arraycopy(fingerArray, 
+                             fromFingerIndex + numberOfFingersToRemove,
+                             fingerArray, 
+                             fromFingerIndex, 
+                             size - fromFingerIndex 
+                                  - numberOfFingersToRemove 
+                                  + 1);
+            
+            Arrays.fill(fingerArray,
+                        size - numberOfFingersToRemove + 1,
+                        size + 1,
+                        null);
+            
+            this.size -= numberOfFingersToRemove;
+        }
+        
+        shiftFingerIndicesToLeft(fromFingerIndex, removalRangeLength);
+        this.list.size -= removalRangeLength;
     }
 
     /**
