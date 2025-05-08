@@ -2823,6 +2823,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  fromFingerIndex,
                                  toFingerIndex);
             
+            size -= removalLength;
         } else if (fingersToRemove < coveredFingers) {
             removeRangeImplCase5(fromIndex, 
                                  toIndex,
@@ -2835,12 +2836,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  fromFingerIndex,
                                  coveredFingers,
                                  fingersToRemove);
+            size -= removalLength;
         }
         
         unlinkNodeRange(this.removeRangeStartNode,
                         this.removeRangeEndNode);
-        
-        size -= removalLength;
         modCount++;
     }
     

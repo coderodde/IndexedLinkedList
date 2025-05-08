@@ -434,13 +434,21 @@ public class FingerListTest {
     @Test
     public void removeFingersOnDeleteRange1() {
         loadList(100);
-        IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         
         list.fingerList.removeFingersOnDeleteRange(3, 4, 20);
+        FingerList<Integer> expectedFingerList = new FingerList<>(null);
         
-        expectedList.fingerList.setFingerIndices(0, 1, 4, 29, 44, 61);
-        assertEquals(expectedList.fingerList, list.fingerList);
-        assertEquals(expectedList.size, list.size);
+        expectedFingerList.size = 6;
+        
+        expectedFingerList.fingerArray[0] = new Finger<>(new Node<>(0),  0  );
+        expectedFingerList.fingerArray[1] = new Finger<>(new Node<>(1),  1  );
+        expectedFingerList.fingerArray[2] = new Finger<>(new Node<>(4),  4  );
+        expectedFingerList.fingerArray[3] = new Finger<>(new Node<>(49), 29 );
+        expectedFingerList.fingerArray[4] = new Finger<>(new Node<>(64), 44 );
+        expectedFingerList.fingerArray[5] = new Finger<>(new Node<>(81), 61 );
+        expectedFingerList.fingerArray[6] = new Finger<>(new Node<>(null), 80);
+            
+        assertEquals(expectedFingerList, list.fingerList);
         
         System.out.println("removeFingersOnDeleteRange1 passed!");
     }
