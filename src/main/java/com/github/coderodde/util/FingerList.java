@@ -170,16 +170,16 @@ final class FingerList<E> {
     }
     
     void arrangeSuffix(int toIndex,
-                       int numberOfFingersInSuffix,
-                       int numberOfFingetsToMoveToSuffix) {
+                       int numberOfSuffixFingers,
+                       int numberOfFingetsToPush) {
         
         makeRoomAtSuffix(toIndex,
-                         numberOfFingersInSuffix, 
-                         numberOfFingetsToMoveToSuffix);
+                         numberOfSuffixFingers, 
+                         numberOfFingetsToPush);
         
         pushCoveredFingersToSuffix(toIndex,
-                                   numberOfFingersInSuffix, 
-                                   numberOfFingetsToMoveToSuffix);
+                                   numberOfSuffixFingers, 
+                                   numberOfFingetsToPush);
     }
 
     /**
@@ -753,8 +753,9 @@ final class FingerList<E> {
             int index = startFinger.index - 1;
             Node<E> node = startFinger.node.prev;
             
-            for (int i = size - targetFingerIndex; 
-                    i > size - numberOfFingersInSuffix - 1; 
+            // TODO: Debug, please!
+            for (int i = targetFingerIndex; 
+                    i > numberOfFingersToMoveToSuffix; 
                     i--) {
                 Finger<E> finger = getFinger(i);
                 finger.index = index--;
@@ -899,9 +900,9 @@ final class FingerList<E> {
         if (numberOfFingersToRemove != 0) {
             
             System.arraycopy(fingerArray, 
-                             fromFingerIndex + numberOfFingersToRemove,
+                             fromFingerIndex + list.numberOfCoveringFingersToPrefix + numberOfFingersToRemove,
                              fingerArray, 
-                             fromFingerIndex, 
+                             fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
                              size - fromFingerIndex 
                                   - numberOfFingersToRemove 
                                   + 1);
@@ -914,7 +915,10 @@ final class FingerList<E> {
             this.size -= numberOfFingersToRemove;
         }
         
-        shiftFingerIndicesToLeft(fromFingerIndex, removalRangeLength);
+        shiftFingerIndicesToLeft(
+                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
+                removalRangeLength);
+        
         this.list.size -= removalRangeLength;
     }
 
