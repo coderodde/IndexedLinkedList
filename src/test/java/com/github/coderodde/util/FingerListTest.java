@@ -275,7 +275,7 @@ public class FingerListTest {
         loadList(10);
         
         list.fingerList.setFingerIndices(3, 4, 8, 9);
-        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
@@ -290,7 +290,7 @@ public class FingerListTest {
         loadList(10);
         
         list.fingerList.setFingerIndices(3, 4, 7, 9);
-        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
@@ -305,7 +305,7 @@ public class FingerListTest {
         loadList(10);
         
         list.fingerList.setFingerIndices(3, 4, 7, 8);
-        list.fingerList.makeRoomAtSuffix(6, 2, 2);
+        list.fingerList.makeRoomAtSuffix(6, 2, 2, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(3, 4, 8, 9);
@@ -320,7 +320,7 @@ public class FingerListTest {
         loadList(10);
         
         list.fingerList.setFingerIndices(3, 4, 7, 8);
-        list.fingerList.makeRoomAtSuffix(6, 0, 2);
+        list.fingerList.makeRoomAtSuffix(6, 2, 0, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(3, 4, 7, 8);
@@ -419,7 +419,7 @@ public class FingerListTest {
         
         list.fingerList.setFingerIndices(5, 14, 15, 25, 26, 39, 49, 85, 86, 99);
         list.fingerList.arrangePrefix(17, 3, 2);
-        list.fingerList.arrangeSuffix(83, 3, 2);
+        list.fingerList.arrangeSuffix(83, 7, 3, 2);
         
         IndexedLinkedList<Integer> expectedList = new IndexedLinkedList<>(list);
         expectedList.fingerList.setFingerIndices(

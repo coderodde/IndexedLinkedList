@@ -170,10 +170,12 @@ final class FingerList<E> {
     }
     
     void arrangeSuffix(int toIndex,
+                       int toFingerIndex,
                        int numberOfSuffixFingers,
                        int numberOfFingetsToPush) {
         
         makeRoomAtSuffix(toIndex,
+                         toFingerIndex,
                          numberOfSuffixFingers, 
                          numberOfFingetsToPush);
         
@@ -701,6 +703,7 @@ final class FingerList<E> {
     }
     
     void makeRoomAtSuffix(int toIndex,
+                          int toFingerIndex,
                           int numberOfFingersInSuffix,
                           int numberOfFingersToMoveToSuffix) {
         
@@ -755,7 +758,7 @@ final class FingerList<E> {
             
             // TODO: Debug, please!
             for (int i = targetFingerIndex; 
-                    i > numberOfFingersToMoveToSuffix; 
+                    i >= toFingerIndex; 
                     i--) {
                 Finger<E> finger = getFinger(i);
                 finger.index = index--;

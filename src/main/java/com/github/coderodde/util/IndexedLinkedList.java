@@ -3234,6 +3234,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  this.numberOfCoveringFingersToPrefix);
         
         fingerList.arrangeSuffix(toIndex, 
+                                 toFingerIndex,
                                  numberOfFingersInSuffix,
                                  this.numberOfCoveringFingersToSuffix);
         
@@ -3242,35 +3243,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.removeFingersOnDeleteRange(fromFingerIndex,
                                               fingersToRemove, 
                                               removalRangeLength);
-//        
-//        if (this.numberOfCoveringFingersToPrefix > 0) {
-//            if (this.numberOfCoveringFingersToSuffix > 0) {
-//                removeRangeImplCase5A(fromFingerIndex,
-//                                      toFingerIndex,
-//                                      fromIndex,
-//                                      toIndex,
-//                                      fingersToRemove);
-//                
-//            } else {
-//                // Here, this.numberOfCoveringFingersInPrefix > 0 and
-//                //       this.numberOfCoveringFingersInSuffix == 0  
-//                removeRangeImplCase5B(fromFingerIndex,
-//                                      toFingerIndex,
-//                                      fromIndex,
-//                                      toIndex,
-//                                      fingersToRemove);
-//            }
-//        } else {
-//            if (this.numberOfCoveringFingersToSuffix > 0) {
-//                // Here, this.numberOfCoveringFingersInPrefix == 0 and
-//                //       this.numberOfCoveringFingersInSuffix > 0
-//                removeRangeImplCase5C(fromFingerIndex,
-//                                      toFingerIndex,
-//                                      fromIndex,
-//                                      toIndex,
-//                                      fingersToRemove);
-//            }
-//        }
     }
     
     /**
