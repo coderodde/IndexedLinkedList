@@ -842,7 +842,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test
+//    @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -1060,7 +1060,7 @@ public class IndexedLinkedListTest {
         }
     }
     
-    //@Test // Passes.
+    @Test
     public void bruteForceSubListClearFromToWithRandomization13() {
         Random random = new Random(13L);
         
