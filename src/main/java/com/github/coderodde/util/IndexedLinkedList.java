@@ -2787,18 +2787,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (coveredFingers > 0) {
                 // Handle the 2nd case:
-                removeRangeImplCase2(fromFingerIndex,
-                                     toFingerIndex,
-                                     fromIndex,
+                
+                removeRangeImplCase5(fromIndex, 
                                      toIndex,
-                                     removalLength,
+                                     fromFingerIndex, 
+                                     toFingerIndex, 
                                      fingersToRemove);
+                
+//                removeRangeImplCase2(fromFingerIndex,
+//                                     toFingerIndex,
+//                                     fromIndex,
+//                                     toIndex,
+//                                     removalLength,
+//                                     fingersToRemove);
               
                 // Unlink the actual nodes:
                 unlinkNodeRange(this.removeRangeStartNode,
                                 this.removeRangeEndNode);
                 
-                size -= removalLength;
+//                size -= removalLength;
                 
                 modCount++;
                 return;
