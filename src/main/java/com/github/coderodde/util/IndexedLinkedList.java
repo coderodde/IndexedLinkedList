@@ -2405,8 +2405,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int removalRangeLength = toFingerIndex 
                                - fromFingerIndex;
         
-        int remainingFingers   = removalRangeLength
-                               - fingersToRemove;
+        int remainingFingers = removalRangeLength
+                             - fingersToRemove;
         
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
         int rightCoveredFingers = remainingFingers - leftCoveredFingers;

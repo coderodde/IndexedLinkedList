@@ -645,8 +645,8 @@ final class FingerList<E> {
                           int numberOfFingersToMoveToPrefix) {
         
         if (numberOfFingersToMoveToPrefix <= 0) {
-            System.out.println("no: " + numberOfFingersToMoveToPrefix);
-            return;
+//            System.out.println("no: " + numberOfFingersToMoveToPrefix);
+//            return;
         }
         
         if (numberOfFingersInPrefix == 0) {
@@ -851,7 +851,7 @@ final class FingerList<E> {
             Node<E> node = rightmostPrefixFinger.node.next;
             
             for (int i = numberOfPrefixFingers; 
-                    i < numberOfPrefixFingers + numberOfFingersToPush;
+                    i <= numberOfPrefixFingers + numberOfFingersToPush;
                     i++) {
                 
                 Finger<E> finger = getFinger(i);
@@ -905,12 +905,13 @@ final class FingerList<E> {
         fingerArray[size].index = list.size;
     }
     
+    // TODO: Debug me, please!
     void removeFingersOnDeleteRange(int fromFingerIndex,
                                     int numberOfFingersToRemove,
                                     int removalRangeLength) {
         
         if (numberOfFingersToRemove != 0) {
-            
+            // This passes 3370th iteration.
             System.arraycopy(fingerArray, 
                              fromFingerIndex + list.numberOfCoveringFingersToPrefix + numberOfFingersToRemove,
                              fingerArray, 
