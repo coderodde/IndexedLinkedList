@@ -644,8 +644,9 @@ final class FingerList<E> {
                           int numberOfFingersInPrefix,
                           int numberOfFingersToMoveToPrefix) {
         
-        if (numberOfFingersToMoveToPrefix < 0) {
+        if (numberOfFingersToMoveToPrefix <= 0) {
             System.out.println("no: " + numberOfFingersToMoveToPrefix);
+            return;
         }
         
         if (numberOfFingersInPrefix == 0) {
@@ -914,9 +915,7 @@ final class FingerList<E> {
                              fromFingerIndex + list.numberOfCoveringFingersToPrefix + numberOfFingersToRemove,
                              fingerArray, 
                              fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-                             size - fromFingerIndex 
-                                  - numberOfFingersToRemove 
-                                  + 1);
+                             size - fromFingerIndex - numberOfFingersToRemove - list.numberOfCoveringFingersToPrefix + 1);
             
             Arrays.fill(fingerArray,
                         size - numberOfFingersToRemove + 1,
