@@ -2409,7 +2409,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                              - fingersToRemove;
         
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
-        int rightCoveredFingers = remainingFingers - leftCoveredFingers;
+        int rightCoveredFingers = 
+                Math.max(
+                        0,
+                        remainingFingers - leftCoveredFingers);
 
         this.numberOfCoveringFingersToPrefix = leftCoveredFingers;
         this.numberOfCoveringFingersToSuffix = rightCoveredFingers;
@@ -2835,10 +2838,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     private void removeRangeImpl(int fromIndex,
-                                      int toIndex,
-                                      int fromFingerIndex,
-                                      int toFingerIndex,
-                                      int fingersToRemove) {
+                                 int toIndex,
+                                 int fromFingerIndex,
+                                 int toFingerIndex,
+                                 int fingersToRemove) {
         
         this.loadFingerCoverageCounters(
                 fromFingerIndex, 

@@ -922,6 +922,15 @@ final class FingerList<E> {
                         size - numberOfFingersToRemove + 1,
                         size + 1,
                         null);
+//            if (list.numberOfCoveringFingersToSuffix > 0) {
+//                
+//            } else {
+//                System.out.println("HELLO!");
+//                
+//                Finger<E> lastSentinelFinger = getFinger(size());
+//                lastSentinelFinger.index -= removalRangeLength;
+//            }
+//            Arrays.fill(fingerArray, fromFingerIndex + numberOfFingersToRemove, size + 1, null);
             
             this.size -= numberOfFingersToRemove;
         }
