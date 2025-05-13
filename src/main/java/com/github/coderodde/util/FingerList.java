@@ -922,22 +922,22 @@ final class FingerList<E> {
                         size - numberOfFingersToRemove + 1,
                         size + 1,
                         null);
-//            if (list.numberOfCoveringFingersToSuffix > 0) {
-//                
-//            } else {
-//                System.out.println("HELLO!");
-//                
-//                Finger<E> lastSentinelFinger = getFinger(size());
-//                lastSentinelFinger.index -= removalRangeLength;
-//            }
-//            Arrays.fill(fingerArray, fromFingerIndex + numberOfFingersToRemove, size + 1, null);
-            
+
             this.size -= numberOfFingersToRemove;
+            shiftFingerIndicesToLeft(
+                    fromFingerIndex + list.numberOfCoveringFingersToPrefix,
+                    removalRangeLength);
+            System.out.println("-----");
+        } else {
+            System.out.println("Hello!");
+            shiftFingerIndicesToLeft(
+                    fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
+                    removalRangeLength);
         }
         
-        shiftFingerIndicesToLeft(
-                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-                removalRangeLength);
+//        shiftFingerIndicesToLeft(
+//                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
+//                removalRangeLength);
         
         this.list.size -= removalRangeLength;
     }
