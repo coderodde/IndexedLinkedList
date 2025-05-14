@@ -911,7 +911,39 @@ final class FingerList<E> {
                                     int removalRangeLength) {
         
         if (numberOfFingersToRemove != 0) {
-            // This passes 3370th iteration.
+            
+            if (list.numberOfCoveringFingersToPrefix < 0) {
+                System.out.println("prefix < 0");
+            }
+            
+            int copyLength = size 
+                           - fromFingerIndex
+                           - numberOfFingersToRemove 
+                           - list.numberOfCoveringFingersToPrefix
+                           + 1;
+            
+            if (copyLength <= 0) {
+                System.out.println("Copy length = " + copyLength);
+                
+                System.arraycopy(fingerArray, 
+                                 size,
+                                 fingerArray,
+                                 size - numberOfFingersToRemove, 
+                                 numberOfFingersToRemove);
+                
+                Arrays.fill(fingerArray, 
+                            size - numberOfFingersToRemove + 1, 
+                            size + 1,
+                            null);
+                
+                this.size -= numberOfFingersToRemove;
+                this.fingerArray[size()].index -= removalRangeLength;
+                this.list.size -= removalRangeLength;
+                
+                return;
+            }
+            
+            // TODO: Debug this please!
             System.arraycopy(fingerArray, 
                              fromFingerIndex + list.numberOfCoveringFingersToPrefix + numberOfFingersToRemove,
                              fingerArray, 

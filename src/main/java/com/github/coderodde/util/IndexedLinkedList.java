@@ -2409,10 +2409,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                              - fingersToRemove;
         
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
-        int rightCoveredFingers = 
-                Math.max(
-                        0,
-                        remainingFingers - leftCoveredFingers);
+        int rightCoveredFingers = remainingFingers - leftCoveredFingers;
+//                Math.max(
+//                        0,
+//                        remainingFingers - leftCoveredFingers);
 
         this.numberOfCoveringFingersToPrefix = leftCoveredFingers;
         this.numberOfCoveringFingersToSuffix = rightCoveredFingers;
