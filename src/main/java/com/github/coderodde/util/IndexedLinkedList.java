@@ -2844,7 +2844,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int fingersToRemove) {
         
         this.loadFingerCoverageCounters(
-                fromFingerIndex, 
+                fromFingerIndex,
                 toFingerIndex, 
                 fromIndex, 
                 toIndex, 
@@ -2852,6 +2852,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int numberOfFingersInPrefix = fromFingerIndex;
         int numberOfFingersInSuffix = fingerList.size() - toFingerIndex;
+        
+        if (fromFingerIndex == this.fingerList.size()) {
+            
+            System.arraycopy(fingerList.fingerArray, 
+                             fingerList.size(),
+                             fingerList.fingerArray,
+                             fingerList.size() - fingersToRemove,
+                             fingersToRemove);
+            
+            Arrays.fill(fingerList.fingerArray, 
+                        fingerList.size - fingersToRemove + 1,
+                        fingerList.size + 1, 
+                        null);
+            
+            int removalLength = toIndex - fromIndex;
+            
+            this.size -= removalLength;
+            this.fingerList.size -= fingersToRemove;
+            this.fingerList
+                .fingerArray[fingerList.size()]
+                .index-= removalLength;
+            
+            return;
+        }
         
         fingerList.arrangePrefix(fromIndex,
                                  numberOfFingersInPrefix,
