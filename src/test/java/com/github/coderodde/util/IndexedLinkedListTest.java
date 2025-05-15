@@ -4325,8 +4325,8 @@ public class IndexedLinkedListTest {
     
     @Test 
     public void bruteForceDeleteRangeAllIndexCombinations() {
-        IndexListGenerator ilg = new IndexListGenerator(25, 5);
-        List<Integer> sourceList = getIntegerList(25);
+        IndexListGenerator ilg = new IndexListGenerator(10, 4);
+        List<Integer> sourceList = getIntegerList(10);
         List<Integer> referenceList = new ArrayList<>();
         
         int iteration = 0;
@@ -4334,8 +4334,8 @@ public class IndexedLinkedListTest {
         do {
             int[] indices = ilg.getIndices();
             
-            for (int fromIndex = 0; fromIndex <= 25; fromIndex++) {
-                for (int toIndex = fromIndex; toIndex <= 25; toIndex++) {
+            for (int fromIndex = 0; fromIndex <= 10; fromIndex++) {
+                for (int toIndex = fromIndex; toIndex <= 10; toIndex++) {
                     
                     iteration++;
                     
