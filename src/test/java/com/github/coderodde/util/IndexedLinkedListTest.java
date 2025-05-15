@@ -4322,4 +4322,107 @@ public class IndexedLinkedListTest {
         
         list.fingerList.makeRoomAtPrefix(4, 1, 2);
     }
+    
+    @Test 
+    public void bruteForceDeleteRangeAllIndexCombinations() {
+        IndexListGenerator ilg = new IndexListGenerator(25, 5);
+        List<Integer> sourceList = getIntegerList(25);
+        List<Integer> referenceList = new ArrayList<>();
+        
+        int iteration = 0;
+        
+        do {
+            int[] indices = ilg.getIndices();
+            
+            for (int fromIndex = 0; fromIndex <= 25; fromIndex++) {
+                for (int toIndex = fromIndex; toIndex <= 25; toIndex++) {
+                    
+                    iteration++;
+                    
+                    System.out.println(
+                            "Iteration: "
+                                    + iteration 
+                                    + ", indices: " 
+                                    + Arrays.toString(indices)
+                                    + ", from: " 
+                                    + fromIndex
+                                    + ", to: " 
+                                    + toIndex 
+                                    + ".");
+                    
+                    list.clear();
+                    list.addAll(sourceList);
+                    list.fingerList.setFingerIndices(indices);
+                    
+                    referenceList.clear();
+                    referenceList.addAll(sourceList);
+                    
+                    list.subList(fromIndex, toIndex).clear();
+                    referenceList.subList(fromIndex, toIndex).clear();
+                    
+                    assertEquals(referenceList, list);
+                    
+                    list.checkInvarant();
+                }
+            }
+            
+        } while (ilg.inc());
+    }
+    
+    @Test
+    public void indexListGenerator() {
+        IndexListGenerator ilg = new IndexListGenerator(10, 4);
+        
+        do {
+            System.out.println(Arrays.toString(ilg.getIndices()));
+        } while (ilg.inc());
+    }
+}
+
+class IndexListGenerator {
+    
+    private final int listSize;
+    private final int[] indices;
+    
+    IndexListGenerator(final int listSize,
+                       final int numberOfIndices) {
+        this.listSize = listSize;
+        this.indices = new int[numberOfIndices];
+        
+        preload();
+    }
+    
+    boolean inc() {
+        if (indices[indices.length - 1] < listSize - 1) {
+            indices[indices.length - 1]++;
+            return true;
+        }
+        
+        for (int i = indices.length - 2; i >= 0; i--) {
+            int a = indices[i];
+            int b = indices[i + 1];
+            
+            if (a < b - 1) {
+                indices[i]++;
+                
+                for (int j = i + 1; j < indices.length; j++) {
+                    indices[j] = indices[j - 1] + 1;
+                }
+                
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    int[] getIndices() {
+        return indices;
+    }
+    
+    private void preload() {
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = i;
+        }
+    }
 }
