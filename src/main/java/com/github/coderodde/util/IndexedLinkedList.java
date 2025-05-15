@@ -2843,6 +2843,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int toFingerIndex,
                                  int fingersToRemove) {
         
+//        if (fingersToRemove == 0) {
+//            throw new IllegalStateException("<<>>");
+//        }
+        
         this.loadFingerCoverageCounters(
                 fromFingerIndex,
                 toFingerIndex, 
