@@ -851,7 +851,7 @@ final class FingerList<E> {
             Node<E> node = rightmostPrefixFinger.node.next;
             
             for (int i = numberOfPrefixFingers; 
-                    i <= numberOfPrefixFingers + numberOfFingersToPush - 1;
+                    i < numberOfPrefixFingers + numberOfFingersToPush;
                     i++) {
                 
                 Finger<E> finger = getFinger(i);
