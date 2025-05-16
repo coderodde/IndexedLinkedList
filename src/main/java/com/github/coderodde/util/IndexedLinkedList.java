@@ -2837,15 +2837,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
+    private void removeRangeImplCaseA() {
+        
+    }
+    
     private void removeRangeImpl(int fromIndex,
                                  int toIndex,
                                  int fromFingerIndex,
                                  int toFingerIndex,
                                  int fingersToRemove) {
+        int removalFingerRangeLength = toFingerIndex - fromFingerIndex;
         
-//        if (fingersToRemove == 0) {
-//            throw new IllegalStateException("<<>>");
-//        }
+        if (removalFingerRangeLength < fingersToRemove) {
+            removeRangeImplCaseA();
+            return;
+        }
         
         this.loadFingerCoverageCounters(
                 fromFingerIndex,

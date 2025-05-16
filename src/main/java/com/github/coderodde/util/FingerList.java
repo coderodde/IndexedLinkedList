@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2024 rodio.
+ * Copyright 2025 Rodion Efremov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 package com.github.coderodde.util;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * This inner class implements the finger list data structure for managing list
@@ -905,16 +904,16 @@ final class FingerList<E> {
         fingerArray[size].index = list.size;
     }
     
+    void removeSingleNode(int fromIndex) {
+        
+    }
+    
     // TODO: Debug me, please!
     void removeFingersOnDeleteRange(int fromFingerIndex,
                                     int numberOfFingersToRemove,
                                     int removalRangeLength) {
         
         if (numberOfFingersToRemove != 0) {
-            
-            if (list.numberOfCoveringFingersToPrefix < 0) {
-                System.out.println("prefix < 0");
-            }
             
             int copyLength = size 
                            - fromFingerIndex
@@ -923,8 +922,6 @@ final class FingerList<E> {
                            + 1;
             
             if (copyLength <= 0) {
-                System.out.println("Copy length = " + copyLength);
-                
                 System.arraycopy(fingerArray, 
                                  size,
                                  fingerArray,

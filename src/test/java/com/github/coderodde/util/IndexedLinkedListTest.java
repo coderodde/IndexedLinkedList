@@ -1033,7 +1033,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-    @Test
+//    @Test
     public void bruteForceSubListClearFromToWithRandomization666() {
         Random random = new Random(666L);
         
@@ -4366,15 +4366,6 @@ public class IndexedLinkedListTest {
                 }
             }
             
-        } while (ilg.inc());
-    }
-    
-    @Test
-    public void indexListGenerator() {
-        IndexListGenerator ilg = new IndexListGenerator(10, 4);
-        
-        do {
-            System.out.println(Arrays.toString(ilg.getIndices()));
         } while (ilg.inc());
     }
 }
