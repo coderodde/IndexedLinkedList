@@ -2837,31 +2837,31 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    private void removeRangeImplCaseA() {
-        
-    }
-    
-    private void removeRangeImplCaseA(int toIndex,
-                                      int removalRangeLength,
-                                      int fromFingerIndex,
+    private void removeRangeImplCaseA(int fromFingerIndex,
+                                      int toFingerIndex,
+                                      int fromIndex,
+                                      int toIndex,
                                       int fingersToRemove) {
         
+        int copyLength = fingerList.size() - toFingerIndex + 1;
+        
         System.arraycopy(fingerList.fingerArray,
-                         fromFingerIndex + fingersToRemove - 1,
+                         fromFingerIndex + fingersToRemove,
                          fingerList.fingerArray, 
                          fromFingerIndex, 
-                         fingerList.size() - fingersToRemove);
+                         copyLength);
         
         Arrays.fill(fingerList.fingerArray,
-                    fingersToRemove + fromFingerIndex,
+                    fingerList.size() + 1 - fingersToRemove,
                     fingerList.size() + 1,
                     null);
         
         fingerList.size -= fingersToRemove;
         
+        int removalRangeLength = toIndex - fromIndex;
+        
         fingerList.shiftFingerIndicesToLeft(fromFingerIndex, 
                                             removalRangeLength);
-        
         size -= removalRangeLength;
     }
     
@@ -2870,8 +2870,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  int fromFingerIndex,
                                  int toFingerIndex,
                                  int fingersToRemove) {
-        int removalFingerRangeLength = toFingerIndex - fromFingerIndex;
-        int removalRangeLength = toIndex - fromIndex;
+        
+        int removalFingerRangeLength = toFingerIndex 
+                                     - fromFingerIndex;
+        
+        int removalRangeLength = toIndex
+                               - fromIndex;
         
         if (removalFingerRangeLength <= fingersToRemove) {
             System.out.println(
@@ -2881,9 +2885,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             + fingersToRemove 
                             + ")");
             
-            removeRangeImplCaseA(toIndex,
-                                 removalRangeLength,
-                                 fromFingerIndex,
+            removeRangeImplCaseA(fromFingerIndex,
+                                 toFingerIndex,
+                                 fromIndex,
+                                 toIndex,
                                  fingersToRemove);
             
             fingerList.contractFingerArrayIfNeeded(fingerList.size());
