@@ -711,10 +711,6 @@ final class FingerList<E> {
                           int numberOfFingersInSuffix,
                           int numberOfFingersToMoveToSuffix) {
         
-        if (numberOfFingersToMoveToSuffix < 0) {
-            System.out.println("yes: " + numberOfFingersToMoveToSuffix);
-        }
-        
         if (numberOfFingersInSuffix == 0) {
             // Here, no fingers in the suffix to move.
             return;
@@ -956,9 +952,7 @@ final class FingerList<E> {
             shiftFingerIndicesToLeft(
                     fromFingerIndex + list.numberOfCoveringFingersToPrefix,
                     removalRangeLength);
-            System.out.println("-----");
         } else {
-            System.out.println("Hello!");
             shiftFingerIndicesToLeft(
                     fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
                     removalRangeLength);
