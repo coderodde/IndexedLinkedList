@@ -842,7 +842,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-//    @Test
+    @Test
     public void bruteForceSubListClearFromTo() {
         List<Integer> data = getIntegerList(100);
         int iteration = 0;
@@ -1033,7 +1033,7 @@ public class IndexedLinkedListTest {
         assertEquals(referenceList, list);
     }
     
-//    @Test
+    @Test
     public void bruteForceSubListClearFromToWithRandomization666() {
         Random random = new Random(666L);
         
@@ -1044,7 +1044,7 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("&& iteration = " + iteration + " &&");
+//                System.out.println("&& iteration = " + iteration + " &&");
                 
                 list.clear();
                 list.addAll(data);
@@ -1060,9 +1060,11 @@ public class IndexedLinkedListTest {
                 list.checkInvarant();
             }
         }
+        
+        System.out.println("bruteForceSubListClearFromTo666 passed!");
     }
     
-//    @Test
+    @Test
     public void bruteForceSubListClearFromToWithRandomization13() {
         Random random = new Random(13L);
         
@@ -1073,7 +1075,7 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("{{>> iteration = " + iteration + " <<}}");
+//                System.out.println("{{>> iteration = " + iteration + " <<}}");
                 
                 list.clear();
                 list.addAll(data);
@@ -1089,6 +1091,8 @@ public class IndexedLinkedListTest {
                 list.checkInvarant();
             }
         }
+        
+        System.out.println("bruteForceSubListClearFromTo13 passed!");
     }
     
     ////////@Test // Passes.
@@ -4330,9 +4334,12 @@ public class IndexedLinkedListTest {
         List<Integer> referenceList = new ArrayList<>();
         
         int iteration = 0;
+        int combinations = 0;
         
         do {
             int[] indices = ilg.getIndices();
+            
+            combinations++;
             
             for (int fromIndex = 0; fromIndex <= 10; fromIndex++) {
                 for (int toIndex = fromIndex; toIndex <= 10; toIndex++) {
@@ -4367,6 +4374,8 @@ public class IndexedLinkedListTest {
             }
             
         } while (ilg.inc());
+        
+        System.out.println("Combinations: " + combinations);
     }
 }
 
