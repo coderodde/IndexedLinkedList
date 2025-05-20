@@ -2846,15 +2846,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int copyLength = Math.min(fingerList.size() - toFingerIndex,
                                   fingerList.size() - fingersToRemove) + 1;
         
-        int sourceIndex = Math.max(toFingerIndex,
-                                   fingersToRemove);
+        int targetIndex = 
+                Math.max(
+                        0, 
+                        Math.min(fromFingerIndex, 
+                                 toFingerIndex - fingersToRemove));
         
-        int targetIndex = sourceIndex - fingersToRemove;
+        int sourceIndex = targetIndex + fingersToRemove;
         
+//        int targetIndex = Math.max(0, toFingerIndex - fingersToRemove);
+//        int sourceIndex = Math.max(toFingerIndex, fromFingerIndex - 
+//                                                  fingersToRemove);
         System.arraycopy(fingerList.fingerArray,
                          sourceIndex, 
                          fingerList.fingerArray, 
-                         targetIndex,
+                         Math.max(0, targetIndex),
                          copyLength);
         
         Arrays.fill(fingerList.fingerArray,
@@ -2866,7 +2872,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int removalRangeLength = toIndex - fromIndex;
         
-        fingerList.shiftFingerIndicesToLeft(toFingerIndex - fingersToRemove, 
+        fingerList.shiftFingerIndicesToLeft(targetIndex, 
                                             removalRangeLength);
         size -= removalRangeLength;
     }
