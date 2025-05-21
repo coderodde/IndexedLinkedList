@@ -874,6 +874,87 @@ public class IndexedLinkedList<E> implements Deque<E>,
     */
     @Override
     public E remove(int index) {
+        int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+        int fingerListSizeAfterRemoval  = 
+                getRecommendedNumberOfFingers(size() - 1);
+        
+        int fromFingerIndex = fingerList.getFingerIndexImpl(index);
+        Node<E> nodeToRemove = fingerList.getNodeNoFingersFix(index);
+        
+        // Here, either fingerListSizeBeforeRemoval == 
+        // fingerListSizeAfterRemoval, or fingerListSizeBeforeRemoval ==
+        // fingerListSizeAfterRemoval + 1.
+        if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
+            removeByIndexCaseA(fromFingerIndex);
+        } else {
+            removeByIndexCaseB(fromFingerIndex, index);
+        }
+        
+        E returnValue = nodeToRemove.item;
+        unlink(nodeToRemove);
+        decreaseSize();
+        return returnValue;
+    }
+    
+    private void removeByIndexCaseA(int fromFingerIndex) {
+        int copyLength = fingerList.size() - fromFingerIndex;
+        
+        System.arraycopy(fingerList.fingerArray, 
+                         fromFingerIndex + 1, 
+                         fingerList.fingerArray,
+                         fromFingerIndex, 
+                         copyLength);
+        
+        fingerList.fingerArray[fingerList.size()] = null;
+        fingerList.size--;
+        fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
+    }
+    
+    private void removeByIndexCaseB(int fromFingerIndex,
+                                    int elementIndex) {
+        Finger<E> finger = fingerList.getFinger(fromFingerIndex);
+        
+        if (finger.index != elementIndex) {
+            fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
+        } else {
+            int numberOfPrefixFingers = elementIndex - fromFingerIndex;
+            int numberOfSuffixFingers = size()
+                                      - numberOfPrefixFingers
+                                      - fromFingerIndex
+                                      - 1;
+            
+            if (numberOfPrefixFingers > numberOfSuffixFingers) {
+                // Push to left:
+                int i = fromFingerIndex - 1;
+                
+                for (; i >= 0; i--) {
+//                    if (fingerList.getFinger(i))
+                }
+                
+                
+                finger.index--;
+                finger.node = finger.node.prev;
+            } else {
+                fingerList.arrangeSuffix(elementIndex + 1, 
+                                         fromFingerIndex + 1,
+                                         numberOfSuffixFingers,
+                                         1);
+                finger.index++;
+                finger.node = finger.node.next;
+            }
+            
+//            loadFingerCoverageCounters(fromFingerIndex,
+//                                       fromFingerIndex + 1,
+//                                       elementIndex, 
+//                                       elementIndex + 1, 
+//                                       1);
+//            
+//            System.out.println("prefix: " + this.numberOfCoveringFingersToPrefix + ", suffix: " + this.numberOfCoveringFingersToSuffix);
+        }
+    }
+    
+//    @Override
+    public E removeOld(int index) {
         checkElementIndex(index);
         
         int closestFingerIndex = fingerList.getClosestFingerIndex(index);

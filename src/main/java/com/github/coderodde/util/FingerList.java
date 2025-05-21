@@ -475,30 +475,7 @@ final class FingerList<E> {
                 return node;
             }
         } else {
-            // Here, 'elementIndex >= nextAIndex':
-            int leftDistance = elementIndex - nextAIndex;
-            int rightDistance = b.index - elementIndex;
-
-            if (leftDistance < rightDistance) {
-                // Once here, rewind the node reference from aNode to the 
-                // right:
-                Node<E> node = aNode;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
-            } else {
-                // Once here, rewind the node refrence from b to the left:
-                Node<E> node = b.node;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
-            }
+            return aNode;
         }
     }
     
@@ -911,37 +888,18 @@ final class FingerList<E> {
         
         if (numberOfFingersToRemove != 0) {
             
-            int copyLength = size 
-                           - fromFingerIndex
-                           - numberOfFingersToRemove 
-                           - list.numberOfCoveringFingersToPrefix
-                           + 1;
-            
-            if (copyLength <= 0) {
-                System.arraycopy(fingerArray, 
-                                 size,
-                                 fingerArray,
-                                 size - numberOfFingersToRemove, 
-                                 numberOfFingersToRemove);
-                
-                Arrays.fill(fingerArray, 
-                            size - numberOfFingersToRemove + 1, 
-                            size + 1,
-                            null);
-                
-                this.size -= numberOfFingersToRemove;
-                this.fingerArray[size()].index -= removalRangeLength;
-                this.list.size -= removalRangeLength;
-                
-                return;
-            }
-            
-            // TODO: Debug this please!
-            System.arraycopy(fingerArray, 
-                             fromFingerIndex + list.numberOfCoveringFingersToPrefix + numberOfFingersToRemove,
-                             fingerArray, 
-                             fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-                             size - fromFingerIndex - numberOfFingersToRemove - list.numberOfCoveringFingersToPrefix + 1);
+            System.arraycopy(
+                    fingerArray, 
+                    fromFingerIndex 
+                            + list.numberOfCoveringFingersToPrefix
+                            + numberOfFingersToRemove,
+                    fingerArray, 
+                    fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
+                    size 
+                            - fromFingerIndex
+                            - numberOfFingersToRemove 
+                            - list.numberOfCoveringFingersToPrefix 
+                            + 1);
             
             Arrays.fill(fingerArray,
                         size - numberOfFingersToRemove + 1,
