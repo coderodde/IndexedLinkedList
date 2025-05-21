@@ -923,24 +923,37 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                       - fromFingerIndex
                                       - 1;
             
+            loadFingerCoverageCounters(fromFingerIndex,
+                                       fromFingerIndex + 1, 
+                                       elementIndex, 
+                                       elementIndex + 1, 
+                                       1);
+                  System.out.println("prefix: " + this.numberOfCoveringFingersToPrefix + ", suffix: " + this.numberOfCoveringFingersToSuffix);
+        
+            
             if (numberOfPrefixFingers > numberOfSuffixFingers) {
-                // Push to left:
-                int i = fromFingerIndex - 1;
-                
-                for (; i >= 0; i--) {
-//                    if (fingerList.getFinger(i))
-                }
-                
-                
-                finger.index--;
-                finger.node = finger.node.prev;
+//                // Push to left:
+//                int i = elementIndex - 1;
+//                finger = fingerList.getFinger(fromFingerIndex);
+//                Node<E> node = finger.node;
+//                
+//                while (i > 0) {
+//                    if (i != finger)
+//                }
+//                for (; i >= 0; i--) {
+////                    if (fingerList.getFinger(i))
+//                }
+//                
+//                
+//                finger.index--;
+//                finger.node = finger.node.prev;
             } else {
-                fingerList.arrangeSuffix(elementIndex + 1, 
-                                         fromFingerIndex + 1,
-                                         numberOfSuffixFingers,
-                                         1);
-                finger.index++;
-                finger.node = finger.node.next;
+//                fingerList.arrangeSuffix(elementIndex + 1, 
+//                                         fromFingerIndex + 1,
+//                                         numberOfSuffixFingers,
+//                                         1);
+//                finger.index++;
+//                finger.node = finger.node.next;
             }
             
 //            loadFingerCoverageCounters(fromFingerIndex,
