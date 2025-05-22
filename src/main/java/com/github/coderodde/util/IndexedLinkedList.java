@@ -917,52 +917,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (finger.index != elementIndex) {
             fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
         } else {
-            int numberOfPrefixFingers = elementIndex - fromFingerIndex;
-            int numberOfSuffixFingers = size()
-                                      - numberOfPrefixFingers
-                                      - fromFingerIndex
-                                      - 1;
+            int fingerPrefixLength = fromFingerIndex;
+            int fingerSuffixLength = fingerList.size() - (fromFingerIndex + 1);
             
-            loadFingerCoverageCounters(fromFingerIndex,
-                                       fromFingerIndex + 1, 
-                                       elementIndex, 
-                                       elementIndex + 1, 
-                                       1);
-                  System.out.println("prefix: " + this.numberOfCoveringFingersToPrefix + ", suffix: " + this.numberOfCoveringFingersToSuffix);
-        
+            int listPrefixFreeSpots = elementIndex;
+            int listSuffixFreeSpots = size - (elementIndex + 1);
             
-            if (numberOfPrefixFingers > numberOfSuffixFingers) {
-//                // Push to left:
-//                int i = elementIndex - 1;
-//                finger = fingerList.getFinger(fromFingerIndex);
-//                Node<E> node = finger.node;
-//                
-//                while (i > 0) {
-//                    if (i != finger)
-//                }
-//                for (; i >= 0; i--) {
-////                    if (fingerList.getFinger(i))
-//                }
-//                
-//                
-//                finger.index--;
-//                finger.node = finger.node.prev;
+            int freeFingerPrefixSpots = listPrefixFreeSpots
+                                      - fingerPrefixLength;
+            
+            int freeFingerSuffixSpots = listSuffixFreeSpots
+                                      - fingerSuffixLength;
+            
+            if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
+                fingerList.arrangePrefix(elementIndex,
+                                         fingerPrefixLength,
+                                         1);
             } else {
-//                fingerList.arrangeSuffix(elementIndex + 1, 
-//                                         fromFingerIndex + 1,
-//                                         numberOfSuffixFingers,
-//                                         1);
-//                finger.index++;
-//                finger.node = finger.node.next;
+                fingerList.arrangeSuffix(elementIndex + 1,
+                                         fromFingerIndex + 1, 
+                                         fingerSuffixLength, 
+                                         1);
             }
             
-//            loadFingerCoverageCounters(fromFingerIndex,
-//                                       fromFingerIndex + 1,
-//                                       elementIndex, 
-//                                       elementIndex + 1, 
-//                                       1);
-//            
-//            System.out.println("prefix: " + this.numberOfCoveringFingersToPrefix + ", suffix: " + this.numberOfCoveringFingersToSuffix);
+            fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex + 1);
         }
     }
     
