@@ -878,8 +878,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 getRecommendedNumberOfFingers(size() - 1);
         
         int fromFingerIndex = fingerList.getFingerIndexImpl(index);
-        // TODO: Optimize this!
-        Node<E> nodeToRemove = fingerList.getNodeNoFingersFix(index);
+        Finger<E> finger    = fingerList.getFinger(fromFingerIndex);
+        Node<E> targetNode  = finger.node;
+        
+        while (index < finger.index) {
+            index++;
+            targetNode = targetNode.prev;
+        }
+        
+//        while (finger.index < index) {
+//            index--;
+//            targetNode = targetNode.next;
+//        }
+        
+//        // TODO: Optimize this!
+//        Node<E> nodeToRemove = fingerList.getNodeNoFingersFix(index);
         
         // Here, either fingerListSizeBeforeRemoval == 
         // fingerListSizeAfterRemoval, or fingerListSizeBeforeRemoval ==
@@ -890,8 +903,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             removeByIndexCaseB(fromFingerIndex, index);
         }
         
-        E returnValue = nodeToRemove.item;
-        unlink(nodeToRemove);
+        E returnValue = targetNode.item;
+        unlink(targetNode);
         decreaseSize();
         return returnValue;
     }
