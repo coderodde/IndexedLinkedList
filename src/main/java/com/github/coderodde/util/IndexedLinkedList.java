@@ -879,6 +879,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 getRecommendedNumberOfFingers(size() - 1);
         
         int fromFingerIndex = fingerList.getFingerIndexImpl(index);
+        // TODO: Optimize this!
         Node<E> nodeToRemove = fingerList.getNodeNoFingersFix(index);
         
         // Here, either fingerListSizeBeforeRemoval == 
@@ -897,7 +898,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     private void removeByIndexCaseA(int fromFingerIndex) {
-        int copyLength = fingerList.size() - fromFingerIndex;
+        int copyLength = fingerList.size() - fromFingerIndex + 1;
         
         System.arraycopy(fingerList.fingerArray, 
                          fromFingerIndex + 1, 
@@ -905,9 +906,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          fromFingerIndex, 
                          copyLength);
         
-        fingerList.fingerArray[fingerList.size()] = null;
+        int fingerListSize = fingerList.size();
+        
+        fingerList.fingerArray[fingerListSize] = null;
         fingerList.size--;
-        fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
+        
+        fingerListSize = fingerList.size();
+        
+        fingerList.fingerArray[fingerListSize].node  = null;
+        fingerList.fingerArray[fingerListSize].index = size;
+        
+        fingerList.shiftFingerIndicesToLeftOnceAll(
+                Math.min(fromFingerIndex,
+                         fingerListSize));
     }
     
     private void removeByIndexCaseB(int fromFingerIndex,
@@ -933,14 +944,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerList.arrangePrefix(elementIndex,
                                          fingerPrefixLength,
                                          1);
+                
+                fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex + 1);
             } else {
                 fingerList.arrangeSuffix(elementIndex + 1,
                                          fromFingerIndex + 1, 
                                          fingerSuffixLength, 
                                          1);
+                
+                fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
             }
-            
-            fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex + 1);
         }
     }
     
