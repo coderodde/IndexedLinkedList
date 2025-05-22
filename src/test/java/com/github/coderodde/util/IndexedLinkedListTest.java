@@ -853,7 +853,7 @@ public class IndexedLinkedListTest {
             for (int toIndex = fromIndex; toIndex <= 100; toIndex++) {
                 iteration++;
                 
-                System.out.println("[[ iteration = " + iteration + " ]]");
+//                System.out.println("[[ iteration = " + iteration + " ]]");
                 
                 list.clear();
                 list.addAll(data);
@@ -2004,32 +2004,32 @@ public class IndexedLinkedListTest {
         }
     }
     
-    @Test
-    public void subListToArrayGenerator() {
-        list.addAll(getIntegerList(20));
-        List<Integer> subList = list.subList(10, 16);
-        Integer[] array = subList.toArray(Integer[]::new);
-        
-        assertEquals(Integer.valueOf(10), array[0]);
-        assertEquals(Integer.valueOf(11), array[1]);
-        assertEquals(Integer.valueOf(12), array[2]);
-        assertEquals(Integer.valueOf(13), array[3]);
-        assertEquals(Integer.valueOf(14), array[4]);
-        assertEquals(Integer.valueOf(15), array[5]);
-    }
+//    @Test
+//    public void subListToArrayGenerator() {
+//        list.addAll(getIntegerList(20));
+//        List<Integer> subList = list.subList(10, 16);
+//        Integer[] array = subList.toArray(Integer[]::new);
+//        
+//        assertEquals(Integer.valueOf(10), array[0]);
+//        assertEquals(Integer.valueOf(11), array[1]);
+//        assertEquals(Integer.valueOf(12), array[2]);
+//        assertEquals(Integer.valueOf(13), array[3]);
+//        assertEquals(Integer.valueOf(14), array[4]);
+//        assertEquals(Integer.valueOf(15), array[5]);
+//    }
     
-    @Test
-    public void listToArrayGenerator() {
-        list.addAll(Arrays.asList(4, 1, 3, 2, 5));
-        Integer[] array = list.toArray(Integer[]::new);
-        
-        assertEquals(5, array.length);
-        assertEquals(Integer.valueOf(4), array[0]);
-        assertEquals(Integer.valueOf(1), array[1]);
-        assertEquals(Integer.valueOf(3), array[2]);
-        assertEquals(Integer.valueOf(2), array[3]);
-        assertEquals(Integer.valueOf(5), array[4]);
-    }
+//    @Test
+//    public void listToArrayGenerator() {
+//        list.addAll(Arrays.asList(4, 1, 3, 2, 5));
+//        Integer[] array = list.toArray(Integer[]::new);
+//        
+//        assertEquals(5, array.length);
+//        assertEquals(Integer.valueOf(4), array[0]);
+//        assertEquals(Integer.valueOf(1), array[1]);
+//        assertEquals(Integer.valueOf(3), array[2]);
+//        assertEquals(Integer.valueOf(2), array[3]);
+//        assertEquals(Integer.valueOf(5), array[4]);
+//    }
     
     @Test
     public void subListToArrayGeneric() {
@@ -2205,7 +2205,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void emptyBatchRemove() {
-        list.batchRemove(List.of(), true, 0, 1);
+        list.batchRemove(new ArrayList<>(), true, 0, 1);
     }
     
     @Test(expected = ConcurrentModificationException.class)
@@ -2267,7 +2267,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void addAllEmpty() {
-        list.addAll(0, List.of());
+        list.addAll(0, new ArrayList<>());
     }
     
     @Test(expected = NoSuchElementException.class)

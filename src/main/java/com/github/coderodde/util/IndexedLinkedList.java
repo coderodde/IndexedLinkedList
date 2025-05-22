@@ -69,7 +69,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * The serial version UID.
      */
-    @java.io.Serial
     private static final long serialVersionUID = 54170828611556733L;
     
     /**
@@ -958,46 +957,46 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
 //    @Override
-    public E removeOld(int index) {
-        checkElementIndex(index);
-        
-        int closestFingerIndex = fingerList.getClosestFingerIndex(index);
-        Finger<E> closestFinger = fingerList.getFinger(closestFingerIndex);
-        
-        E returnValue;
-        Node<E> nodeToRemove;
-        
-        if (closestFinger.index == index) {
-            nodeToRemove = closestFinger.node;
-            moveFingerOutOfRemovalLocation(closestFinger, 
-                                           closestFingerIndex);    
-        } else {
-            // Keep the fingers at their original position.
-            // Find the target node:
-            int steps = closestFinger.index - index;
-            
-            nodeToRemove =
-                    traverseLinkedListBackwards(
-                            closestFinger,
-                            steps);
-            
-            fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
-            
-            if (steps > 0) {
-                fingerList.getFinger(closestFingerIndex).index--;
-            }
-        }
-        
-        returnValue = nodeToRemove.item;
-        unlink(nodeToRemove);
-        decreaseSize();
-
-        if (mustRemoveFinger()) {
-            removeFinger();
-        }
-
-        return returnValue;
-    }
+//    public E removeOld(int index) {
+//        checkElementIndex(index);
+//        
+//        int closestFingerIndex = fingerList.getClosestFingerIndex(index);
+//        Finger<E> closestFinger = fingerList.getFinger(closestFingerIndex);
+//        
+//        E returnValue;
+//        Node<E> nodeToRemove;
+//        
+//        if (closestFinger.index == index) {
+//            nodeToRemove = closestFinger.node;
+//            moveFingerOutOfRemovalLocation(closestFinger, 
+//                                           closestFingerIndex);    
+//        } else {
+//            // Keep the fingers at their original position.
+//            // Find the target node:
+//            int steps = closestFinger.index - index;
+//            
+//            nodeToRemove =
+//                    traverseLinkedListBackwards(
+//                            closestFinger,
+//                            steps);
+//            
+//            fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
+//            
+//            if (steps > 0) {
+//                fingerList.getFinger(closestFingerIndex).index--;
+//            }
+//        }
+//        
+//        returnValue = nodeToRemove.item;
+//        unlink(nodeToRemove);
+//        decreaseSize();
+//
+//        if (mustRemoveFinger()) {
+//            removeFinger();
+//        }
+//
+//        return returnValue;
+//    }
     
     /**
      * Removes from this list all the elements mentioned in {@code c}. Runs in
@@ -1228,18 +1227,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         return arr;
-    }
-    
-    /**
-     * Generates the array containing all the elements in this list.
-     * 
-     * @param <T>       the array component type.
-     * @param generator the generator function.
-     * @return the list contents in an array with component type of {@code T}.
-     */
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return toArray(generator.apply(size));
     }
     
     /**
@@ -2669,7 +2656,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @throws java.io.IOException if I/O fails.
      * @throws ClassNotFoundException if the class is not found.
      */
-    @java.io.Serial
     private void readObject(java.io.ObjectInputStream s) 
             throws java.io.IOException, ClassNotFoundException {
         // Read in any hidden serialization magic
@@ -3258,7 +3244,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * 
      * @throws java.io.IOException if the I/O fails.
      */
-    @java.io.Serial
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic
@@ -3726,7 +3711,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public E get(int index) {
-            Objects.checkIndex(index, size);
+            checkIndex(index, size);
             checkForComodification();
             return root.get(offset + index);
         }
@@ -3910,7 +3895,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public E remove(int index) {
-            Objects.checkIndex(index, size);
+            checkIndex(index, size);
             checkForComodification();
             E result = root.remove(offset + index);
             updateSizeAndModCount(-1);
@@ -3981,7 +3966,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public E set(int index, E element) {
-            Objects.checkIndex(index, size);
+            checkIndex(index, size);
             checkForComodification();
             return root.set(offset + index, element);
         }
@@ -4081,19 +4066,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             return array;
-        }
-
-        /**
-         * Returns the array of elements in this view.
-         * 
-         * @param <T>       the element data type.
-         * @param generator the generator function. 
-         * @return the element array in the same order they appear in the 
-         *         underlying linked list.
-         */
-        @Override
-        public <T> T[] toArray(IntFunction<T[]> generator) {
-            return toArray(generator.apply(size));
         }
 
         /**
@@ -4229,6 +4201,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 subList.modCount = root.modCount;
                 subList = subList.parent;
             } while (subList != null);
+        }
+    }
+    
+    private static void checkIndex(int index, int length) {
+        if (length < 0) {
+            throw new IndexOutOfBoundsException("length(" + index + ") < 0");
+        }
+        
+        if (index < 0) {
+            throw new IndexOutOfBoundsException("index(" + index + ") < 0");
+        }
+        
+        if (index >= length) {
+            throw new IndexOutOfBoundsException(
+                    "index(" + index + ") >= length(" + length + ")");
         }
     }
 }
