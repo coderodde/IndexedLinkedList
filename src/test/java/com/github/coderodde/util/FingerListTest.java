@@ -18,6 +18,7 @@ package com.github.coderodde.util;
 
 import java.util.List;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
@@ -451,6 +452,40 @@ public class FingerListTest {
         assertEquals(expectedFingerList, list.fingerList);
         
         System.out.println("removeFingersOnDeleteRange1 passed!");
+    }
+    
+    @Test
+    public void equals() {
+        IndexedLinkedList<Integer> list1 = new IndexedLinkedList<>();
+        IndexedLinkedList<Integer> list2 = new IndexedLinkedList<>();
+        FingerList<Integer> fingerList1 = new FingerList<>(list1);
+        FingerList<Integer> fingerList2 = new FingerList<>(list2);
+        
+        assertTrue(fingerList1.equals(fingerList1));
+        assertFalse(fingerList1.equals(null));
+        
+        fingerList2.size = 1;
+        
+        assertFalse(fingerList1.equals(fingerList2));
+        assertFalse(fingerList1.equals(new Object()));
+        
+        fingerList1.size = 0;
+        fingerList1.appendFinger(new Finger<>(new Node(1), 0));
+        fingerList1.appendFinger(new Finger<>(new Node(2), 1));
+        
+        fingerList2.size = 0;
+        fingerList2.appendFinger(new Finger<>(new Node(1), 0));
+        
+        assertFalse(fingerList1.equals(fingerList2));
+        
+        fingerList2.appendFinger(new Finger<>(new Node(2), 1));
+        
+        assertTrue(fingerList1.equals(fingerList2));
+        
+        fingerList2.fingerArray[1] = null;
+        
+        assertFalse(fingerList1.equals(fingerList2));
+        assertFalse(fingerList2.equals(fingerList1));
     }
     
     private void loadList(int size) {

@@ -24,6 +24,7 @@
 package com.github.coderodde.util;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * This inner class implements the finger list data structure for managing list
@@ -79,7 +80,7 @@ final class FingerList<E> {
         }
         
         for (int i = 0; i < size; i++) {
-            if (!fingerArray[i].equals(other.fingerArray[i])) {
+            if (!Objects.equals(fingerArray[i], other.fingerArray[i])) {
                 return false;
             }
         }
@@ -217,7 +218,7 @@ final class FingerList<E> {
                 // Yes, we can do it as well.
                 nextCapacity /= 2;
             }
-
+            
             fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
         }
     }

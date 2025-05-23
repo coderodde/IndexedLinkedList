@@ -906,8 +906,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             removeByIndexCaseB(fromFingerIndex, index);
         }
         
-//        E returnValue = nodeToRemove.item;
-//        unlink(nodeToRemove);
         E returnValue = targetNode.item;
         unlink(targetNode);
         decreaseSize();
@@ -936,6 +934,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.shiftFingerIndicesToLeftOnceAll(
                 Math.min(fromFingerIndex,
                          fingerListSize));
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
     
     private void removeByIndexCaseB(int fromFingerIndex,
@@ -973,48 +973,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
     }
-    
-//    @Override
-//    public E removeOld(int index) {
-//        checkElementIndex(index);
-//        
-//        int closestFingerIndex = fingerList.getClosestFingerIndex(index);
-//        Finger<E> closestFinger = fingerList.getFinger(closestFingerIndex);
-//        
-//        E returnValue;
-//        Node<E> nodeToRemove;
-//        
-//        if (closestFinger.index == index) {
-//            nodeToRemove = closestFinger.node;
-//            moveFingerOutOfRemovalLocation(closestFinger, 
-//                                           closestFingerIndex);    
-//        } else {
-//            // Keep the fingers at their original position.
-//            // Find the target node:
-//            int steps = closestFinger.index - index;
-//            
-//            nodeToRemove =
-//                    traverseLinkedListBackwards(
-//                            closestFinger,
-//                            steps);
-//            
-//            fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
-//            
-//            if (steps > 0) {
-//                fingerList.getFinger(closestFingerIndex).index--;
-//            }
-//        }
-//        
-//        returnValue = nodeToRemove.item;
-//        unlink(nodeToRemove);
-//        decreaseSize();
-//
-//        if (mustRemoveFinger()) {
-//            removeFinger();
-//        }
-//
-//        return returnValue;
-//    }
     
     /**
      * Removes from this list all the elements mentioned in {@code c}. Runs in
@@ -1209,7 +1167,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Compares the argument indexed list to this list. The two lists are
+     * considered to be strongly equal if and only if the have the same data 
+     * content and the respective finger lists are equal.
      * 
+     * @param otherList the other indexed list to compare to.
+     * @return {@code true} if and only if the two lists are strongly equal.
      */
     public boolean strongEquals(final IndexedLinkedList<E> otherList) {
         return equals(otherList) && fingerList.equals(otherList.fingerList);
@@ -2888,6 +2851,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         unlinkNodeRange(this.removeRangeStartNode,
                         this.removeRangeEndNode);
         modCount++;
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
     
     /**
@@ -2979,20 +2944,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                - fromIndex;
         
         if (removalFingerRangeLength <= fingersToRemove) {
-//            System.out.println(
-//                    "FUNKY: removalFingerRangeLength("
-//                            + removalFingerRangeLength 
-//                            + ") <= fingersToRemove(" 
-//                            + fingersToRemove 
-//                            + ")");
             
             removeRangeImplCaseA(fromFingerIndex,
                                  toFingerIndex,
                                  fromIndex,
                                  toIndex,
                                  fingersToRemove);
-            
-            fingerList.contractFingerArrayIfNeeded(fingerList.size());
             modCount++;
             return;
         }
@@ -3135,7 +3092,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * If steps > 0, rewind to the left. Otherwise, rewinds to the right.
+     * If steps &gt; 0, rewind to the left. Otherwise, rewinds to the right.
      * 
      * @param finger the finger to traverse.
      * @param steps  the number of steps to traverse the {@code finger}.

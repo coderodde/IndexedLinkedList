@@ -186,13 +186,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.3</version>
                 <configuration>
-                    <additionalOptions>
-                        <additionalOption>-private</additionalOption>
-                        <additionalOption>--allow-script-in-comments</additionalOption>
-                        <additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>
-                    </additionalOptions>
+                    <show>private</show>
+                    <!--<additionalOptions>-->
+                        <!--<additionalOption>-private</additionalOption>-->
+                        <!--<additionalOption>-´allow-script-in-comments</additionalOption>-->
+                        <!--<additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>-->
+                    <!--</additionalOptions>-->
                     <excludePackageNames>com.github.coderodde.util.benchmark</excludePackageNames>
                 </configuration>
                 <executions>

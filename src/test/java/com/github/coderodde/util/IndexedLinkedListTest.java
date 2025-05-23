@@ -83,6 +83,14 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void tryGetFingerListContract() {
+        list.addAll(getIntegerList(10));
+        assertEquals(4, list.fingerList.size());
+        list.remove(5);
+        assertEquals(3, list.fingerList.size());
+    }
+    
+    @Test
     public void deepCopy() {
         list.addAll(getIntegerList(26));
         list.randomizeFingers(11L);
