@@ -3471,6 +3471,7 @@ public class IndexedLinkedListTest {
         int counter = 0;
 
         while (iterator.hasNext()) {
+            System.out.println("counter = " + counter);
             assertEquals(Integer.valueOf(counter), iterator.next());
             
             // Remove every 10th element:

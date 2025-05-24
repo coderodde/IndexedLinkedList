@@ -863,6 +863,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
     
+    /**
+     * 
+     * @param fromFingerIndex
+     * @param index
+     * @param finger
+     * @param node
+     * @return 
+     */
     private E removeByIndexImpl(int fromFingerIndex, 
                                 int index, 
                                 Finger<E> finger, 
@@ -960,6 +968,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
 //        return returnValue;
     }
     
+    /**
+     * Removes a node and a finger from this list.
+     * 
+     * @param fromFingerIndex the leftmost finger index.
+     */
     private void removeByIndexCaseA(int fromFingerIndex) {
         int copyLength = fingerList.size() - fromFingerIndex + 1;
         
@@ -986,6 +999,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
     
+    /**
+     * Removes the node from the list. The number of fingers in the finger list
+     * remains intact.
+     * 
+     * @param fromFingerIndex the leftmost finger index.
+     * @param elementIndex    the element index.
+     */
     private void removeByIndexCaseB(int fromFingerIndex,
                                     int elementIndex) {
         Finger<E> finger = fingerList.getFinger(fromFingerIndex);
@@ -1574,10 +1594,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public E next() {
-            if (finger.index == nextIndex) {
-                finger = fingerList.getFinger(++fingerIndex);
-            }
-            
             checkForComodification();
             
             if (!hasNext()) {
@@ -1587,6 +1603,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturned = next;
             next = next.next;
             nextIndex++;
+            
+            if (finger.index == nextIndex) {
+                finger = fingerList.getFinger(++fingerIndex);
+            }
+            
             return lastReturned.item;
         }
 
@@ -1609,7 +1630,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
             checkForComodification();
             
             int removalIndex = nextIndex - 1;
-            removeObjectImpl(lastReturned, removalIndex);
+            
+            unlink(next.prev);
+            IndexedLinkedList.this.size--;
+            
+            if (IndexedLinkedList.this.mustRemoveFinger()) {
+                IndexedLinkedList.this.removeFinger();
+                IndexedLinkedList.this
+                                 .fingerList
+                                 .shiftFingerIndicesToLeftOnceAll(fingerIndex);
+            }
+            
+//            removeByIndexImpl(fingerIndex, 
+//                              removalIndex, 
+//                              finger,
+//                              finger.node);
+            
+//            removeObjectImpl(lastReturned, removalIndex);
             nextIndex--;
             lastReturned = null;
             expectedModCount++;
