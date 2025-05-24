@@ -159,6 +159,9 @@ public class LinkedListBenchmark2 {
         
         try (AffinityLock al = AffinityLock.acquireLock()) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            warmupRemove();
+            benchmarkRemove();
+            System.exit(0);
             clearDurationCounterMap();
             warmup();
             benchmark();
@@ -217,6 +220,10 @@ public class LinkedListBenchmark2 {
         clearPerOperationCounterMap();
     }
     
+    private static void warmupRemove() {
+        benchmarkRemoveImpl(false);
+    }
+    
     private static void benchmark() {
         clearDurationCounterMap(); // Clear from the warmup run.
         
@@ -229,6 +236,14 @@ public class LinkedListBenchmark2 {
         }
         
         showPerOperationStatistics();
+    }
+    
+    private static void benchmarkRemove() {
+        benchmarkRemoveImpl(true);
+    }
+    
+    private static void benchmarkRemoveImpl(boolean print) {
+        
     }
     
     private static void showPerOperationStatistics() {

@@ -863,23 +863,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return false;
     }
     
-    /**
-     * Removes the element residing at the given index. Runs in worst-case
-     * \(\mathcal{O}(\sqrt{n})\) time.
-     * 
-     * @param index the index of the element to remove.
-     * @return the removed element. (The one that resided at the index 
-     *         {@code index}.)
-    */
-    @Override
-    public E remove(int index) {
+    private E removeByIndexImpl(int fromFingerIndex, 
+                                int index, 
+                                Finger<E> finger, 
+                                Node<E> node) {
+        
         int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
-        int fingerListSizeAfterRemoval  = 
+        int fingerListSizeAfterRemoval = 
                 getRecommendedNumberOfFingers(size() - 1);
         
-        int fromFingerIndex = fingerList.getFingerIndexImpl(index);
-        Finger<E> finger    = fingerList.getFinger(fromFingerIndex);
-        Node<E> targetNode  = finger.node;
+        Node<E> targetNode = node;
         int currentIndex = index;
         
         if (targetNode == null) {
@@ -910,6 +903,61 @@ public class IndexedLinkedList<E> implements Deque<E>,
         unlink(targetNode);
         decreaseSize();
         return returnValue;
+    }
+    
+    /**
+     * Removes the element residing at the given index. Runs in worst-case
+     * \(\mathcal{O}(\sqrt{n})\) time.
+     * 
+     * @param index the index of the element to remove.
+     * @return the removed element. (The one that resided at the index 
+     *         {@code index}.)
+    */
+    @Override
+    public E remove(int index) {
+//        int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+//        int fingerListSizeAfterRemoval  = 
+//                getRecommendedNumberOfFingers(size() - 1);
+        
+        int fromFingerIndex = fingerList.getFingerIndexImpl(index);
+        Finger<E> finger    = fingerList.getFinger(fromFingerIndex);
+        Node<E> targetNode  = finger.node;
+        
+        return removeByIndexImpl(fromFingerIndex,
+                                 index,
+                                 finger,
+                                 targetNode);
+        
+//        int currentIndex = index;
+//        
+//        if (targetNode == null) {
+//            finger = fingerList.getFinger(fingerList.size() - 1);
+//            targetNode = finger.node;
+//            
+//            while (currentIndex > finger.index) {
+//                currentIndex--;
+//                targetNode = targetNode.next;
+//            }
+//        } else {
+//            while (currentIndex < finger.index) {
+//                currentIndex++;
+//                targetNode = targetNode.prev;
+//            }
+//        }
+//        
+//        // Here, either fingerListSizeBeforeRemoval == 
+//        // fingerListSizeAfterRemoval, or fingerListSizeBeforeRemoval ==
+//        // fingerListSizeAfterRemoval + 1.
+//        if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
+//            removeByIndexCaseA(fromFingerIndex);
+//        } else {
+//            removeByIndexCaseB(fromFingerIndex, index);
+//        }
+//        
+//        E returnValue = targetNode.item;
+//        unlink(targetNode);
+//        decreaseSize();
+//        return returnValue;
     }
     
     private void removeByIndexCaseA(int fromFingerIndex) {
@@ -1013,16 +1061,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        int index = 0;
-        
-        for (Node<E> x = head; x != null; x = x.next, index++) {
-            if (Objects.equals(o, x.item)) {
-                removeObjectImpl(x, index);
-                return true;
-            }
-        }
-        
-        return false;
+        return remove(o);
     }
     
     /**
@@ -1490,6 +1529,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         private Node<E> next = head;
         
+        private int fingerIndex = 0;
+        
+        /**
+         * Caches the current finger.
+         */
+        private Finger<E> finger = fingerList.getFinger(0);
+        
         /**
          * The index of the next node to iterate over.
          */
@@ -1528,6 +1574,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public E next() {
+            if (finger.index == nextIndex) {
+                finger = fingerList.getFinger(++fingerIndex);
+            }
+            
             checkForComodification();
             
             if (!hasNext()) {
@@ -2772,6 +2822,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         fingerList.getFinger(fingerList.size()).index = size;
         return returnValue;
+    }
+    
+    private void removeObjectImpl(Node<E> node, Finger<E> finger, int index) {
+        
     }
     
     /**
