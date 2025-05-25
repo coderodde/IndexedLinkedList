@@ -315,10 +315,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         while (node != null) {
             tentativeSize++;
             
-            if (finger.node == node) {
-                System.out.println("finger.node == node");
+            if (Objects.equals(finger.node, node)) {
+//                System.out.println("finger.node == node");
                 finger = fingerList.getFinger(++fingerCount);
-                System.out.println("figerCount = " + fingerCount);
+//                System.out.println("figerCount = " + fingerCount);
                 
                 if (finger == null) {
                     throw new IllegalStateException("finger == null");
@@ -1567,6 +1567,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int nextIndex;
         
         /**
+         * 
+         */
+        private int numberOfIteratedElements;
+        
+        /**
          * Caches the expected modification count. We use this value in order to
          * detect the concurrent modifications as early as possible.
          */
@@ -1600,12 +1605,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
             lastReturnedNode = next;
             next = next.next;
-            nextIndex++;
             
-            if (finger.index < nextIndex) {
+            nextIndex++;
+            if (finger.index == nextIndex) {
                 System.out.println("SHIT");
                 finger = fingerList.getFinger(++fingerIndex);
             }
+            
             
             return lastReturnedNode.item;
         }
