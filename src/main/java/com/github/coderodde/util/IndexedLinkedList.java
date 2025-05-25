@@ -1567,9 +1567,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int nextIndex;
         
         /**
-         * 
+         * Counts the number of removed elements so far.
          */
-        private int numberOfIteratedElements;
+        private int numberOfRemovedElements;
         
         /**
          * Caches the expected modification count. We use this value in order to
