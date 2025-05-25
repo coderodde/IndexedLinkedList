@@ -16,7 +16,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -317,10 +316,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             tentativeSize++;
             
             if (finger.node == node) {
+                System.out.println("finger.node == node");
                 finger = fingerList.getFinger(++fingerCount);
+                System.out.println("figerCount = " + fingerCount);
                 
                 if (finger == null) {
-                    throw new IllegalStateException("figner == null");
+                    throw new IllegalStateException("finger == null");
                 }
             }
             
@@ -1542,13 +1543,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Caches the most recently returned node.
          */
-        private Node<E> lastReturned;
+        private Node<E> lastReturnedNode;
         
         /**
          * Caches the next node to iterate over.
          */
         private Node<E> next = head;
         
+        /**
+         * Caches the leftmost finger on the right side from the node 
+         * {@code next}.
+         */
         private int fingerIndex = 0;
         
         /**
@@ -1566,13 +1571,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * detect the concurrent modifications as early as possible.
          */
         int expectedModCount = IndexedLinkedList.this.modCount;
-
-        /**
-         * Constructs the basic iterator pointing to the first element.
-         */
-        BasicIterator() {
-            
-        }
         
         /**
          * Returns {@code true} if and only if this iterator has more elements 
@@ -1600,15 +1598,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 throw new NoSuchElementException();
             }
 
-            lastReturned = next;
+            lastReturnedNode = next;
             next = next.next;
             nextIndex++;
             
-            if (finger.index == nextIndex) {
+            if (finger.index < nextIndex) {
+                System.out.println("SHIT");
                 finger = fingerList.getFinger(++fingerIndex);
             }
             
-            return lastReturned.item;
+            return lastReturnedNode.item;
         }
 
         /**
@@ -1623,32 +1622,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public void remove() {
-            if (lastReturned == null) {
+            if (lastReturnedNode == null) {
                 throw new IllegalStateException();
             }
             
             checkForComodification();
-            
-            int removalIndex = nextIndex - 1;
-            
-            unlink(next.prev);
-            IndexedLinkedList.this.size--;
-            
-            if (IndexedLinkedList.this.mustRemoveFinger()) {
-                IndexedLinkedList.this.removeFinger();
-                IndexedLinkedList.this
-                                 .fingerList
-                                 .shiftFingerIndicesToLeftOnceAll(fingerIndex);
-            }
-            
-//            removeByIndexImpl(fingerIndex, 
-//                              removalIndex, 
-//                              finger,
-//                              finger.node);
-            
-//            removeObjectImpl(lastReturned, removalIndex);
             nextIndex--;
-            lastReturned = null;
+            
+            IndexedLinkedList.this
+                             .removeByIndexImpl(fingerIndex, 
+                                                nextIndex,
+                                                finger,
+                                                finger.node);
+            lastReturnedNode = null;
             expectedModCount++;
         }
 
@@ -2859,10 +2845,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         fingerList.getFinger(fingerList.size()).index = size;
         return returnValue;
-    }
-    
-    private void removeObjectImpl(Node<E> node, Finger<E> finger, int index) {
-        
     }
     
     /**
