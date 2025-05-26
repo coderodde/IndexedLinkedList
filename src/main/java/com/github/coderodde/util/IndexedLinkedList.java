@@ -1606,12 +1606,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            nextIndex++;
-            if (finger.index == nextIndex) {
+            if (finger.index == nextIndex + numberOfRemovedElements) {
                 System.out.println("SHIT");
                 finger = fingerList.getFinger(++fingerIndex);
+            } else {
+                ++nextIndex;
             }
-            
             
             return lastReturnedNode.item;
         }
@@ -1641,7 +1641,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                                 finger,
                                                 finger.node);
             lastReturnedNode = null;
-            expectedModCount++;
+            ++numberOfRemovedElements;
+            ++expectedModCount;
         }
 
         /**
