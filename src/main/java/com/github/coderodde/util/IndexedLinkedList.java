@@ -1609,7 +1609,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (finger.index == nextIndex + numberOfRemovedElements) {
                 System.out.println("SHIT");
                 finger = fingerList.getFinger(++fingerIndex);
-            } else {
+            } else {   
                 ++nextIndex;
             }
             
@@ -1633,16 +1633,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             checkForComodification();
-            nextIndex--;
             
             IndexedLinkedList.this
                              .removeByIndexImpl(fingerIndex, 
-                                                nextIndex,
+                                                nextIndex - 1,
                                                 finger,
                                                 finger.node);
             lastReturnedNode = null;
             ++numberOfRemovedElements;
             ++expectedModCount;
+            --nextIndex;
         }
 
         /**
