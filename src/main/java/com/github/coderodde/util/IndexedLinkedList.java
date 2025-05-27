@@ -316,9 +316,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             tentativeSize++;
             
             if (Objects.equals(finger.node, node)) {
-//                System.out.println("finger.node == node");
                 finger = fingerList.getFinger(++fingerCount);
-//                System.out.println("figerCount = " + fingerCount);
                 
                 if (finger == null) {
                     throw new IllegalStateException("finger == null");
@@ -1557,9 +1555,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int fingerIndex = 0;
         
         /**
-         * Caches the current finger.
+         * The current node index of the current finger.
          */
-        private Finger<E> finger = fingerList.getFinger(0);
+        private int fingerNodeIndex = 0;
+        
+//        /**
+//         * Caches the current finger.
+//         */
+//        private Finger<E> finger = fingerList.getFinger(0);
         
         /**
          * The index of the next node to iterate over.
@@ -1572,10 +1575,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int numberOfRemovedElements;
         
         /**
+         * Counts the number of times 
+         * {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#next()}
+         * or {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#remove()}
+         * were called.
+         */
+        private int numberOfOperations;
+        
+        /**
          * Caches the expected modification count. We use this value in order to
          * detect the concurrent modifications as early as possible.
          */
         int expectedModCount = IndexedLinkedList.this.modCount;
+        
+        /**
+         * Constructs this basic iterator.
+         */
+        BasicIterator() {
+            fingerNodeIndex = fingerList.getFinger(0).index;
+        }
         
         /**
          * Returns {@code true} if and only if this iterator has more elements 
@@ -1602,17 +1620,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
+            
+//            System.out.println("nextIndex = " + nextIndex);
 
             lastReturnedNode = next;
             next = next.next;
             
-            if (finger.index == nextIndex + numberOfRemovedElements) {
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1) {
                 System.out.println("SHIT");
-                finger = fingerList.getFinger(++fingerIndex);
+                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             } else {   
                 ++nextIndex;
             }
             
+            System.out.println("hello, nextIndex - 1 = " + (nextIndex - 1) + ", z = " + (nextIndex + numberOfRemovedElements - fingerIndex));
+            ++numberOfOperations;
             return lastReturnedNode.item;
         }
 
@@ -1634,15 +1656,27 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             checkForComodification();
             
-            IndexedLinkedList.this
-                             .removeByIndexImpl(fingerIndex, 
-                                                nextIndex - 1,
-                                                finger,
-                                                finger.node);
+            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+            int fingerListSizeAfterRemoval  = 
+                    getRecommendedNumberOfFingers(size() - 1);
+            
+            
+            if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
+                removeByIndexCaseA(fingerIndex);
+            } else {
+//                removeByIndexCaseB(fingerIndex, nextIndex - numberOfRemovedElements);
+                removeByIndexCaseB(fingerIndex, nextIndex + numberOfRemovedElements - fingerIndex
+                );
+            }
+            
+            unlink(lastReturnedNode);
+            decreaseSize();
+            
             lastReturnedNode = null;
-            ++numberOfRemovedElements;
-            ++expectedModCount;
             --nextIndex;
+            ++numberOfRemovedElements;
+            ++numberOfOperations;
+            ++expectedModCount;
         }
 
         /**
