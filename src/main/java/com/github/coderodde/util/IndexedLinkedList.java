@@ -967,6 +967,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
 //        return returnValue;
     }
     
+    private void removeByIndexCaseA2(int fromFingerIndex,
+                                     int copyLength) {
+        
+        System.arraycopy(fingerList.fingerArray, 
+                         fromFingerIndex + 1, 
+                         fingerList.fingerArray,
+                         fromFingerIndex, 
+                         copyLength);
+        
+        int fingerListSize = fingerList.size();
+        
+        fingerList.fingerArray[fingerListSize] = null;
+        fingerList.size--;
+        
+        fingerListSize = fingerList.size();
+        
+        fingerList.fingerArray[fingerListSize].node  = null;
+        fingerList.fingerArray[fingerListSize].index = size;
+        
+        fingerList.shiftFingerIndicesToLeftOnceAll(
+                Math.min(fromFingerIndex,
+                         fingerListSize));
+        
+        fingerList.contractFingerArrayIfNeeded(fingerList.size());
+    }
+    
     /**
      * Removes a node and a finger from this list.
      * 
@@ -1559,11 +1585,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         private int fingerNodeIndex = 0;
         
-//        /**
-//         * Caches the current finger.
-//         */
-//        private Finger<E> finger = fingerList.getFinger(0);
-        
         /**
          * The index of the next node to iterate over.
          */
@@ -1626,10 +1647,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1) {
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements + 1) {
                 System.out.println("SHIT");
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
-            } else {   
+            } else {
                 ++nextIndex;
             }
             
@@ -1660,13 +1681,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
             int fingerListSizeAfterRemoval  = 
                     getRecommendedNumberOfFingers(size() - 1);
             
-            
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
-                removeByIndexCaseA(fingerIndex);
+                removeByIndexCaseA2(fingerIndex, 
+                                    fingerList.size() - 1);
             } else {
-//                removeByIndexCaseB(fingerIndex, nextIndex - numberOfRemovedElements);
-                removeByIndexCaseB(fingerIndex, nextIndex + numberOfRemovedElements - fingerIndex
-                );
+                removeByIndexCaseB(0, 
+                                   nextIndex - 1 + fingerIndex);
             }
             
             unlink(lastReturnedNode);
