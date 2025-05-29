@@ -1684,7 +1684,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     getRecommendedNumberOfFingers(size() - 1);
             
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
-                removeByIndexCaseA2(fingerIndex, 
+                removeByIndexCaseA2(fingerIndex - removedFingers,
                                     fingerList.size());
                 
                 removedFingers++;
