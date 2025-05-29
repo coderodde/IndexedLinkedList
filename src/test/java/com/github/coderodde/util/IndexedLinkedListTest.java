@@ -3463,8 +3463,26 @@ public class IndexedLinkedListTest {
 
         assertEquals(Integer.valueOf(10), list.get(2));
     }
-
+    
     @Test
+    public void debugBasicIterator1() {
+        list.addAll(getIntegerList(10));
+        list.fingerList.setFingerIndices(0, 1, 5, 7);
+        Iterator<Integer> iterator = list.iterator();
+        
+        int count = 0;
+        
+        while (!list.isEmpty()) {
+            System.out.println("count = " + ++count);
+            
+            iterator.next();
+            list.checkInvarant();
+            iterator.remove();
+            list.checkInvarant();
+        }
+    }
+
+//    @Test
     public void findFailingIterator() {
         list.addAll(getIntegerList(3850));
         Iterator<Integer> iterator = list.iterator();

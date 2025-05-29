@@ -1641,20 +1641,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            
-//            System.out.println("nextIndex = " + nextIndex);
 
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements + 1) {
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1) {
                 System.out.println("SHIT");
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             } else {
                 ++nextIndex;
             }
             
-            System.out.println("hello, nextIndex - 1 = " + (nextIndex - 1) + ", z = " + (nextIndex + numberOfRemovedElements - fingerIndex));
             ++numberOfOperations;
             return lastReturnedNode.item;
         }
@@ -1683,10 +1680,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
                 removeByIndexCaseA2(fingerIndex, 
-                                    fingerList.size() - 1);
+                                    fingerList.size());
             } else {
-                removeByIndexCaseB(0, 
-                                   nextIndex - 1 + fingerIndex);
+                removeByIndexCaseB(fingerIndex - numberOfRemovedElements, 
+                                   nextIndex + fingerIndex - 1);
             }
             
             unlink(lastReturnedNode);
