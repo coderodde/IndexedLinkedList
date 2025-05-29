@@ -1604,6 +1604,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private int numberOfOperations;
         
         /**
+         * The number of removed fingers.
+         */
+        private int removedFingers;
+        
+        /**
          * Caches the expected modification count. We use this value in order to
          * detect the concurrent modifications as early as possible.
          */
@@ -1681,8 +1686,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
                 removeByIndexCaseA2(fingerIndex, 
                                     fingerList.size());
+                
+                removedFingers++;
             } else {
-                removeByIndexCaseB(fingerIndex - numberOfRemovedElements, 
+                removeByIndexCaseB(fingerIndex - removedFingers, 
                                    nextIndex + fingerIndex - 1);
             }
             
