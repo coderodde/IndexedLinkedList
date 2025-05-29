@@ -1650,17 +1650,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1) {
+            
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1 && fingerIndex < fingerList.size()) {
                 System.out.println("SHIT");
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             } else {
                 ++nextIndex;
             }
+//            nextIndex++;
             
             ++numberOfOperations;
             return lastReturnedNode.item;
         }
-
+        
         /**
          * Removes the most recently iterated element from the list.
          * 
