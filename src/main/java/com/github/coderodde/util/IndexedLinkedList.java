@@ -1567,7 +1567,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Caches the most recently returned node.
          */
-        private Node<E> lastReturnedNode;
+        private Node<E> lastReturnedNode = null;
         
         /**
          * Caches the next node to iterate over.
@@ -1650,14 +1650,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1 && fingerIndex < fingerList.size()) {
-                System.out.println("SHIT");
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
+                    && 
+                    fingerIndex < fingerList.size()) {
+                
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             } else {
-                ++nextIndex;
             }
             
+            ++nextIndex;
             ++numberOfOperations;
             return lastReturnedNode.item;
         }
