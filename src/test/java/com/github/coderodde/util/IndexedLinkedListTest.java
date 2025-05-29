@@ -3473,7 +3473,7 @@ public class IndexedLinkedListTest {
         int count = 0;
         
         while (!list.isEmpty()) {
-            System.out.println("count = " + ++count);
+//            System.out.println("count = " + ++count);
             
             iterator.next();
             list.checkInvarant();

@@ -1687,7 +1687,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
               
                 if (fingerIndex - 1 == fingerList.size()) {
-                    // TODO: Fill the code here!
+                    fingerList.fingerArray[1] = null;
+                    fingerList.fingerArray[0].node = null;
+                    fingerList.fingerArray[0].index = 0;
+                    fingerList.size = 0;
                 } else {
                     removeByIndexCaseA2(fingerIndex - removedFingers,
                                         fingerList.size());
