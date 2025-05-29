@@ -1657,7 +1657,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             } else {
                 ++nextIndex;
             }
-//            nextIndex++;
             
             ++numberOfOperations;
             return lastReturnedNode.item;
@@ -1686,10 +1685,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     getRecommendedNumberOfFingers(size() - 1);
             
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
-                removeByIndexCaseA2(fingerIndex - removedFingers,
-                                    fingerList.size());
-                
-                removedFingers++;
+              
+                if (fingerIndex - 1 == fingerList.size()) {
+                    // TODO: Fill the code here!
+                } else {
+                    removeByIndexCaseA2(fingerIndex - removedFingers,
+                                        fingerList.size());
+                    removedFingers++;
+                }
             } else {
                 removeByIndexCaseB(fingerIndex - removedFingers, 
                                    nextIndex + fingerIndex - 1);
