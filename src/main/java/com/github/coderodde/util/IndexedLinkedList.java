@@ -1701,7 +1701,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             } else {
                 System.out.println("remove() with no finger removal");
                 System.out.println("yeah = " + (fingerIndex - removedFingers));
-                removeByIndexCaseB(0, 
+                removeByIndexCaseB(fingerIndex - removedFingers, 
                                    nextIndex + removedFingers - 1);
             }
             
