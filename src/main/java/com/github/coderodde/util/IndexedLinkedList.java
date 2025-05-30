@@ -1038,7 +1038,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (finger.index < elementIndex) {
             fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
         } else {
-            int fingerPrefixLength = fromFingerIndex;
+            int fingerPrefixLength = fromFingerIndex - 1;
             int fingerSuffixLength = fingerList.size() - (fromFingerIndex + 1);
             
             int listPrefixFreeSpots = elementIndex;
@@ -1650,7 +1650,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements + 1
                     && 
                     fingerIndex < fingerList.size()) {
                 
@@ -1701,8 +1701,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
             } else {
                 System.out.println("remove() with no finger removal");
                 System.out.println("yeah = " + (fingerIndex - removedFingers));
-                removeByIndexCaseB(fingerIndex - removedFingers, 
-                                   nextIndex + removedFingers - 1);
+                
+                int elementIndex = nextIndex + fingerIndex - 1;
+                int d = fingerNodeIndex != elementIndex ? 1 : 0;
+                int fingerIdx = Math.min(fingerIndex - removedFingers, 
+                                         fingerIndex - removedFingers + d);
+                
+                System.out.println("yeah2 = " + (fingerIdx));
+                
+                removeByIndexCaseB(fingerIdx, 
+//                removeByIndexCaseB(fingerIndex - removedFingers, 
+                                   nextIndex + fingerIndex - 1);
             }
             
             unlink(lastReturnedNode);
