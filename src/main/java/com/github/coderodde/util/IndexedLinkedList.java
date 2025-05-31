@@ -983,6 +983,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         fingerListSize = fingerList.size();
         
+        // TODO: Remove me?
         fingerList.fingerArray[fingerListSize].node  = null;
         fingerList.fingerArray[fingerListSize].index = size;
         
@@ -1034,7 +1035,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void removeByIndexCaseB(int fromFingerIndex,
                                     int elementIndex) {
         
-        if (fromFingerIndex != elementIndex) {
+        Finger<E> finger = fingerList.getFinger(fromFingerIndex);
+        
+        if (finger.index != elementIndex) {
             fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
         } else {
             int fingerPrefixLength = fromFingerIndex - 1;
@@ -1649,7 +1652,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements + removedFingers - 1
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
                     && 
                     fingerIndex < fingerList.size()) {
                 System.out.print("fidx: " + fingerIndex + ", ");
