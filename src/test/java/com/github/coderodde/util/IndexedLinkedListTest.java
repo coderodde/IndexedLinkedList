@@ -3457,6 +3457,28 @@ public class IndexedLinkedListTest {
 
     // TODO: DEBUG ME!
     @Test
+    public void debugBasicIterator2() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4));
+        Iterator<Integer> iterator = list.iterator();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(0), iterator.next());
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(1), iterator.next());
+        
+        iterator.remove();
+        list.checkInvarant();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(2), iterator.next());
+        
+        iterator.remove();
+        list.checkInvarant();
+        
+    }
+    // TODO: DEBUG ME!
+//    @Test
     public void findFailingIterator() {
         list.addAll(getIntegerList(3850));
         Iterator<Integer> iterator = list.iterator();

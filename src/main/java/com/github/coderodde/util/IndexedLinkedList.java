@@ -1033,9 +1033,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void removeByIndexCaseB(int fromFingerIndex,
                                     int elementIndex) {
-        Finger<E> finger = fingerList.getFinger(fromFingerIndex);
         
-        if (finger.index < elementIndex) {
+        if (fromFingerIndex > elementIndex) {
             fingerList.shiftFingerIndicesToLeftOnceAll(fromFingerIndex);
         } else {
             int fingerPrefixLength = fromFingerIndex - 1;
@@ -1650,12 +1649,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = next;
             next = next.next;
             
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
+            if (fingerNodeIndex == nextIndex + numberOfRemovedElements + removedFingers
                     && 
                     fingerIndex < fingerList.size()) {
-                
+                System.out.print("fidx: " + fingerIndex + ", ");
+                System.out.print("before: " + fingerList.getFinger(fingerIndex) + ", after: ");
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+                System.out.println(fingerList.getFinger(fingerIndex));
             } else {
+//                
                 ++nextIndex;
             }
             
@@ -1699,20 +1701,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     System.out.println("remove() WITH finger removal");
                 }
             } else {
-                System.out.println("remove() with no finger removal");
-                System.out.println("yeah = " + (fingerIndex - removedFingers));
-                
-                int elementIndex = nextIndex + fingerIndex - 1;
-                int d = fingerNodeIndex == elementIndex ? 1 : 0;
-                int fingerIdx = Math.min(fingerIndex - removedFingers, 
-                                         fingerIndex - removedFingers - d);
-                
-                fingerIdx = Math.max(0, fingerIdx);
-                
-                System.out.println("yeah2 = " + (fingerIdx));
-                
-                removeByIndexCaseB(fingerIdx, 
-//                removeByIndexCaseB(fingerIndex - removedFingers, 
+                removeByIndexCaseB(fingerIndex - removedFingers, 
                                    nextIndex + fingerIndex - 1);
             }
             
