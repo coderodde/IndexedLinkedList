@@ -3463,19 +3463,35 @@ public class IndexedLinkedListTest {
         
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(0), iterator.next());
+        list.checkInvarant();
         
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(1), iterator.next());
+        list.checkInvarant();
         
+        // Remove 1:
         iterator.remove();
         list.checkInvarant();
         
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(2), iterator.next());
+        list.checkInvarant();
         
+        // Remove 2:
         iterator.remove();
         list.checkInvarant();
         
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(3), iterator.next());
+        list.checkInvarant();
+        
+        // Remove 3:
+        iterator.remove();
+        list.checkInvarant();
+        
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(4), iterator.next());
+        list.checkInvarant();
     }
     // TODO: DEBUG ME!
 //    @Test
