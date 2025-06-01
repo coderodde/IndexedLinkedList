@@ -3437,7 +3437,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
     
-    //@Test
+    @Test
     public void debugBasicIterator1() {
         list.addAll(getIntegerList(10));
         list.fingerList.setFingerIndices(0, 1, 5, 7);

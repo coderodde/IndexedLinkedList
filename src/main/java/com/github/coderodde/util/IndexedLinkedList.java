@@ -1699,12 +1699,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.size = 0;
                 } else {
                     removeByIndexCaseA2(fingerIndex,
-                                        fingerList.size() - 1);
+                                        fingerList.size());
                     removedFingers++;
                     System.out.println("remove() WITH finger removal");
                 }
             } else {
-                removeByIndexCaseB(fingerIndex, 
+                removeByIndexCaseB(fingerIndex - removedFingers, 
                                    nextIndex + fingerIndex - 1);
             }
             
