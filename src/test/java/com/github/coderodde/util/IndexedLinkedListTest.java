@@ -3458,6 +3458,7 @@ public class IndexedLinkedListTest {
     // TODO: DEBUG ME!
     @Test
     public void debugBasicIterator2() {
+        // Elements 1, 2, 3, 4 will be removed.
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
         Iterator<Integer> iterator = list.iterator();
         
@@ -3486,7 +3487,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         
         // Remove 3:
-        iterator.remove();
+        iterator.remove(); // TODO: Debug me!s
         list.checkInvarant();
         
         assertTrue(iterator.hasNext());
