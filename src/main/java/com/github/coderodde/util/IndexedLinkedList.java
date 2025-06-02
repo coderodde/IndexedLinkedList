@@ -1585,7 +1585,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * The current node index of the current finger.
          */
-        private int fingerNodeIndex = 0;
+        private int fingerNodeIndex;
         
         /**
          * The index of the next node to iterate over.
@@ -1705,6 +1705,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.size = 1;
                 } else {
                     ++removedFingers;
+                    fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+                    
                     removeByIndexCaseA2(
                             Math.max(0, fingerIndex - removedFingers + 1),
                             fingerList.size());
@@ -1718,7 +1720,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 System.out.println("----");
                 
                 removeByIndexCaseB(
-                        Math.min(numberOfRemovedElements, fingerIndex - removedFingers + 1), 
+                        Math.min(numberOfRemovedElements - 1, fingerIndex - removedFingers), 
                         nextIndex + fingerIndex - 1);
             }
             
