@@ -1655,12 +1655,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
                     && 
                     fingerIndex < fingerList.size() - 1) {
-                System.out.print("fidx: " + fingerIndex + ", ");
-                System.out.print("before: " + fingerList.getFinger(fingerIndex) + ", after: ");
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
-                System.out.println(fingerList.getFinger(fingerIndex));
+                System.out.println("fingerIndex == " + fingerIndex);
             } else {
-//                
                 ++nextIndex;
             }
             
@@ -1709,13 +1706,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 } else {
                     ++removedFingers;
                     removeByIndexCaseA2(
-                            Math.max(0, fingerIndex - removedFingers),
+                            Math.max(0, fingerIndex - removedFingers + 1),
                             fingerList.size());
                     
                 }
             } else {
-                removeByIndexCaseB(Math.max(0, fingerIndex - removedFingers), 
-                                   nextIndex + fingerIndex - 1);
+                System.out.println("----");
+                System.out.println("fingerIndex:             " + fingerIndex);
+                System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
+                System.out.println("removedFingers:          " + removedFingers);
+                System.out.println("----");
+                
+                removeByIndexCaseB(
+                        Math.min(numberOfRemovedElements, fingerIndex - removedFingers + 1), 
+                        nextIndex + fingerIndex - 1);
             }
             
             unlink(lastReturnedNode);
