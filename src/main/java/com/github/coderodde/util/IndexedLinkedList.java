@@ -1692,16 +1692,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
               
-                if (fingerIndex - 1 == fingerList.size()) {
+                if (size == 1) {
                     fingerList.fingerArray[1] = null;
                     fingerList.fingerArray[0].node = null;
-                    fingerList.fingerArray[0].index = 0;
                     fingerList.size = 0;
+                } else if (size == 2) {
+                    fingerList.fingerArray[2] = null;
+                    int elementIndex = nextIndex + fingerIndex - 1;
+                    
+                    if (elementIndex == 0) {
+                        fingerList.fingerArray[0].node = head.next;
+                    }
+                    
+                    fingerList.fingerArray[1].node = null;
+                    fingerList.size = 1;
                 } else {
-                    System.out.println("nore: " + numberOfRemovedElements + ", rf: "  + removedFingers);
-                    removedFingers++;
-                    removeByIndexCaseA2(Math.max(0, fingerIndex - removedFingers),
-                                        fingerList.size());
+                    ++removedFingers;
+                    removeByIndexCaseA2(
+                            Math.max(0, fingerIndex - removedFingers),
+                            fingerList.size());
+                    
                 }
             } else {
                 removeByIndexCaseB(Math.max(0, fingerIndex - removedFingers), 
