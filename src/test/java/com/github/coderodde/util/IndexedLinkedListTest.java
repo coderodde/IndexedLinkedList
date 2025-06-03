@@ -3603,6 +3603,13 @@ public class IndexedLinkedListTest {
         
         referenceList.remove(1);
         assertEquals(referenceList, list);
+        
+        assertEquals(2, it.next());
+        it.remove();
+        list.checkInvarant();
+        
+        referenceList.remove(2);
+        assertEquals(referenceList, list);
     }
     
     // TODO: DEBUG ME!

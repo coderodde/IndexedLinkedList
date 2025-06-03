@@ -1649,23 +1649,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Once here, no finger removal is needed.
                 removeImplCaseA();
             } else {
-                if (size == 1) {
-                    fingerList.fingerArray[1] = null;
-                    fingerList.fingerArray[0].node = null;
-                    fingerList.size = 0;
-                } else if (size == 2) {
-                    fingerList.fingerArray[2] = null;
-                    int elementIndex = nextIndex - 1;
-                    
-                    if (elementIndex == 0) {
-                        fingerList.fingerArray[0].node = head.next;
-                    }
-                    
-                    fingerList.fingerArray[1].node = null;
-                    fingerList.size = 1;
-                } else {
-                    removeByIndexCaseA(fingerIndex);
-                }
+                removeImplCaseB();
+                
             }
             
             unlink(lastReturnedNode);
@@ -1673,7 +1658,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             lastReturnedNode = null;
             --nextIndex;
-            ++expectedModCount;
+            ++expectedModCount; 
         }
 
         /**
@@ -1730,6 +1715,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 }
+            }
+        }
+        
+        private void removeImplCaseB() {
+            if (size == 1) {
+                fingerList.fingerArray[1] = null;
+                fingerList.fingerArray[0].node = null;
+                fingerList.size = 0;
+            } else if (size == 2) {
+                fingerList.fingerArray[2] = null;
+                int elementIndex = nextIndex - 1;
+
+                if (elementIndex == 0) {
+                    fingerList.fingerArray[0].node = head.next;
+                }
+
+                fingerList.fingerArray[1].node = null;
+                fingerList.size = 1;
+            } else {
+                removeByIndexCaseA(fingerIndex);
             }
         }
     }
