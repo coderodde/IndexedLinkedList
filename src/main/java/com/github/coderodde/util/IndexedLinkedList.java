@@ -1635,7 +1635,39 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public void remove() {
-        
+            if (lastReturnedNode == null) {
+                throw new IllegalStateException();
+            }
+            
+            checkForComodification();
+            
+            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+            int fingerListSizeAfterRemoval  = 
+                    getRecommendedNumberOfFingers(size() - 1);
+            
+            if (fingerListSizeBeforeRemoval == fingerListSizeAfterRemoval) {
+                // Once here, no finger removal is needed
+                removeByIndexCaseB(fingerIndex, 
+                                   nextIndex - 1);
+            } else {
+                if (size == 1) {
+                    fingerList.fingerArray[1] = null;
+                    fingerList.fingerArray[0].node = null;
+                    fingerList.size = 0;
+                } else if (size == 2) {
+                    fingerList.fingerArray[2] = null;
+                    int elementIndex = nextIndex + fingerIndex - 1;
+                    
+                    if (elementIndex == 0) {
+                        fingerList.fingerArray[0].node = head.next;
+                    }
+                    
+                    fingerList.fingerArray[1].node = null;
+                    fingerList.size = 1;
+                } else {
+                    removeByIndexCaseA(fingerIndex);
+                }
+            }
         }
 
         /**
