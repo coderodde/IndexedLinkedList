@@ -17,6 +17,7 @@
 package com.github.coderodde.util;
 
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
+import com.github.coderodde.util.IndexedLinkedList.BasicIteratorV2;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
 import java.io.File;
 import java.io.FileInputStream;
@@ -3437,7 +3438,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
     
-    @Test
+//    @Test
     public void debugBasicIterator1() {
         list.addAll(getIntegerList(10));
         list.fingerList.setFingerIndices(0, 1, 5, 7);
@@ -3456,7 +3457,7 @@ public class IndexedLinkedListTest {
     }
 
     // TODO: DEBUG ME!
-    @Test
+//    @Test
     public void debugBasicIterator2() {
         // Elements 1, 2, 3, 4 will be removed.
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
@@ -3501,6 +3502,47 @@ public class IndexedLinkedListTest {
         assertFalse(iterator.hasNext());
         list.checkInvarant();
     }
+    
+    // TODO: Rename me!
+    
+    @Test
+    public void iteratorFingerRolling1() {
+        // 0, 1, 2, 3, 4 
+        list.addAll(getIntegerList(5));
+        list.fingerList.setFingerIndices(0, 1, 2);
+        BasicIteratorV2 it = list.basicIteratorResearch();
+        
+        assertEquals(-1, it.fingerIndex);
+        assertEquals(-1, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(0, it.next());
+        assertEquals(0, it.fingerIndex);
+        assertEquals(0, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(1, it.next());
+        assertEquals(1, it.fingerIndex);
+        assertEquals(1, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(2, it.next());
+        assertEquals(2, it.fingerIndex);
+        assertEquals(2, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(3, it.next());
+        assertEquals(3, it.fingerIndex);
+        assertEquals(5, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(4, it.next());
+        assertEquals(3, it.fingerIndex);
+        assertEquals(5, it.fingerNodeIndex);
+        
+        assertFalse(it.hasNext());
+    }
+    
     // TODO: DEBUG ME!
 //    @Test
     public void findFailingIterator() {

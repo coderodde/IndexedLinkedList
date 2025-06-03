@@ -607,6 +607,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public Iterator<E> iterator() {
         return new BasicIterator();
     }
+    
+    public BasicIteratorV2 basicIteratorResearch() {
+        return new BasicIteratorV2();
+    }
 
     /**
      * Returns the index of the rightmost {@code obj}, or {@code -1} if 
@@ -1559,6 +1563,98 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void appendFinger(Node<E> node, int index) {
         Finger<E> finger = new Finger<>(node, index);
         fingerList.appendFinger(finger);
+    }
+    
+    public final class BasicIteratorV2 implements Iterator<E> {
+
+        /**
+         * Caches the most recently returned node.
+         */
+        Node<E> lastReturnedNode = null;
+        
+        /**
+         * Caches the next node to iterate over.
+         */
+        Node<E> nextNode = head;
+        
+        /**
+         * Caches the index of the leftmost finger on the right side from the 
+         * node {@code nextNode}.
+         */
+        int fingerIndex = -1;
+        
+        /**
+         * Caches the node index of the 
+         * {@code fingerList.getFinger(fingerIndex)}.
+         */
+        int fingerNodeIndex = -1;
+        
+        /**
+         * The index of the next node to iterate over.
+         */
+        int nextIndex;
+        
+        /**
+         * Caches the expected modification count. We use this value in order to
+         * detect the concurrent modifications as early as possible.
+         */
+        int expectedModCount = IndexedLinkedList.this.modCount;
+        
+        /**
+         * {@inheritDoc } 
+         */
+        @Override
+        public boolean hasNext() {
+            return nextIndex < size;
+        }
+
+        /**
+         * {@inheritDoc } 
+         */
+        @Override
+        public E next() {
+            checkForComodification();
+            
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            
+            lastReturnedNode = nextNode;
+            nextNode = nextNode.next;
+            
+            if (fingerNodeIndex < nextIndex) {
+                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+            }
+            
+            ++nextIndex;
+            return lastReturnedNode.item;
+        }
+
+        /**
+         * {@inheritDoc } 
+         */
+        @Override
+        public void remove() {
+        
+        }
+
+        /**
+         * {@inheritDoc } 
+         */
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+        
+        }
+        
+        /**
+         * Makes sure that the list was not modified outside of the iterator API
+         * while iterating.
+         */
+        void checkForComodification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
     }
     
     /**
