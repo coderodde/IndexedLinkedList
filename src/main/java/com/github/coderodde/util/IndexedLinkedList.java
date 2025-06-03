@@ -1667,6 +1667,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     removeByIndexCaseA(fingerIndex);
                 }
             }
+            
+            unlink(lastReturnedNode);
+            decreaseSize();
+            
+            lastReturnedNode = null;
+            --nextIndex;
+            ++expectedModCount;
         }
 
         /**
@@ -1693,10 +1700,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void removeImplCaseA() {
             int elementIndex = nextIndex - 1;
         
-            if (fingerNodeIndex != nextIndex - 1) {
+            if (fingerNodeIndex != elementIndex) {
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
             } else {
-
+                // Here, fingerNodeIndex == elementIndex!
                 int fingerPrefixLength = Math.max(0, fingerIndex - 1);
                 int fingerSuffixLength = fingerList.size() - (fingerIndex + 1);
 
@@ -1709,7 +1716,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 int freeFingerSuffixSpots = listSuffixFreeSpots
                                           - fingerSuffixLength;
 
-                if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
+                if (freeFingerPrefixSpots >= freeFingerSuffixSpots) {
                     fingerList.arrangePrefix(elementIndex,
                                              fingerPrefixLength,
                                              1);
@@ -1721,7 +1728,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                              fingerSuffixLength, 
                                              1);
 
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 }
             }
         }
