@@ -1646,9 +1646,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     getRecommendedNumberOfFingers(size() - 1);
             
             if (fingerListSizeBeforeRemoval == fingerListSizeAfterRemoval) {
-                // Once here, no finger removal is needed
-                removeByIndexCaseB(fingerIndex, 
-                                   nextIndex - 1);
+                // Once here, no finger removal is needed.
+                removeImplCaseA();
             } else {
                 if (size == 1) {
                     fingerList.fingerArray[1] = null;
@@ -1656,7 +1655,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.size = 0;
                 } else if (size == 2) {
                     fingerList.fingerArray[2] = null;
-                    int elementIndex = nextIndex + fingerIndex - 1;
+                    int elementIndex = nextIndex - 1;
                     
                     if (elementIndex == 0) {
                         fingerList.fingerArray[0].node = head.next;
@@ -1685,6 +1684,45 @@ public class IndexedLinkedList<E> implements Deque<E>,
         void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
+            }
+        }
+        
+        /**
+         * Removes an item such that the number of fingers remains intact.
+         */
+        private void removeImplCaseA() {
+            int elementIndex = nextIndex - 1;
+        
+            if (fingerNodeIndex != nextIndex - 1) {
+                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+            } else {
+
+                int fingerPrefixLength = Math.max(0, fingerIndex - 1);
+                int fingerSuffixLength = fingerList.size() - (fingerIndex + 1);
+
+                int listPrefixFreeSpots = elementIndex;
+                int listSuffixFreeSpots = size - (elementIndex + 1);
+
+                int freeFingerPrefixSpots = listPrefixFreeSpots
+                                          - fingerPrefixLength;
+
+                int freeFingerSuffixSpots = listSuffixFreeSpots
+                                          - fingerSuffixLength;
+
+                if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
+                    fingerList.arrangePrefix(elementIndex,
+                                             fingerPrefixLength,
+                                             1);
+
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
+                } else {
+                    fingerList.arrangeSuffix(elementIndex + 1,
+                                             fingerIndex + 1, 
+                                             fingerSuffixLength, 
+                                             1);
+
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+                }
             }
         }
     }
