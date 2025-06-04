@@ -1005,11 +1005,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void removeByIndexCaseA(int fromFingerIndex) {
         int copyLength = fingerList.size() - fromFingerIndex + 1;
+        int sourceFingerIndex = Math.max(1, fromFingerIndex);
+        int targetFingerIndex = sourceFingerIndex - 1;
         
         System.arraycopy(fingerList.fingerArray, 
-                         fromFingerIndex + 1, 
+                         sourceFingerIndex,
                          fingerList.fingerArray,
-                         fromFingerIndex, 
+                         targetFingerIndex,
                          copyLength);
         
         int fingerListSize = fingerList.size();
@@ -1022,9 +1024,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.fingerArray[fingerListSize].node  = null;
         fingerList.fingerArray[fingerListSize].index = size;
         
-        fingerList.shiftFingerIndicesToLeftOnceAll(
-                Math.min(fromFingerIndex,
-                         fingerListSize));
+        fingerList.shiftFingerIndicesToLeftOnceAll(sourceFingerIndex);
+//                Math.min(fromFingerIndex,
+//                         fingerListSize));
         
         fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
@@ -1601,6 +1603,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int expectedModCount = IndexedLinkedList.this.modCount;
         
         /**
+         * Caches the number of removed fingers.
+         */
+        int numberOfRemovedFingers = 0;
+        
+        /**
          * {@inheritDoc } 
          */
         @Override
@@ -1650,7 +1657,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 removeImplCaseA();
             } else {
                 removeImplCaseB();
-                
+                ++numberOfRemovedFingers;
             }
             
             unlink(lastReturnedNode);
@@ -1685,11 +1692,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void removeImplCaseA() {
             int elementIndex = nextIndex - 1;
         
-            if (fingerNodeIndex != elementIndex) {
+            if (fingerNodeIndex < elementIndex) {
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
             } else {
                 // Here, fingerNodeIndex == elementIndex!
-                int fingerPrefixLength = fingerIndex;
+                int fingerPrefixLength = 
+                        Math.max(
+                                0, 
+                                fingerIndex - numberOfRemovedFingers);
+                
                 int fingerSuffixLength = fingerList.size() - (fingerIndex + 1);
 
                 int listPrefixFreeSpots = elementIndex;
@@ -1899,7 +1910,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
                     
                     removeByIndexCaseA2(
-                            Math.max(0, fingerIndex - removedFingers + 1),
+                            Math.max(0, fingerIndex - removedFingers),
                             fingerList.size());
                     
                 }

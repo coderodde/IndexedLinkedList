@@ -3438,11 +3438,11 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(10), list.get(2));
     }
     
-//    @Test
+    @Test
     public void debugBasicIterator1() {
         list.addAll(getIntegerList(10));
         list.fingerList.setFingerIndices(0, 1, 5, 7);
-        Iterator<Integer> iterator = list.iterator();
+        Iterator<Integer> iterator = list.basicIteratorResearch();
         
         int count = 0;
         
@@ -3454,14 +3454,16 @@ public class IndexedLinkedListTest {
             iterator.remove();
             list.checkInvarant();
         }
+        
+        System.out.println("debugBasicIterator1() passed!");
     }
 
     // TODO: DEBUG ME!
-//    @Test
+    @Test
     public void debugBasicIterator2() {
         // Elements 1, 2, 3, 4 will be removed.
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
-        Iterator<Integer> iterator = list.iterator();
+        Iterator<Integer> iterator = list.basicIteratorResearch();
         
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(0), iterator.next());
@@ -3488,7 +3490,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         
         // Remove 3:
-        iterator.remove(); // TODO: Debug me!s
+        iterator.remove(); 
         list.checkInvarant();
         
         assertTrue(iterator.hasNext());
@@ -3615,10 +3617,10 @@ public class IndexedLinkedListTest {
     }
     
     // TODO: DEBUG ME!
-//    @Test
+    @Test
     public void findFailingIterator() {
         list.addAll(getIntegerList(3850));
-        Iterator<Integer> iterator = list.iterator();
+        Iterator<Integer> iterator = list.basicIteratorResearch();
         int counter = 0;
 
         while (iterator.hasNext()) {
