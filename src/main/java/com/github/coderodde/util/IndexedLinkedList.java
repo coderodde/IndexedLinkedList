@@ -1681,12 +1681,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * Removes an item such that the number of fingers remains intact.
          */
         private void removeImplCaseA() {
-            int elementIndex = nextIndex - 1;
+            int elementIndex = nextIndex - 1; // Need to be 635!
         
-            if (fingerNodeIndex < elementIndex) {
-                fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+            if (elementIndex < fingerNodeIndex) {
+                fingerList.shiftFingerIndicesToLeftOnceAll(
+                        fingerIndex - numberOfRemovedFingers);
             } else {
                 // Here, fingerNodeIndex == elementIndex!
+                // This means we need to move the finger pointing to
+                // elementIndex'th element.
                 int fingerPrefixLength = 
                         Math.max(
                                 0, 
