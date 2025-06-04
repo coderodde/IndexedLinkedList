@@ -1018,16 +1018,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         fingerList.fingerArray[fingerListSize] = null;
         fingerList.size--;
-        
-        fingerListSize = fingerList.size();
-        
-        fingerList.fingerArray[fingerListSize].node  = null;
-        fingerList.fingerArray[fingerListSize].index = size;
-        
-        fingerList.shiftFingerIndicesToLeftOnceAll(sourceFingerIndex);
-//                Math.min(fromFingerIndex,
-//                         fingerListSize));
-        
+        fingerList.shiftFingerIndicesToLeftOnceAll(targetFingerIndex);
         fingerList.contractFingerArrayIfNeeded(fingerList.size());
     }
     
