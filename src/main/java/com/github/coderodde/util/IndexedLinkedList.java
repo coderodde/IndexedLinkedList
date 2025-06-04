@@ -1689,7 +1689,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
             } else {
                 // Here, fingerNodeIndex == elementIndex!
-                int fingerPrefixLength = Math.max(0, fingerIndex - 1);
+                int fingerPrefixLength = fingerIndex;
                 int fingerSuffixLength = fingerList.size() - (fingerIndex + 1);
 
                 int listPrefixFreeSpots = elementIndex;
@@ -1701,7 +1701,20 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 int freeFingerSuffixSpots = listSuffixFreeSpots
                                           - fingerSuffixLength;
 
-                if (freeFingerPrefixSpots >= freeFingerSuffixSpots) {
+                if (freeFingerPrefixSpots == 0) {
+                    fingerList.arrangeSuffix(elementIndex + 1,
+                                             fingerIndex + 1, 
+                                             fingerSuffixLength, 
+                                             1);
+
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+                } else if (freeFingerSuffixSpots == 0) {
+                    fingerList.arrangePrefix(elementIndex,
+                                             fingerPrefixLength,
+                                             1);
+
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
+                } else if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
                     fingerList.arrangePrefix(elementIndex,
                                              fingerPrefixLength,
                                              1);
@@ -1713,7 +1726,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                              fingerSuffixLength, 
                                              1);
 
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
                 }
             }
         }

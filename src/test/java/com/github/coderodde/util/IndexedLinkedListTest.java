@@ -3590,25 +3590,27 @@ public class IndexedLinkedListTest {
     
     @Test
     public void basicIteratorV2remove1() {
+        // list = 0, 1, 2, 3
+        //           ^  ^
         list.addAll(getIntegerList(4));
         list.fingerList.setFingerIndices(1, 2);
         referenceList.addAll(list);
         BasicIteratorV2 it = list.basicIteratorResearch();
         
         assertTrue(it.hasNext());
-        assertEquals(0, it.next());
-        assertEquals(1, it.next());
-        it.remove();
+        assertEquals(0, it.next()); // Get 0
+        assertEquals(1, it.next()); // Get 1
+        it.remove();                // Remove 1
         list.checkInvarant();
         
         referenceList.remove(1);
         assertEquals(referenceList, list);
         
-        assertEquals(2, it.next());
-        it.remove();
+        assertEquals(2, it.next()); // Get 2
+        it.remove();                // Remove 2
         list.checkInvarant();
         
-        referenceList.remove(2);
+        referenceList.remove(1);
         assertEquals(referenceList, list);
     }
     
