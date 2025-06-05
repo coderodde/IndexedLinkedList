@@ -1736,7 +1736,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.arrangeSuffix(
                             elementIndex + 1,
                             fingerIndex - numberOfRemovedFingers, 
-                            fingerSuffixLength, 
+                            fingerSuffixLength + fingerIndex
+                                               + numberOfRemovedFingers, 
                             1);
 
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
