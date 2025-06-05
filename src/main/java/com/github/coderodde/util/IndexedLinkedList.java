@@ -1004,8 +1004,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fromFingerIndex the leftmost finger index.
      */
     private void removeByIndexCaseA(int fromFingerIndex) {
-        int copyLength = fingerList.size() - fromFingerIndex + 1;
-        int sourceFingerIndex = Math.max(1, fromFingerIndex);
+        int copyLength = fingerList.size() - fromFingerIndex;
+        int sourceFingerIndex = Math.max(1, fromFingerIndex + 1);
         int targetFingerIndex = sourceFingerIndex - 1;
         
         System.arraycopy(fingerList.fingerArray, 
@@ -1599,6 +1599,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int numberOfRemovedFingers = 0;
         
         /**
+         * Caches the number of removed elements.
+         */
+        int numberOfRemovedElements = 0;
+        
+        /**
          * {@inheritDoc } 
          */
         @Override
@@ -1656,6 +1661,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             lastReturnedNode = null;
             --nextIndex;
+            ++numberOfRemovedElements;
             ++expectedModCount; 
         }
 
@@ -1675,6 +1681,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
+            
         }
         
         /**
@@ -1683,9 +1690,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void removeImplCaseA() {
             int elementIndex = nextIndex - 1; // Need to be 635!
         
-            if (elementIndex < fingerNodeIndex) {
+            if (elementIndex < fingerNodeIndex - numberOfRemovedElements) {
                 fingerList.shiftFingerIndicesToLeftOnceAll(
-                        fingerIndex - numberOfRemovedFingers);
+                        Math.max(0, fingerIndex - numberOfRemovedFingers - 1));
             } else {
                 // Here, fingerNodeIndex == elementIndex!
                 // This means we need to move the finger pointing to

@@ -3466,11 +3466,11 @@ public class IndexedLinkedListTest {
         Iterator<Integer> iterator = list.basicIteratorResearch();
         
         assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(0), iterator.next());
+        assertEquals(Integer.valueOf(0), iterator.next()); // Omit 0.
         list.checkInvarant();
         
         assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(1), iterator.next());
+        assertEquals(Integer.valueOf(1), iterator.next()); // Omit 1.
         list.checkInvarant();
         
         // Remove 1:
