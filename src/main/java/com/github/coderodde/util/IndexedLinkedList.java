@@ -1733,10 +1733,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 } else {
-                    fingerList.arrangeSuffix(elementIndex + 1,
-                                             fingerIndex + 1, 
-                                             fingerSuffixLength, 
-                                             1);
+                    fingerList.arrangeSuffix(
+                            elementIndex + 1,
+                            fingerIndex - numberOfRemovedFingers, 
+                            fingerSuffixLength, 
+                            1);
 
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
                 }
