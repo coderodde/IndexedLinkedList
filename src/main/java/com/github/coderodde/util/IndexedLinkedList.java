@@ -1733,14 +1733,29 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 } else {
-                    fingerList.arrangeSuffix(
+                    
+                    fingerList.makeRoomAtSuffix(
                             elementIndex + 1,
                             fingerIndex - numberOfRemovedFingers, 
-                            fingerSuffixLength + fingerIndex
-                                               + numberOfRemovedFingers, 
+                            fingerSuffixLength //+ fingerIndex
+                                              ,// + numberOfRemovedFingers, 
                             1);
+                    
+                    fingerList.pushCoveredFingersToSuffix(
+                            elementIndex + 1,
+                            fingerSuffixLength// + fingerIndex
+                                              + numberOfRemovedFingers, 
+                            1);
+                    
+//                    fingerList.arrangeSuffix(
+//                            elementIndex + 1,
+//                            fingerIndex - numberOfRemovedFingers, 
+//                            fingerSuffixLength + fingerIndex
+//                                               + numberOfRemovedFingers, 
+//                            1);
 
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+                    fingerList.shiftFingerIndicesToLeftOnceAll(
+                            fingerIndex - numberOfRemovedFingers);
                 }
             }
         }
