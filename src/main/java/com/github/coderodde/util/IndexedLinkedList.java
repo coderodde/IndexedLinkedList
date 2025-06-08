@@ -1700,9 +1700,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 int fingerPrefixLength = 
                         Math.max(
                                 0, 
-                                fingerIndex - numberOfRemovedFingers);
+                                fingerIndex - numberOfRemovedFingers - 1);
                 
-                int fingerSuffixLength = fingerList.size() - (fingerIndex + 1);
+                int fingerSuffixLength = fingerList.size() - fingerIndex - 1;
 
                 int listPrefixFreeSpots = elementIndex;
                 int listSuffixFreeSpots = size - (elementIndex + 1);

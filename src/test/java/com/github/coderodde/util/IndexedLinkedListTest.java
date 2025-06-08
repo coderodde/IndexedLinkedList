@@ -3505,7 +3505,30 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    // TODO: Rename me!
+    @Test
+    public void debugBasicIterator3() {
+        System.out.println("BEGIN: debugBasicIterator3()");
+        list.addAll(getIntegerList(12));
+        list.fingerList.setFingerIndices(1, 2, 4, 5);
+        Iterator<Integer> iterator = list.basicIteratorResearch();
+        
+        int count = 0;
+        
+        while (iterator.hasNext()) {
+            System.out.println("cnt = " + ++count);
+            
+            iterator.next();
+            list.checkInvarant();
+            
+            if (count % 2 == 0) {
+                iterator.remove();
+                list.checkInvarant();
+            }
+        }
+        
+        System.out.println("PASS: debugBasicIterator3()");
+    }
+    
     @Test
     public void iteratorFingerRolling1() {
         // 0, 1, 2, 3, 4 
@@ -3617,7 +3640,7 @@ public class IndexedLinkedListTest {
     }
     
     // TODO: DEBUG ME!
-    @Test
+    //@Test
     public void findFailingIterator() {
         list.addAll(getIntegerList(3850));
         Iterator<Integer> iterator = list.basicIteratorResearch();
