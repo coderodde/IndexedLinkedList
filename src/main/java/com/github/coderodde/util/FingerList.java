@@ -620,12 +620,7 @@ final class FingerList<E> {
     void makeRoomAtPrefix(int fromIndex,
                           int numberOfFingersInPrefix,
                           int numberOfFingersToMoveToPrefix) {
-        
-        if (numberOfFingersToMoveToPrefix <= 0) {
-//            System.out.println("no: " + numberOfFingersToMoveToPrefix);
-//            return;
-        }
-        
+       
         if (numberOfFingersInPrefix == 0) {
             // Here, no fingers in the prefix to move.
             return;
