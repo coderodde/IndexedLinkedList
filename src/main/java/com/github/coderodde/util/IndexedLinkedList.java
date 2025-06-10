@@ -1625,11 +1625,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = nextNode;
             nextNode = nextNode.next;
             
-            if (fingerNodeIndex < nextIndex) {
+            if (fingerNodeIndex < ++nextIndex) {
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             }
             
-            ++nextIndex;
+//            ++nextIndex;
             return lastReturnedNode.item;
         }
 
@@ -1643,19 +1643,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             checkForComodification();
-            ++numberOfRemovedElements;
             
             int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
             int fingerListSizeAfterRemoval  = 
                     getRecommendedNumberOfFingers(size() - 1);
             
             if (fingerListSizeBeforeRemoval == fingerListSizeAfterRemoval) {
+                ++numberOfRemovedElements;
                 // Once here, no finger removal is needed.
                 removeImplCaseA();
             } else {
-//                ++numberOfRemovedFingers;
-//                --fingerIndex;
                 removeImplCaseB();
+                ++numberOfRemovedElements;
             }
             
             unlink(lastReturnedNode);
@@ -1681,8 +1680,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         void checkForComodification() {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
-            }
-            
+            }   
         }
         
         /**
@@ -1706,15 +1704,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Here, fingerNodeIndex == elementIndex!
                 // This means we need to move the finger pointing to
                 // elementIndex'th element.
-                int fingerPrefixLength = 
-                        Math.max(
-                                0, 
-                                fingerIndex - numberOfRemovedFingers + 1);
-                
+                int fingerPrefixLength = fingerIndex - 1;
                 int fingerSuffixLength = fingerList.size() 
-                                       - fingerPrefixLength
+                                       - fingerPrefixLength 
                                        - 1;
-
+                
                 int listPrefixFreeSpots = elementIndex;
                 int listSuffixFreeSpots = size - (elementIndex + 1);
 
@@ -1726,7 +1720,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
                 if (freeFingerPrefixSpots == 0) {
                     fingerList.makeRoomAtPrefix(elementIndex,
-                                                freeFingerPrefixSpots,
+                                                fingerPrefixLength,
                                                 1);
                     
                     fingerList.pushCoveredFingersToPrefix(
@@ -1734,7 +1728,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             freeFingerPrefixSpots, 
                             1);
                     
-//                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 } else if (freeFingerSuffixSpots == 0) {
                     fingerList.arrangePrefix(elementIndex,
                                              fingerPrefixLength,
@@ -1763,7 +1757,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             1);
                     
                     fingerList.shiftFingerIndicesToLeftOnceAll(
-                            fingerIndex - numberOfRemovedFingers);
+                            Math.max(0, fingerIndex - 1));
                 }
             }
         }
@@ -1784,7 +1778,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 fingerList.fingerArray[1].node = null;
                 fingerList.size = 1;
             } else {
-                removeByIndexCaseA(fingerIndex - numberOfRemovedFingers);
+                removeByIndexCaseA(fingerIndex - numberOfRemovedFingers
+                                               - numberOfRemovedElements);
             }
         }
     }
