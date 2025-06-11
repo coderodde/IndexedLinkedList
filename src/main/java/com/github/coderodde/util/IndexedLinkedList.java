@@ -1718,7 +1718,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                           - fingerSuffixLength;
 
                 if (freeFingerPrefixSpots == 0) {
-                    System.out.println("freeFingerPrefixSpots == 0");
+//                    System.out.println("freeFingerPrefixSpots == 0");
                     
                     fingerList.makeRoomAtSuffix(elementIndex + 1, 
                                                 fingerIndex, 
@@ -1732,7 +1732,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
                     
                 } else if (freeFingerSuffixSpots == 0) {
-                    System.out.println("freeFingerSuffixSpots == 0");
+//                    System.out.println("freeFingerSuffixSpots == 0");
                     
                     fingerList.makeRoomAtPrefix(elementIndex,
                                                 fingerPrefixLength,
@@ -1745,7 +1745,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
                 } else if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
-                    System.out.println("freeFingerPrefixSpots > freeFingerSuffixSpots");
+//                    System.out.println("freeFingerPrefixSpots > freeFingerSuffixSpots");
                     
                     fingerList.makeRoomAtPrefix(elementIndex, 
                                                 fingerPrefixLength, 
@@ -1757,7 +1757,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 } else {
-                    System.out.println("freeFingerPrefixSpots < freeFingerSuffixSpots");
+//                    System.out.println("freeFingerPrefixSpots < freeFingerSuffixSpots");
                     
                     fingerList.makeRoomAtSuffix(
                             elementIndex + 1,
@@ -1803,7 +1803,210 @@ public class IndexedLinkedList<E> implements Deque<E>,
             ++numberOfRemovedFingers;
         }
     }
-    
+//    
+//    /**
+//     * This class implements a basic iterator over this list.
+//     */
+//    public final class BasicIterator implements Iterator<E> {
+//        
+//        /**
+//         * Caches the most recently returned node.
+//         */
+//        private Node<E> lastReturnedNode = null;
+//        
+//        /**
+//         * Caches the next node to iterate over.
+//         */
+//        private Node<E> next = head;
+//        
+//        /**
+//         * Caches the leftmost finger on the right side from the node 
+//         * {@code next}.
+//         */
+//        private int fingerIndex = 0;
+//        
+//        /**
+//         * The current node index of the current finger.
+//         */
+//        private int fingerNodeIndex;
+//        
+//        /**
+//         * The index of the next node to iterate over.
+//         */
+//        private int nextIndex;
+//        
+//        /**
+//         * Counts the number of removed elements so far.
+//         */
+//        private int numberOfRemovedElements;
+//        
+//        /**
+//         * Counts the number of times 
+//         * {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#next()}
+//         * or {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#remove()}
+//         * were called.
+//         */
+//        private int numberOfOperations;
+//        
+//        /**
+//         * The number of removed fingers.
+//         */
+//        private int removedFingers;
+//        
+//        /**
+//         * Caches the expected modification count. We use this value in order to
+//         * detect the concurrent modifications as early as possible.
+//         */
+//        int expectedModCount = IndexedLinkedList.this.modCount;
+//        
+//        /**
+//         * Constructs this basic iterator.
+//         */
+//        BasicIterator() {
+//            fingerNodeIndex = fingerList.getFinger(0).index;
+//        }
+//        
+//        /**
+//         * Returns {@code true} if and only if this iterator has more elements 
+//         * to offer.
+//         * 
+//         * @return {@code true} if and only if iteration may continue.
+//         */
+//        @Override
+//        public boolean hasNext() {
+//            return nextIndex + fingerIndex < size;
+//        }
+//
+//        /**
+//         * Attempts to return the next element in the iteration order.
+//         * 
+//         * @return the next element.
+//         * @throws ConcurrentModificationException if the list was modified 
+//         *                                         outside the iterator API. 
+//         */
+//        @Override
+//        public E next() {
+//            checkForComodification();
+//            
+//            if (!hasNext()) {
+//                throw new NoSuchElementException();
+//            }
+//
+//            lastReturnedNode = next;
+//            next = next.next;
+//            
+//            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
+//                    && 
+//                    fingerIndex < fingerList.size() - 1) {
+//                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+////                System.out.println("fingerIndex == " + fingerIndex);
+//            } else {
+//                ++nextIndex;
+//            }
+//            
+//            ++numberOfOperations;
+//            return lastReturnedNode.item;
+//        }
+//        
+//        /**
+//         * Removes the most recently iterated element from the list.
+//         * 
+//         * @throws IllegalStateException if there is no most recent element. 
+//         *                               This can happen if there was no 
+//         *                               {@link DescendingIterator#next()} 
+//         *                               on this iterator, or the previous 
+//         *                               operation was
+//         *                               {@link DescendingIterator#remove()}.
+//         */
+//        @Override
+//        public void remove() {
+//            if (lastReturnedNode == null) {
+//                throw new IllegalStateException();
+//            }
+//            
+//            checkForComodification();
+//            
+//            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+//            int fingerListSizeAfterRemoval  = 
+//                    getRecommendedNumberOfFingers(size() - 1);
+//            
+//            if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
+//              
+//                if (size == 1) {
+//                    fingerList.fingerArray[1] = null;
+//                    fingerList.fingerArray[0].node = null;
+//                    fingerList.size = 0;
+//                } else if (size == 2) {
+//                    fingerList.fingerArray[2] = null;
+//                    int elementIndex = nextIndex + fingerIndex - 1;
+//                    
+//                    if (elementIndex == 0) {
+//                        fingerList.fingerArray[0].node = head.next;
+//                    }
+//                    
+//                    fingerList.fingerArray[1].node = null;
+//                    fingerList.size = 1;
+//                } else {
+//                    ++removedFingers;
+//                    fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+//                    
+//                    removeByIndexCaseA2(
+//                            Math.max(0, fingerIndex - removedFingers),
+//                            fingerList.size());
+//                    
+//                }
+//            } else {
+////                System.out.println("----");
+////                System.out.println("fingerIndex:             " + fingerIndex);
+////                System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
+////                System.out.println("removedFingers:          " + removedFingers);
+////                System.out.println("----");
+//                
+//                removeByIndexCaseB(
+//                        Math.min(numberOfRemovedElements - 1, fingerIndex - removedFingers), 
+//                        nextIndex + fingerIndex - 1);
+//            }
+//            
+//            unlink(lastReturnedNode);
+//            decreaseSize();
+//            
+//            lastReturnedNode = null;
+//            --nextIndex;
+//            ++numberOfRemovedElements;
+//            ++numberOfOperations;
+//            ++expectedModCount;
+//        }
+//
+//        /**
+//         * Runs {@code action} on every remaining elements.
+//         * 
+//         * @param action the action to perform on each remaining element.
+//         * @throws ConcurrentModificationException if the list was modified 
+//         *                                         outside the iterator API.
+//         */
+//        @Override
+//        public void forEachRemaining(Consumer<? super E> action) {
+//            Objects.requireNonNull(action);
+//            
+//            while (modCount == expectedModCount && nextIndex < size) {
+//                action.accept(next.item);
+//                next = next.next;
+//                nextIndex++;
+//            }
+//            
+//            checkForComodification();
+//        }
+//
+//        /**
+//         * Makes sure that the list was not modified outside of the iterator API
+//         * while iterating.
+//         */
+//        void checkForComodification() {
+//            if (modCount != expectedModCount) {
+//                throw new ConcurrentModificationException();
+//            }
+//        }
+//    }
     /**
      * This class implements a basic iterator over this list.
      */
@@ -1812,7 +2015,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         /**
          * Caches the most recently returned node.
          */
-        private Node<E> lastReturnedNode = null;
+        private Node<E> lastReturned;
         
         /**
          * Caches the next node to iterate over.
@@ -1820,50 +2023,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private Node<E> next = head;
         
         /**
-         * Caches the leftmost finger on the right side from the node 
-         * {@code next}.
-         */
-        private int fingerIndex = 0;
-        
-        /**
-         * The current node index of the current finger.
-         */
-        private int fingerNodeIndex;
-        
-        /**
          * The index of the next node to iterate over.
          */
         private int nextIndex;
-        
-        /**
-         * Counts the number of removed elements so far.
-         */
-        private int numberOfRemovedElements;
-        
-        /**
-         * Counts the number of times 
-         * {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#next()}
-         * or {@link com.github.coderodde.util.IndexedLinkedList.BasicIterator#remove()}
-         * were called.
-         */
-        private int numberOfOperations;
-        
-        /**
-         * The number of removed fingers.
-         */
-        private int removedFingers;
         
         /**
          * Caches the expected modification count. We use this value in order to
          * detect the concurrent modifications as early as possible.
          */
         int expectedModCount = IndexedLinkedList.this.modCount;
-        
+
         /**
-         * Constructs this basic iterator.
+         * Constructs the basic iterator pointing to the first element.
          */
         BasicIterator() {
-            fingerNodeIndex = fingerList.getFinger(0).index;
+            
         }
         
         /**
@@ -1874,7 +2048,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public boolean hasNext() {
-            return nextIndex + fingerIndex < size;
+            return nextIndex < size;
         }
 
         /**
@@ -1892,22 +2066,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 throw new NoSuchElementException();
             }
 
-            lastReturnedNode = next;
+            lastReturned = next;
             next = next.next;
-            
-            if (fingerNodeIndex == nextIndex + numberOfRemovedElements - 1
-                    && 
-                    fingerIndex < fingerList.size() - 1) {
-                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
-                System.out.println("fingerIndex == " + fingerIndex);
-            } else {
-                ++nextIndex;
-            }
-            
-            ++numberOfOperations;
-            return lastReturnedNode.item;
+            nextIndex++;
+            return lastReturned.item;
         }
-        
+
         /**
          * Removes the most recently iterated element from the list.
          * 
@@ -1920,61 +2084,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public void remove() {
-            if (lastReturnedNode == null) {
+            if (lastReturned == null) {
                 throw new IllegalStateException();
             }
             
             checkForComodification();
             
-            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
-            int fingerListSizeAfterRemoval  = 
-                    getRecommendedNumberOfFingers(size() - 1);
-            
-            if (fingerListSizeBeforeRemoval != fingerListSizeAfterRemoval) {
-              
-                if (size == 1) {
-                    fingerList.fingerArray[1] = null;
-                    fingerList.fingerArray[0].node = null;
-                    fingerList.size = 0;
-                } else if (size == 2) {
-                    fingerList.fingerArray[2] = null;
-                    int elementIndex = nextIndex + fingerIndex - 1;
-                    
-                    if (elementIndex == 0) {
-                        fingerList.fingerArray[0].node = head.next;
-                    }
-                    
-                    fingerList.fingerArray[1].node = null;
-                    fingerList.size = 1;
-                } else {
-                    ++removedFingers;
-                    fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
-                    
-                    removeByIndexCaseA2(
-                            Math.max(0, fingerIndex - removedFingers),
-                            fingerList.size());
-                    
-                }
-            } else {
-                System.out.println("----");
-                System.out.println("fingerIndex:             " + fingerIndex);
-                System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
-                System.out.println("removedFingers:          " + removedFingers);
-                System.out.println("----");
-                
-                removeByIndexCaseB(
-                        Math.min(numberOfRemovedElements - 1, fingerIndex - removedFingers), 
-                        nextIndex + fingerIndex - 1);
-            }
-            
-            unlink(lastReturnedNode);
-            decreaseSize();
-            
-            lastReturnedNode = null;
-            --nextIndex;
-            ++numberOfRemovedElements;
-            ++numberOfOperations;
-            ++expectedModCount;
+            int removalIndex = nextIndex - 1;
+            removeObjectImpl(lastReturned, removalIndex);
+            nextIndex--;
+            lastReturned = null;
+            expectedModCount++;
         }
 
         /**
@@ -2007,6 +2127,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
     }
+    
     
     /**
      * Implements the batch remove. If {@code complement} is {@code true}, this 

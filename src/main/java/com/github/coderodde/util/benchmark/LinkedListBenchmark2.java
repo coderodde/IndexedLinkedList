@@ -4,6 +4,7 @@ import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,9 +154,53 @@ public class LinkedListBenchmark2 {
         }  
     }
     
+    private static void benchmarkBasicIteratorNext() {
+        benchmarkBasicIteratorNext(false);
+        benchmarkBasicIteratorNext(true);
+    }
+    
+    private static void benchmarkBasicIteratorNext(boolean print) {
+        List<Integer> list1 = new IndexedLinkedList<>();
+        IndexedLinkedList<Integer> list2 = new IndexedLinkedList<>();
+        
+        for (int i = 0; i < 20_000_000; ++i) {
+            list1.add(i);
+            list2.add(i);
+        }
+        
+        Iterator<Integer> it1 = list1.iterator();
+        IndexedLinkedList.BasicIteratorV2 it2 = list2.basicIteratorResearch();
+        
+        long ta = System.currentTimeMillis();
+        
+        while (it1.hasNext()) {
+            it1.next();
+        }
+        
+        long tb = System.currentTimeMillis();
+        long duration = tb - ta;
+        
+        if (print) {
+            System.out.println("Simple iterator in " + duration + ".");
+        }
+        
+        ta = System.currentTimeMillis();
+        
+        while (it2.hasNext()) {
+            it2.next();
+        }
+        
+        tb = System.currentTimeMillis();
+        duration = tb - ta;
+        
+        if (print) {
+            System.out.println("Research iterator in " + duration + ".");
+        }
+    }
+    
     public static void main(String[] args) {
-//        deleteRange();
-//        System.exit(0);
+        benchmarkBasicIteratorNext();
+        System.exit(0);
         
         try (AffinityLock al = AffinityLock.acquireLock()) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
