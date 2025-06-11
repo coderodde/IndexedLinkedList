@@ -1625,11 +1625,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
             lastReturnedNode = nextNode;
             nextNode = nextNode.next;
             
-            if (fingerNodeIndex < ++nextIndex) {
+            if (fingerNodeIndex < ++nextIndex - 1) {
                 fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
             }
             
-//            ++nextIndex;
             return lastReturnedNode.item;
         }
 
@@ -1689,13 +1688,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void removeImplCaseA() {
             int elementIndex = nextIndex - 1;
             
-            System.out.println("<<-------------------------");
-            System.out.println("fingerIndex: " + fingerIndex);
-            System.out.println("fingerNodeIndex: " + fingerNodeIndex);
-            System.out.println("nextIndex: " + nextIndex);
-            System.out.println("numberOfRemovedFingers: " + numberOfRemovedFingers);
-            System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
-            System.out.println("------------------------->>");
+//            System.out.println("<<-------------------------");
+//            System.out.println("fingerIndex: " + fingerIndex);
+//            System.out.println("fingerNodeIndex: " + fingerNodeIndex);
+//            System.out.println("nextIndex: " + nextIndex);
+//            System.out.println("numberOfRemovedFingers: " + numberOfRemovedFingers);
+//            System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
+//            System.out.println("------------------------->>");
         
             if (elementIndex < fingerNodeIndex - numberOfRemovedElements) {
                 fingerList.shiftFingerIndicesToLeftOnceAll(
@@ -1719,6 +1718,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                           - fingerSuffixLength;
 
                 if (freeFingerPrefixSpots == 0) {
+                    System.out.println("freeFingerPrefixSpots == 0");
+                    
                     fingerList.makeRoomAtSuffix(elementIndex + 1, 
                                                 fingerIndex, 
                                                 fingerSuffixLength, 
@@ -1731,28 +1732,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
                     
                 } else if (freeFingerSuffixSpots == 0) {
+                    System.out.println("freeFingerSuffixSpots == 0");
+                    
                     fingerList.makeRoomAtPrefix(elementIndex,
                                                 fingerPrefixLength,
                                                 1);
                     
                     fingerList.pushCoveredFingersToPrefix(
                             elementIndex, 
-                            freeFingerPrefixSpots, 
+                            fingerPrefixLength, 
                             1);
                     
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
-//                    fingerList.arrangePrefix(elementIndex,
-//                                             fingerPrefixLength,
-//                                             1);
-//
-//                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
+                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
                 } else if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
-                    fingerList.arrangePrefix(elementIndex,
-                                             fingerPrefixLength,
-                                             1);
+                    System.out.println("freeFingerPrefixSpots > freeFingerSuffixSpots");
+                    
+                    fingerList.makeRoomAtPrefix(elementIndex, 
+                                                fingerPrefixLength, 
+                                                1);
 
+                    fingerList.pushCoveredFingersToPrefix(elementIndex, 
+                                                          fingerPrefixLength, 
+                                                          1);
+                    
                     fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 } else {
+                    System.out.println("freeFingerPrefixSpots < freeFingerSuffixSpots");
                     
                     fingerList.makeRoomAtSuffix(
                             elementIndex + 1,
