@@ -1704,7 +1704,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 // Here, fingerNodeIndex == elementIndex!
                 // This means we need to move the finger pointing to
                 // elementIndex'th element.
-                int fingerPrefixLength = Math.max(0, fingerIndex - 1);
+                int fingerPrefixLength = fingerIndex;
                 int fingerSuffixLength = fingerList.size() 
                                        - fingerPrefixLength 
                                        - 1;

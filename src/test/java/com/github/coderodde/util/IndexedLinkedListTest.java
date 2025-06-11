@@ -3531,7 +3531,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void iteratorFingerRolling3() {
-        System.out.println("BEGIN: iteratorFingerRolling3()");
+        System.out.println("BEGIN:  iteratorFingerRolling3()");
         // 0, 1, 2, 3
         // ^     ^
         list.addAll(getIntegerList(4));
@@ -3549,10 +3549,71 @@ public class IndexedLinkedListTest {
         it.remove();
         
         assertTrue(it.hasNext());
+        assertEquals(1, it.next());
         assertEquals(0, it.fingerIndex);
         assertEquals(1, it.fingerNodeIndex);
         
+        assertTrue(it.hasNext());
+        assertEquals(2, it.next());
+        assertEquals(1, it.fingerIndex);
+        assertEquals(1, it.fingerNodeIndex);
+        
+        it.remove();
+        
+        assertTrue(it.hasNext());
+        assertEquals(3, it.next());
+        assertEquals(1, it.fingerIndex);
+        assertEquals(2, it.fingerNodeIndex);
+        
+        assertFalse(it.hasNext());
+        
         System.out.println("PASSED: iteratorFingerRolling3()");
+    }
+    
+    @Test
+    public void iteratorFingerRolling4() {
+        System.out.println("BEGIN:  iteratorFingerRolling4()");
+        // 0, 1, 2, 3
+        //       ^  ^
+        list.addAll(getIntegerList(4));
+        list.fingerList.setFingerIndices(2, 3);
+        BasicIteratorV2 it = list.basicIteratorResearch();
+        
+        assertEquals(-1, it.fingerIndex);
+        assertEquals(-1, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(0, it.next());
+        assertEquals(0, it.fingerIndex);
+        assertEquals(2, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(1, it.next());
+        assertEquals(0, it.fingerIndex);
+        assertEquals(2, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(2, it.next());
+        assertEquals(1, it.fingerIndex);
+        assertEquals(3, it.fingerNodeIndex);
+        
+        it.remove();
+        
+        assertEquals(1, it.fingerIndex);
+        assertEquals(3, it.fingerNodeIndex);
+        
+        assertTrue(it.hasNext());
+        assertEquals(3, it.next());
+        assertEquals(1, it.fingerIndex);
+        assertEquals(3, it.fingerNodeIndex);
+        
+        it.remove();
+        
+        assertFalse(it.hasNext());
+        assertEquals(2, it.fingerIndex);
+        assertEquals(3, it.fingerNodeIndex);
+        
+        System.out.println("PASSED: iteratorFingerRolling4()");
     }
     
     @Test
