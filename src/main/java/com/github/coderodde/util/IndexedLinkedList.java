@@ -16,7 +16,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -1276,14 +1275,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
 
         int distance = collectionSize / numberOfNewFingers;
-        int nodesToSkip = 0; //distance / 2;
-        int index = firstIndex + nodesToSkip;
         
         spreadFingers(first, 
+                      firstIndex, 
+                      fingerIndex,
                       numberOfNewFingers, 
-                      index, 
-                      distance,
-                      fingerIndex);
+                      distance);
     }
     
     /**
@@ -1316,14 +1313,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
         
         int distance = collectionSize / numberOfNewFingers;
-        int startOffset = 0; // distance / 2;
-        int index = indexOfInsertedRangeHead + startOffset;
         
         spreadFingers(headNodeOfInsertedRange,
+                      indexOfInsertedRangeHead,
+                      startFingerIndex,
                       numberOfNewFingers,
-                      index,
-                      distance,
-                      startFingerIndex);
+                      distance);
     }
     
     /**
@@ -1343,13 +1338,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.makeRoomAtIndex(0, numberOfNewFingers, collectionSize);
 
         int distance = collectionSize / numberOfNewFingers;
-        int startIndex = distance / 2;
         
         spreadFingers(head, 
-                      numberOfNewFingers,
                       0, 
-                      distance, 
-                      0);
+                      0,
+                      numberOfNewFingers,
+                      distance);
     }
     
     /**
@@ -1365,13 +1359,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
         
         int distance = size / numberOfNewFingers;
-        int startIndex = 0;
         
         spreadFingers(head,
+                      0, 
+                      0,
                       numberOfNewFingers,
-                      startIndex, 
-                      distance,
-                      0);
+                      distance);
     }
     
     /**
@@ -3010,10 +3003,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fingerIndex        the starting finger index.
      */
     private void spreadFingers(Node<E> node, 
-                               int numberOfNewFingers,
                                int index,
-                               int distance,
-                               int fingerIndex) {
+                               int fingerIndex,
+                               int numberOfNewFingers,
+                               int distance) {
         
 //        node = scrollNodeToRight(node, distance / 2);
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
