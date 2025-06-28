@@ -1105,7 +1105,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Verifies that the contents of this indexed list and the {@code otherList}
+     * are the same, and their respective fingers lists are identical. Used for
+     * debugging.
      * 
+     * @param otherList the other indexed list.
+     * 
+     * @return {@code true} if and only if the both lists are identical in 
+     *         structure.
      */
     public boolean strongEquals(final IndexedLinkedList<E> otherList) {
         return equals(otherList) && fingerList.equals(otherList.fingerList);
@@ -3027,7 +3034,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * If steps > 0, rewind to the left. Otherwise, rewinds to the right.
+     * If steps &gt; 0, rewind to the left. Otherwise, rewinds to the right.
      * 
      * @param finger the finger to traverse.
      * @param steps  the number of steps to traverse the {@code finger}.

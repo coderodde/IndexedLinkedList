@@ -39,23 +39,6 @@
     </scm>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.7</version>
-        </dependency>
 
         <dependency>
             <groupId>net.openhft</groupId>
@@ -82,6 +65,13 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+
     </dependencies>
     
     <distributionManagement>
@@ -189,11 +179,10 @@
                 <version>3.6.3</version>
                 <configuration>
                     <show>private</show>
-                    <!--<additionalOptions>-->
-                        <!--<additionalOption>-private</additionalOption>-->
+                    <additionalOptions>
                         <!--<additionalOption>-´allow-script-in-comments</additionalOption>-->
                         <!--<additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>-->
-                    <!--</additionalOptions>-->
+                    </additionalOptions>
                     <excludePackageNames>com.github.coderodde.util.benchmark</excludePackageNames>
                 </configuration>
                 <executions>

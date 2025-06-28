@@ -4,7 +4,6 @@ import com.github.coderodde.util.IndexedLinkedList;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -199,26 +198,9 @@ public class LinkedListBenchmark2 {
 //    }
     
     public static void main(String[] args) {
-        final List<Integer> arrlist = new ArrayList<>();
-        
-        for (int i = 0; i < 100; ++i) {
-            arrlist.add(i);
-        }
-        
-        IndexedLinkedList<Integer> ill = new IndexedLinkedList<>(arrlist);
-        
-        System.out.println("entropy: " + ill.getEntropy());
-        
-        System.exit(0);
-        
-//        benchmarkBasicIteratorNext();
-//        System.exit(0);
         
         try (AffinityLock al = AffinityLock.acquireLock()) {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-            warmupRemove();
-            benchmarkRemove();
-            System.exit(0);
             clearDurationCounterMap();
             warmup();
             benchmark();
@@ -277,10 +259,6 @@ public class LinkedListBenchmark2 {
         clearPerOperationCounterMap();
     }
     
-    private static void warmupRemove() {
-        benchmarkRemoveImpl(false);
-    }
-    
     private static void benchmark() {
         clearDurationCounterMap(); // Clear from the warmup run.
         
@@ -293,14 +271,6 @@ public class LinkedListBenchmark2 {
         }
         
         showPerOperationStatistics();
-    }
-    
-    private static void benchmarkRemove() {
-        benchmarkRemoveImpl(true);
-    }
-    
-    private static void benchmarkRemoveImpl(boolean print) {
-        
     }
     
     private static void showPerOperationStatistics() {
