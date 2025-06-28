@@ -1316,7 +1316,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
         
         int distance = collectionSize / numberOfNewFingers;
-        int startOffset = distance / 2;
+        int startOffset = 0; // distance / 2;
         int index = indexOfInsertedRangeHead + startOffset;
         
         spreadFingers(headNodeOfInsertedRange,
@@ -1347,7 +1347,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         spreadFingers(head, 
                       numberOfNewFingers,
-                      startIndex, 
+                      0, 
                       distance, 
                       0);
     }

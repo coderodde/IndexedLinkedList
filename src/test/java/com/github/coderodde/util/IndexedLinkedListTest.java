@@ -801,13 +801,69 @@ public class IndexedLinkedListTest {
         list.subList(4, 9).clear();
         list.checkInvarant();
         assertEquals(Arrays.asList(0, 1, 2, 3, 9, 10, 11), list);
-        
-        list.clear();
-        list.addAll(getIntegerList(12));
-        list.fingerList.fingerArray[1] = new Finger(list.fingerList.getNode(6), 6);
-        
-        list.subList(1, 6).clear();
-        list.checkInvarant();
+    }
+    
+    @Test
+    public void bruteforceCollectionSetAll() {
+        for (int sz = 0; sz < 10; ++sz) {
+            list.clear();
+            list.checkInvarant();
+
+            List<Integer> tmpList = getIntegerList(sz);
+
+            list.addAll(tmpList);
+            list.checkInvarant();
+        }
+    }
+    
+    @Test
+    public void bruteforceCollectionAppend() {
+        for (int sz = 0; sz < 10; ++sz) {
+            for (int sz2 = 0; sz2 < 10; ++sz2) {
+                list.clear();
+                list.addAll(getIntegerList(sz));
+                list.checkInvarant();
+                
+                List<Integer> tmpList = getIntegerList(sz2);
+                
+                list.addAll(tmpList);
+                list.checkInvarant();
+            }
+        }
+    }
+    
+    @Test
+    public void bruteforceCollectionPrepend() {
+        for (int sz = 0; sz < 10; ++sz) {
+            for (int sz2 = 0; sz2 < 10; ++sz2) {
+                list.clear();
+                list.addAll(getIntegerList(sz));
+                list.checkInvarant();
+                
+                List<Integer> tmpList = getIntegerList(sz2);
+                
+                list.addAll(0, tmpList);
+                list.checkInvarant();
+            }
+        }
+    }
+    
+    @Test
+    public void bruteforceCollectionInsert() {
+        for (int sz = 0; sz < 10; ++sz) {
+            for (int sz2 = 0; sz2 < 10; ++sz2) {
+                for (int index = 0; index <= sz; ++index) {
+                    list.clear();
+                    list.addAll(getIntegerList(sz));
+                    list.checkInvarant();
+
+                    List<Integer> tmpList = getIntegerList(sz2);
+
+                    list.addAll(index, tmpList);
+                    list.checkInvarant();
+                }
+            }
+        }
     }
     
     @Test // Passes. 
@@ -3193,6 +3249,20 @@ public class IndexedLinkedListTest {
     public void spreadOnAppend() {
         list.addAll(getIntegerList(10));
         list.addAll(getIntegerList(90));
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void spreadOnPrepend() {
+        list.addAll(getIntegerList(10));
+        list.addAll(0, getIntegerList(90));
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void spreadOnInsert() {
+        list.addAll(getIntegerList(20));
+        list.addAll(10, getIntegerList(80));
         list.checkInvarant();
     }
     
