@@ -160,7 +160,7 @@ public class FingerListTest {
         assertEquals(4, finger1.index);
         assertEquals(5, finger2.index);
         
-        System.out.println("makeRoomAtPrefix1Oldl passed!");
+        //System.out.println("makeRoomAtPrefix1Oldl passed!");
     }
     
     @Test
@@ -176,7 +176,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix1 passed!");
+        //System.out.println("makeRoomAtPrefix1 passed!");
     }
     
         @Test
@@ -192,7 +192,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix2 passed!");
+        //System.out.println("makeRoomAtPrefix2 passed!");
     }
     
         @Test
@@ -208,7 +208,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix3 passed!");
+        //System.out.println("makeRoomAtPrefix3 passed!");
     }
     
         @Test
@@ -224,7 +224,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix4 passed!");
+        //System.out.println("makeRoomAtPrefix4 passed!");
     }
     
         @Test
@@ -240,7 +240,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix5 passed!");
+        //System.out.println("makeRoomAtPrefix5 passed!");
     }
     
         @Test
@@ -261,7 +261,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtPrefix6 passed!");
+        //System.out.println("makeRoomAtPrefix6 passed!");
     }
     
         @Test
@@ -276,7 +276,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtSuffix1 passed!");
+        //System.out.println("makeRoomAtSuffix1 passed!");
     }
     
         @Test
@@ -291,7 +291,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtSuffix2 passed!");
+        //System.out.println("makeRoomAtSuffix2 passed!");
     }
     
         @Test
@@ -306,7 +306,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtSuffix3 passed!");
+        //System.out.println("makeRoomAtSuffix3 passed!");
     }
     
         @Test
@@ -321,7 +321,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("makeRoomAtSuffix4 passed!");
+        //System.out.println("makeRoomAtSuffix4 passed!");
     }
     
         @Test
@@ -336,7 +336,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("arrangePrefix1 passed!");
+        //System.out.println("arrangePrefix1 passed!");
     }
     
         @Test
@@ -351,7 +351,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("arrangePrefix2 passed!");
+        //System.out.println("arrangePrefix2 passed!");
     }
     
         @Test
@@ -372,7 +372,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("arrangePrefix3 passed!");
+        //System.out.println("arrangePrefix3 passed!");
     }
     
         @Test
@@ -388,7 +388,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("pushCoveredFingersToSuffix1 passed!");
+        //System.out.println("pushCoveredFingersToSuffix1 passed!");
     }
     
         @Test
@@ -404,7 +404,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("pushCoveredFingersToSuffix2 passed!");
+        //System.out.println("pushCoveredFingersToSuffix2 passed!");
     }
     
         @Test
@@ -422,7 +422,7 @@ public class FingerListTest {
         
         assertTrue(list.strongEquals(expectedList));
         
-        System.out.println("arrange1 passed!");
+        //System.out.println("arrange1 passed!");
     }
     
         @Test
@@ -444,7 +444,7 @@ public class FingerListTest {
             
         assertEquals(expectedFingerList, list.fingerList);
         
-        System.out.println("removeFingersOnDeleteRange1 passed!");
+        //System.out.println("removeFingersOnDeleteRange1 passed!");
     }
     
         @Test

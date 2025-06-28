@@ -71,7 +71,7 @@ public class IndexedLinkedListTest {
         int iteration = 0;
         
         while (!referenceList.isEmpty()) {
-            System.out.println("Iteration = " + (++iteration));
+//            System.out.println("Iteration = " + (++iteration));
             referenceList.remove(0);
             list.remove(0);
             list.checkInvarant();
@@ -876,7 +876,7 @@ public class IndexedLinkedListTest {
             }
         }
         
-        System.out.println("bruteForceSubListClearFromTo passed!");
+//        System.out.println("bruteForceSubListClearFromTo passed!");
     }
     
     @Test
@@ -1071,7 +1071,7 @@ public class IndexedLinkedListTest {
             }
         }
         
-        System.out.println("bruteForceSubListClearFromTo666 passed!");
+//        System.out.println("bruteForceSubListClearFromTo666 passed!");
     }
     
     @Test
@@ -1102,7 +1102,7 @@ public class IndexedLinkedListTest {
             }
         }
         
-        System.out.println("bruteForceSubListClearFromTo13 passed!");
+//        System.out.println("bruteForceSubListClearFromTo13 passed!");
     }
     
     @Test // Passes.
@@ -3446,7 +3446,7 @@ public class IndexedLinkedListTest {
         int count = 0;
         
         while (iterator.hasNext()) {
-            System.out.println("count = " + ++count);
+//            System.out.println("count = " + ++count);
             
             iterator.next();
             list.checkInvarant();
@@ -3454,7 +3454,7 @@ public class IndexedLinkedListTest {
             list.checkInvarant();
         }
         
-        System.out.println("debugBasicIterator1() passed!");
+//        System.out.println("debugBasicIterator1() passed!");
     }
 
     // TODO: DEBUG ME!
@@ -3506,7 +3506,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void debugBasicIterator3() {
-        System.out.println("BEGIN: debugBasicIterator3()");
+//        System.out.println("BEGIN: debugBasicIterator3()");
         list.addAll(getIntegerList(12));
         list.fingerList.setFingerIndices(1, 2, 4, 5);
         Iterator<Integer> iterator = list.iterator();
@@ -3514,7 +3514,7 @@ public class IndexedLinkedListTest {
         int count = 0;
         
         while (iterator.hasNext()) {
-            System.out.println("cnt = " + ++count);
+//            Sysem.out.println("cnt = " + ++count);
             
             iterator.next();
             list.checkInvarant();
@@ -3525,7 +3525,7 @@ public class IndexedLinkedListTest {
             }
         }
         
-        System.out.println("PASS: debugBasicIterator3()");
+//        System.out.println("PASS: debugBasicIterator3()");
     }
     
 //    @Test // Leave
@@ -3734,7 +3734,7 @@ public class IndexedLinkedListTest {
         int counter = 0;
 
         while (iterator.hasNext()) {
-            System.out.println("counter = " + counter);
+//            System.out.println("counter = " + counter);
             Integer actualInteger = iterator.next();
             assertEquals(Integer.valueOf(counter), actualInteger);
             list.checkInvarant();
@@ -4567,7 +4567,7 @@ public class IndexedLinkedListTest {
         list.loadFingerCoverageCounters(2, 4, 3, 6, 1);
         assertEquals(0, list.numberOfCoveringFingersToPrefix);
         assertEquals(1, list.numberOfCoveringFingersToSuffix);
-        System.out.println("loadFingerCoverageCounters1 done!");
+//        System.out.println("loadFingerCoverageCounters1 done!");
     }
     
     @Test
@@ -4577,7 +4577,7 @@ public class IndexedLinkedListTest {
         list.loadFingerCoverageCounters(0, 9, 1, 99, 8);
         assertEquals(1, list.numberOfCoveringFingersToPrefix);
         assertEquals(0, list.numberOfCoveringFingersToSuffix);
-        System.out.println("loadFingerCoverageCounters2 done!");
+//        System.out.println("loadFingerCoverageCounters2 done!");
     }
     
     @Test
@@ -4587,7 +4587,7 @@ public class IndexedLinkedListTest {
         list.loadFingerCoverageCounters(0, 5, 13, 18, 0);
         assertEquals(3, list.numberOfCoveringFingersToPrefix);
         assertEquals(2, list.numberOfCoveringFingersToSuffix);
-        System.out.println("loadFingerCoverageCounters3 done!");
+        //System.out.println("loadFingerCoverageCounters3 done!");
     }
     
     @Test
@@ -4651,7 +4651,7 @@ public class IndexedLinkedListTest {
             
         } while (ilg.inc());
         
-        System.out.println("Combinations: " + combinations);
+//        System.out.println("Combinations: " + combinations);
     }
     
     @Test
