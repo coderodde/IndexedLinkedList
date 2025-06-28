@@ -32,22 +32,15 @@ public class FingerListTest {
         fl.clear();
     }
     
-        @Test
+    @Test
     public void fingerToString() {
         Finger<Integer> f = new Finger<>(new Node<>(13), 2);
         assertEquals("[Finger; index = 2, item = 13]", f.toString());
         f = new Finger<>(new Node<>(null), 3);
         assertEquals("[Finger; index = 3, item = null]", f.toString());
     }
-    
-        @Test
-    public void fingerListString() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 1));
-        assertEquals("[FingerList, size = 2]", fl.toString());
-    }
 
-        @Test
+    @Test
     public void appendGetFinger() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
@@ -94,7 +87,7 @@ public class FingerListTest {
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 0);
         
-//        fl.insertFinger(insertionFinger);
+        fl.insertFingerAndShiftOnceToRight(insertionFinger);
         
         Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(0));
         assertEquals(insertionFinger.index, finger.index);
@@ -114,7 +107,7 @@ public class FingerListTest {
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 6);
         
-//        fl.insertFinger(insertionFinger);
+        fl.insertFingerAndShiftOnceToRight(insertionFinger);
 
         Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(6));
         assertEquals(insertionFinger.index, finger.index);
@@ -130,7 +123,7 @@ public class FingerListTest {
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 4);
         
-//        fl.insertFinger(insertionFinger);
+        fl.insertFingerAndShiftOnceToRight(insertionFinger);
         
         assertEquals(insertionFinger, fl.getFinger(1));
     }
@@ -143,7 +136,7 @@ public class FingerListTest {
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 3);
         
-//        fl.insertFinger(insertionFinger);
+        fl.insertFingerAndShiftOnceToRight(insertionFinger);
         
         assertEquals(insertionFinger, fl.getFinger(1));
     }
@@ -157,19 +150,20 @@ public class FingerListTest {
         list.fingerList.setFingerIndices(6, 7, 8, 9);
         
         list.fingerList.makeRoomAtPrefix(5, 0, 3);
+        list.fingerList.pushCoveredFingersToPrefix(6, 0, 3);
         
         Finger<Integer> finger0 = list.fingerList.fingerArray[0];
         Finger<Integer> finger1 = list.fingerList.fingerArray[1];
         Finger<Integer> finger2 = list.fingerList.fingerArray[2];
         
-        assertEquals(2, finger0.index);
-        assertEquals(3, finger1.index);
-        assertEquals(4, finger2.index);
+        assertEquals(3, finger0.index);
+        assertEquals(4, finger1.index);
+        assertEquals(5, finger2.index);
         
         System.out.println("makeRoomAtPrefix1Oldl passed!");
     }
     
-        @Test
+    @Test
     public void makeRoomAtPrefix1() {
         
         loadList(10);
