@@ -1276,7 +1276,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
 
         int distance = collectionSize / numberOfNewFingers;
-        int nodesToSkip = distance / 2;
+        int nodesToSkip = 0; //distance / 2;
         int index = firstIndex + nodesToSkip;
         
         spreadFingers(first, 
@@ -1365,7 +1365,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                    collectionSize);
         
         int distance = size / numberOfNewFingers;
-        int startIndex = distance / 2;
+        int startIndex = 0;
         
         spreadFingers(head,
                       numberOfNewFingers,
@@ -3015,7 +3015,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                int distance,
                                int fingerIndex) {
         
-        node = scrollNodeToRight(node, distance / 2);
+//        node = scrollNodeToRight(node, distance / 2);
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         
         for (int i = 1; i < numberOfNewFingers; i++) {
@@ -3023,6 +3023,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = scrollNodeToRight(node, distance);
             fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         }
+//        node = scrollNodeToRight(node, distance / 2);
+//        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
+//        
+//        for (int i = 1; i < numberOfNewFingers; i++) {
+//            index += distance;
+//            node = scrollNodeToRight(node, distance);
+//            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
+//        }
     }
     
     /**

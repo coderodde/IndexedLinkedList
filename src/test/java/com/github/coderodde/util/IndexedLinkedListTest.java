@@ -3184,6 +3184,19 @@ public class IndexedLinkedListTest {
     }
 
     @Test
+    public void spreadOnSet() {
+        list.addAll(getIntegerList(100));
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void spreadOnAppend() {
+        list.addAll(getIntegerList(10));
+        list.addAll(getIntegerList(90));
+        list.checkInvarant();
+    }
+    
+    @Test
     public void basicIteratorTraversal() {
         list.addAll(Arrays.asList(0, 1, 2, 3, 4));
 

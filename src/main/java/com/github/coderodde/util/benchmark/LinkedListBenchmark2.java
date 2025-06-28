@@ -199,6 +199,18 @@ public class LinkedListBenchmark2 {
 //    }
     
     public static void main(String[] args) {
+        final List<Integer> arrlist = new ArrayList<>();
+        
+        for (int i = 0; i < 100; ++i) {
+            arrlist.add(i);
+        }
+        
+        IndexedLinkedList<Integer> ill = new IndexedLinkedList<>(arrlist);
+        
+        System.out.println("entropy: " + ill.getEntropy());
+        
+        System.exit(0);
+        
 //        benchmarkBasicIteratorNext();
 //        System.exit(0);
         
