@@ -2876,12 +2876,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                - fromIndex;
         
         if (removalFingerRangeLength <= fingersToRemove) {
-            System.out.println(
-                    "FUNKY: removalFingerRangeLength("
-                            + removalFingerRangeLength 
-                            + ") <= fingersToRemove(" 
-                            + fingersToRemove 
-                            + ")");
             
             removeRangeImplCaseA(fromFingerIndex,
                                  toFingerIndex,
