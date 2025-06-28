@@ -608,9 +608,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         return new BasicIterator();
     }
     
-    public BasicIteratorV2 basicIteratorResearch() {
-        return new BasicIteratorV2();
-    }
+//    public BasicIteratorV2 basicIteratorResearch() {
+//        return new BasicIteratorV2();
+//    }
 
     /**
      * Returns the index of the rightmost {@code obj}, or {@code -1} if 
@@ -1558,251 +1558,251 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.appendFinger(finger);
     }
     
-    public final class BasicIteratorV2 implements Iterator<E> {
-
-        /**
-         * Caches the most recently returned node.
-         */
-        Node<E> lastReturnedNode = null;
-        
-        /**
-         * Caches the next node to iterate over.
-         */
-        Node<E> nextNode = head;
-        
-        /**
-         * Caches the index of the leftmost finger on the right side from the 
-         * node {@code nextNode}.
-         */
-        int fingerIndex = -1;
-        
-        /**
-         * Caches the node index of the 
-         * {@code fingerList.getFinger(fingerIndex)}.
-         */
-        int fingerNodeIndex = -1;
-        
-        /**
-         * The index of the next node to iterate over.
-         */
-        int nextIndex;
-        
-        /**
-         * Caches the expected modification count. We use this value in order to
-         * detect the concurrent modifications as early as possible.
-         */
-        int expectedModCount = IndexedLinkedList.this.modCount;
-        
-        /**
-         * Caches the number of removed fingers.
-         */
-        int numberOfRemovedFingers = 0;
-        
-        /**
-         * Caches the number of removed elements.
-         */
-        int numberOfRemovedElements = 0;
-        
-        /**
-         * {@inheritDoc } 
-         */
-        @Override
-        public boolean hasNext() {
-            return nextIndex < size;
-        }
-
-        /**
-         * {@inheritDoc } 
-         */
-        @Override
-        public E next() {
-            checkForComodification();
-            
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            
-            lastReturnedNode = nextNode;
-            nextNode = nextNode.next;
-            
-            if (fingerNodeIndex < ++nextIndex - 1) {
-                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
-            }
-            
-            return lastReturnedNode.item;
-        }
-
-        /**
-         * {@inheritDoc } 
-         */
-        @Override
-        public void remove() {
-            if (lastReturnedNode == null) {
-                throw new IllegalStateException();
-            }
-            
-            checkForComodification();
-            
-            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
-            int fingerListSizeAfterRemoval  = 
-                    getRecommendedNumberOfFingers(size() - 1);
-            
-            if (fingerListSizeBeforeRemoval == fingerListSizeAfterRemoval) {
-                // Once here, no finger removal is needed.
-                ++numberOfRemovedElements;
-                removeImplCaseA();
-            } else {
-                removeImplCaseB();
-                ++numberOfRemovedElements;
-            }
-            
-            unlink(lastReturnedNode);
-            decreaseSize();
-            
-            lastReturnedNode = null;
-            --nextIndex;
-            ++expectedModCount; 
-        }
-
-        /**
-         * {@inheritDoc } 
-         */
-        @Override
-        public void forEachRemaining(Consumer<? super E> action) {
-        
-        }
-        
-        /**
-         * Makes sure that the list was not modified outside of the iterator API
-         * while iterating.
-         */
-        void checkForComodification() {
-            if (modCount != expectedModCount) {
-                throw new ConcurrentModificationException();
-            }   
-        }
-        
-        /**
-         * Removes an item such that the number of fingers remains intact.
-         */
-        private void removeImplCaseA() {
-            int elementIndex = nextIndex - 1;
-            
-//            System.out.println("<<-------------------------");
-//            System.out.println("fingerIndex: " + fingerIndex);
-//            System.out.println("fingerNodeIndex: " + fingerNodeIndex);
-//            System.out.println("nextIndex: " + nextIndex);
-//            System.out.println("numberOfRemovedFingers: " + numberOfRemovedFingers);
-//            System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
-//            System.out.println("------------------------->>");
-        
-            if (elementIndex < fingerNodeIndex - numberOfRemovedElements) {
-                fingerList.shiftFingerIndicesToLeftOnceAll(
-                        Math.max(0, numberOfRemovedElements - fingerIndex));
-            } else {
-                // Here, fingerNodeIndex == elementIndex!
-                // This means we need to move the finger pointing to
-                // elementIndex'th element.
-                int fingerPrefixLength = fingerIndex;
-                int fingerSuffixLength = fingerList.size() 
-                                       - fingerPrefixLength 
-                                       - 1;
-                
-                int listPrefixFreeSpots = elementIndex;
-                int listSuffixFreeSpots = size - (elementIndex + 1);
-
-                int freeFingerPrefixSpots = listPrefixFreeSpots
-                                          - fingerPrefixLength;
-
-                int freeFingerSuffixSpots = listSuffixFreeSpots
-                                          - fingerSuffixLength;
-
-                if (freeFingerPrefixSpots == 0) {
-//                    System.out.println("freeFingerPrefixSpots == 0");
-                    
-                    fingerList.makeRoomAtSuffix(elementIndex + 1, 
-                                                fingerIndex, 
-                                                fingerSuffixLength, 
-                                                1);
-                    
-                    fingerList.pushCoveredFingersToSuffix(elementIndex + 1, 
-                                                          fingerSuffixLength, 
-                                                          1);
-                    
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
-                    
-                } else if (freeFingerSuffixSpots == 0) {
-//                    System.out.println("freeFingerSuffixSpots == 0");
-                    
-                    fingerList.makeRoomAtPrefix(elementIndex,
-                                                fingerPrefixLength,
-                                                1);
-                    
-                    fingerList.pushCoveredFingersToPrefix(
-                            elementIndex, 
-                            fingerPrefixLength, 
-                            1);
-                    
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
-                } else if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
-//                    System.out.println("freeFingerPrefixSpots > freeFingerSuffixSpots");
-                    
-                    fingerList.makeRoomAtPrefix(elementIndex, 
-                                                fingerPrefixLength, 
-                                                1);
-
-                    fingerList.pushCoveredFingersToPrefix(elementIndex, 
-                                                          fingerPrefixLength, 
-                                                          1);
-                    
-                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
-                } else {
-//                    System.out.println("freeFingerPrefixSpots < freeFingerSuffixSpots");
-                    
-                    fingerList.makeRoomAtSuffix(
-                            elementIndex + 1,
-                            fingerIndex - numberOfRemovedFingers, 
-                            fingerSuffixLength //+ fingerIndex
-                                              ,// + numberOfRemovedFingers, 
-                            1);
-                    
-                    fingerList.pushCoveredFingersToSuffix(
-                            elementIndex + 1,
-                            fingerSuffixLength// + fingerIndex
-                                              + numberOfRemovedFingers, 
-                            1);
-                    
-                    fingerList.shiftFingerIndicesToLeftOnceAll(
-                            Math.max(0, fingerIndex - 1));
-                }
-                
-                fingerNodeIndex = fingerList.getFinger(fingerIndex + 1).index;
-            }
-        }
-        
-        private void removeImplCaseB() {
-            if (size == 1) {
-                fingerList.fingerArray[1] = null;
-                fingerList.fingerArray[0].node = null;
-                fingerList.size = 0;
-            } else if (size == 2) {
-                fingerList.fingerArray[2] = null;
-                int elementIndex = nextIndex - 1;
-
-                if (elementIndex == 0) {
-                    fingerList.fingerArray[0].node = head.next;
-                }
-
-                fingerList.fingerArray[1].node = null;
-                fingerList.size = 1;
-            } else {
-                removeByIndexCaseA(fingerIndex - numberOfRemovedFingers
-                                               - numberOfRemovedElements);
-            }
-            
-            ++numberOfRemovedFingers;
-        }
-    }
+//    public final class BasicIteratorV2 implements Iterator<E> {
+//
+//        /**
+//         * Caches the most recently returned node.
+//         */
+//        Node<E> lastReturnedNode = null;
+//        
+//        /**
+//         * Caches the next node to iterate over.
+//         */
+//        Node<E> nextNode = head;
+//        
+//        /**
+//         * Caches the index of the leftmost finger on the right side from the 
+//         * node {@code nextNode}.
+//         */
+//        int fingerIndex = -1;
+//        
+//        /**
+//         * Caches the node index of the 
+//         * {@code fingerList.getFinger(fingerIndex)}.
+//         */
+//        int fingerNodeIndex = -1;
+//        
+//        /**
+//         * The index of the next node to iterate over.
+//         */
+//        int nextIndex;
+//        
+//        /**
+//         * Caches the expected modification count. We use this value in order to
+//         * detect the concurrent modifications as early as possible.
+//         */
+//        int expectedModCount = IndexedLinkedList.this.modCount;
+//        
+//        /**
+//         * Caches the number of removed fingers.
+//         */
+//        int numberOfRemovedFingers = 0;
+//        
+//        /**
+//         * Caches the number of removed elements.
+//         */
+//        int numberOfRemovedElements = 0;
+//        
+//        /**
+//         * {@inheritDoc } 
+//         */
+//        @Override
+//        public boolean hasNext() {
+//            return nextIndex < size;
+//        }
+//
+//        /**
+//         * {@inheritDoc } 
+//         */
+//        @Override
+//        public E next() {
+//            checkForComodification();
+//            
+//            if (!hasNext()) {
+//                throw new NoSuchElementException();
+//            }
+//            
+//            lastReturnedNode = nextNode;
+//            nextNode = nextNode.next;
+//            
+//            if (fingerNodeIndex < ++nextIndex - 1) {
+//                fingerNodeIndex = fingerList.getFinger(++fingerIndex).index;
+//            }
+//            
+//            return lastReturnedNode.item;
+//        }
+//
+//        /**
+//         * {@inheritDoc } 
+//         */
+//        @Override
+//        public void remove() {
+//            if (lastReturnedNode == null) {
+//                throw new IllegalStateException();
+//            }
+//            
+//            checkForComodification();
+//            
+//            int fingerListSizeBeforeRemoval = getRecommendedNumberOfFingers();
+//            int fingerListSizeAfterRemoval  = 
+//                    getRecommendedNumberOfFingers(size() - 1);
+//            
+//            if (fingerListSizeBeforeRemoval == fingerListSizeAfterRemoval) {
+//                // Once here, no finger removal is needed.
+//                ++numberOfRemovedElements;
+//                removeImplCaseA();
+//            } else {
+//                removeImplCaseB();
+//                ++numberOfRemovedElements;
+//            }
+//            
+//            unlink(lastReturnedNode);
+//            decreaseSize();
+//            
+//            lastReturnedNode = null;
+//            --nextIndex;
+//            ++expectedModCount; 
+//        }
+//
+//        /**
+//         * {@inheritDoc } 
+//         */
+//        @Override
+//        public void forEachRemaining(Consumer<? super E> action) {
+//        
+//        }
+//        
+//        /**
+//         * Makes sure that the list was not modified outside of the iterator API
+//         * while iterating.
+//         */
+//        void checkForComodification() {
+//            if (modCount != expectedModCount) {
+//                throw new ConcurrentModificationException();
+//            }   
+//        }
+//        
+//        /**
+//         * Removes an item such that the number of fingers remains intact.
+//         */
+//        private void removeImplCaseA() {
+//            int elementIndex = nextIndex - 1;
+//            
+////            System.out.println("<<-------------------------");
+////            System.out.println("fingerIndex: " + fingerIndex);
+////            System.out.println("fingerNodeIndex: " + fingerNodeIndex);
+////            System.out.println("nextIndex: " + nextIndex);
+////            System.out.println("numberOfRemovedFingers: " + numberOfRemovedFingers);
+////            System.out.println("numberOfRemovedElements: " + numberOfRemovedElements);
+////            System.out.println("------------------------->>");
+//        
+//            if (elementIndex < fingerNodeIndex - numberOfRemovedElements) {
+//                fingerList.shiftFingerIndicesToLeftOnceAll(
+//                        Math.max(0, numberOfRemovedElements - fingerIndex));
+//            } else {
+//                // Here, fingerNodeIndex == elementIndex!
+//                // This means we need to move the finger pointing to
+//                // elementIndex'th element.
+//                int fingerPrefixLength = fingerIndex;
+//                int fingerSuffixLength = fingerList.size() 
+//                                       - fingerPrefixLength 
+//                                       - 1;
+//                
+//                int listPrefixFreeSpots = elementIndex;
+//                int listSuffixFreeSpots = size - (elementIndex + 1);
+//
+//                int freeFingerPrefixSpots = listPrefixFreeSpots
+//                                          - fingerPrefixLength;
+//
+//                int freeFingerSuffixSpots = listSuffixFreeSpots
+//                                          - fingerSuffixLength;
+//
+//                if (freeFingerPrefixSpots == 0) {
+////                    System.out.println("freeFingerPrefixSpots == 0");
+//                    
+//                    fingerList.makeRoomAtSuffix(elementIndex + 1, 
+//                                                fingerIndex, 
+//                                                fingerSuffixLength, 
+//                                                1);
+//                    
+//                    fingerList.pushCoveredFingersToSuffix(elementIndex + 1, 
+//                                                          fingerSuffixLength, 
+//                                                          1);
+//                    
+//                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex);
+//                    
+//                } else if (freeFingerSuffixSpots == 0) {
+////                    System.out.println("freeFingerSuffixSpots == 0");
+//                    
+//                    fingerList.makeRoomAtPrefix(elementIndex,
+//                                                fingerPrefixLength,
+//                                                1);
+//                    
+//                    fingerList.pushCoveredFingersToPrefix(
+//                            elementIndex, 
+//                            fingerPrefixLength, 
+//                            1);
+//                    
+//                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);   
+//                } else if (freeFingerPrefixSpots > freeFingerSuffixSpots) {
+////                    System.out.println("freeFingerPrefixSpots > freeFingerSuffixSpots");
+//                    
+//                    fingerList.makeRoomAtPrefix(elementIndex, 
+//                                                fingerPrefixLength, 
+//                                                1);
+//
+//                    fingerList.pushCoveredFingersToPrefix(elementIndex, 
+//                                                          fingerPrefixLength, 
+//                                                          1);
+//                    
+//                    fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
+//                } else {
+////                    System.out.println("freeFingerPrefixSpots < freeFingerSuffixSpots");
+//                    
+//                    fingerList.makeRoomAtSuffix(
+//                            elementIndex + 1,
+//                            fingerIndex - numberOfRemovedFingers, 
+//                            fingerSuffixLength //+ fingerIndex
+//                                              ,// + numberOfRemovedFingers, 
+//                            1);
+//                    
+//                    fingerList.pushCoveredFingersToSuffix(
+//                            elementIndex + 1,
+//                            fingerSuffixLength// + fingerIndex
+//                                              + numberOfRemovedFingers, 
+//                            1);
+//                    
+//                    fingerList.shiftFingerIndicesToLeftOnceAll(
+//                            Math.max(0, fingerIndex - 1));
+//                }
+//                
+//                fingerNodeIndex = fingerList.getFinger(fingerIndex + 1).index;
+//            }
+//        }
+//        
+//        private void removeImplCaseB() {
+//            if (size == 1) {
+//                fingerList.fingerArray[1] = null;
+//                fingerList.fingerArray[0].node = null;
+//                fingerList.size = 0;
+//            } else if (size == 2) {
+//                fingerList.fingerArray[2] = null;
+//                int elementIndex = nextIndex - 1;
+//
+//                if (elementIndex == 0) {
+//                    fingerList.fingerArray[0].node = head.next;
+//                }
+//
+//                fingerList.fingerArray[1].node = null;
+//                fingerList.size = 1;
+//            } else {
+//                removeByIndexCaseA(fingerIndex - numberOfRemovedFingers
+//                                               - numberOfRemovedElements);
+//            }
+//            
+//            ++numberOfRemovedFingers;
+//        }
+//    }
 //    
 //    /**
 //     * This class implements a basic iterator over this list.

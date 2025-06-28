@@ -16,7 +16,6 @@
  */
 package com.github.coderodde.util;
 
-import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +32,7 @@ public class FingerListTest {
         fl.clear();
     }
     
-    @Test
+        @Test
     public void fingerToString() {
         Finger<Integer> f = new Finger<>(new Node<>(13), 2);
         assertEquals("[Finger; index = 2, item = 13]", f.toString());
@@ -41,14 +40,14 @@ public class FingerListTest {
         assertEquals("[Finger; index = 3, item = null]", f.toString());
     }
     
-//    @Test
+        @Test
     public void fingerListString() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 1));
         assertEquals("[FingerList, size = 2]", fl.toString());
     }
 
-    @Test
+        @Test
     public void appendGetFinger() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
@@ -86,7 +85,7 @@ public class FingerListTest {
         assertEquals(Integer.valueOf(6), finger.node.item);
     }
     
-//    @Test
+        @Test
     public void insertFingerAtFront() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
@@ -103,7 +102,7 @@ public class FingerListTest {
         assertEquals(5, fl.size());
     }
     
-//    @Test
+        @Test
     public void insertFingerAtTail() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
@@ -123,7 +122,7 @@ public class FingerListTest {
         assertEquals(4, fl.size());
     }
     
-//    @Test
+    @Test
     public void insertFingerInBetween1() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
@@ -136,7 +135,7 @@ public class FingerListTest {
         assertEquals(insertionFinger, fl.getFinger(1));
     }
     
-//    @Test
+    @Test
     public void insertFingerInBetween2() {
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
         fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
@@ -149,7 +148,7 @@ public class FingerListTest {
         assertEquals(insertionFinger, fl.getFinger(1));
     }
     
-//    @Test
+    @Test
     public void makeRoomAtPrefix1Old() {
         for (int i = 0; i < 10; i++) {
             list.add(i);
@@ -170,7 +169,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix1Oldl passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix1() {
         
         loadList(10);
@@ -186,7 +185,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix1 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix2() {
         
         loadList(10);
@@ -202,7 +201,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix2 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix3() {
         
         loadList(10);
@@ -218,7 +217,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix3 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix4() {
         
         loadList(10);
@@ -234,7 +233,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix4 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix5() {
         
         loadList(10);
@@ -250,7 +249,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix5 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtPrefix6() {
         
         loadList(101);
@@ -271,7 +270,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtPrefix6 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtSuffix1() {
         loadList(10);
         
@@ -286,7 +285,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtSuffix1 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtSuffix2() {
         loadList(10);
         
@@ -301,7 +300,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtSuffix2 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtSuffix3() {
         loadList(10);
         
@@ -316,7 +315,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtSuffix3 passed!");
     }
     
-    @Test
+        @Test
     public void makeRoomAtSuffix4() {
         loadList(10);
         
@@ -331,7 +330,7 @@ public class FingerListTest {
         System.out.println("makeRoomAtSuffix4 passed!");
     }
     
-    @Test
+        @Test
     public void arrangePrefix1() {
         loadList(10);
         
@@ -346,7 +345,7 @@ public class FingerListTest {
         System.out.println("arrangePrefix1 passed!");
     }
     
-    @Test
+        @Test
     public void arrangePrefix2() {
         loadList(10);
         
@@ -361,7 +360,7 @@ public class FingerListTest {
         System.out.println("arrangePrefix2 passed!");
     }
     
-    @Test
+        @Test
     public void arrangePrefix3() {
         
         loadList(101);
@@ -382,7 +381,7 @@ public class FingerListTest {
         System.out.println("arrangePrefix3 passed!");
     }
     
-    @Test
+        @Test
     public void pushCoveredFingersToSuffix1() {
         
         loadList(10);
@@ -398,7 +397,7 @@ public class FingerListTest {
         System.out.println("pushCoveredFingersToSuffix1 passed!");
     }
     
-    @Test
+        @Test
     public void pushCoveredFingersToSuffix2() {
        
         loadList(10);
@@ -414,7 +413,7 @@ public class FingerListTest {
         System.out.println("pushCoveredFingersToSuffix2 passed!");
     }
     
-    @Test
+        @Test
     public void arrange1() {
         loadList(100);
         
@@ -432,7 +431,7 @@ public class FingerListTest {
         System.out.println("arrange1 passed!");
     }
     
-    @Test
+        @Test
     public void removeFingersOnDeleteRange1() {
         loadList(100);
         
@@ -454,7 +453,7 @@ public class FingerListTest {
         System.out.println("removeFingersOnDeleteRange1 passed!");
     }
     
-    @Test
+        @Test
     public void equals() {
         IndexedLinkedList<Integer> list1 = new IndexedLinkedList<>();
         IndexedLinkedList<Integer> list2 = new IndexedLinkedList<>();
