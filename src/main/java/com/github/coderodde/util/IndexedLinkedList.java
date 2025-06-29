@@ -449,6 +449,63 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Distributes the fingers over the element list
+     * {@code [fromIndex, toIndex)}.
+     * 
+     * @param fromIndex the leftmost element index in the range over which to 
+     *                  distribute the fingers.
+     * @param toIndex   the one past the rightmost element index in the range 
+     *                  over which to distribute the fingers.
+     */
+    public void distributeFingers(int fromIndex, int toIndex) {
+        checkFromTo(fromIndex, toIndex);
+        
+        int rangeLength = toIndex - fromIndex;
+        
+        if (rangeLength == 0) {
+            return;
+        }
+        
+        int fingerPrefixLength = fingerList.getFingerIndexImpl(fromIndex);
+        int fingerSuffixLength = fingerList.size() 
+                               - fingerList.getFingerIndexImpl(toIndex);
+        
+        int numberOfRangeFingers = fingerList.size()
+                                 - fingerPrefixLength 
+                                 - fingerSuffixLength;
+        
+        if (numberOfRangeFingers == 0) {
+            return;
+        }
+        
+        int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
+        int index = fromIndex;
+        
+        Node<E> node = node(fromIndex);
+        
+        for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
+            Finger<E> finger = fingerList.getFinger(i + fingerPrefixLength);
+            finger.node = node;
+            finger.index = index;
+            
+            for (int j = 0; j < numberOfElementsPerFinger; ++j) {
+                node = node.next;
+            }
+            
+            index += numberOfElementsPerFinger;
+        }
+        
+        // Since we cannot advance node to the right, we need to deal with the
+        // last (non-sentinel) finger manually:
+        Finger<E> lastFinger =
+                fingerList.getFinger(
+                        numberOfRangeFingers - 1 + fingerPrefixLength);
+        
+        lastFinger.node  = node;
+        lastFinger.index = index;
+    }    
+    
+    /**
      * Returns the first element of this list. Runs in constant time.
      * 
      * @return the first element of this list.
@@ -837,30 +894,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E remove() {
         return removeFirst();
     }
-
-    /**
-     * Removes the leftmost occurrence of {@code o} in this list. Runs in worst-
-     * case \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for iterating 
-     * the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the fingers.
-     * 
-     * @param o the object to remove.
-     * 
-     * @return {@code true} only if {@code o} was located in this list and, 
-     *         thus, removed.
-     */
-    @Override
-    public boolean remove(Object o) {
-        int index = 0;
-
-        for (Node<E> x = head; x != null; x = x.next, index++) {
-            if (Objects.equals(o, x.item)) {
-                removeObjectImpl(x, index);
-                return true;
-            }
-        }
-
-        return false;
-    }
     
     /**
      * Removes the element residing at the given index. Runs in worst-case
@@ -874,7 +907,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E remove(int index) {
         checkElementIndex(index);
         
-        int closestFingerIndex = fingerList.getClosestFingerIndex(index);
+        int closestFingerIndex  = fingerList.getClosestFingerIndex(index);
         Finger<E> closestFinger = fingerList.getFinger(closestFingerIndex);
         
         E returnValue;
@@ -910,6 +943,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
 
         return returnValue;
+    }
+
+    /**
+     * Removes the leftmost occurrence of {@code o} in this list. Runs in worst-
+     * case \(\mathcal{O}(n + \sqrt{n})\) time. \(\mathcal{O}(n)\) for iterating 
+     * the list and \(\mathcal{O}(\sqrt{n})\) time for fixing the fingers.
+     * 
+     * @param o the object to remove.
+     * 
+     * @return {@code true} only if {@code o} was located in this list and, 
+     *         thus, removed.
+     */
+    @Override
+    public boolean remove(Object o) {
+        int index = 0;
+
+        for (Node<E> x = head; x != null; x = x.next, index++) {
+            if (Objects.equals(o, x.item)) {
+                removeObjectImpl(x, index);
+                return true;
+            }
+        }
+
+        return false;
     }
     
     /**
@@ -1623,63 +1680,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         size--;
         modCount++;
     }   
-    
-    /**
-     * Distributes the fingers over the element list
-     * {@code [fromIndex, toIndex)}.
-     * 
-     * @param fromIndex the leftmost element index in the range over which to 
-     *                  distribute the fingers.
-     * @param toIndex   the one past the rightmost element index in the range 
-     *                  over which to distribute the fingers.
-     */
-    public void distributeFingers(int fromIndex, int toIndex) {
-        checkFromTo(fromIndex, toIndex);
-        
-        int rangeLength = toIndex - fromIndex;
-        
-        if (rangeLength == 0) {
-            return;
-        }
-        
-        int fingerPrefixLength = fingerList.getFingerIndexImpl(fromIndex);
-        int fingerSuffixLength = fingerList.size() 
-                               - fingerList.getFingerIndexImpl(toIndex);
-        
-        int numberOfRangeFingers = fingerList.size()
-                                 - fingerPrefixLength 
-                                 - fingerSuffixLength;
-        
-        if (numberOfRangeFingers == 0) {
-            return;
-        }
-        
-        int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
-        int index = fromIndex;
-        
-        Node<E> node = node(fromIndex);
-        
-        for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
-            Finger<E> finger = fingerList.getFinger(i + fingerPrefixLength);
-            finger.node = node;
-            finger.index = index;
-            
-            for (int j = 0; j < numberOfElementsPerFinger; ++j) {
-                node = node.next;
-            }
-            
-            index += numberOfElementsPerFinger;
-        }
-        
-        // Since we cannot advance node to the right, we need to deal with the
-        // last (non-sentinel) finger manually:
-        Finger<E> lastFinger =
-                fingerList.getFinger(
-                        numberOfRangeFingers - 1 + fingerPrefixLength);
-        
-        lastFinger.node  = node;
-        lastFinger.index = index;
-    }
     
     /**
      * Distributes evenly all the fingers over this list.
@@ -2421,6 +2421,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param fingerIndex the index of {@code finger}.
      */
     void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
+        
         if (fingerList.size() == size()) {
             // Here, fingerList.size() is 1 or 2 and the size of the list is the
             // same:

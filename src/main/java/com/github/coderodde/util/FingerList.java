@@ -908,6 +908,10 @@ final class FingerList<E> {
                     removalRangeLength);
         }
         
+//        shiftFingerIndicesToLeft(
+//                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
+//                removalRangeLength);
+        
         this.list.size -= removalRangeLength;
     }
 

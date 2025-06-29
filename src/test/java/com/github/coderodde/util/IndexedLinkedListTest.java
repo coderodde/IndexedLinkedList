@@ -2278,7 +2278,9 @@ public class IndexedLinkedListTest {
     
     @Test
     public void distributeFingers() {
+        list.addAll(getIntegerList(10));
         list.distributeFingers(2, 2);
+        list.checkInvarant();
     }
     
     @Test(expected = NoSuchElementException.class)
