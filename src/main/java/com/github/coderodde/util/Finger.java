@@ -99,7 +99,7 @@ final class Finger<E> {
      */
     @Override
     public String toString() {
-        return "[Finger; index = " + index
+        return "[index = " + index
                 + ", item = " + ((node == null) ? "null" : node.item)
                 + "]";
     }

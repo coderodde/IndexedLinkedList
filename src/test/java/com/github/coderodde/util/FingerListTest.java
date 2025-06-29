@@ -16,6 +16,7 @@
  */
 package com.github.coderodde.util;
 
+import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,9 +36,21 @@ public class FingerListTest {
     @Test
     public void fingerToString() {
         Finger<Integer> f = new Finger<>(new Node<>(13), 2);
-        assertEquals("[Finger; index = 2, item = 13]", f.toString());
+        assertEquals("[index = 2, item = 13]", f.toString());
+        
         f = new Finger<>(new Node<>(null), 3);
-        assertEquals("[Finger; index = 3, item = null]", f.toString());
+        assertEquals("[index = 3, item = null]", f.toString());
+    }
+    
+    @Test
+    public void toStringImpl() {
+        list.addAll(Arrays.asList(9, 10));
+        
+        assertEquals("[FingerList (size = 3) | " + 
+                     "[index = 0, item = 9], "   +  
+                     "[index = 1, item = 10], "  +
+                     "[index = 2, item = null]]", 
+                     list.fingerList.toString());
     }
 
     @Test

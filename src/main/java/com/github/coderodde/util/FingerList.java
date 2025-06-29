@@ -103,10 +103,15 @@ final class FingerList<E> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("[");
+        StringBuilder sb = 
+                new StringBuilder()
+                        .append("[FingerList (size = ")
+                        .append(size + 1)
+                        .append(") | ");
+        
         boolean first = true;
 
-        for (int i = 0; i != size; i++) {
+        for (int i = 0; i != size + 1; i++) {
             if (first) {
                 first = false;
             } else {
