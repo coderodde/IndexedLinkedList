@@ -18,6 +18,7 @@ package com.github.coderodde.util;
 
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
+import static com.github.coderodde.util.IndexedLinkedList.checkIndex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -136,6 +138,13 @@ public class IndexedLinkedListTest {
     }
     
     @Test(expected = IllegalStateException.class)
+    public void onWrongFingerListSize() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.size = 5;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
     public void onJunkFingers() {
         list.addAll(getIntegerList(16));
         list.fingerList.fingerArray[6] = new Finger<>(new Node<>(666), -13);
@@ -149,6 +158,41 @@ public class IndexedLinkedListTest {
                 Arrays.copyOf(list.fingerList.fingerArray, 100);
         
         list.checkInvarant();
+    }
+    
+    @Test
+    public void getEntropy() {
+        list.addAll(getIntegerList(25));
+        list.fingerList.setFingerIndices(0, 5, 10, 15, 20);
+        assertEquals(1.0, list.getEntropy(), 0.001);
+    }
+    
+    @Test
+    public void randomizeFingers() {
+        list.addAll(getIntegerList(10));
+        list.randomizeFingers();
+        list.randomizeFingers(new Random(3L));
+        list.randomizeFingers(4L);
+    }
+    
+    @Test
+    public void strongEquals() {
+        list.addAll(getIntegerList(10));
+        IndexedLinkedList<Integer> other = new IndexedLinkedList<>();
+        
+        for (int i = 0; i < list.size(); ++i) {
+            assertNotEquals(other, list);
+            assertFalse(list.strongEquals(other));
+            other.add(i);
+        }
+        
+        assertEquals(other, list);
+        assertFalse(list.strongEquals(other));
+        
+        list .fingerList.setFingerIndices(2, 4, 7, 8);
+        other.fingerList.setFingerIndices(2, 4, 7, 8);
+        
+        assertTrue(list.strongEquals(other));
     }
     
     @Test
@@ -2466,6 +2510,42 @@ public class IndexedLinkedListTest {
         new IndexedLinkedList<>().iterator().forEachRemaining((a) -> {});
     }
     
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkFromToOnNegativeFromIndex() {
+        list.checkFromTo(-1, 2);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkFromToOnTooLargeToIndex() {
+        list.add(1);
+        list.add(3);
+        
+        list.checkFromTo(0, 3);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void checkFromToOnBackwardIndices() {
+        list.add(1);
+        list.add(3);
+        
+        list.checkFromTo(2, 1);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void checkIndexOnNegativeSize() {
+        checkIndex(0, -1);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkIndexOnNegativeIndex() {
+        checkIndex(-1, 1);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkIndexOnTooLargeIndex() {
+        checkIndex(2, 2);
+    }
+    
     @Test
     public void peekFirst() {
         assertNull(list.peek());
@@ -2482,7 +2562,7 @@ public class IndexedLinkedListTest {
         
         assertEquals(Integer.valueOf(1), list.peekFirst());
     
-        list.addFirst(Integer.valueOf(-1));
+        list.addFirst(-1);
 
         assertEquals(Integer.valueOf(-1), list.peekFirst());
     }

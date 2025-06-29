@@ -376,14 +376,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             + tentativeSize);
         }
         
-        if (fingerList.size() != fingerCount) {
-            throw new IllegalStateException(
-                    "Number of fingers mismatch: fingerList.size() = " 
-                            + fingerList.size() 
-                            + ", fingerCount = " 
-                            + fingerCount);
-        }
-        
         for (int i = fingerList.size() + 1;
                  i < fingerList.fingerArray.length;  
                  i++) {
@@ -1395,6 +1387,56 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Validates the range indices.
+     * 
+     * @param fromIndex the starting, inclusive index of the range.
+     * @param toIndex   the ending, exclusive index of the range.
+     */
+    void checkFromTo(int fromIndex, int toIndex) {
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException(
+                    String.format("fromIndex(%d) < 0", fromIndex));
+        }
+        
+        if (toIndex > size) {
+            throw new IndexOutOfBoundsException(
+                    String.format("toIndex(%d) > size(%d)", toIndex, size));
+        }
+        
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "fromIndex(%d) > toIndex(%d)",
+                            fromIndex, 
+                            toIndex));
+        }
+    }
+        
+    /**
+     * Checks that the input index is within correct bounds.
+     * 
+     * @param index the index to check.
+     * @param size  the size of the list.
+     */
+    static void checkIndex(int index, int size) {
+        
+        if (size < 0) {
+            throw new IllegalArgumentException(
+                    String.format("size(%d) < 0", size));
+        }
+        
+        if (index < 0) {
+            throw new IndexOutOfBoundsException(
+                    String.format("index(%d) < 0", index));
+        }
+        
+        if (index >= size) {
+            throw new IndexOutOfBoundsException(
+                    String.format("index(%d) >= size(%d)", index, size));
+        }
+    }
+    
+    /**
      * Returns the number of fingers in the finger list. Does not count the 
      * end-of-finger-list sentinel finger. Used in unit tests.
      * 
@@ -1487,25 +1529,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 return;
             }
             
-            // Once here, 'fingerList.size() == 2'!
-            switch (fingerIndex) {
-                case 0:
-                    // Shift 2nd and the sentinal fingers one position to the
-                    // left:
-                    fingerList.setFinger(0, fingerList.getFinger(1));
-                    fingerList.getFinger(0).index = 0;
-                    fingerList.setFinger(1, fingerList.getFinger(2));
-                    fingerList.getFinger(1).index = 1;
-                    fingerList.setFinger(2, null);
-                    fingerList.size = 1;
-                    break;
-                    
-                case 1:
-                    // Just remove the (last) finger:
-                    fingerList.removeFinger();
-                    fingerList.getFinger(1).index = 1;
-                    break;
-            }
+            if (fingerIndex == 0) {
+                // Shift 2nd and the sentinal fingers one position to the
+                // left:
+                fingerList.setFinger(0, fingerList.getFinger(1));
+                fingerList.getFinger(0).index = 0;
+                fingerList.setFinger(1, fingerList.getFinger(2));
+                fingerList.getFinger(1).index = 1;
+                fingerList.setFinger(2, null);
+                fingerList.size = 1;
+            } else {
+                // Here, fingerIndex == 1:
+                // Just remove the (last) finger:
+                fingerList.removeFinger();
+                fingerList.getFinger(1).index = 1;
+            }   
             
             return;
         }
@@ -1766,56 +1804,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void checkElementIndex(int index) {
         if (!isElementIndex(index)) {
             throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
-        }
-    }
-    
-    /**
-     * Validates the range indices.
-     * 
-     * @param fromIndex the starting, inclusive index of the range.
-     * @param toIndex   the ending, exclusive index of the range.
-     */
-    private void checkFromTo(int fromIndex, int toIndex) {
-        if (fromIndex < 0) {
-            throw new IndexOutOfBoundsException(
-                    String.format("fromIndex(%d) < 0", fromIndex));
-        }
-        
-        if (toIndex > size) {
-            throw new IndexOutOfBoundsException(
-                    String.format("toIndex(%d) > size(%d)", toIndex, size));
-        }
-        
-        if (fromIndex > toIndex) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "fromIndex(%d) > toIndex(%d)",
-                            fromIndex, 
-                            toIndex));
-        }
-    }
-    
-    /**
-     * Checks that the input index is within correct bounds.
-     * 
-     * @param index the index to check.
-     * @param size  the size of the list.
-     */
-    private static void checkIndex(int index, int size) {
-        
-        if (size < 0) {
-            throw new IllegalArgumentException(
-                    String.format("size(%d) < 0", size));
-        }
-        
-        if (index < 0) {
-            throw new IndexOutOfBoundsException(
-                    String.format("index(%d) < 0", index));
-        }
-        
-        if (index >= size) {
-            throw new IndexOutOfBoundsException(
-                    String.format("index(%d) >= size(%d)", index, size));
         }
     }
     
