@@ -1,4 +1,4 @@
-/*
+    /*
  * The MIT License
  *
  * Copyright 2024 rodio.
@@ -26,7 +26,7 @@ package com.github.coderodde.util;
 import java.util.Objects;
 
 /**
- * This static inner class implements the actual linked list node.
+ * This class implements the actual linked list node.
  *
  * @param <E> the type of the satellite data.
  */
@@ -80,7 +80,7 @@ final class Node<E> {
             return false;
         }
         
-        final Node<E> other = (Node<E>) o;
+        Node<E> other = (Node<E>) o;
         return Objects.equals(this.item, other.item);
     }
 
@@ -91,6 +91,6 @@ final class Node<E> {
      */
     @Override
     public String toString() {
-        return "[Node; item = " + item + "]";
+        return String.format("<item = %s>", Objects.toString(item));
     }
 }

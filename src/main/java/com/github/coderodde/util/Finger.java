@@ -26,7 +26,16 @@ package com.github.coderodde.util;
 import java.util.Objects;
 
 /**
- * This static inner class implements the actual finger.
+ * This class implements the actual finger. Each finger consists of two fields:
+ * <ul>
+ * <li>
+ * <code>node</code> which points to the node in the internal linked list, and
+ * </li>
+ * <li>
+ * <code>index</code> which is the appearance index of <code>node</code> in the
+ * linked list.
+ * </li>
+ * </ul>
  *
  * @param <E> the type of the list's satellite data.
  */
@@ -72,6 +81,9 @@ final class Finger<E> {
         return index;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -99,34 +111,9 @@ final class Finger<E> {
      */
     @Override
     public String toString() {
-        return "[index = " + index
-                + ", item = " + ((node == null) ? "null" : node.item)
-                + "]";
-    }
-
-    /**
-     * Moves this finger {@code steps} position to the left.
-     *
-     * @param steps the number of steps to rewind.
-     */
-    void rewindLeft(int steps) {
-        for (int i = 0; i < steps; i++) {
-            node = node.prev;
-        }
-
-        index -= steps;
-    }
-
-    /**
-     * Moves this finger {@code steps} position to the right.
-     *
-     * @param steps the number of steps to rewind.
-     */
-    void rewindRight(int steps) {
-        for (int i = 0; i < steps; i++) {
-            node = node.next;
-        }
-
-        index += steps;
+        return String.format(
+                "[index = %d, item = %s]",
+                index, 
+                node == null ? "null" : Objects.toString(node.item));
     }
 }

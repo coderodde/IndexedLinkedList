@@ -521,7 +521,7 @@ public class IndexedLinkedListTest {
     @Test
     public void nodeToString() {
         Node<Integer> node = new Node<>(12);
-        assertEquals("[Node; item = 12]", node.toString());
+        assertEquals("<item = 12>", node.toString());
     }
     
     @Test 
