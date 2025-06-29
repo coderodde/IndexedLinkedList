@@ -267,6 +267,25 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Runs always in linear time.
      */
     public void checkInvarant() {
+        if (fingerList.size() == 0) {
+            if (this.isEmpty()) {
+                throw new IllegalStateException(
+                        "fingerList.size() === "
+                                + fingerList.size()
+                                + ", this.size() == " 
+                                + this.size()
+                                + " != 0");
+            }
+            
+            if (head != null) {
+                throw new IllegalStateException("head != null");
+            }
+            
+            if (tail != null) {
+                throw new IllegalStateException("tail != null");
+            }
+        }
+        
         if (fingerList.getFinger(0).index < 0) {
             throw new IllegalStateException(
                     "First finger index is negative: "
@@ -1263,7 +1282,65 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         return stringBuilder.append("]").toString();
     }
+    
+    /**
+     * Implements the batch remove. If {@code complement} is {@code true}, this 
+     * operation removes all the elements appearing in {@code c}. Otherwise, it 
+     * will retain all the elements present in {@code c}.
+     * 
+     * @param c          the target collection to operate on.
+     * @param complement the operation choice flag.
+     * @param from       the starting, inclusive index of the range to consider.
+     * @param end        the ending, exclusive index of the range to consider.
+     * 
+     * @return {@code true} if and only if the list was modified.
+     */
+    boolean batchRemove(Collection<?> c,
+                        boolean complement,
+                        int from,  
+                        int end) {
+        Objects.requireNonNull(c);
+        
+        if (c.isEmpty()) {
+            return false;
+        }
+        
+        boolean modified = false;
+        
+        int numberOfNodesToIterate = end - from;
+        int i = 0;
+        int nodeIndex = from;
+        
+        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
+            Node<E> nextNode = node.next;
+            
+            if (c.contains(node.item) == complement) {
+                modified = true;
+                removeObjectImpl(node, nodeIndex);
+            } else {
+                nodeIndex++;
+            }
+            
+            node = nextNode;
+        }
+        
+        return modified;
+    }
 
+    /**
+     * Checks that the input {@code expectedModCount} equals the list's 
+     * internal, cached modification count.
+     * 
+     * @param expectedModCount the modification count to check.
+     * @throws ConcurrentModificationException if the cached and the input 
+     *                                         modification counts differ.
+     */
+    void checkForComodification(int expectedModCount) {
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+    }
+    
     /**
      * Returns the number of fingers in the finger list. Does not count the 
      * end-of-finger-list sentinel finger. Used in unit tests.
@@ -1275,16 +1352,174 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Computes the recommended number of fingers for {@code size} elements. 
-     * Equals \(\Bigg\lceil \sqrt{N} \Bigg\rceil\), where \(N = \) {@code size}.
+     * Accesses the {@code index}th node sequentially without relying on 
+     * fingers. Used in {@link #randomizeFingers()}.
      * 
-     * @param size the size for which we want to compute the recommended number
-     *             of fingers.
+     * @param index the index of the desired node.
      * 
-     * @return the recommended number of fingers.
+     * @return the {@code index}th node.
      */
-    private static int getRecommendedNumberOfFingers(int size) {
-        return (int) Math.ceil(Math.sqrt(size));
+    Node<E> getNodeSequentially(int index) {
+        Node<E> node = head;
+        
+        for (int i = 0; i < index; i++) {
+            node = node.next;
+        }
+        
+        return node;
+    }
+    
+    /**
+     * Loads the two counters representing how much fingers we should push to 
+     * left and how much fingers to push to right.
+     * 
+     * @param fromFingerIndex the lower finger index.
+     * @param toFingerIndex   the upper, exclusive finger index.
+     * @param fromIndex       the starting, inclusive element index of the
+     *                        range.
+     * @param toIndex         the ending, exclusive element index of the range.
+     * @param fingersToRemove the number of fingers to remove.
+     */
+    void loadFingerCoverageCounters(int fromFingerIndex,
+                                    int toFingerIndex,
+                                    int fromIndex,
+                                    int toIndex,
+                                    int fingersToRemove) {
+        
+        int fingerPrefixLength = fromFingerIndex;
+        int fingerSuffixLength = fingerList.size() - toFingerIndex;
+
+        int listPrefixFreeSpots = fromIndex;
+        int listSuffixFreeSpots = size - toIndex;
+
+        int freeFingerPrefixSpots = listPrefixFreeSpots
+                                  - fingerPrefixLength;
+
+        int freeFingerSuffixSpots = listSuffixFreeSpots 
+                                  - fingerSuffixLength;
+
+        int freeSpots = freeFingerPrefixSpots
+                      + freeFingerSuffixSpots;
+
+        float leftRatio = (float)(freeFingerPrefixSpots) / 
+                          (float)(freeSpots);
+
+        int removalRangeLength = toFingerIndex 
+                               - fromFingerIndex;
+        
+        int remainingFingers = removalRangeLength
+                             - fingersToRemove;
+        
+        int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
+        int rightCoveredFingers = remainingFingers - leftCoveredFingers;
+
+        this.numberOfCoveringFingersToPrefix = leftCoveredFingers;
+        this.numberOfCoveringFingersToSuffix = rightCoveredFingers;
+    }
+    
+    /**
+     * Moves the {@code finger} out of the element with index 
+     * {@code finger.index}.
+     * 
+     * @param finger      the finger to move. 
+     * @param fingerIndex the index of {@code finger}.
+     */
+    void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
+        
+        if (fingerList.size() == size()) {
+            // Here, fingerList.size() is 1 or 2 and the size of the list is the
+            // same:
+            if (fingerList.size() == 1) {
+                // The only finger will be removed in 'remove(int)'. Return:
+                return;
+            }
+            
+            // Once here, 'fingerList.size() == 2'!
+            switch (fingerIndex) {
+                case 0:
+                    // Shift 2nd and the sentinal fingers one position to the
+                    // left:
+                    fingerList.setFinger(0, fingerList.getFinger(1));
+                    fingerList.getFinger(0).index = 0;
+                    fingerList.setFinger(1, fingerList.getFinger(2));
+                    fingerList.getFinger(1).index = 1;
+                    fingerList.setFinger(2, null);
+                    fingerList.size = 1;
+                    break;
+                    
+                case 1:
+                    // Just remove the (last) finger:
+                    fingerList.removeFinger();
+                    fingerList.getFinger(1).index = 1;
+                    break;
+            }
+            
+            return;
+        }
+        
+        // Try push the fingers to the right:
+        if (tryPushFingersToRight(fingerIndex)) {
+            return;
+        }
+        
+        // Could not push the fingers to the right. Try push to the left:
+        if (tryPushFingersToLeft(fingerIndex)) {
+            return;
+        }
+        
+        // Once here, the only free spots are at the very beginning of the
+        // finger list:
+        for (int i = 0; i <= fingerIndex; ++i) {
+            Finger<E> fngr = fingerList.getFinger(i);
+            fngr.index--;
+            fngr.node = fngr.node.prev;
+        }
+        
+        fingerList.shiftFingerIndicesToLeft(fingerIndex + 1, 1);
+    }
+    
+    /**
+     * Removes the list range {@code [fromIndex, ..., toIndex - 1]}.
+     * 
+     * @param fromIndex the staring, inclusive range index.
+     * @param toIndex   the ending, exclusive range index.
+     */
+    void removeRange(int fromIndex, int toIndex) {
+        int removalLength = toIndex - fromIndex;
+        
+        if (removalLength == 0) {
+            return;
+        }
+        
+        if (removalLength == 1) {
+            remove(fromIndex);
+            return;
+        }
+        
+        if (removalLength == size) {
+            clear();
+            return;
+        }
+        
+        int fromFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
+        int toFingerIndex   = fingerList.getFingerIndexImpl(toIndex);
+        int fingersToRemove = getRecommendedNumberOfFingers() 
+                            - getRecommendedNumberOfFingers(
+                                    size - removalLength);
+        
+        loadRemoveRangeEndNodes(fromIndex, 
+                                toIndex);
+        
+        removeRangeImpl(fromIndex, 
+                        toIndex,
+                        fromFingerIndex, 
+                        toFingerIndex, 
+                        fingersToRemove);
+
+        // Unlink the actual nodes:
+        unlinkNodeRange(this.removeRangeStartNode,
+                        this.removeRangeEndNode);
+        modCount++;
     }
     
     /**
@@ -1311,7 +1546,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     "fromIndex(" + fromIndex + ") > toIndex(" 
                             + toIndex + ")");
     }
-    
     /**
      * Adds the fingers for the range just appended.
      * 
@@ -1345,7 +1579,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                       fingerIndex,
                       numberOfNewFingers, 
                       distance);
-    }
+    }    
     
     /**
      * Adds fingers after inserting a collection in this list.
@@ -1467,6 +1701,205 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Checks the element index. In the case of non-empty list, valid indices 
+     * are {@code { 0, 1, ..., size - 1 }}.
+     * 
+     * @param index the index to validate.
+     * @throws IndexOutOfBoundsException if the {@code index} is not a valid 
+     *                                   list index.
+     */
+    private void checkElementIndex(int index) {
+        if (!isElementIndex(index)) {
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
+    }
+    
+    /**
+     * Validates the range indices.
+     * 
+     * @param fromIndex the starting, inclusive index of the range.
+     * @param toIndex   the ending, exclusive index of the range.
+     */
+    private void checkFromTo(int fromIndex, int toIndex) {
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException(
+                    String.format("fromIndex(%d) < 0", fromIndex));
+        }
+        
+        if (toIndex > size) {
+            throw new IndexOutOfBoundsException(
+                    String.format("toIndex(%d) > size(%d)", toIndex, size));
+        }
+        
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "fromIndex(%d) > toIndex(%d)",
+                            fromIndex, 
+                            toIndex));
+        }
+    }
+    
+    /**
+     * Checks that the input index is within correct bounds.
+     * 
+     * @param index the index to check.
+     * @param size  the size of the list.
+     */
+    private static void checkIndex(int index, int size) {
+        
+        if (size < 0) {
+            throw new IllegalArgumentException(
+                    String.format("size(%d) < 0", size));
+        }
+        
+        if (index < 0) {
+            throw new IndexOutOfBoundsException(
+                    String.format("index(%d) < 0", index));
+        }
+        
+        if (index >= size) {
+            throw new IndexOutOfBoundsException(
+                    String.format("index(%d) >= size(%d)", index, size));
+        }
+    }
+    
+    /**
+     * Checks that the input index is a valid position index for 
+     * {@link #add(int, java.lang.Object)} operation or iterator position. In 
+     * other words, checks that {@code index} is in the set 
+     * {@code {0, 1, ..., size}}.
+     * 
+     * @param index the index to validate.  
+     */
+    private void checkPositionIndex(int index) {
+        if (!isPositionIndex(index)) {
+            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
+        }
+    }
+    
+    /**
+     * Decreases the size counter and increments the modification count.
+     */
+    private void decreaseSize() {
+        size--;
+        modCount++;
+    }   
+    
+    /**
+     * Distributes evenly all the fingers over this list.
+     */
+    private void distributeAllFingers() {
+        distributeFingers(0, size);
+    }
+    
+    /**
+     * Checks that the list {@code other} matches {@code this[from ... to - 1]}.
+     * 
+     * @param other the target list to compare to.
+     * @param from  the starting, inclusive index of the range in this list.
+     * @param to    the ending, exclusive index of the range in this list.
+     * 
+     * @return {@code true} if and only if {@code other} equals 
+     *         {@code this[from ... to - 1]}.   
+     */
+    private boolean equalsRange(List<?> other, int from, int to) {
+        int rangeLength = to - from;
+        
+        if (rangeLength != other.size()) {
+            return false;
+        }
+        
+        Iterator<?> otherIterator = other.iterator();
+        
+        for (Node<E> node = nodeNoFingerFixing(from); 
+                from < to; 
+                from++, node = node.next) {
+            
+            if (!otherIterator.hasNext() || 
+                    !Objects.equals(node.item, otherIterator.next())) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Constructs an IndexOutOfBoundsException detail message.
+     * 
+     * @param index the target index.
+     * @return the detail message.
+     */
+    private String getOutOfBoundsMessage(int index) {
+        return "Index: " + index + ", Size: " + size;
+    }
+    
+    /**
+     * Computes the recommended number of fingers.
+     * 
+     * @return the recommended number of fingers. Equals 
+     * \(\Bigg\lceil\sqrt{N}\Bigg\rceil\), where \(N\) is {@code size}.
+     */
+    private int getRecommendedNumberOfFingers() {
+        return (int) Math.ceil(Math.sqrt(this.size));
+    }
+    
+    /**
+     * Computes the recommended number of fingers for {@code size} elements. 
+     * Equals \(\Bigg\lceil \sqrt{N} \Bigg\rceil\), where \(N = \) {@code size}.
+     * 
+     * @param size the size for which we want to compute the recommended number
+     *             of fingers.
+     * 
+     * @return the recommended number of fingers.
+     */
+    private static int getRecommendedNumberOfFingers(int size) {
+        return (int) Math.ceil(Math.sqrt(size));
+    }
+    
+    /**
+     * Increases the size of the list and its modification count.
+     */
+    private void increaseSize() {
+        ++size;
+        ++modCount;
+    }
+    
+    /**
+     * Returns the index of the leftmost occurrence of the object {@code o} in
+     * the range {@code this[start ... end - 1]}.   
+     * 
+     * @param o     the object to search. May be {@code null}.
+     * @param start the starting, inclusive index of the range to search.
+     * @param end   the ending, exclusive index of the range to search.
+     * @return the leftmost occurrence index.
+     */
+    private int indexOfRange(Object o, int start, int end) {
+        int index = start;
+        
+        if (o == null) {
+            for (Node<E> node = node(start);
+                    index < end; 
+                    index++, node = node.next) {
+                if (node.item == null) {
+                    return index;
+                }
+            }
+        } else {
+            for (Node<E> node = node(start);
+                    index < end;
+                    index++, node = node.next) {
+                if (o.equals(node.item)) {
+                    return index;
+                }
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
      * This class implements a basic iterator over this list.
      */
     public final class BasicIterator implements Iterator<E> {
@@ -1585,107 +2018,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 throw new ConcurrentModificationException();
             }
         }
-    }
-    
-    /**
-     * Implements the batch remove. If {@code complement} is {@code true}, this 
-     * operation removes all the elements appearing in {@code c}. Otherwise, it 
-     * will retain all the elements present in {@code c}.
-     * 
-     * @param c          the target collection to operate on.
-     * @param complement the operation choice flag.
-     * @param from       the starting, inclusive index of the range to consider.
-     * @param end        the ending, exclusive index of the range to consider.
-     * 
-     * @return {@code true} if and only if the list was modified.
-     */
-    boolean batchRemove(Collection<?> c,
-                        boolean complement,
-                        int from,  
-                        int end) {
-        Objects.requireNonNull(c);
-        
-        if (c.isEmpty()) {
-            return false;
-        }
-        
-        boolean modified = false;
-        
-        int numberOfNodesToIterate = end - from;
-        int i = 0;
-        int nodeIndex = from;
-        
-        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
-            Node<E> nextNode = node.next;
-            
-            if (c.contains(node.item) == complement) {
-                modified = true;
-                removeObjectImpl(node, nodeIndex);
-            } else {
-                nodeIndex++;
-            }
-            
-            node = nextNode;
-        }
-        
-        return modified;
-    }
-    
-    /**
-     * Checks the element index. In the case of non-empty list, valid indices 
-     * are {@code { 0, 1, ..., size - 1 }}.
-     * 
-     * @param index the index to validate.
-     * @throws IndexOutOfBoundsException if the {@code index} is not a valid 
-     *                                   list index.
-     */
-    private void checkElementIndex(int index) {
-        if (!isElementIndex(index)) {
-            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
-        }
-    }
-    
-    /**
-     * Checks that the input {@code expectedModCount} equals the list's 
-     * internal, cached modification count.
-     * 
-     * @param expectedModCount the modification count to check.
-     * @throws ConcurrentModificationException if the cached and the input 
-     *                                         modification counts differ.
-     */
-    void checkForComodification(int expectedModCount) {
-        if (modCount != expectedModCount) {
-            throw new ConcurrentModificationException();
-        }
-    }
-    
-    /**
-     * Checks that the input index is a valid position index for 
-     * {@link #add(int, java.lang.Object)} operation or iterator position. In 
-     * other words, checks that {@code index} is in the set 
-     * {@code {0, 1, ..., size}}.
-     * 
-     * @param index the index to validate.  
-     */
-    private void checkPositionIndex(int index) {
-        if (!isPositionIndex(index)) {
-            throw new IndexOutOfBoundsException(getOutOfBoundsMessage(index));
-        }
-    }
-    
-    /**
-     * Decreases the size counter and increments the modification count.
-     */
-    private void decreaseSize() {
-        size--;
-        modCount++;
-    }   
-    
-    /**
-     * Distributes evenly all the fingers over this list.
-     */
-    private void distributeAllFingers() {
-        distributeFingers(0, size);
     }
     
     /**
@@ -2049,142 +2381,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Checks that the list {@code other} matches {@code this[from ... to - 1]}.
-     * 
-     * @param other the target list to compare to.
-     * @param from  the starting, inclusive index of the range in this list.
-     * @param to    the ending, exclusive index of the range in this list.
-     * 
-     * @return {@code true} if and only if {@code other} equals 
-     *         {@code this[from ... to - 1]}.   
-     */
-    private boolean equalsRange(List<?> other, int from, int to) {
-        int rangeLength = to - from;
-        
-        if (rangeLength != other.size()) {
-            return false;
-        }
-        
-        Iterator<?> otherIterator = other.iterator();
-        
-        for (Node<E> node = nodeNoFingerFixing(from); 
-                from < to; 
-                from++, node = node.next) {
-            
-            if (!otherIterator.hasNext() || 
-                    !Objects.equals(node.item, otherIterator.next())) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
-    /**
-     * Constructs an IndexOutOfBoundsException detail message.
-     * 
-     * @param index the target index.
-     * @return the detail message.
-     */
-    private String getOutOfBoundsMessage(int index) {
-        return "Index: " + index + ", Size: " + size;
-    }
-
-    /**
-     * Computes the recommended number of fingers.
-     * 
-     * @return the recommended number of fingers. Equals 
-     * \(\Bigg\lceil\sqrt{N}\Bigg\rceil\), where \(N\) is {@code size}.
-     */
-    private int getRecommendedNumberOfFingers() {
-        return (int) Math.ceil(Math.sqrt(size));
-    }
-    
-    /**
-     * Accesses the {@code index}th node sequentially without relying on 
-     * fingers. Used in {@link #randomizeFingers()}.
-     * 
-     * @param index the index of the desired node.
-     * 
-     * @return the {@code index}th node.
-     */
-    Node<E> getNodeSequentially(int index) {
-        Node<E> node = head;
-        
-        for (int i = 0; i < index; i++) {
-            node = node.next;
-        }
-        
-        return node;
-    }
-    
-    /**
-     * Computes the hash code for the range {@code this[from, to - 1]} and 
-     * returns it.
-     * 
-     * @param from the starting, inclusive index.
-     * @param to   the ending, exclusive index.
-     * @return the hash value of the range.
-     */
-    private int hashCodeRange(int from, int to) {
-        int hashCode = 1;
-        
-        Node<E> node = node(from);
-        
-        while (from++ < to) {
-            // Same arithmetics as in ArrayList.
-            hashCode =
-                    31 * hashCode + 
-                    (node.item == null ? 0 : node.item.hashCode());
-            
-            node = node.next;
-        }
-        
-        return hashCode;
-    }
-    
-    /**
-     * Increases the size of the list and its modification count.
-     */
-    private void increaseSize() {
-        ++size;
-        ++modCount;
-    }
-    
-    /**
-     * Returns the index of the leftmost occurrence of the object {@code o} in
-     * the range {@code this[start ... end - 1]}.   
-     * 
-     * @param o     the object to search. May be {@code null}.
-     * @param start the starting, inclusive index of the range to search.
-     * @param end   the ending, exclusive index of the range to search.
-     * @return the leftmost occurrence index.
-     */
-    private int indexOfRange(Object o, int start, int end) {
-        int index = start;
-        
-        if (o == null) {
-            for (Node<E> node = node(start);
-                    index < end; 
-                    index++, node = node.next) {
-                if (node.item == null) {
-                    return index;
-                }
-            }
-        } else {
-            for (Node<E> node = node(start);
-                    index < end;
-                    index++, node = node.next) {
-                if (o.equals(node.item)) {
-                    return index;
-                }
-            }
-        }
-        
-        return -1;
-    }
-    
-    /**
      * Inserts the input collection right before the node {@code succ}.
      * 
      * @param c         the collection to insert.
@@ -2239,7 +2435,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @return {@code true} if and only if the index is valid.
      */
     private boolean isPositionIndex(int index) {
-        return index >= 0 && index <= size;
+        return 0 <= index && index <= size;
     }
     
     /**
@@ -2356,43 +2552,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
     
-    void loadFingerCoverageCounters(int fromFingerIndex,
-                                    int toFingerIndex,
-                                    int fromIndex,
-                                    int toIndex,
-                                    int fingersToRemove) {
-        
-        int fingerPrefixLength = fromFingerIndex;
-        int fingerSuffixLength = fingerList.size() - toFingerIndex;
-
-        int listPrefixFreeSpots = fromIndex;
-        int listSuffixFreeSpots = size - toIndex;
-
-        int freeFingerPrefixSpots = listPrefixFreeSpots
-                                  - fingerPrefixLength;
-
-        int freeFingerSuffixSpots = listSuffixFreeSpots 
-                                  - fingerSuffixLength;
-
-        int freeSpots = freeFingerPrefixSpots
-                      + freeFingerSuffixSpots;
-
-        float leftRatio = (float)(freeFingerPrefixSpots) / 
-                          (float)(freeSpots);
-
-        int removalRangeLength = toFingerIndex 
-                               - fromFingerIndex;
-        
-        int remainingFingers = removalRangeLength
-                             - fingersToRemove;
-        
-        int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
-        int rightCoveredFingers = remainingFingers - leftCoveredFingers;
-
-        this.numberOfCoveringFingersToPrefix = leftCoveredFingers;
-        this.numberOfCoveringFingersToSuffix = rightCoveredFingers;
-    }
-    
     /**
      * Loads the endpoint nodes for the range to remove.
      * 
@@ -2411,67 +2570,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         this.removeRangeStartNode = startNode;
         this.removeRangeEndNode   = endNode;
-    }
-    
-    /**
-     * Moves the {@code finger} out of the element with index 
-     * {@code finger.index}.
-     * 
-     * @param finger      the finger to move. 
-     * @param fingerIndex the index of {@code finger}.
-     */
-    void moveFingerOutOfRemovalLocation(Finger<E> finger, int fingerIndex) {
-        
-        if (fingerList.size() == size()) {
-            // Here, fingerList.size() is 1 or 2 and the size of the list is the
-            // same:
-            if (fingerList.size() == 1) {
-                // The only finger will be removed in 'remove(int)'. Return:
-                return;
-            }
-            
-            // Once here, 'fingerList.size() == 2'!
-            switch (fingerIndex) {
-                case 0:
-                    // Shift 2nd and the sentinal fingers one position to the
-                    // left:
-                    fingerList.setFinger(0, fingerList.getFinger(1));
-                    fingerList.getFinger(0).index = 0;
-                    fingerList.setFinger(1, fingerList.getFinger(2));
-                    fingerList.getFinger(1).index = 1;
-                    fingerList.setFinger(2, null);
-                    fingerList.size = 1;
-                    break;
-                    
-                case 1:
-                    // Just remove the (last) finger:
-                    fingerList.removeFinger();
-                    fingerList.getFinger(1).index = 1;
-                    break;
-            }
-            
-            return;
-        }
-        
-        // Try push the fingers to the right:
-        if (tryPushFingersToRight(fingerIndex)) {
-            return;
-        }
-        
-        // Could not push the fingers to the right. Try push to the left:
-        if (tryPushFingersToLeft(fingerIndex)) {
-            return;
-        }
-        
-        // Once here, the only free spots are at the very beginning of the
-        // finger list:
-        for (int i = 0; i <= fingerIndex; ++i) {
-            Finger<E> fngr = fingerList.getFinger(i);
-            fngr.index--;
-            fngr.node = fngr.node.prev;
-        }
-        
-        fingerList.shiftFingerIndicesToLeft(fingerIndex + 1, 1);
     }
     
     /**
@@ -2730,50 +2828,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (mustRemoveFinger()) {
             removeFinger();
         }
-    }
-    
-    /**
-     * Removes the list range {@code [fromIndex, ..., toIndex - 1]}.
-     * 
-     * @param fromIndex the staring, inclusive range index.
-     * @param toIndex   the ending, exclusive range index.
-     */
-    void removeRange(int fromIndex, int toIndex) {
-        int removalLength = toIndex - fromIndex;
-        
-        if (removalLength == 0) {
-            return;
-        }
-        
-        if (removalLength == 1) {
-            remove(fromIndex);
-            return;
-        }
-        
-        if (removalLength == size) {
-            clear();
-            return;
-        }
-        
-        int fromFingerIndex = fingerList.getFingerIndexImpl(fromIndex);
-        int toFingerIndex   = fingerList.getFingerIndexImpl(toIndex);
-        int fingersToRemove = getRecommendedNumberOfFingers() 
-                            - getRecommendedNumberOfFingers(
-                                    size - removalLength);
-        
-        loadRemoveRangeEndNodes(fromIndex, 
-                                toIndex);
-        
-        removeRangeImpl(fromIndex, 
-                        toIndex,
-                        fromFingerIndex, 
-                        toFingerIndex, 
-                        fingersToRemove);
-
-        // Unlink the actual nodes:
-        unlinkNodeRange(this.removeRangeStartNode,
-                        this.removeRangeEndNode);
-        modCount++;
     }
     
     /**
@@ -4095,44 +4149,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 subList.modCount = root.modCount;
                 subList = subList.parent;
             } while (subList != null);
-        }
-    }
-    
-    private static void checkIndex(int index, int size) {
-        
-        if (size < 0) {
-            throw new IllegalArgumentException(
-                    String.format("size(%d) < 0", size));
-        }
-        
-        if (index < 0) {
-            throw new IndexOutOfBoundsException(
-                    String.format("index(%d) < 0", index));
-        }
-        
-        if (index >= size) {
-            throw new IndexOutOfBoundsException(
-                    String.format("index(%d) >= size(%d)", index, size));
-        }
-    }
-    
-    private void checkFromTo(int fromIndex, int toIndex) {
-        if (fromIndex < 0) {
-            throw new IndexOutOfBoundsException(
-                    String.format("fromIndex(%d) < 0", fromIndex));
-        }
-        
-        if (toIndex > size) {
-            throw new IndexOutOfBoundsException(
-                    String.format("toIndex(%d) > size(%d)", toIndex, size));
-        }
-        
-        if (fromIndex > toIndex) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "fromIndex(%d) > toIndex(%d)",
-                            fromIndex, 
-                            toIndex));
         }
     }
 }
