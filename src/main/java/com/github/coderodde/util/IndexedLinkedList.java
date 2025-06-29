@@ -267,8 +267,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Runs always in linear time.
      */
     public void checkInvarant() {
-        if (fingerList.size() == 0) {
-            if (this.isEmpty()) {
+        if (fingerList.isEmpty()) {
+            if  (!this.isEmpty()) {
                 throw new IllegalStateException(
                         "fingerList.size() === "
                                 + fingerList.size()
@@ -1859,6 +1859,31 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Computes the hash code for the range {@code this[from, to - 1]} and 
+     * returns it.
+     * 
+     * @param from the starting, inclusive index.
+     * @param to   the ending, exclusive index.
+     * @return the hash value of the range.
+     */
+    private int hashCodeRange(int from, int to) {
+        int hashCode = 1;
+        
+        Node<E> node = node(from);
+        
+        while (from++ < to) {
+            // Same arithmetics as in ArrayList.
+            hashCode =
+                    31 * hashCode + 
+                    (node.item == null ? 0 : node.item.hashCode());
+            
+            node = node.next;
+        }
+        
+        return hashCode;
+    }
+    
+    /**
      * Increases the size of the list and its modification count.
      */
     private void increaseSize() {
@@ -1994,7 +2019,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * This class implements a basic iterator over this list.
      */
-    public final class BasicIterator implements Iterator<E> {
+    final class BasicIterator implements Iterator<E> {
         
         /**
          * Caches the most recently returned node.
@@ -2017,13 +2042,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         int expectedModCount = IndexedLinkedList.this.modCount;
 
-        /**
-         * Constructs the basic iterator pointing to the first element.
-         */
-        BasicIterator() {
-            
-        }
-        
         /**
          * Returns {@code true} if and only if this iterator has more elements 
          * to offer.
@@ -3225,223 +3243,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * This static inner class implements the spliterator over this list.
-     * 
-     * @param <E> the node datum type. 
-     */
-    static final class LinkedListSpliterator<E> implements Spliterator<E> {
-        
-        /**
-         * The minimum batch size.
-         */
-        static final long MINIMUM_BATCH_SIZE = 1024L;
-        
-        /**
-         * The target list.
-         */
-        private final IndexedLinkedList<E> list;
-        
-        /**
-         * The current node.
-         */
-        private Node<E> node;
-        
-        /**
-         * The length of this spliterator.
-         */
-        private long lengthOfSpliterator;
-        
-        /**
-         * The number of processed elements so far.
-         */
-        private long numberOfProcessedElements;
-        
-        /**
-         * The offset of this spliterator.
-         */
-        private long offsetOfSpliterator;
-        
-        /**
-         * The expected modification count. We rely on this in order to catch 
-         * the modifications from outside the spliterator API.
-         */
-        private final int expectedModCount;
-        
-        /**
-         * Constructs a new spliterator.
-         * 
-         * @param list                the target list to split.
-         * @param node                the initial node of this spliterator.
-         * @param lengthOfSpliterator the length of this spliterator.
-         * @param offsetOfSpliterator the offset of this spliterator.
-         * @param expectedModCount    the expected modification count.
-         */
-        private LinkedListSpliterator(IndexedLinkedList<E> list,
-                                      Node<E> node,
-                                      long lengthOfSpliterator,
-                                      long offsetOfSpliterator,
-                                      int expectedModCount) {
-            this.list = list;
-            this.node = node;
-            this.lengthOfSpliterator = lengthOfSpliterator;
-            this.offsetOfSpliterator = offsetOfSpliterator;
-            this.expectedModCount = expectedModCount;
-        }
-
-        /**
-         * Makes an attempt to advance in this spliterator.
-         * 
-         * @param action the action which to apply to the advanced element.
-         * @return {@code true} if and only if there were an element to advance.
-         */
-        @Override
-        public boolean tryAdvance(Consumer<? super E> action) {
-            if (action == null) {
-                throw new NullPointerException();
-            }
-            
-            if (numberOfProcessedElements == lengthOfSpliterator) {
-                return false;
-            }
-            
-            numberOfProcessedElements++;
-            E item = node.item;
-            action.accept(item);
-            node = node.next;
-            
-            if (list.modCount != expectedModCount) {
-                throw new ConcurrentModificationException();
-            }
-                
-            return true;
-        }
-
-        /**
-         * Applies {@code action} to all remaining elements in this spliterator.
-         * 
-         * @param action the action to apply to each remaining element.
-         */
-        @Override
-        public void forEachRemaining(Consumer<? super E> action) {
-            Objects.requireNonNull(action);
-            
-            for (long i = numberOfProcessedElements; 
-                 i < lengthOfSpliterator; 
-                 i++) {
-                E item = node.item;
-                action.accept(item);
-                node = node.next;
-            }
-            
-            numberOfProcessedElements = lengthOfSpliterator;
-            
-            if (list.modCount != expectedModCount) {
-                throw new ConcurrentModificationException();
-            }
-        }
-        
-        /**
-         * Attempts to split this spliterator. Upon success, it returns the rest
-         * of this spliterator, and a child spliterator working on the another
-         * half of the range.
-         * 
-         * @return another spliterator, or {@code null} if splitting was not 
-         *         possible.
-         */
-        @Override
-        public Spliterator<E> trySplit() {
-            long sizeLeft = estimateSize();
-            
-            if (sizeLeft == 0) {
-                return null;
-            }
-                
-            long thisSpliteratorNewLength = sizeLeft / 2L;
-            
-            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE) {
-                return null;
-            }
-            
-            long newSpliteratorLength = sizeLeft - thisSpliteratorNewLength;
-            long newSpliteratorOffset = this.offsetOfSpliterator;
-            
-            this.offsetOfSpliterator += newSpliteratorLength;
-            this.lengthOfSpliterator -= newSpliteratorLength;
-            
-            Node<E> newSpliteratorNode = this.node;
-            
-            this.node = list.node((int) this.offsetOfSpliterator);
-            
-            return new LinkedListSpliterator<>(list,
-                                               newSpliteratorNode,
-                                               newSpliteratorLength, // length
-                                               newSpliteratorOffset, // offset
-                                               expectedModCount);
-        }
-
-        /**
-         * Returns the estimated size left. This method, however, returns the 
-         * exact size estimate.
-         * 
-         * @return the number of elements in this spliterator not yet advanced
-         *         over.
-         */
-        @Override
-        public long estimateSize() {
-            return (long)(lengthOfSpliterator - numberOfProcessedElements);
-        }
-
-        /**
-         * Just like {@link #estimateSize()}, returns the exact number of 
-         * elements not yet advanced over via this spliterator.
-         * 
-         * @return the number of elements in this spliterator not yet advanced
-         *         over.
-         */
-        @Override
-        public long getExactSizeIfKnown() {
-            return estimateSize();
-        }
-
-        /**
-         * Returns characteristics masks.
-         * 
-         * @return characteristics masks.
-         */
-        @Override
-        public int characteristics() {
-            return Spliterator.ORDERED | 
-                   Spliterator.SUBSIZED |
-                   Spliterator.SIZED;
-        }
-        
-        /**
-         * Queries for particular characteristics.
-         * 
-         * @param characteristics the characteristic flag.
-         * @return {@code true} if and only if this spliterator supports the 
-         *         {@code characteristics}.
-         */
-        @Override
-        public boolean hasCharacteristics(int characteristics) {
-            switch (characteristics) {
-                case Spliterator.ORDERED:
-                case Spliterator.SIZED:
-                case Spliterator.SUBSIZED:
-                    return true;
-                    
-                default:
-                    return false;
-            }
-        }
-    }
-    
-    /**
      * This inner class implements a sublist view over the compassing list. This
      * class is not {@code static} since it needs to work with the underlying 
      * list.
      */
-    class EnhancedSubList implements List<E>, Cloneable {
+    final class EnhancedSubList implements List<E>, Cloneable {
         
         /**
          * The root list.
@@ -3475,14 +3281,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param fromIndex the starting, inclusive index of this view.
          * @param toIndex   the ending, exclusive index of this view.
          */
-        public EnhancedSubList(IndexedLinkedList<E> root, 
+        EnhancedSubList(IndexedLinkedList<E> root, 
                                int fromIndex, 
                                int toIndex) {
             
-            this.root = root;
-            this.parent = null;
-            this.offset = fromIndex;
-            this.size = toIndex - fromIndex;
+            this.root     = root;
+            this.parent   = null;
+            this.offset   = fromIndex;
+            this.size     = toIndex - fromIndex;
             this.modCount = root.modCount;
         }
         
@@ -3499,10 +3305,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                 int fromIndex, 
                                 int toIndex) {
             
-            this.root = parent.root;
-            this.parent = parent;
-            this.offset = parent.offset + fromIndex;
-            this.size = toIndex - fromIndex;
+            this.root     = parent.root;
+            this.parent   = parent;
+            this.offset   = parent.offset + fromIndex;
+            this.size     = toIndex - fromIndex;
             this.modCount = root.modCount;
         }
 
@@ -4167,6 +3973,218 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 subList.modCount = root.modCount;
                 subList = subList.parent;
             } while (subList != null);
+        }
+    }
+    
+    /**
+     * This static inner class implements the spliterator over this list.
+     * 
+     * @param <E> the node datum type. 
+     */
+    static final class LinkedListSpliterator<E> implements Spliterator<E> {
+        
+        /**
+         * The minimum batch size.
+         */
+        static final long MINIMUM_BATCH_SIZE = 1024L;
+        
+        /**
+         * The target list.
+         */
+        private final IndexedLinkedList<E> list;
+        
+        /**
+         * The current node.
+         */
+        private Node<E> node;
+        
+        /**
+         * The length of this spliterator.
+         */
+        private long lengthOfSpliterator;
+        
+        /**
+         * The number of processed elements so far.
+         */
+        private long numberOfProcessedElements;
+        
+        /**
+         * The offset of this spliterator.
+         */
+        private long offsetOfSpliterator;
+        
+        /**
+         * The expected modification count. We rely on this in order to catch 
+         * the modifications from outside the spliterator API.
+         */
+        private final int expectedModCount;
+        
+        /**
+         * Constructs a new spliterator.
+         * 
+         * @param list                the target list to split.
+         * @param node                the initial node of this spliterator.
+         * @param lengthOfSpliterator the length of this spliterator.
+         * @param offsetOfSpliterator the offset of this spliterator.
+         * @param expectedModCount    the expected modification count.
+         */
+        private LinkedListSpliterator(IndexedLinkedList<E> list,
+                                      Node<E> node,
+                                      long lengthOfSpliterator,
+                                      long offsetOfSpliterator,
+                                      int expectedModCount) {
+            this.list = list;
+            this.node = node;
+            this.lengthOfSpliterator = lengthOfSpliterator;
+            this.offsetOfSpliterator = offsetOfSpliterator;
+            this.expectedModCount = expectedModCount;
+        }
+
+        /**
+         * Returns characteristics masks.
+         * 
+         * @return characteristics masks.
+         */
+        @Override
+        public int characteristics() {
+            return Spliterator.ORDERED | 
+                   Spliterator.SUBSIZED |
+                   Spliterator.SIZED;
+        }
+
+        /**
+         * Returns the estimated size left. This method, however, returns the 
+         * exact size estimate.
+         * 
+         * @return the number of elements in this spliterator not yet advanced
+         *         over.
+         */
+        @Override
+        public long estimateSize() {
+            return (long)(lengthOfSpliterator - numberOfProcessedElements);
+        }
+
+        /**
+         * Applies {@code action} to all remaining elements in this spliterator.
+         * 
+         * @param action the action to apply to each remaining element.
+         */
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            
+            for (long i = numberOfProcessedElements; 
+                 i < lengthOfSpliterator; 
+                 i++) {
+                E item = node.item;
+                action.accept(item);
+                node = node.next;
+            }
+            
+            numberOfProcessedElements = lengthOfSpliterator;
+            
+            if (list.modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        /**
+         * Just like {@link #estimateSize()}, returns the exact number of 
+         * elements not yet advanced over via this spliterator.
+         * 
+         * @return the number of elements in this spliterator not yet advanced
+         *         over.
+         */
+        @Override
+        public long getExactSizeIfKnown() {
+            return estimateSize();
+        }
+        
+        /**
+         * Queries for particular characteristics.
+         * 
+         * @param characteristics the characteristic flag.
+         * @return {@code true} if and only if this spliterator supports the 
+         *         {@code characteristics}.
+         */
+        @Override
+        public boolean hasCharacteristics(int characteristics) {
+            switch (characteristics) {
+                case Spliterator.ORDERED:
+                case Spliterator.SIZED:
+                case Spliterator.SUBSIZED:
+                    return true;
+                    
+                default:
+                    return false;
+            }
+        }
+        
+        /**
+         * Makes an attempt to advance in this spliterator.
+         * 
+         * @param action the action which to apply to the advanced element.
+         * @return {@code true} if and only if there were an element to advance.
+         */
+        @Override
+        public boolean tryAdvance(Consumer<? super E> action) {
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            
+            if (numberOfProcessedElements == lengthOfSpliterator) {
+                return false;
+            }
+            
+            numberOfProcessedElements++;
+            E item = node.item;
+            action.accept(item);
+            node = node.next;
+            
+            if (list.modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+                
+            return true;
+        }
+
+        /**
+         * Attempts to split this spliterator. Upon success, it returns the rest
+         * of this spliterator, and a child spliterator working on the another
+         * half of the range.
+         * 
+         * @return another spliterator, or {@code null} if splitting was not 
+         *         possible.
+         */
+        @Override
+        public Spliterator<E> trySplit() {
+            long sizeLeft = estimateSize();
+            
+            if (sizeLeft == 0) {
+                return null;
+            }
+                
+            long thisSpliteratorNewLength = sizeLeft / 2L;
+            
+            if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE) {
+                return null;
+            }
+            
+            long newSpliteratorLength = sizeLeft - thisSpliteratorNewLength;
+            long newSpliteratorOffset = this.offsetOfSpliterator;
+            
+            this.offsetOfSpliterator += newSpliteratorLength;
+            this.lengthOfSpliterator -= newSpliteratorLength;
+            
+            Node<E> newSpliteratorNode = this.node;
+            
+            this.node = list.node((int) this.offsetOfSpliterator);
+            
+            return new LinkedListSpliterator<>(list,
+                                               newSpliteratorNode,
+                                               newSpliteratorLength, // length
+                                               newSpliteratorOffset, // offset
+                                               expectedModCount);
         }
     }
 }

@@ -593,6 +593,16 @@ final class FingerList<E> {
     }
     
     /**
+     * Returns {@code true} if this finger list is empty.
+     * 
+     * @return {@code true} if this finger contains no fingers (except the
+     *         end-of-finger-list sentinel).
+     */
+    boolean isEmpty() {
+        return size == 0;
+    }
+    
+    /**
      * Make sure we can insert {@code roomSize} fingers starting from
      * {@code fingerIndex}, shifting all the fingers starting from
      * {@code numberOfNodes} to the right.

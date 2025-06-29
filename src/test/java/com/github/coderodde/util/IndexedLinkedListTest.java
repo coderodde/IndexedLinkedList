@@ -2315,8 +2315,7 @@ public class IndexedLinkedListTest {
     
     @Test(expected = ConcurrentModificationException.class)
     public void checkIteratorComodification() {
-        BasicIterator iterator =
-                (BasicIterator) 
+        BasicIterator iterator = (BasicIterator)
                 new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
         
         iterator.expectedModCount = 1000;
@@ -2763,7 +2762,7 @@ public class IndexedLinkedListTest {
     public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(1_000_000));
         
-        BasicIterator iter =(BasicIterator) list.iterator();
+        BasicIterator iter = (BasicIterator) list.iterator();
         iter.expectedModCount = -1000;
         
         iter.forEachRemaining((e) -> {});
