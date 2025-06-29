@@ -19,6 +19,7 @@ package com.github.coderodde.util;
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import com.github.coderodde.util.IndexedLinkedList.DescendingIterator;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
+import com.github.coderodde.util.IndexedLinkedList.EnhancedSubList;
 import static com.github.coderodde.util.IndexedLinkedList.checkIndex;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1633,6 +1634,29 @@ public class IndexedLinkedListTest {
         Predicate<Integer> predicate = (i) -> false; 
         list.addAll(Arrays.asList(1, 2, 4, 8));
         assertFalse(list.subList(0, 3).removeIf(predicate));
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkInsertionIndexOnNegative() {
+        list.addAll(Arrays.asList(1, 3, 5));
+        EnhancedSubList sl = (EnhancedSubList) list.subList(0, 3);
+        sl.checkInsertionIndex(-1);
+    }
+    
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void checkInsertionIndexOnTooLarge() {
+        list.addAll(Arrays.asList(1, 3, 5));
+        EnhancedSubList sl = (EnhancedSubList) list.subList(0, 3);
+        sl.checkInsertionIndex(4);
+    }
+    
+    @Test
+    public void returnsFalseIfDidNotRemoveObjects() {
+        list.add(1);
+        list.add(2);
+        EnhancedSubList subList = (EnhancedSubList) list.subList(0, 2);
+        
+        assertFalse(subList.removeAll(Arrays.asList(4, 3)));
     }
     
     @Test
