@@ -808,11 +808,15 @@ public class IndexedLinkedListTest {
         for (int sz = 0; sz < 10; ++sz) {
             list.clear();
             list.checkInvarant();
+            referenceList.clear();
 
             List<Integer> tmpList = getIntegerList(sz);
 
             list.addAll(tmpList);
             list.checkInvarant();
+            referenceList.addAll(tmpList);
+            
+            assertEquals(referenceList, list);
         }
     }
     
@@ -824,10 +828,17 @@ public class IndexedLinkedListTest {
                 list.addAll(getIntegerList(sz));
                 list.checkInvarant();
                 
+                referenceList.clear();
+                referenceList.addAll(list);
+                
                 List<Integer> tmpList = getIntegerList(sz2);
                 
                 list.addAll(tmpList);
                 list.checkInvarant();
+                
+                referenceList.addAll(tmpList);
+                
+                assertEquals(referenceList, list);
             }
         }
     }
@@ -840,10 +851,17 @@ public class IndexedLinkedListTest {
                 list.addAll(getIntegerList(sz));
                 list.checkInvarant();
                 
+                referenceList.clear();
+                referenceList.addAll(list);
+                
                 List<Integer> tmpList = getIntegerList(sz2);
                 
                 list.addAll(0, tmpList);
                 list.checkInvarant();
+                
+                referenceList.addAll(0, tmpList);
+                
+                assertEquals(referenceList, list);
             }
         }
     }
@@ -857,10 +875,17 @@ public class IndexedLinkedListTest {
                     list.addAll(getIntegerList(sz));
                     list.checkInvarant();
 
+                    referenceList.clear();
+                    referenceList.addAll(list);
+                    
                     List<Integer> tmpList = getIntegerList(sz2);
 
                     list.addAll(index, tmpList);
                     list.checkInvarant();
+                    
+                    referenceList.addAll(index, tmpList);
+                    
+                    assertEquals(referenceList, list);
                 }
             }
         }
