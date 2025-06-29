@@ -1633,7 +1633,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param toIndex   the one past the rightmost element index in the range 
      *                  over which to distribute the fingers.
      */
-    void distributeFingers(int fromIndex, int toIndex) {
+    public void distributeFingers(int fromIndex, int toIndex) {
+        checkFromTo(fromIndex, toIndex);
+        
         int rangeLength = toIndex - fromIndex;
         
         if (rangeLength == 0) {
@@ -2150,17 +2152,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Increases the size of this list by {@code m} elements and modifies the
-     * modification count.
-     * 
-     * @param m the size add-on. 
-     */
-    private void increaseSize(final int m) {
-        size += m;
-        ++modCount;
-    }
-    
-    /**
      * Returns the index of the leftmost occurrence of the object {@code o} in
      * the range {@code this[start ... end - 1]}.   
      * 
@@ -2397,9 +2388,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
         int rightCoveredFingers = remainingFingers - leftCoveredFingers;
-//                Math.max(
-//                        0,
-//                        remainingFingers - leftCoveredFingers);
 
         this.numberOfCoveringFingersToPrefix = leftCoveredFingers;
         this.numberOfCoveringFingersToSuffix = rightCoveredFingers;
@@ -2840,9 +2828,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         int sourceIndex = targetIndex + fingersToRemove;
         
-//        int targetIndex = Math.max(0, toFingerIndex - fingersToRemove);
-//        int sourceIndex = Math.max(toFingerIndex, fromFingerIndex - 
-//                                                  fingersToRemove);
         System.arraycopy(fingerList.fingerArray,
                          sourceIndex, 
                          fingerList.fingerArray, 
@@ -3015,7 +3000,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                int numberOfNewFingers,
                                int distance) {
         
-//        node = scrollNodeToRight(node, distance / 2);
         fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         
         for (int i = 1; i < numberOfNewFingers; i++) {
@@ -3023,14 +3007,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = scrollNodeToRight(node, distance);
             fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
         }
-//        node = scrollNodeToRight(node, distance / 2);
-//        fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
-//        
-//        for (int i = 1; i < numberOfNewFingers; i++) {
-//            index += distance;
-//            node = scrollNodeToRight(node, distance);
-//            fingerList.setFinger(fingerIndex++, new Finger<>(node, index));
-//        }
     }
     
     /**
@@ -4136,6 +4112,26 @@ public class IndexedLinkedList<E> implements Deque<E>,
         if (index >= size) {
             throw new IndexOutOfBoundsException(
                     String.format("index(%d) >= size(%d)", index, size));
+        }
+    }
+    
+    private void checkFromTo(int fromIndex, int toIndex) {
+        if (fromIndex < 0) {
+            throw new IndexOutOfBoundsException(
+                    String.format("fromIndex(%d) < 0", fromIndex));
+        }
+        
+        if (toIndex > size) {
+            throw new IndexOutOfBoundsException(
+                    String.format("toIndex(%d) > size(%d)", toIndex, size));
+        }
+        
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "fromIndex(%d) > toIndex(%d)",
+                            fromIndex, 
+                            toIndex));
         }
     }
 }

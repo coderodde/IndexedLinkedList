@@ -873,10 +873,6 @@ final class FingerList<E> {
         fingerArray[size].index = list.size;
     }
     
-    void removeSingleNode(int fromIndex) {
-        
-    }
-    
     // TODO: Debug me, please!
     void removeFingersOnDeleteRange(int fromFingerIndex,
                                     int numberOfFingersToRemove,
@@ -911,10 +907,6 @@ final class FingerList<E> {
                     fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
                     removalRangeLength);
         }
-        
-//        shiftFingerIndicesToLeft(
-//                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-//                removalRangeLength);
         
         this.list.size -= removalRangeLength;
     }
