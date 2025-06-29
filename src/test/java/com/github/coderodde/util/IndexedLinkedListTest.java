@@ -17,6 +17,7 @@
 package com.github.coderodde.util;
 
 import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
+import com.github.coderodde.util.IndexedLinkedList.DescendingIterator;
 import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
 import static com.github.coderodde.util.IndexedLinkedList.checkIndex;
 import java.io.File;
@@ -43,6 +44,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -1610,6 +1612,29 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(10, 7, 4), list);
     }
     
+    @Test(expected = NoSuchElementException.class)
+    public void noNextItemEnhancedSubList() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        List<Integer> subList = list.subList(0, 3);
+        ListIterator<Integer> iter = subList.listIterator(3);
+        iter.next();
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void noPreviousItemEnhancedSubList() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        List<Integer> subList = list.subList(0, 3);
+        ListIterator<Integer> iter = subList.listIterator(0);
+        iter.previous();
+    }
+    
+    @Test
+    public void removeIfOnNothing() {
+        Predicate<Integer> predicate = (i) -> false; 
+        list.addAll(Arrays.asList(1, 2, 4, 8));
+        assertFalse(list.subList(0, 3).removeIf(predicate));
+    }
+    
     @Test
     public void retainAll() {
         list.addAll(Arrays.asList(1, 2, 3, 4, 5, 6));
@@ -2547,8 +2572,70 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void equalsRangeShortArgList() {
+        list.addAll(Arrays.asList(1, 2, 3, 4));
+        referenceList.addAll(Arrays.asList(1, 2, 3));
+        assertFalse(list.equals(referenceList));
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void noHasNext() {
+        list.iterator().next();
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void noHasNextDescending() {
+        list.descendingIterator().next();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void throwsOnDoubleRemove() {
+        list.add(10);
+        Iterator<Integer> it = list.iterator();
+        it.next();
+        it.remove();
+        it.remove();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void throwsOnDoubleRemoveDescending() {
+        list.add(10);
+        Iterator<Integer> it = list.descendingIterator();
+        it.next();
+        it.remove();
+        it.remove();
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void throwOnConcurrency() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> it = list.iterator();
+        
+        it.next();
+        list.add(13);
+        it.next();
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void throwOnConcurrencyDescending() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        Iterator<Integer> it = list.descendingIterator();
+        
+        it.next();
+        list.add(13);
+        it.next();
+    }
+    
+    @Test
+    public void equalsHaltsOnShorterArgList() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        referenceList.addAll(Arrays.asList(1, 2));
+        assertFalse(list.equals(referenceList));
+    }
+    
+    @Test
     public void peekFirst() {
-        assertNull(list.peek());
+        assertNull(list.peekFirst());
         
         list.checkInvarant();
         list.addLast(0);
@@ -2569,7 +2656,7 @@ public class IndexedLinkedListTest {
     
     @Test
     public void peekLast() {
-        assertNull(list.peek());
+        assertNull(list.peekLast());
         
         list.addLast(0);
         list.checkInvarant();
@@ -2664,7 +2751,6 @@ public class IndexedLinkedListTest {
         assertTrue(list.equals(Arrays.asList(3, 2, 1)));
     }
     
-    // TODO: Find where to apply.
     class BadList extends IndexedLinkedList<Integer> {
         
         class BadListIterator implements Iterator<Integer> {
@@ -2944,6 +3030,31 @@ public class IndexedLinkedListTest {
         BasicIterator iter = (BasicIterator) list.iterator();
         iter.expectedModCount = -1000;
         
+        iter.forEachRemaining((e) -> {});
+    }
+    
+    @Test
+    public void addEmptyCollection() {
+        list.subList(0, 0).addAll(0, Collections.emptyList());
+    }
+    
+    @Test
+    public void onEmptyCollectionSort() {
+        list.subList(0, 0).sort(null);
+    }
+    
+    @Test
+    public void sublistRemoveNullNotMatched() {
+        list.addAll(Arrays.asList(1, 2, 3));
+        assertFalse(list.subList(0, 3).remove(null));
+    }
+    
+    @Test(expected = ConcurrentModificationException.class)
+    public void basicDescendingIteratorForEachRemainingThrowsOnConcurrentModification() {
+        list.addAll(getIntegerList(1_000_000));
+        
+        DescendingIterator iter = (DescendingIterator) list.descendingIterator();
+        iter.expectedModCount = -1000;
         iter.forEachRemaining((e) -> {});
     }
     

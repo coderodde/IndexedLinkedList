@@ -1859,8 +1859,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 from < to; 
                 from++, node = node.next) {
             
-            if (!otherIterator.hasNext() || 
-                    !Objects.equals(node.item, otherIterator.next())) {
+            if (!Objects.equals(node.item, otherIterator.next())) {
                 return false;
             }
         }
@@ -2176,7 +2175,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     /**
      * Implements the descending list iterator over this list.
      */
-    private final class DescendingIterator implements Iterator<E> {
+    final class DescendingIterator implements Iterator<E> {
 
         /**
          * The most recently returned element.
@@ -2198,13 +2197,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * where the list is modified outside iterator API during iteration.
          */
         int expectedModCount = IndexedLinkedList.this.modCount;
-        
-        /**
-         * Constructs this descending iterator.
-         */
-        public DescendingIterator() {
-            
-        }
         
         /**
          * Returns {@code true} if and only if this iterator has more elements
@@ -2933,30 +2925,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int numberOfFingersInPrefix = fromFingerIndex;
         int numberOfFingersInSuffix = fingerList.size() - toFingerIndex;
         
-        if (fromFingerIndex == this.fingerList.size()) {
-            
-            System.arraycopy(fingerList.fingerArray, 
-                             fingerList.size(),
-                             fingerList.fingerArray,
-                             fingerList.size() - fingersToRemove,
-                             fingersToRemove);
-            
-            Arrays.fill(fingerList.fingerArray, 
-                        fingerList.size - fingersToRemove + 1,
-                        fingerList.size + 1, 
-                        null);
-            
-            int removalLength = toIndex - fromIndex;
-            
-            this.size -= removalLength;
-            this.fingerList.size -= fingersToRemove;
-            this.fingerList
-                .fingerArray[fingerList.size()]
-                .index-= removalLength;
-            
-            return;
-        }
-        
         fingerList.arrangePrefix(fromIndex,
                                  numberOfFingersInPrefix,
                                  this.numberOfCoveringFingersToPrefix);
@@ -3176,11 +3144,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private boolean tryPushFingersToLeft(int fingerIndex) {
         if (fingerIndex == 0) {
             Finger<E> finger = fingerList.getFinger(0);
-            
-            if (finger.index == 0) {
-                // Nowhere to push to left:
-                return false;
-            }
             
             finger.index--;
             finger.node = finger.node.prev;
@@ -3944,6 +3907,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
 
             return stringBuilder.append("]").toString();
         }
+        
+        /**
+         * Checks that the input finger {@code index} is in the set
+         * \(\{ 0, 1, \ldots, N\}\), where \(N = \){@code size}.
+         * 
+         * @param index the insertion index to validate. 
+         */
+        void checkInsertionIndex(int index) {
+            if (index < 0) {
+                throw new IndexOutOfBoundsException("Negative index: " + index);
+            }
+            
+            if (index > this.size) {
+                throw new IndexOutOfBoundsException(
+                        "index(" + index + ") > size(" + size + ")");
+            }
+        }
     
         /**
          * Operates in batch over all the elements in {@code c}.
@@ -3979,23 +3959,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private void checkForComodification() {
             if (root.modCount != this.modCount)
                 throw new ConcurrentModificationException();
-        }
-
-        /**
-         * Checks that the input finger {@code index} is in the set
-         * \(\{ 0, 1, \ldots, N\}\), where \(N = \){@code size}.
-         * 
-         * @param index the insertion index to validate. 
-         */
-        private void checkInsertionIndex(int index) {
-            if (index < 0) {
-                throw new IndexOutOfBoundsException("Negative index: " + index);
-            }
-            
-            if (index > this.size) {
-                throw new IndexOutOfBoundsException(
-                        "index(" + index + ") > size(" + size + ")");
-            }
         }
         
         /**
