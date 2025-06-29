@@ -110,6 +110,44 @@ public class IndexedLinkedListTest {
     public void onInvalidListsize() {
         list.addAll(getIntegerList(5));
         list.size = 6;
+        list.fingerList.getFinger(3).index = 6;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void onBadRecommendation() {
+        list.addAll(getIntegerList(5));
+        list.size = 4;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onNullSentinel() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.setFinger(4, null);
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onFingerListMismatch() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.size = 5;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onJunkFingers() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.fingerArray[6] = new Finger<>(new Node<>(666), -13);
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onNonContractedFingerArray() {
+        list.addAll(getIntegerList(16));
+        list.fingerList.fingerArray = 
+                Arrays.copyOf(list.fingerList.fingerArray, 100);
+        
         list.checkInvarant();
     }
     

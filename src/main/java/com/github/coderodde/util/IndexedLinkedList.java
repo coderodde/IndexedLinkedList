@@ -299,15 +299,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         for (int i = 0; i < fingerList.size() - 1; ++i) {
-            Finger<E> left = fingerList.getFinger(i);
-            
-            if (left == null) {
-                throw new IllegalStateException(
-                        "fingerList[" + i + "] is null.");
-            }
-            
+            Finger<E> left  = fingerList.getFinger(i);
             Finger<E> right = fingerList.getFinger(i + 1);
             
+            // First left will be checked in the very beginning of this method:
             if (right == null) {
                 throw new IllegalStateException(
                         "fingerList[" + (i + 1) + " is null.");
@@ -327,7 +322,22 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
         }
         
+        if (getRecommendedNumberOfFingers() != fingerList.size()) {
+            throw new IllegalStateException(
+                    "Number of fingers mismatch: required = " 
+                            + getRecommendedNumberOfFingers() 
+                            + ", actual = " 
+                            + fingerList.size());
+        }
+        
         Finger<E> sentinelFinger = fingerList.getFinger(fingerList.size());
+                
+        if (sentinelFinger == null) {
+            throw new IllegalStateException(
+                    "No sentinel finger (number of fingers = " 
+                            + fingerList.size() 
+                            + ").");
+        }
         
         if (sentinelFinger.index != this.size) {
             throw new IllegalStateException(
@@ -372,6 +382,36 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             + fingerList.size() 
                             + ", fingerCount = " 
                             + fingerCount);
+        }
+        
+        for (int i = fingerList.size() + 1;
+                 i < fingerList.fingerArray.length;  
+                 i++) {
+            
+            finger = fingerList.getFinger(i);
+            
+            if (finger != null) {
+                throw new IllegalStateException(
+                        "Junk finger " + finger + " at fingerList[" + i + "]");
+            }
+        }
+        
+        int length = fingerList.fingerArray.length;
+        
+        // Finally, check that the finger list cannot be contracted:
+        if (length == FingerList.INITIAL_CAPACITY) {
+            // Nothing to contract:
+            return;
+        }
+
+        if (size + 1 < (length / FingerList.THRESHOLD_FACTOR)) {
+            throw new IllegalStateException(
+                    "The list has " 
+                            + (size() + 1) 
+                            + " elements in total. Capacity of the "
+                            + "finger list is "
+                            + fingerList.size()
+                            + ". Must be contracted.");
         }
     }
     
@@ -1533,6 +1573,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         unlinkNodeRange(this.removeRangeStartNode,
                         this.removeRangeEndNode);
         modCount++;
+        
+        fingerList.contractFingerArrayIfNeeded(size);
     }
     
     /**
@@ -2889,8 +2931,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  fromIndex,
                                  toIndex,
                                  fingersToRemove);
-            
-            fingerList.contractFingerArrayIfNeeded(fingerList.size());
             modCount++;
             return;
         }

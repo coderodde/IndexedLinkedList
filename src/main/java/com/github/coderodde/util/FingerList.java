@@ -42,7 +42,20 @@ final class FingerList<E> {
     /**
      * This is also the minimum capacity.
      */
-    private static final int INITIAL_CAPACITY = 8;
+    static final int INITIAL_CAPACITY = 8;
+    
+    /**
+     * When the actual size of the finger list (end-sentinel included) is
+     * smaller than {@code fingerArray.length / THRESHOLD_FACTOR}, the array is
+     * contracted to {@code fingerArray.length / CONTRACTION_FACTOR} elements.
+     */
+    static final int THRESHOLD_FACTOR = 4;
+    
+    /**
+     * The actual contraction factor. The capacity of the finger array will be 
+     * divided by this constant.
+     */
+    static final int CONTRACTION_FACTOR = 2;
 
     /**
      * The actual list storage array.
@@ -205,18 +218,22 @@ final class FingerList<E> {
      * sentinel finger.
      */
     void contractFingerArrayIfNeeded(int nextSize) {
+        if (fingerArray.length == INITIAL_CAPACITY) {
+            // Nothing to contract:
+            return;
+        }
+        
         // Can we contract at least once?
-        if ((nextSize + 1) * 4 < fingerArray.length
-                && fingerArray.length > INITIAL_CAPACITY) {
-
-            int nextCapacity = fingerArray.length / 2;
+        if (nextSize + 1 < fingerArray.length / THRESHOLD_FACTOR) {
+            
+            int nextCapacity = fingerArray.length / CONTRACTION_FACTOR;
 
             // Good, we can. But can we keep on splitting in half the 
             // capacity any further?
-            while (nextCapacity >= 2 * (nextSize + 1)
-                    && nextCapacity > INITIAL_CAPACITY) {
+            while (nextCapacity >= (nextSize + 1) * CONTRACTION_FACTOR
+                && nextCapacity > INITIAL_CAPACITY) {
                 // Yes, we can do it as well.
-                nextCapacity /= 2;
+                nextCapacity /= CONTRACTION_FACTOR;
             }
             
             fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
