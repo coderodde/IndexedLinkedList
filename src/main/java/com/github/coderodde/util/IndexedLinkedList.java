@@ -1900,6 +1900,98 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
+     * Inserts the input collection right before the node {@code succ}.
+     * 
+     * @param c         the collection to insert.
+     * @param succ      the node that is right before the end of the inserted 
+     *                  collection.
+     * @param succIndex the appearance index of {@code succ} in the list.
+     */
+    private void insertAll(Collection<? extends E> c,
+                           Node<E> succ,
+                           int succIndex) {
+        
+        Node<E> pred = succ.prev;
+        Node<E> prev = pred;
+
+        for (E item : c) {
+            Node<E> newNode = new Node<>(item);
+            newNode.prev = prev;
+            prev.next = newNode;
+            prev = newNode;
+        }
+
+        prev.next = succ;
+        succ.prev = prev;
+
+        int sz = c.size();
+        modCount++;
+        size += sz;
+        
+        // Add fingers:
+        addFingersAfterInsertAll(pred.next, 
+                                 succIndex,
+                                 sz);
+    }
+    
+    /**
+     * Tells if the argument is the index of an existing element. The index is
+     * valid if it is in the set \(\{0, 1, ..., \) {@code size}\( - 1\}\).
+     * 
+     * @param index the index to validate.
+     * @return {@code true} if and only if the index is valid.
+     */
+    private boolean isElementIndex(int index) {
+        return index >= 0 && index < size;
+    }
+    
+    /**
+     * Tells if the argument is the index of a valid position for an iterator or 
+     * an add operation. The index is valid if it is in set
+     * \(\{ 0, 1, ..., \) {@code size}\(\}\).
+     * 
+     * @param index the index to validate.
+     * @return {@code true} if and only if the index is valid.
+     */
+    private boolean isPositionIndex(int index) {
+        return 0 <= index && index <= size;
+    }
+    
+    /**
+     * Returns the last appearance index of {@code obj} or {@code -1} if the 
+     * {@code o} is not in this list.
+     *
+     * @param o     the object to search for.
+     * @param start the starting, inclusive index of the range to search.
+     * @param end   the ending, exclusive index of the range to search.
+     * @return the index of the rightmost appearance of {@code o} or {@code -1}
+     *         if there is no such.
+     */
+    private int lastIndexOfRange(Object o, int start, int end) {
+        int index = end - 1;
+        
+        if (o == null) {
+            for (Node<E> node = node(index);
+                    index >= start; 
+                    index--, node = node.prev) {
+                if (node.item == null) {
+                    return index;
+                }
+            }
+        } else {
+            for (Node<E> node = node(index);
+                    index >= start;
+                    index--, node = node.prev) {
+                if (o.equals(node.item)) {
+                    return index;
+                }
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
      * This class implements a basic iterator over this list.
      */
     public final class BasicIterator implements Iterator<E> {
@@ -2381,98 +2473,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Inserts the input collection right before the node {@code succ}.
-     * 
-     * @param c         the collection to insert.
-     * @param succ      the node that is right before the end of the inserted 
-     *                  collection.
-     * @param succIndex the appearance index of {@code succ} in the list.
-     */
-    private void insertAll(Collection<? extends E> c,
-                           Node<E> succ,
-                           int succIndex) {
-        
-        Node<E> pred = succ.prev;
-        Node<E> prev = pred;
-
-        for (E item : c) {
-            Node<E> newNode = new Node<>(item);
-            newNode.prev = prev;
-            prev.next = newNode;
-            prev = newNode;
-        }
-
-        prev.next = succ;
-        succ.prev = prev;
-
-        int sz = c.size();
-        modCount++;
-        size += sz;
-        
-        // Add fingers:
-        addFingersAfterInsertAll(pred.next, 
-                                 succIndex,
-                                 sz);
-    }
-
-    /**
-     * Tells if the argument is the index of an existing element. The index is
-     * valid if it is in the set \(\{0, 1, ..., \) {@code size}\( - 1\}\).
-     * 
-     * @param index the index to validate.
-     * @return {@code true} if and only if the index is valid.
-     */
-    private boolean isElementIndex(int index) {
-        return index >= 0 && index < size;
-    }
-
-    /**
-     * Tells if the argument is the index of a valid position for an iterator or 
-     * an add operation. The index is valid if it is in set
-     * \(\{ 0, 1, ..., \) {@code size}\(\}\).
-     * 
-     * @param index the index to validate.
-     * @return {@code true} if and only if the index is valid.
-     */
-    private boolean isPositionIndex(int index) {
-        return 0 <= index && index <= size;
-    }
-    
-    /**
-     * Returns the last appearance index of {@code obj} or {@code -1} if the 
-     * {@code o} is not in this list.
-     *
-     * @param o     the object to search for.
-     * @param start the starting, inclusive index of the range to search.
-     * @param end   the ending, exclusive index of the range to search.
-     * @return the index of the rightmost appearance of {@code o} or {@code -1}
-     *         if there is no such.
-     */
-    private int lastIndexOfRange(Object o, int start, int end) {
-        int index = end - 1;
-        
-        if (o == null) {
-            for (Node<E> node = node(index);
-                    index >= start; 
-                    index--, node = node.prev) {
-                if (node.item == null) {
-                    return index;
-                }
-            }
-        } else {
-            for (Node<E> node = node(index);
-                    index >= start;
-                    index--, node = node.prev) {
-                if (o.equals(node.item)) {
-                    return index;
-                }
-            }
-        }
-        
-        return -1;
-    }
-    
-    /**
      * Links the input element right before the node {@code succ}.
      * 
      * @param e     the element to link.
@@ -2831,78 +2831,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Unlinks the node range {@code [startNode, ..., endNode]}, both inclusive 
-     * from this indexed list.
-     * '
-     * @param startNode the start node of the range.
-     * @param endNode   the end node of the range.
+     * Implements the range removal procedure.
+     * 
+     * @param fromIndex       the starting, inclusive index of the target range.
+     * @param toIndex         the ending, exclusive index of the target range.
+     * @param fromFingerIndex the start bound finger index.
+     * @param toFingerIndex   the upper bound finger index.
+     * @param fingersToRemove the number of fingers to remove.
      */
-    private void unlinkNodeRange(Node<E> startNode, Node<E> endNode) {
-        Node<E> currentNode = startNode;
-        Node<E> nextNode;
-        
-        Node<E> prevStartNode = startNode.prev;
-        Node<E> nextEndNode   = endNode.next;
-        
-        // Get rid of all the nodes in the removed range:
-        do {
-            nextNode = currentNode.next;
-            currentNode.item = null;
-            currentNode.prev = null;
-            currentNode.next = null;
-            currentNode = nextNode;
-        } while (currentNode != nextEndNode);
-        
-        // Stitch the list:
-        if (prevStartNode == null) {
-            head = nextEndNode;
-            nextEndNode.prev = null;
-        } else if (nextEndNode == null) {
-            prevStartNode.next = null;
-            tail = prevStartNode;
-        } else {
-            prevStartNode.next = nextEndNode;
-            nextEndNode.prev = prevStartNode;
-        }
-    }
-    
-    private void removeRangeImplCaseA(int fromFingerIndex,
-                                      int toFingerIndex,
-                                      int fromIndex,
-                                      int toIndex,
-                                      int fingersToRemove) {
-        
-        int copyLength = Math.min(fingerList.size() - toFingerIndex,
-                                  fingerList.size() - fingersToRemove) + 1;
-        
-        int targetIndex = 
-                Math.max(
-                        0, 
-                        Math.min(fromFingerIndex, 
-                                 toFingerIndex - fingersToRemove));
-        
-        int sourceIndex = targetIndex + fingersToRemove;
-        
-        System.arraycopy(fingerList.fingerArray,
-                         sourceIndex, 
-                         fingerList.fingerArray, 
-                         Math.max(0, targetIndex),
-                         copyLength);
-        
-        Arrays.fill(fingerList.fingerArray,
-                    fingerList.size() + 1 - fingersToRemove,
-                    fingerList.size() + 1,
-                    null);
-        
-        fingerList.size -= fingersToRemove;
-        
-        int removalRangeLength = toIndex - fromIndex;
-        
-        fingerList.shiftFingerIndicesToLeft(targetIndex, 
-                                            removalRangeLength);
-        size -= removalRangeLength;
-    }
-    
     private void removeRangeImpl(int fromIndex,
                                  int toIndex,
                                  int fromFingerIndex,
@@ -2974,6 +2910,88 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.removeFingersOnDeleteRange(fromFingerIndex,
                                               fingersToRemove, 
                                               removalRangeLength);
+    }
+    
+    /**
+     * Unlinks the node range {@code [startNode, ..., endNode]}, both inclusive 
+     * from this indexed list.
+     * '
+     * @param startNode the start node of the range.
+     * @param endNode   the end node of the range.
+     */
+    private void unlinkNodeRange(Node<E> startNode, Node<E> endNode) {
+        Node<E> currentNode = startNode;
+        Node<E> nextNode;
+        
+        Node<E> prevStartNode = startNode.prev;
+        Node<E> nextEndNode   = endNode.next;
+        
+        // Get rid of all the nodes in the removed range:
+        do {
+            nextNode = currentNode.next;
+            currentNode.item = null;
+            currentNode.prev = null;
+            currentNode.next = null;
+            currentNode = nextNode;
+        } while (currentNode != nextEndNode);
+        
+        // Stitch the list:
+        if (prevStartNode == null) {
+            head = nextEndNode;
+            nextEndNode.prev = null;
+        } else if (nextEndNode == null) {
+            prevStartNode.next = null;
+            tail = prevStartNode;
+        } else {
+            prevStartNode.next = nextEndNode;
+            nextEndNode.prev = prevStartNode;
+        }
+    }
+    
+    /**
+     * Handles a special case of range removal.
+     * 
+     * @param fromFingerIndex the starting finger index.
+     * @param toFingerIndex   the ending finger index.
+     * @param fromIndex       the starting node index.
+     * @param toIndex         the ending node index.
+     * @param fingersToRemove the number of fingers to remove.
+     */
+    private void removeRangeImplCaseA(int fromFingerIndex,
+                                      int toFingerIndex,
+                                      int fromIndex,
+                                      int toIndex,
+                                      int fingersToRemove) {
+        
+        int copyLength = Math.min(fingerList.size() - toFingerIndex,
+                                  fingerList.size() - fingersToRemove) + 1;
+        
+        int targetIndex = 
+                Math.max(
+                        0, 
+                        Math.min(fromFingerIndex, 
+                                 toFingerIndex - fingersToRemove));
+        
+        int sourceIndex = targetIndex + fingersToRemove;
+        
+        System.arraycopy(fingerList.fingerArray,
+                         sourceIndex, 
+                         fingerList.fingerArray, 
+                         Math.max(0, targetIndex),
+                         copyLength);
+        
+        Arrays.fill(fingerList.fingerArray,
+                    fingerList.size() + 1 - fingersToRemove,
+                    fingerList.size() + 1,
+                    null);
+        
+        fingerList.size -= fingersToRemove;
+        
+        int removalRangeLength = toIndex - fromIndex;
+        
+        fingerList.shiftFingerIndicesToLeft(targetIndex, 
+                                            removalRangeLength);
+        size -= removalRangeLength;
     }
     
     /**
