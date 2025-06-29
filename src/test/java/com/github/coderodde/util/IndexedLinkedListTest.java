@@ -64,6 +64,67 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
+    @Test(expected = IllegalStateException.class)
+    public void onEmptyFingerListNonNullHead() {
+        list.head = new Node<>(3);
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onEmptyFingerListNonNullTail() {
+        list.tail = new Node<>(3);
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onEmptyFingerListNonEmptyList() {
+        list.addAll(getIntegerList(13));
+        list.fingerList.size = 0;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void onNegativeFirstFingerNodeIndex() {
+        list.addAll(getIntegerList(13));
+        list.fingerList.getFinger(0).index = -1;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void onTooMissingSecondFinger() {
+        list.addAll(getIntegerList(5));
+        list.fingerList.setFingerIndices(0, 1, 2);
+        list.fingerList.fingerArray[1] = null;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void onTooMissingFirstFinger() {
+        list.addAll(getIntegerList(5));
+        list.fingerList.setFingerIndices(0, 1, 2);
+        list.fingerList.fingerArray[0] = null;
+        list.checkInvarant();
+    }
+    
+    @Test(expected = IllegalStateException.class) 
+    public void onInvalidListsize() {
+        list.addAll(getIntegerList(5));
+        list.size = 6;
+        list.checkInvarant();
+    }
+    
+    @Test
+    public void deoptimize() {
+        list.addAll(getIntegerList(10));
+        list.deoptimize();
+        
+        IndexedLinkedList<Integer> other = new IndexedLinkedList<>(list);
+        
+        other.fingerList.setFingerIndices(0, 1, 2, 3);
+        
+        assertEquals(other.fingerList, list.fingerList);
+    }
+    
     @Test 
     public void removeIntAtZeroIndex() {
         referenceList.addAll(Arrays.asList(1, 2, 3, 4, 5));

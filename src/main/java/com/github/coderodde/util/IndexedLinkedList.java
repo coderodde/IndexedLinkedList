@@ -267,6 +267,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Runs always in linear time.
      */
     public void checkInvarant() {
+        if (fingerList.getFinger(0) == null) {
+            throw new IllegalStateException(
+                    "fingerList[0] is null. " + 
+                    "Must be at least the end-of-finger-list sentinel.");
+        }
+        
         if (fingerList.isEmpty()) {
             if  (!this.isEmpty()) {
                 throw new IllegalStateException(
@@ -294,7 +300,18 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         for (int i = 0; i < fingerList.size() - 1; ++i) {
             Finger<E> left = fingerList.getFinger(i);
+            
+            if (left == null) {
+                throw new IllegalStateException(
+                        "fingerList[" + i + "] is null.");
+            }
+            
             Finger<E> right = fingerList.getFinger(i + 1);
+            
+            if (right == null) {
+                throw new IllegalStateException(
+                        "fingerList[" + (i + 1) + " is null.");
+            }
             
             if (left.index >= right.index) {
                 throw new IllegalStateException(
@@ -336,10 +353,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             if (finger.node == node) {
                 finger = fingerList.getFinger(++fingerCount);
-                
-                if (finger == null) {
-                    throw new IllegalStateException("figner == null");
-                }
             }
             
             node = node.next;
