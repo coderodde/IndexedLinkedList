@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.coderodde.util;
+package io.github.coderodde.util;
 
+import io.github.coderodde.util.Node;
+import io.github.coderodde.util.Finger;
+import io.github.coderodde.util.FingerList;
+import io.github.coderodde.util.IndexedLinkedList;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

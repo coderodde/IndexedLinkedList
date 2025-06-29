@@ -1,4 +1,4 @@
-package com.github.coderodde.util;
+package io.github.coderodde.util;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ import java.util.function.UnaryOperator;
  * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
- * @version 1.6.1 (Nov 9, 2024)
+ * @version 1.7.0 (Jun 29, 2025))
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the element type.
  */

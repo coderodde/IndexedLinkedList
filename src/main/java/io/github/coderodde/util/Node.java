@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.coderodde.util;
+package io.github.coderodde.util;
 
 import java.util.Objects;
 
@@ -29,6 +29,7 @@ import java.util.Objects;
  * This class implements the actual linked list node.
  *
  * @param <E> the type of the satellite data.
+ * @version 1.7.0 (Jun 29, 2025)
  */
 final class Node<E> {
 

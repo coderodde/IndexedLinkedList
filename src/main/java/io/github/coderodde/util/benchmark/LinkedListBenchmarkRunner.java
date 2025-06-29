@@ -1,6 +1,6 @@
-package com.github.coderodde.util.benchmark;
+package io.github.coderodde.util.benchmark;
 
-import com.github.coderodde.util.IndexedLinkedList;
+import io.github.coderodde.util.IndexedLinkedList;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;

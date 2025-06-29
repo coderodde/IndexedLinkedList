@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.coderodde.util;
+package io.github.coderodde.util;
 
-import com.github.coderodde.util.IndexedLinkedList.BasicIterator;
-import com.github.coderodde.util.IndexedLinkedList.DescendingIterator;
-import com.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
-import com.github.coderodde.util.IndexedLinkedList.EnhancedSubList;
-import static com.github.coderodde.util.IndexedLinkedList.checkIndex;
+import io.github.coderodde.util.Node;
+import io.github.coderodde.util.Finger;
+import io.github.coderodde.util.IndexedLinkedList;
+import io.github.coderodde.util.IndexedLinkedList.BasicIterator;
+import io.github.coderodde.util.IndexedLinkedList.DescendingIterator;
+import io.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
+import io.github.coderodde.util.IndexedLinkedList.EnhancedSubList;
+import static io.github.coderodde.util.IndexedLinkedList.checkIndex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
