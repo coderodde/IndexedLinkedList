@@ -314,7 +314,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             if (right == null) {
                 // 'right' cannot be 'null':
                 throw new IllegalStateException(
-                        "fingerList[" + (i + 1) + " is null.");
+                        "fingerList[" + (i + 1) + "] is null.");
             }
             
             if (left.index >= right.index) {
@@ -1788,47 +1788,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                     "fromIndex(" + fromIndex + ") > toIndex(" 
                             + toIndex + ")");
     }
-    /**
-     * Adds the fingers for the range just appended.
-     * 
-     * @param first          the first node of the added collection.
-     * @param firstIndex     the index of {@code first}.
-     * @param collectionSize the size of the added collection.
-     */
-    private void addFingersAfterAppendAll(
-            Node<E> first,
-            int firstIndex,
-            int collectionSize) {
-        
-        // The number of new fingers to add:
-        int numberOfNewFingers = 
-                getRecommendedNumberOfFingers() - fingerList.size();
-
-        if (numberOfNewFingers == 0) {
-            // Once here, nothing to do. Just update the index of the 
-            // end-of-finger-list sentinel and return:
-            fingerList.getFinger(fingerList.size()).index += collectionSize;
-            return;
-        }
-        
-        int fingerIndex = fingerList.size();
-
-        // Make room for 'numberOfNewFingers' fingers between the last
-        // non-sentinel finger and the end-of-finger-list sentinel finger:
-        fingerList.makeRoomAtIndex(fingerIndex, 
-                                   numberOfNewFingers, 
-                                   collectionSize);
-
-        // Compute the distance between new fingers to add:
-        int distance = collectionSize / numberOfNewFingers;
-        
-        // Distribute the new fingers:
-        spreadFingers(first, 
-                      firstIndex, 
-                      fingerIndex,
-                      numberOfNewFingers, 
-                      distance);
-    }    
     
     /**
      * Adds fingers after inserting a collection in this list.
@@ -1923,7 +1882,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = tail;
-        Node<E> oldLast = tail;
         int collectionSize = c.size();
         int numberOfTotalFingers = 
                 getRecommendedNumberOfFingers(size() + collectionSize);
@@ -1932,34 +1890,64 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 numberOfTotalFingers - 
                 getRecommendedNumberOfFingers();
         
-        int distance = collectionSize / numberOfNewFingers;
-        int fingerIndex = fingerList.size();
-        int index = collectionSize;
-        
-        fingerList.reserve(
-                Math.max(numberOfTotalFingers, 
-                         FingerList.INITIAL_CAPACITY));
-        
-        for (E item : c) {
-            // Keep appending:
-            Node<E> newNode = new Node<>(item);
-            newNode.prev = prev;
-            prev.next = newNode;
-            prev = newNode;
+        if (numberOfNewFingers == 0) {
+            for (E item : c) {
+                // Keep appending:
+                Node<E> newNode = new Node<>(item);
+                newNode.prev = prev;
+                prev.next = newNode;
+                prev = newNode;
+            }
             
-            if (fingerIndex < numberOfNewFingers && index % distance == 0) {
+            // Just push the index of the end-of-finger-list sentinel to the 
+            // right by 'collectionSize' positions:
+            fingerList.getFinger(fingerList.size()).index += collectionSize;
+        } else {
+            // The distance between consecutive fingers:
+            int distance = collectionSize / numberOfNewFingers;
+            
+            // The index of the new finger:
+            int targetFingerIndex = fingerList.size();
+            
+            // Denotes the number of new fingers set so far:
+            int fingersSet = 0;
+            
+            // The index of the next inserted node:
+            int index = size;
+
+            // Move the end-of-finger-list sentinel node 'numberOfNewFingers'
+            // positions to the right towards higher indices:
+            fingerList.makeRoomAtIndex(fingerList.size(), 
+                                       numberOfNewFingers, 
+                                       collectionSize);
+            for (E item : c) {
+                // Keep appending:
+                Node<E> newNode = new Node<>(item);
+                newNode.prev = prev;
+                prev.next = newNode;
+                prev = newNode;
+
+                if (fingersSet < numberOfNewFingers
+                        && (index - size) % distance == 0) {
+                    
+                    ++fingersSet;
+                    
+                    // Once here, set a new finger. Essentially, we have more
+                    // fingers to set and the 'index' points to the correct
+                    // node:
+                    fingerList.setFinger(targetFingerIndex++, 
+                                         new Finger<>(newNode, index));
+                }
                 
+                ++index;
             }
         }
-
+        
         // Postprocess the appending:
         tail = prev;
         int sz = c.size();
         size += sz;
         modCount++;
-        
-        // Add possibly new fingers:s
-        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
     }
     
     /**

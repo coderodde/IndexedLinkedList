@@ -1024,6 +1024,8 @@ public class IndexedLinkedListTest {
                 
                 List<Integer> tmpList = getIntegerList(sz2);
                 
+                System.out.println("sz = " + sz + ", sz2 = " + sz2);
+                
                 list.addAll(tmpList);
                 list.checkInvarant();
                 
