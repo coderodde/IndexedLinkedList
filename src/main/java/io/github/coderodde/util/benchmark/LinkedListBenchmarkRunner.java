@@ -67,7 +67,7 @@ final class LinkedListBenchmarkRunner {
             }
         }
         
-        long seed = System.currentTimeMillis();
+        long seed = 1751301286465L; //System.currentTimeMillis();
 
         System.out.println("<<< Benchmark seed = " + seed + " >>>");
         System.out.println();
