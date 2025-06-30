@@ -906,13 +906,18 @@ final class FingerList<E> {
         fingerArray[size].index = list.size;
     }
     
-    // TODO: Debug me, please!
+    /**
+     * 
+     * @param fromFingerIndex
+     * @param numberOfFingersToRemove
+     * @param removalRangeLength 
+     */
     void removeFingersOnDeleteRange(int fromFingerIndex,
                                     int numberOfFingersToRemove,
                                     int removalRangeLength) {
         
         if (numberOfFingersToRemove != 0) {
-            
+            // Push 'numberOfFingersToRemove' towards to the prefix:
             System.arraycopy(
                     fingerArray, 
                     fromFingerIndex 
@@ -926,26 +931,23 @@ final class FingerList<E> {
                             - list.numberOfCoveringFingersToPrefix 
                             + 1);
             
+            // Set all unused finger array positions to 'null' in order to get
+            // rid of junk:
             Arrays.fill(fingerArray,
                         size - numberOfFingersToRemove + 1,
                         size + 1,
                         null);
 
+            // Update the number of fingers:
             this.size -= numberOfFingersToRemove;
-            shiftFingerIndicesToLeft(
-                    fromFingerIndex + list.numberOfCoveringFingersToPrefix,
-                    removalRangeLength);
-        } else {
-            shiftFingerIndicesToLeft(
-                    fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-                    removalRangeLength);
         }
         
-//        shiftFingerIndicesToLeft(
-//                fromFingerIndex + list.numberOfCoveringFingersToPrefix, 
-//                removalRangeLength);
+        // Update the finger indices on the right:
+        shiftFingerIndicesToLeft(
+                fromFingerIndex + list.numberOfCoveringFingersToPrefix,
+                removalRangeLength);
         
-        this.list.size -= removalRangeLength;
+        list.size -= removalRangeLength;
     }
 
     /**
