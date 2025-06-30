@@ -4731,6 +4731,23 @@ public class IndexedLinkedListTest {
     }
     
     @Test
+    public void getNodeSequentially() {
+        list.addAll(getIntegerList(5));
+        assertEquals(Integer.valueOf(3), 
+                     list.getNodeSequentially(3).item);
+    }
+    
+    @Test
+    public void stressTestGetNodeSequentially() {
+        list.addAll(getIntegerList(100));
+        
+        for (int i = 0; i < list.size(); ++i) {
+            assertEquals(list.get(i),
+                         list.getNodeSequentially(i).item);
+        }
+    }
+    
+    @Test
     public void getPrefixNode() {
         for (int i = 0; i < 1000; i++) {
             list.add(i);

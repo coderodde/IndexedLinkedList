@@ -1253,6 +1253,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return;
         }
         
+        // Convert to an array and sort the array:
         Object[] array = toArray();
         Arrays.sort((E[]) array, c);
         
@@ -1264,7 +1265,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node.item = item;
         }
         
+        // Distribute all the fingers evenly:
         distributeAllFingers();
+        // Update the modification count:
         modCount++;
     }
     
@@ -1338,16 +1341,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @Override
     public <T> T[] toArray(T[] a) {
         if (a.length < size) {
+            // Once here, we need a larger array:
             a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
         }
         
         int index = 0;
         
+        // Copy the contents into the array:
         for (Node<E> node = head; node != null; node = node.next) {
             a[index++] = (T) node.item;
         }
         
         if (a.length > size) {
+            // Once here, mark the end of the data as 'null':
             a[size] = null;
         }
         
@@ -1364,12 +1370,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[");
         
+        // Indicates that we are before the first iteration:
         boolean firstIteration = true;
         
         for (E element : this) {
             if (firstIteration) {
                 firstIteration = false;
             } else {
+                // Once here, this iteration is not the first one. Add a comma:
                 stringBuilder.append(", ");
             }
             
@@ -1398,11 +1406,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Objects.requireNonNull(c);
         
         if (c.isEmpty()) {
+            // Once here, there is nothing to remove. Return false:
             return false;
         }
         
         boolean modified = false;
         
+        // The number of nodes to process:
         int numberOfNodesToIterate = end - from;
         int i = 0;
         int nodeIndex = from;
@@ -1411,9 +1421,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
             Node<E> nextNode = node.next;
             
             if (c.contains(node.item) == complement) {
+                // Once here, we have a match. Remove it and mark 'modified' as
+                // 'true':
                 modified = true;
                 removeObjectImpl(node, nodeIndex);
             } else {
+                // Omit the element. We need this in order for 
+                // 'removeObjectImpl(node, nodeIndex)' to work properly:
                 nodeIndex++;
             }
             
@@ -1506,13 +1520,28 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @return the {@code index}th node.
      */
     Node<E> getNodeSequentially(int index) {
-        Node<E> node = head;
-        
-        for (int i = 0; i < index; i++) {
-            node = node.next;
+        // This is the so called "nearest neighbor optimization":
+        if (index < size / 2) {
+            // Once here, 'index'th element is closer to the head node. Iterate
+            // starting from the head node forward:
+            Node<E> node = head;
+
+            for (int i = 0; i < index; i++) {
+                node = node.next;
+            }
+
+            return node;
+        } else {
+            // Once here, 'index'th element is closer to the tail node. Iterate
+            // starting from the tail node backwards:
+            Node<E> node = tail;
+            
+            for (int i = 0; i < size - 1 - index; i++) {
+                node = node.prev;
+            }
+            
+            return node;
         }
-        
-        return node;
     }
     
     /**
@@ -1532,30 +1561,41 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                     int toIndex,
                                     int fingersToRemove) {
         
+        // Compute the number of fingers in the finger list prefix and suffix:
         int fingerPrefixLength = fromFingerIndex;
         int fingerSuffixLength = fingerList.size() - toFingerIndex;
 
+        // Compute the lengths of elements in the acutual list prefix and suffx:
         int listPrefixFreeSpots = fromIndex;
         int listSuffixFreeSpots = size - toIndex;
 
+        // Compute the number of free spots for fingers in both list prefix and
+        // suffix:
         int freeFingerPrefixSpots = listPrefixFreeSpots
                                   - fingerPrefixLength;
 
         int freeFingerSuffixSpots = listSuffixFreeSpots 
                                   - fingerSuffixLength;
 
+        // Compute the total number of free spots for fingers:
         int freeSpots = freeFingerPrefixSpots
                       + freeFingerSuffixSpots;
 
+        // Compute the ratio between free prefix finger spots and the toal 
+        // number of free spots:
         float leftRatio = (float)(freeFingerPrefixSpots) / 
                           (float)(freeSpots);
 
+        // Compute the length of the finger list that will be removed:
         int removalRangeLength = toFingerIndex 
                                - fromFingerIndex;
         
+        // Compute the number of fingers left to distribute to the finger list
+        // prefix/suffix:
         int remainingFingers = removalRangeLength
                              - fingersToRemove;
         
+        // Finally, compute the number of fingers going to prefix/suffix:
         int leftCoveredFingers  = (int)(leftRatio * remainingFingers);
         int rightCoveredFingers = remainingFingers - leftCoveredFingers;
 
@@ -1601,11 +1641,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Try push the fingers to the right:
         if (tryPushFingersToRight(fingerIndex)) {
+            // Once here, pushing to the right was successful. Return:
             return;
         }
         
         // Could not push the fingers to the right. Try push to the left:
         if (tryPushFingersToLeft(fingerIndex)) {
+            // Once here, pushing to the left was successful. Return:
             return;
         }
         
@@ -1613,10 +1655,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // finger list:
         for (int i = 0; i <= fingerIndex; ++i) {
             Finger<E> fngr = fingerList.getFinger(i);
+            // Move 'fngr' one spot to the left:
             fngr.index--;
             fngr.node = fngr.node.prev;
         }
         
+        // Fix the remaining indices:
         fingerList.shiftFingerIndicesToLeft(fingerIndex + 1, 1);
     }
     
