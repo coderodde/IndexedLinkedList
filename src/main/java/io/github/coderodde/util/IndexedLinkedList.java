@@ -1032,7 +1032,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             // Once here, the closest finger does not point to the node to be
             // removed. Traverse to the actual removal node:
             nodeToRemove =
-                    traverseLinkedList(
+                    rewindFinger(
                             closestFinger,
                             steps);
             
@@ -3333,13 +3333,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * If steps &gt; 0, rewind to the left. Otherwise, rewinds to the right.
+     * If {@code steps} &gt; 0, rewinds the finger {@code finger} to the right. 
+     * Otherwise, rewinds to the right.
      * 
-     * @param finger the finger to traverse.
-     * @param steps  the number of steps to traverse the {@code finger}.
+     * @param finger the finger to rewind.
+     * @param steps  the number of steps to rewind the {@code finger}.
      * @return the reached node.
      */
-    private Node<E> traverseLinkedList(Finger<E> finger, int steps) {
+    private Node<E> rewindFinger(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
         if (steps < 0) {
@@ -3378,22 +3379,30 @@ public class IndexedLinkedList<E> implements Deque<E>,
             return true;
         }
         
+        // Attempt to push to the left:
         for (int j = fingerIndex; j > 0; --j) {
             Finger<E> fingerLeft  = fingerList.getFinger(j - 1);
             Finger<E> fingerRight = fingerList.getFinger(j);
             
             if (fingerLeft.index + 1 < fingerRight.index) {
+                // We have a free spot between 'fingerLeft' and 'fingerRight' of
+                // length at least one (1). Now push all the fingers from the 
+                // range [j, fingerIndex] one position to the left:
                 for (int k = j; k <= fingerIndex; k++) {
                     Finger<E> fngr = fingerList.getFinger(k);
                     fngr.node = fngr.node.prev;
                     fngr.index--;
                 }
-                   
+                 
+                // Update all the finger indices residing after the target 
+                // finger with index 'fingerIndex':
                 fingerList.shiftFingerIndicesToLeftOnceAll(fingerIndex + 1);
                 return true;
             }
         }
         
+        // Once here, the prefix is tightly packed and does not allow shifting
+        // to the left:
         return false;
     }
     
@@ -3405,11 +3414,14 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @return {@code true} if a free spot is found, {@code false} otherwise.
      */
     private boolean tryPushFingersToRight(int fingerIndex) {
+        // Attempt to push to the right:
         for (int j = fingerIndex; j < fingerList.size(); ++j) {
             Finger<E> fingerLeft  = fingerList.getFinger(j);
             Finger<E> fingerRight = fingerList.getFinger(j + 1);
 
             if (fingerLeft.index + 1 < fingerRight.index) {
+                // Once here, we have an opportunity for pushing to the right.
+                // Move nodes one spot to the right:
                 for (int i = j; i >= fingerIndex; --i) {
                     Finger<E> fngr = fingerList.getFinger(i);
                     fngr.node = fngr.node.next;
@@ -3432,6 +3444,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Node<E> next = x.next;
         Node<E> prev = x.prev;
 
+        // Unlink from the predecessor:
         if (prev == null) {
             head = next;
         } else {
@@ -3439,6 +3452,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             x.prev = null;
         }
 
+        // Unlink from the ancestor:
         if (next == null) {
             tail = prev;
         } else {
@@ -3461,13 +3475,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
-        // Write out any hidden serialization magic
+        // Write out any hidden serialization magic:
         s.defaultWriteObject();
 
-        // Write out size
+        // Write out size:
         s.writeInt(size);
 
-        // Write out all elements in the proper order.
+        // Write out all elements in the proper order:
         for (Node<E> x = head; x != null; x = x.next) {
             s.writeObject(x.item);
         }
@@ -4165,12 +4179,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
         private boolean batchRemove(Collection<?> c, boolean complement) {
             checkForComodification();
             int oldSize = root.size;
+            
+            // Run the batch remove and obtain the modification flag:
             boolean modified = root.batchRemove(c,
                                                 complement, 
                                                 offset, 
                                                 offset + size);
             
             if (modified) {
+                // Update the size and modification counters:
                 updateSizeAndModCount(root.size - oldSize);
             }
             
@@ -4304,14 +4321,17 @@ public class IndexedLinkedList<E> implements Deque<E>,
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
             
+            // Iterate for each remaining element:
             for (long i = numberOfProcessedElements; 
                  i < lengthOfSpliterator; 
                  i++) {
+                
                 E item = node.item;
                 action.accept(item);
                 node = node.next;
             }
             
+            // Update the cached element counter:
             numberOfProcessedElements = lengthOfSpliterator;
             
             if (list.modCount != expectedModCount) {
@@ -4359,14 +4379,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
          */
         @Override
         public boolean tryAdvance(Consumer<? super E> action) {
-            if (action == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(action);
             
             if (numberOfProcessedElements == lengthOfSpliterator) {
+                // Once here, this spliterator instance has iterated over all
+                // available data:
                 return false;
             }
             
+            // Process an element:
             numberOfProcessedElements++;
             E item = node.item;
             action.accept(item);
@@ -4392,25 +4413,33 @@ public class IndexedLinkedList<E> implements Deque<E>,
             long sizeLeft = estimateSize();
             
             if (sizeLeft == 0) {
+                // Once here, there is no more data available:
                 return null;
             }
                 
+            // New length:
             long thisSpliteratorNewLength = sizeLeft / 2L;
             
             if (thisSpliteratorNewLength < MINIMUM_BATCH_SIZE) {
+                // New length is too small:
                 return null;
             }
             
+            // New spliterator parameters:
             long newSpliteratorLength = sizeLeft - thisSpliteratorNewLength;
             long newSpliteratorOffset = this.offsetOfSpliterator;
             
+            // Update this spliterator:
             this.offsetOfSpliterator += newSpliteratorLength;
             this.lengthOfSpliterator -= newSpliteratorLength;
             
+            // Set the new spliterators current node:
             Node<E> newSpliteratorNode = this.node;
             
+            // Advance the current node of this spliterator:
             this.node = list.getNode((int) this.offsetOfSpliterator);
             
+            // Once here, we can create a new spliterator:
             return new LinkedListSpliterator<>(list,
                                                newSpliteratorNode,
                                                newSpliteratorLength, // length
