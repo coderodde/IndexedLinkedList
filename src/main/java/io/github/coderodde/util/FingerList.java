@@ -907,10 +907,14 @@ final class FingerList<E> {
     }
     
     /**
+     * This method is responsible for actual removal of the fingers. Run in 
+     * worst-case \(\mathcal{O}(\sqrt{N})\) time.
      * 
-     * @param fromFingerIndex
-     * @param numberOfFingersToRemove
-     * @param removalRangeLength 
+     * @param fromFingerIndex         the index of the very first finger to 
+     *                                remove.
+     * @param numberOfFingersToRemove the number of fingers to remove.
+     * @param removalRangeLength      the length of the element range belonging
+     *                                to the range being removed.
      */
     void removeFingersOnDeleteRange(int fromFingerIndex,
                                     int numberOfFingersToRemove,

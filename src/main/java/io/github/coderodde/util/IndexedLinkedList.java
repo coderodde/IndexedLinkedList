@@ -264,9 +264,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * <li>Each finger {@code F} points to the {@code i}th linked list node,
      * where {@code i = F.index}.</li>
      * </ol>
-     * Runs always in linear time.
+     * Runs in worst case \(\mathcal{O}(n)\) time.
      */
     public void checkInvarant() {
+        // The first finger spot can never be 'null':
         if (fingerList.getFinger(0) == null) {
             throw new IllegalStateException(
                     "fingerList[0] is null. " + 
@@ -274,7 +275,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (fingerList.isEmpty()) {
+            // Here the finger list is empty (apart from the end-of-finger-list
+            // sentinel):
             if  (!this.isEmpty()) {
+                // This indexed list cannot be here empty:
                 throw new IllegalStateException(
                         "fingerList.size() === "
                                 + fingerList.size()
@@ -284,31 +288,37 @@ public class IndexedLinkedList<E> implements Deque<E>,
             }
             
             if (head != null) {
+                // The finger and actual lists are empty. 'head' must be 'null':
                 throw new IllegalStateException("head != null");
             }
             
             if (tail != null) {
+                // The finger and actual lists are empty. 'tail' must be 'null':
                 throw new IllegalStateException("tail != null");
             }
         }
         
         if (fingerList.getFinger(0).index < 0) {
+            // Negative initial finger index:
             throw new IllegalStateException(
                     "First finger index is negative: "
                             +  fingerList.getFinger(0).index);
         }
         
+        // Check the fingers:
         for (int i = 0; i < fingerList.size() - 1; ++i) {
             Finger<E> left  = fingerList.getFinger(i);
             Finger<E> right = fingerList.getFinger(i + 1);
             
             // First left will be checked in the very beginning of this method:
             if (right == null) {
+                // 'right' cannot be 'null':
                 throw new IllegalStateException(
                         "fingerList[" + (i + 1) + " is null.");
             }
             
             if (left.index >= right.index) {
+                // Here, indices are in opposite relative order:
                 throw new IllegalStateException(
                         "FingerList failed: fingerList[" 
                                 + i
@@ -323,6 +333,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (getRecommendedNumberOfFingers() != fingerList.size()) {
+            // The required and actual number of fingers mismatch:
             throw new IllegalStateException(
                     "Number of fingers mismatch: required = " 
                             + getRecommendedNumberOfFingers() 
@@ -333,6 +344,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Finger<E> sentinelFinger = fingerList.getFinger(fingerList.size());
                 
         if (sentinelFinger == null) {
+            // Here, the end-of-finger-list sentinel is 'null':
             throw new IllegalStateException(
                     "No sentinel finger (number of fingers = " 
                             + fingerList.size() 
@@ -340,6 +352,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (sentinelFinger.index != this.size) {
+            // Size mismatch:
             throw new IllegalStateException(
                     "sentinelFinger.index != this.size. (" 
                             + sentinelFinger.index 
@@ -349,19 +362,23 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (sentinelFinger.node != null) {
+            // The sentinel finger may not have any node associated with it:
             throw new IllegalStateException(
                     "sentinelFigner.node != null: " + sentinelFinger);
         }
         
+        // Check the finger and element counters:
         Finger<E> finger = fingerList.getFinger(0);
         Node<E> node = head;
         int fingerCount = 0;
         int tentativeSize = 0;
         
         while (node != null) {
+            // Count a new 'node':
             tentativeSize++;
             
             if (finger.node == node) {
+                // 'node' is pointed by a finger:
                 finger = fingerList.getFinger(++fingerCount);
             }
             
@@ -369,6 +386,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
         
         if (size != tentativeSize) {
+            // The size recording in this indexed list and actual counted size
+            // do not match:
             throw new IllegalStateException(
                     "Number of nodes mismatch: size = " 
                             + size 
@@ -376,6 +395,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                             + tentativeSize);
         }
         
+        // Check that there is no junk fingers in the rest of the finger array:
         for (int i = fingerList.size() + 1;
                  i < fingerList.fingerArray.length;  
                  i++) {
@@ -383,6 +403,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             finger = fingerList.getFinger(i);
             
             if (finger != null) {
+                // Found a junk finger:
                 throw new IllegalStateException(
                         "Junk finger " + finger + " at fingerList[" + i + "]");
             }
@@ -397,6 +418,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
 
         if (size + 1 < (length / FingerList.THRESHOLD_FACTOR)) {
+            // The finger array capacity is too large. Should have contracted.
             throw new IllegalStateException(
                     "The list has " 
                             + (size() + 1) 
@@ -2226,7 +2248,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * This class implements a basic iterator over this list.
+     * This inner class implements a basic iterator over this list.
      */
     final class BasicIterator implements Iterator<E> {
         
@@ -2340,7 +2362,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Implements the descending list iterator over this list.
+     * This inner class implements the descending list iterator over this list.
      */
     final class DescendingIterator implements Iterator<E> {
 
@@ -2455,7 +2477,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Implements the enhanced list iterator over this list.
+     * This inner class implements the enhanced list iterator over this list.
      */
     final class EnhancedIterator implements ListIterator<E> {
 
@@ -3488,9 +3510,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * This inner class implements a sublist view over the compassing list. This
-     * class is not {@code static} since it needs to work with the underlying 
-     * list.
+     * This inner class implements a sublist view over the compassing list.
      */
     final class EnhancedSubList implements List<E>, Cloneable {
         
