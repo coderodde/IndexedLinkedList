@@ -1917,31 +1917,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Adds fingers after setting a collection as a list.
-     * 
-     * @param collectionSize the size of the collection being set.
-     */
-    private void addFingersAfterSetAll(int collectionSize) {
-        // The number of new fingers to add:
-        int numberOfNewFingers = getRecommendedNumberOfFingers();
-        
-        // Sets the entire finger list:
-        fingerList.makeRoomAtIndex(0,
-                                   numberOfNewFingers,
-                                   collectionSize);
-        
-        // Compute the distance between new fingers to add:
-        int distance = size / numberOfNewFingers;
-        
-        // Distribute the new fingers:
-        spreadFingers(head,
-                      0, 
-                      0,
-                      numberOfNewFingers,
-                      distance);
-    }
-    
-    /**
      * Appends the input collection to the tail of this list.
      * 
      * @param c the collection to append.
@@ -1949,13 +1924,32 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void appendAll(Collection<? extends E> c) {
         Node<E> prev = tail;
         Node<E> oldLast = tail;
-
+        int collectionSize = c.size();
+        int numberOfTotalFingers = 
+                getRecommendedNumberOfFingers(size() + collectionSize);
+        
+        int numberOfNewFingers = 
+                numberOfTotalFingers - 
+                getRecommendedNumberOfFingers();
+        
+        int distance = collectionSize / numberOfNewFingers;
+        int fingerIndex = fingerList.size();
+        int index = collectionSize;
+        
+        fingerList.reserve(
+                Math.max(numberOfTotalFingers, 
+                         FingerList.INITIAL_CAPACITY));
+        
         for (E item : c) {
             // Keep appending:
             Node<E> newNode = new Node<>(item);
             newNode.prev = prev;
             prev.next = newNode;
             prev = newNode;
+            
+            if (fingerIndex < numberOfNewFingers && index % distance == 0) {
+                
+            }
         }
 
         // Postprocess the appending:
@@ -3344,9 +3338,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Set the size of the finger list:
         fingerList.size = numberOfFingers;
         modCount++;
-
-        // Add the all required fingers:
-//        addFingersAfterSetAll(c.size());
     }
     
     /**
