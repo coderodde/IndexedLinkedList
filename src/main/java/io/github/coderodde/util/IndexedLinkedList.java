@@ -169,7 +169,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else if (index == 0) {
             linkFirst(element);
         } else {
-            linkBefore(element, index, node(index));
+            linkBefore(element, index, getNode(index));
         }
     }
     
@@ -221,7 +221,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else if (index == 0) {
             prependAll(c);
         } else {
-            insertAll(c, node(index), index);
+            insertAll(c, getNode(index), index);
         }
         
         return true;
@@ -495,20 +495,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
     }
     
     /**
-     * Packs all the fingers to beginning of this list. Used for research.
+     * Packs half of fingers at the list prefix and the rest of fingers to the
+     * suffix of the list. Used for research.
      */
     public void deoptimize() {
         if (fingerList.isEmpty()) {
+            // Nothing to deoptimize. Return:
             return;
         }
         
         if (fingerList.size() == 1) {
+            // Handles a special case:
             Finger<E> finger = fingerList.getFinger(0);
             finger.index = 0;
             finger.node = head;
             return;
         }
         
+        // Packs the fingers:
         int leftFingers  = fingerList.size() / 2;
         int rightFingers = fingerList.size() - leftFingers;
         int sz = fingerList.size(); 
@@ -525,6 +529,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         node = tail;
         
+        // Pack the remaining fingers at the end of the list:
         for (int i = 0; i < rightFingers; ++i) {
             fingerList.getFinger(sz - 1 - i).index = size - 1 - i;
             fingerList.getFinger(sz - 1 - i).node  = node;
@@ -545,7 +550,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     
     /**
      * Distributes the fingers over the element list
-     * {@code [fromIndex, toIndex)}.
+     * {@code [fromIndex, toIndex)} evenly.
      * 
      * @param fromIndex the leftmost element index in the range over which to 
      *                  distribute the fingers.
@@ -570,23 +575,24 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                  - fingerSuffixLength;
         
         if (numberOfRangeFingers == 0) {
+            // Nothing to distribute. Return:
             return;
         }
         
         int numberOfElementsPerFinger = rangeLength / numberOfRangeFingers;
         int index = fromIndex;
         
-        Node<E> node = node(fromIndex);
+        // Grab the node:
+        Node<E> node = getNode(fromIndex);
         
         for (int i = 0; i < numberOfRangeFingers - 1; ++i) {
+            // Grab the ith finger in the range:
             Finger<E> finger = fingerList.getFinger(i + fingerPrefixLength);
-            finger.node = node;
-            finger.index = index;
-            
-            for (int j = 0; j < numberOfElementsPerFinger; ++j) {
-                node = node.next;
-            }
-            
+            // Update its data:
+            finger.node      = node;
+            finger.index     = index;
+            // Advance both node and index to the next finger's node:
+            node   = scrollNodeToRight(node, numberOfElementsPerFinger);
             index += numberOfElementsPerFinger;
         }
         
@@ -650,7 +656,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @Override
     public E get(int index) {
         checkElementIndex(index);
-        return node(index).item;
+        return getNode(index).item;
     }
     
     /**
@@ -952,19 +958,21 @@ public class IndexedLinkedList<E> implements Deque<E>,
      */
     public void randomizeFingers(Random random) {
         final Set<Integer> indexFilter = new HashSet<>();
-        
+        // Load the set of valid, random integers of size 'fingerList.size()':
         while (indexFilter.size() < fingerList.size) {
             indexFilter.add(random.nextInt(size));
         }
         
+        // Sort the finger indices:
         Integer[] newFingerIndexArray = new Integer[fingerList.size];
         newFingerIndexArray = indexFilter.toArray(newFingerIndexArray);
         Arrays.sort(newFingerIndexArray);
         
+        // Update the finger list:
         for (int i = 0; i < fingerList.size; i++) {
             Finger finger = fingerList.fingerArray[i];
-            finger.index = newFingerIndexArray[i];
-            finger.node = getNodeSequentially(finger.index);
+            finger.index  = newFingerIndexArray[i];
+            finger.node   = getNodeSequentially(finger.index);
         }
     }
 
@@ -1002,6 +1010,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     public E remove(int index) {
         checkElementIndex(index);
         
+        // Get the closest finger:
         int closestFingerIndex  = fingerList.getClosestFingerIndex(index);
         Finger<E> closestFinger = fingerList.getFinger(closestFingerIndex);
         
@@ -1009,31 +1018,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Node<E> nodeToRemove;
         
         if (closestFinger.index == index) {
+            // Once here, element with index 'index' is pointed by a finger:
             nodeToRemove = closestFinger.node;
+            // Move the pointing finger out of the node to be removed:
             moveFingerOutOfRemovalLocation(closestFinger, 
                                            closestFingerIndex);    
         } else {
             // Keep the fingers at their original position.
-            // Find the target node:
+            // Find the target node. Effectively, 'steps' communicates how much
+            // steps we must do to the left:
             int steps = closestFinger.index - index;
             
+            // Once here, the closest finger does not point to the node to be
+            // removed. Traverse to the actual removal node:
             nodeToRemove =
                     traverseLinkedListBackwards(
                             closestFinger,
                             steps);
             
+            // Shift all the indices starting from 'closestFingerIndex + 1'th 
+            // finger o ne position to the left (smaller indices):
             fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
             
-            if (steps > 0) {
+            if (steps > 0) {          
+                // Once here, we need to fix the index also of the 
+                // 'closestFingerIndex'th finger:
                 fingerList.getFinger(closestFingerIndex).index--;
             }
         }
         
+        // Actually unlink the target node:
         returnValue = nodeToRemove.item;
         unlink(nodeToRemove);
         decreaseSize();
 
         if (mustRemoveFinger()) {
+            // Once here, we can safely remove the last finger:
             removeFinger();
         }
 
@@ -1205,7 +1225,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     @Override
     public E set(int index, E element) {
         checkElementIndex(index);
-        Node<E> node = node(index);
+        Node<E> node = getNode(index);
         E oldElement = node.item;
         node.item = element;
         return oldElement;
@@ -1387,7 +1407,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int i = 0;
         int nodeIndex = from;
         
-        for (Node<E> node = node(from); i < numberOfNodesToIterate; ++i) {
+        for (Node<E> node = getNode(from); i < numberOfNodesToIterate; ++i) {
             Node<E> nextNode = node.next;
             
             if (c.contains(node.item) == complement) {
@@ -1656,7 +1676,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
         Objects.requireNonNull(operator); 
         int expectedModCount = modCount;
-        Node<E> node = node(i);
+        Node<E> node = getNode(i);
         
         while (modCount == expectedModCount && i < end) {
             node.item = operator.apply(node.item);
@@ -1965,7 +1985,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private int hashCodeRange(int from, int to) {
         int hashCode = 1;
         
-        Node<E> node = node(from);
+        Node<E> node = getNode(from);
         
         while (from++ < to) {
             // Same arithmetics as in ArrayList.
@@ -2000,7 +2020,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int index = start;
         
         if (o == null) {
-            for (Node<E> node = node(start);
+            for (Node<E> node = getNode(start);
                     index < end; 
                     index++, node = node.next) {
                 if (node.item == null) {
@@ -2008,7 +2028,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
         } else {
-            for (Node<E> node = node(start);
+            for (Node<E> node = getNode(start);
                     index < end;
                     index++, node = node.next) {
                 if (o.equals(node.item)) {
@@ -2092,7 +2112,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int index = end - 1;
         
         if (o == null) {
-            for (Node<E> node = node(index);
+            for (Node<E> node = getNode(index);
                     index >= start; 
                     index--, node = node.prev) {
                 if (node.item == null) {
@@ -2100,7 +2120,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
                 }
             }
         } else {
-            for (Node<E> node = node(index);
+            for (Node<E> node = getNode(index);
                     index >= start;
                     index--, node = node.prev) {
                 if (o.equals(node.item)) {
@@ -2347,7 +2367,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
     final class EnhancedIterator implements ListIterator<E> {
 
         /**
-         * The most recently iterated node.
+         * The most recently iterated node. 
          */
         private Node<E> lastReturned;
         
@@ -2379,7 +2399,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
          * @param index the starting node index.
          */
         EnhancedIterator(int index) {
-            next = (index == size) ? null : node(index);
+            next = (index == size) ? null : getNode(index);
             nextIndex = index;
         }
         
@@ -2707,13 +2727,13 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param elementIndex the index of the target element.
      * @return the node containing the target element.
      */
-    private Node<E> node(int elementIndex) {
+    private Node<E> getNode(int elementIndex) {
          return fingerList.getNode(elementIndex);
     }
     
     /**
      * Returns the node at index {@code elementIndex}. Unlike 
-     * {@link #node(int)}, this method does no relocate fingers.
+     * {@link #getNode(int)}, this method does no relocate fingers.
      * 
      * @param elementIndex the index of the target element.
      * @return the node containing the target element.
@@ -2861,7 +2881,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         int i = 0;
         int nodeIndex = fromIndex;
         
-        for (Node<E> node = node(fromIndex); i < numberOfNodesToIterate; ++i) {
+        for (Node<E> node = getNode(fromIndex); i < numberOfNodesToIterate; ++i) {
             Node<E> nextNode = node.next;
             
             if (filter.test(node.item)) {
@@ -3498,7 +3518,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             int expectedModCount = modCount;
             int iterated = 0;
             
-            for (Node<E> node = node(offset); 
+            for (Node<E> node = getNode(offset); 
                     modCount == expectedModCount && iterated < size; 
                     node = node.next, ++iterated) {
                 
@@ -3803,7 +3823,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             int expectedModCount = modCount;
             Object[] array = toArray();
-            Node<E> node = node(offset);
+            Node<E> node = getNode(offset);
 
             Arrays.sort((E[]) array, c);
 
@@ -3829,7 +3849,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         @Override
         public Spliterator<E> spliterator() {
             return new LinkedListSpliterator(root,
-                                             node(offset),
+                                             getNode(offset),
                                              size,
                                              offset,
                                              modCount);
@@ -3860,7 +3880,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             checkForComodification();
             int expectedModCount = root.modCount;
             Object[] array = new Object[this.size];
-            Node<E> node = node(offset);
+            Node<E> node = getNode(offset);
             
             for (int i = 0; 
                     i < array.length && expectedModCount == root.modCount;
@@ -3900,7 +3920,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             int index = 0;
             
-            for (Node<E> node = node(offset);
+            for (Node<E> node = getNode(offset);
                     expectedModCount == root.modCount && index < size; 
                     ++index, node = node.next) {
                 
@@ -4213,7 +4233,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
             
             Node<E> newSpliteratorNode = this.node;
             
-            this.node = list.node((int) this.offsetOfSpliterator);
+            this.node = list.getNode((int) this.offsetOfSpliterator);
             
             return new LinkedListSpliterator<>(list,
                                                newSpliteratorNode,
