@@ -417,6 +417,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         // Help GC:
         for (Node<E> node = head; node != null;) {
+            // Unlink 'node':
             node.prev = null;
             node.item = null;
             Node<E> next = node.next;
@@ -424,7 +425,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
             node = next;
         }
 
+        // Repair the invariant:
         head = tail = null;
+        // Signal that state was changed:
         modCount++;
     }
     
@@ -477,13 +480,15 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @return a deep copy of this list.
      */
     public IndexedLinkedList<E> deepCopy() {
+        // First, copy the actual content:
         IndexedLinkedList<E> other = new IndexedLinkedList<>(this);
         int fingerIndex = 0;
         
+        // Copy the finger list:
         for (int i = 0; i <= this.fingerList.size; i++) {
-            Finger<E> fingerCopy = new Finger<>(fingerList.fingerArray[i]);
-            fingerCopy.node = getNodeSequentially(fingerCopy.index);
-            other.fingerList.fingerArray[fingerIndex++] = fingerCopy;
+            // Copy the finger:
+            other.fingerList.fingerArray[fingerIndex++] = 
+                    new Finger<>(fingerList.fingerArray[i]);
         }
         
         return other;
@@ -493,12 +498,38 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * Packs all the fingers to beginning of this list. Used for research.
      */
     public void deoptimize() {
+        if (fingerList.isEmpty()) {
+            return;
+        }
+        
+        if (fingerList.size() == 1) {
+            Finger<E> finger = fingerList.getFinger(0);
+            finger.index = 0;
+            finger.node = head;
+            return;
+        }
+        
+        int leftFingers  = fingerList.size() / 2;
+        int rightFingers = fingerList.size() - leftFingers;
+        int sz = fingerList.size(); 
         Node<E> node = head;
         
-        for (int i = 0; i < fingerList.size(); i++) {
+        // Just pack all the fingers at the very beginning.
+        for (int i = 0; i < leftFingers; ++i) {
+            // Pack the current finger:
             fingerList.getFinger(i).index = i;
-            fingerList.getFinger(i).node = node;
+            fingerList.getFinger(i).node  = node;
+            // Grab the reference to the next node:
             node = node.next;
+        }
+        
+        node = tail;
+        
+        for (int i = 0; i < rightFingers; ++i) {
+            fingerList.getFinger(sz - 1 - i).index = size - 1 - i;
+            fingerList.getFinger(sz - 1 - i).node  = node;
+            // Grab the reference to the previous node:
+            node = node.prev;
         }
     }
     
@@ -1613,6 +1644,29 @@ public class IndexedLinkedList<E> implements Deque<E>,
         modCount++;
         
         fingerList.contractFingerArrayIfNeeded(size);
+    }
+    
+    /**
+     * Replaces all the elements from range {@code [i, end - 1]}.
+     * 
+     * @param operator the replacement operator.
+     * @param i the starting, inclusive index of the range to replace.
+     * @param end the ending, exclusive index of the range to replace.
+     */
+    void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
+        Objects.requireNonNull(operator); 
+        int expectedModCount = modCount;
+        Node<E> node = node(i);
+        
+        while (modCount == expectedModCount && i < end) {
+            node.item = operator.apply(node.item);
+            node = node.next;
+            i++;
+        }
+        
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
     }
     
     /**
@@ -3019,29 +3073,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
         fingerList.shiftFingerIndicesToLeft(targetIndex, 
                                             removalRangeLength);
         size -= removalRangeLength;
-    }
-    
-    /**
-     * Replaces all the elements from range {@code [i, end - 1]}.
-     * 
-     * @param operator the replacement operator.
-     * @param i the starting, inclusive index of the range to replace.
-     * @param end the ending, exclusive index of the range to replace.
-     */
-    private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
-        Objects.requireNonNull(operator); 
-        int expectedModCount = modCount;
-        Node<E> node = node(i);
-        
-        while (modCount == expectedModCount && i < end) {
-            node.item = operator.apply(node.item);
-            node = node.next;
-            i++;
-        }
-        
-        if (modCount != expectedModCount) {
-            throw new ConcurrentModificationException();
-        }
     }
     
     /**

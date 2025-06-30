@@ -16,9 +16,6 @@
  */
 package io.github.coderodde.util;
 
-import io.github.coderodde.util.Node;
-import io.github.coderodde.util.Finger;
-import io.github.coderodde.util.IndexedLinkedList;
 import io.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import io.github.coderodde.util.IndexedLinkedList.DescendingIterator;
 import io.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
@@ -202,13 +199,58 @@ public class IndexedLinkedListTest {
     }
     
     @Test
-    public void deoptimize() {
-        list.addAll(getIntegerList(10));
+    public void deoptimizeOnEmptyList() {
+        list.deoptimize();
+        assertTrue(list.fingerList.isEmpty());
+        assertEquals(0, list.fingerList.getFinger(0).index);
+        assertNull(list.fingerList.getFinger(0).node);
+    }
+    
+    @Test
+    public void deoptimizeOnOneFinger() {
+        list.add(10);
+        assertEquals(1, list.fingerList.size());
+        assertEquals(Integer.valueOf(10),
+                     list.fingerList.getFinger(0).node.item);
+        
+        assertEquals(0, list.fingerList.getFinger(0).index);
+        
+        assertNull(list.fingerList.getFinger(1).node);
+        assertEquals(1, list.fingerList.getFinger(1).index);
+    }
+    
+    @Test
+    public void deoptimize2Fingers() {
+        list.addAll(getIntegerList(4));
         list.deoptimize();
         
         IndexedLinkedList<Integer> other = new IndexedLinkedList<>(list);
         
-        other.fingerList.setFingerIndices(0, 1, 2, 3);
+        other.fingerList.setFingerIndices(0, 3);
+        
+        assertEquals(other.fingerList, list.fingerList);
+    }
+    
+    @Test
+    public void deoptimize3Fingers() {
+        list.addAll(getIntegerList(8));
+        list.deoptimize();
+        
+        IndexedLinkedList<Integer> other = new IndexedLinkedList<>(list);
+        
+        other.fingerList.setFingerIndices(0, 6, 7);
+        
+        assertEquals(other.fingerList, list.fingerList);
+    }
+    
+    @Test
+    public void deoptimize4Fingers() {
+        list.addAll(getIntegerList(11));
+        list.deoptimize();
+        
+        IndexedLinkedList<Integer> other = new IndexedLinkedList<>(list);
+        
+        other.fingerList.setFingerIndices(0, 1, 9, 10);
         
         assertEquals(other.fingerList, list.fingerList);
     }
