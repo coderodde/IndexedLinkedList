@@ -73,6 +73,14 @@ final class FingerList<E> {
         this.fingerArray[0] = new Finger<>(null, 0);
     }
     
+    /**
+     * Verifies that this finger list and {@code o} have the same size and 
+     * content. Runs in worst-case linear time.
+     * 
+     * @param o the object to compare to.
+     * @return {@code true} if and only if {@code o} is a {@code FingerList},
+     *         has the same size as this finger list and the same content.
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -132,7 +140,8 @@ final class FingerList<E> {
     int size;
     
     /**
-     * Adjusts the finger list after removing the first finger.
+     * Adjusts the finger list after removing the first finger. runs in worst-
+     * case \(\mathcal{O}(\sqrt{n})\) time.
      */
     void adjustOnRemoveFirst() {
         int lastPrefixIndex = Integer.MAX_VALUE;
@@ -152,7 +161,8 @@ final class FingerList<E> {
     }
     
     /**
-     * Appends the input finger to the tail of the finger list.
+     * Appends the input finger to the tail of the finger list. Runs in 
+     * amortized constant time.
      *
      * @param finger the finger to append.
      */
@@ -954,6 +964,15 @@ final class FingerList<E> {
         list.size -= removalRangeLength;
     }
 
+    /**
+     * Reserves a particular capacity.
+     * 
+     * @param requestedSize the requested size.
+     */
+    void reserve(int requestedSize) {
+        fingerArray = new Finger[requestedSize + 1];
+    }
+        
     /**
      * Sets the finger {@code finger} to the finger array at index
      * {@code index}.

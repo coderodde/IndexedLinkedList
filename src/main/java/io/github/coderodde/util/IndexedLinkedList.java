@@ -3311,21 +3311,42 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // Prepare the first element:
         head = new Node<>(iterator.next());
         Node<E> prevNode = head;
-
+        
+        int collectionSize  = c.size();
+        int numberOfFingers = getRecommendedNumberOfFingers(collectionSize);
+        int distance        = collectionSize / numberOfFingers;
+        int fingerIndex     = 1;
+        
+        fingerList.reserve(
+                Math.max(numberOfFingers, 
+                         FingerList.INITIAL_CAPACITY));
+        
+        fingerList.setFinger(0, new Finger<>(head, 0));
+        
+        fingerList.setFinger(numberOfFingers, 
+                             new Finger<>(null, collectionSize));
+        
         for (int i = 1, sz = c.size(); i < sz; i++) {
             // Keep setting the new elements from 'c':
             Node<E> newNode = new Node<>(iterator.next());
             prevNode.next = newNode;
             newNode.prev = prevNode;
             prevNode = newNode;
+            
+            if (fingerIndex < numberOfFingers && i % distance == 0) {
+                fingerList.setFinger(fingerIndex++, new Finger<>(newNode, i));
+            }
         }
 
         tail = prevNode;
+        // Set the size of the actual indexed list:
         size = c.size();
+        // Set the size of the finger list:
+        fingerList.size = numberOfFingers;
         modCount++;
 
         // Add the all required fingers:
-        addFingersAfterSetAll(c.size());
+//        addFingersAfterSetAll(c.size());
     }
     
     /**
