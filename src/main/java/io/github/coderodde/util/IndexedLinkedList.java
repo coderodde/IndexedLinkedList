@@ -57,7 +57,7 @@ import java.util.function.UnaryOperator;
  * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
- * @version 1.7.0 (Jun 29, 2025))
+ * @version 1.7.1 (Jul 1, 2025) - the Master thesis version)
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the element type.
  */

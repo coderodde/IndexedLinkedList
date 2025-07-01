@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fi.helsinki</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.618033988</version>
+    <version>1.7.1</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
