@@ -105,8 +105,8 @@ final class LinkedListBenchmark {
     private void listsEqual() {
         listsEqual(roddeList,
                    linkedList, 
-                   arrayList, 
-                   treeList);
+                   treeList,
+                   arrayList);
     }
 
     private static void listsEqual(List<Integer>... lists) {
@@ -219,6 +219,8 @@ final class LinkedListBenchmark {
     }
 
     private void profileAddViaIndex() {
+        listsEqual();
+        
         profileAddIndexRoddeListV2();
         profileAddIndexLinkedList();
         profileAddIndexArrayList();
@@ -510,8 +512,23 @@ final class LinkedListBenchmark {
 
         for (int i = 0; i < operations; i++) {
             int index = random.nextInt(list.size());
+            
             Integer value = getRandomInteger(random);
             list.add(index, value);
+            
+            Integer retrieved = list.get(index);
+            
+            if (!retrieved.equals(value)) {
+                throw new IllegalStateException(
+                        "Data mismatch: value = " 
+                                + value 
+                                + " vs. " 
+                                + retrieved
+                                + " at list " 
+                                + i
+                                + ", element index: " 
+                                + index);
+            }
         }
 
         long endMillis = System.currentTimeMillis();

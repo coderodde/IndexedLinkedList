@@ -69,6 +69,34 @@ public class IndexedLinkedListTest {
         referenceList.clear();
     }
     
+    @Test
+    public void debugAddAtIndex() {
+        long seed = System.currentTimeMillis();
+        Random random = new Random(seed);
+        System.out.println("debugAddAtIndex(), seed = " + seed);
+        
+        list.add(0, 0);
+        referenceList.add(0, 0);
+        
+        for (int i = 1; i < 100; ++i) {
+            int index = random.nextInt(list.size());
+            list.add(index, i);
+            list.checkInvarant();
+            referenceList.add(index, i);
+            assertEquals(referenceList, list);
+        }
+        
+    }
+    
+    @Test
+    public void debugTryPushFingersToRight1() {
+        list.addAll(getIntegerList(17));
+        list.fingerList.setFingerIndices(2, 3, 4, 6, 7);
+        list.remove(2);
+        list.checkInvarant();
+        System.out.println("passed!");
+    }
+    
     @Test(expected = IllegalStateException.class)
     public void onEmptyFingerListNonNullHead() {
         list.head = new Node<>(3);
@@ -1024,7 +1052,7 @@ public class IndexedLinkedListTest {
                 
                 List<Integer> tmpList = getIntegerList(sz2);
                 
-                System.out.println("sz = " + sz + ", sz2 = " + sz2);
+//                System.out.println("sz = " + sz + ", sz2 = " + sz2);
                 
                 list.addAll(tmpList);
                 list.checkInvarant();

@@ -32,8 +32,6 @@ final class LinkedListBenchmarkRunner {
      * @param args the command line arguments. Ignored. 
      */
     public static void main(String[] args) {
-//        deleteRange();
-//        System.exit(0);
         boolean runSubListClear = false;
         boolean runRemoveAll = false;
         boolean runSort = false;

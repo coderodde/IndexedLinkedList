@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
-    <description>An efficient, heuristic, indexeded linked-list for versatile usage.</description>
+    <description>An efficient, heuristic, indexeded linked-list for versatile usage for large data.</description>
     <url>https://github.com/coderodde/IndexedLinkedList</url>
 
     <properties>
@@ -28,7 +28,7 @@
             <name>Rodion Efremov</name>
             <email>rodion.efremov@helsinki.fi</email>
             <organization>University of Helsinki, Department of Computer Science</organization>
-            <organizationUrl>github.com/coderodde</organizationUrl>
+            <organizationUrl>coderodde.github.io</organizationUrl>
         </developer>
     </developers>
 
@@ -86,7 +86,26 @@
     </distributionManagement>
 
     <build>
-        <plugins><!--
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
+                    <arguments>
+                        <argument>--all</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -250,15 +269,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>
-                                com.github.coderodde.util.benchmark.LinkedListBenchmark2
-                            </mainClass>
+                            <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
