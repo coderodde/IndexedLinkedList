@@ -38,7 +38,7 @@ final class FingerList<E> {
     /**
      * The owner indexed linked list.
      */
-    private final IndexedLinkedList<E> list;
+    final IndexedLinkedList<E> list;
 
     /**
      * This is also the minimum capacity.
@@ -167,9 +167,15 @@ final class FingerList<E> {
      * @param finger the finger to append.
      */
      void appendFinger(Finger<E> finger) {
+        
+        enlargeFingerArrayWithEmptyRange(size + 2 , 
+                                         size, 
+                                         1,
+                                         1);
         size++;
-        enlargeFingerArrayIfNeeded(size + 1);
-        fingerArray[size] = fingerArray[size - 1];
+         
+//        enlargeFingerArrayIfNeeded(size + 1);
+        fingerArray[size] = fingerArray[size - 1]; // TODO: Remove me?
         fingerArray[size - 1] = finger;
         fingerArray[size].index = list.size;
     }
@@ -256,24 +262,24 @@ final class FingerList<E> {
         }
     }
     
-    /**
-     * Enlarges the finger array so that it can accommodate
-     * {@code requestedSize} fingers.
-     *
-     * @param requestedSize the requested size, including the end-of-finger-list
-     * sentinel finger.
-     */
-    private void enlargeFingerArrayIfNeeded(int requestedSize) {
-        int nextCapacity = fingerArray.length;
-
-        while (requestedSize > nextCapacity) {
-            nextCapacity *= 2;
-        }
-
-        if (nextCapacity != fingerArray.length) {
-            fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
-        }
-    }
+//    /**
+//     * Enlarges the finger array so that it can accommodate
+//     * {@code requestedSize} fingers.
+//     *
+//     * @param requestedSize the requested size, including the end-of-finger-list
+//     * sentinel finger.
+//     */
+//    private void enlargeFingerArrayIfNeeded(int requestedSize) {
+//        int nextCapacity = fingerArray.length;
+//
+//        while (requestedSize > nextCapacity) {
+//            nextCapacity *= 2;
+//        }
+//
+//        if (nextCapacity != fingerArray.length) {
+//            fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
+//        }
+//    }
     
     void enlargeFingerArrayWithEmptyRange(int requestedCapacity,
                                           int fingerRangeStartIndex,
@@ -297,12 +303,19 @@ final class FingerList<E> {
             shiftFingerIndicesToRight(fingerRangeStartIndex,
                                       elementRangeLength);
             
+            // Copy the finger array prefix:
+            System.arraycopy(fingerArray, 
+                             0,
+                             nextFingerArray, 
+                             0,
+                             fingerRangeStartIndex);
+            
             // Make room for the finger range:
             System.arraycopy(fingerArray, 
                              fingerRangeStartIndex,
                              nextFingerArray,
                              fingerRangeStartIndex + fingerRangeLength,
-                             fingerRangeLength);
+                             fingerRangeLength + 2);
             
             fingerArray = nextFingerArray;
         } else {
@@ -310,12 +323,21 @@ final class FingerList<E> {
             shiftFingerIndicesToRight(fingerRangeStartIndex, 
                                       elementRangeLength);
             
+            int numberOfSuffixFingers = fingerArray.length
+                                      - size
+                                      - fingerRangeStartIndex
+                                      - fingerRangeLength;
+//            int numberOfSuffixFingers = Math.min(fingerArray.length 
+//                                                    - fingerRangeLength 
+//                                                    - fingerRangeStartIndex,
+//                                                 fingerRangeLength);
+            
             // Make room for the finger range:
             System.arraycopy(fingerArray,
                              fingerRangeStartIndex,
                              fingerArray,
                              fingerRangeStartIndex + fingerRangeLength,
-                             fingerRangeLength + 2);
+                             numberOfSuffixFingers);
         }
     }
     
@@ -652,14 +674,21 @@ final class FingerList<E> {
      * @param finger the finger to insert.
      */
     void insertFingerAndShiftOnceToRight(Finger<E> finger) {
-        enlargeFingerArrayIfNeeded(size + 2);
         int beforeFingerIndex = getFingerIndexImpl(finger.index);
-        System.arraycopy(
-                fingerArray,
-                beforeFingerIndex,
-                fingerArray,
-                beforeFingerIndex + 1,
-                size + 1 - beforeFingerIndex);
+        
+        enlargeFingerArrayWithEmptyRange(size + 2,
+                                         beforeFingerIndex, 
+                                         1,
+                                         1);
+        
+//        enlargeFingerArrayIfNeeded(size + 2);
+
+//        System.arraycopy(
+//                fingerArray,
+//                beforeFingerIndex,
+//                fingerArray,
+//                beforeFingerIndex + 1,
+//                size + 1 - beforeFingerIndex);
 
         ++size;
 
@@ -692,16 +721,21 @@ final class FingerList<E> {
     void makeRoomAtIndex(int fingerIndex,
                          int roomSize,
                          int numberOfNodes) {
-
-        shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
-        size += roomSize;
-        enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
-                                              // sentinel.
-        System.arraycopy(fingerArray,
-                         fingerIndex,
-                         fingerArray,
-                         fingerIndex + roomSize,
-                         size - roomSize - fingerIndex + 1);
+        
+        enlargeFingerArrayWithEmptyRange(size + 1 + roomSize, 
+                                         fingerIndex, 
+                                         roomSize,
+                                         numberOfNodes);
+//
+//        shiftFingerIndicesToRight(fingerIndex, numberOfNodes);
+//        size += roomSize;
+//        enlargeFingerArrayIfNeeded(size + 1); // +1 for the end of list
+//                                              // sentinel.
+//        System.arraycopy(fingerArray,
+//                         fingerIndex,
+//                         fingerArray,
+//                         fingerIndex + roomSize,
+//                         size - roomSize - fingerIndex + 1);
     }
     
     void makeRoomAtPrefix(int fromIndex,

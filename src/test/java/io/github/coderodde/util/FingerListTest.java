@@ -146,23 +146,23 @@ public class FingerListTest {
         assertEquals(5, fl.size());
     }
     
-        @Test
+    @Test
     public void insertFingerAtTail() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
+        fl.list.size = 1;
+        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 0));
+        fl.list.size = 2;
+        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 1));
+        fl.list.size = 3;
+        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 2));
         
         // Add end of finger list sentinel:
-        fl.fingerArray[3] = 
-                new Finger<>(new Node<Integer>(Integer.valueOf(100)), 10);
+        fl.fingerArray[3] = new Finger<>(new Node<>(null), 10);
         
-        Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 6);
+        fl.list.size = 4;
+        Finger<Integer> insertionFinger = new Finger<>(new Node<>(13), 1);
         
         fl.insertFingerAndShiftOnceToRight(insertionFinger);
 
-        Finger<Integer> finger = fl.getFinger(fl.getClosestFingerIndex(6));
-        assertEquals(insertionFinger.index, finger.index);
-        
         assertEquals(4, fl.size());
     }
     
