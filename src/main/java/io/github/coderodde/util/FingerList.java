@@ -166,7 +166,7 @@ final class FingerList<E> {
      *
      * @param finger the finger to append.
      */
-    void appendFinger(Finger<E> finger) {
+     void appendFinger(Finger<E> finger) {
         size++;
         enlargeFingerArrayIfNeeded(size + 1);
         fingerArray[size] = fingerArray[size - 1];
@@ -255,7 +255,7 @@ final class FingerList<E> {
             fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
         }
     }
-
+    
     /**
      * Enlarges the finger array so that it can accommodate
      * {@code requestedSize} fingers.
@@ -272,6 +272,50 @@ final class FingerList<E> {
 
         if (nextCapacity != fingerArray.length) {
             fingerArray = Arrays.copyOf(fingerArray, nextCapacity);
+        }
+    }
+    
+    void enlargeFingerArrayWithEmptyRange(int requestedCapacity,
+                                          int fingerRangeStartIndex,
+                                          int fingerRangeLength,
+                                          int elementRangeLength) {
+        
+        // + 1 for the end-of-finger-list sentinel:
+        if (requestedCapacity > fingerArray.length + fingerRangeLength) {
+            // Compute the next accommodating capacity:
+            int nextCapacity = 2 * fingerArray.length;
+            
+            while (nextCapacity < requestedCapacity) {
+                nextCapacity *= 2;
+            }
+            
+            // Here, we have a next accommodating capacity!
+            
+            Finger<E>[] nextFingerArray = new Finger[nextCapacity];
+            
+            // Shift the right part to the right:
+            shiftFingerIndicesToRight(fingerRangeStartIndex,
+                                      elementRangeLength);
+            
+            // Make room for the finger range:
+            System.arraycopy(fingerArray, 
+                             fingerRangeStartIndex,
+                             nextFingerArray,
+                             fingerRangeStartIndex + fingerRangeLength,
+                             fingerRangeLength);
+            
+            fingerArray = nextFingerArray;
+        } else {
+            // Shift the right part to the right:
+            shiftFingerIndicesToRight(fingerRangeStartIndex, 
+                                      elementRangeLength);
+            
+            // Make room for the finger range:
+            System.arraycopy(fingerArray,
+                             fingerRangeStartIndex,
+                             fingerArray,
+                             fingerRangeStartIndex + fingerRangeLength,
+                             fingerRangeLength + 2);
         }
     }
     
@@ -827,9 +871,41 @@ final class FingerList<E> {
      */
     void prependFingerForNode(Node<E> node) {
         Finger<E> finger = new Finger<>(node, 0);
-        enlargeFingerArrayIfNeeded(size + 2);
-        shiftFingerIndicesToRightOnce(0);
-        System.arraycopy(fingerArray, 0, fingerArray, 1, size + 1);
+        
+        // 'size + 1': actual number of fingers + the end-of-finger-list 
+        // sentinel:
+        if (size + 1 == fingerArray.length) {
+            // Once here, the 'fingerArray' is fully filled:
+            Finger<E>[] newFingerArray = new Finger[2 * fingerArray.length];
+            
+            // Move the current finger list contents to the new finger array:
+            System.arraycopy(fingerArray, 
+                             0,
+                             newFingerArray, 
+                             1,
+                             size + 1);
+            
+            fingerArray = newFingerArray;
+            
+            // Shift all the rest fingers' indices one step to the right towards
+            // higher indices:
+            shiftFingerIndicesToRightOnce(1);
+            
+            // Update the index of the new end-of-finger-list sentinel:
+            ++getFinger(size() + 1).index;
+        } else {
+            // Shift the all fingers' indices one step to the right:
+            shiftFingerIndicesToRightOnce(0);
+            
+            // Make room for the new finger:
+            System.arraycopy(fingerArray,
+                             0,
+                             fingerArray,
+                             1, 
+                             size + 1);
+            
+        }
+        
         fingerArray[0] = finger;
         size++;
     }

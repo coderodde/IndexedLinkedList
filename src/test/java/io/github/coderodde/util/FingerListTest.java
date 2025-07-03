@@ -16,10 +16,6 @@
  */
 package io.github.coderodde.util;
 
-import io.github.coderodde.util.Node;
-import io.github.coderodde.util.Finger;
-import io.github.coderodde.util.FingerList;
-import io.github.coderodde.util.IndexedLinkedList;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,6 +31,44 @@ public class FingerListTest {
     @Before
     public void setUp() {
         fl.clear();
+    }
+    
+    @Test
+    public void enlargeFingerArrayWithEmptyRangeNonExpansion() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
+        list.fingerList.setFingerIndices(0, 1, 2, 3);
+        list.fingerList.enlargeFingerArrayWithEmptyRange(8, 1, 2, 2);
+        
+        assertEquals(new Finger<>(new Node<>(0), 0), 
+                     list.fingerList.fingerArray[0]);
+        
+        assertEquals(new Finger<>(new Node<>(1), 3), 
+                     list.fingerList.fingerArray[1]);
+        
+        assertEquals(new Finger<>(new Node<>(2), 4), 
+                     list.fingerList.fingerArray[2]);
+        
+        assertEquals(new Finger<>(new Node<>(1), 3), 
+                     list.fingerList.fingerArray[3]);
+        
+        assertEquals(new Finger<>(new Node<>(2), 4), 
+                     list.fingerList.fingerArray[4]);
+        
+        assertEquals(new Finger<>(new Node<>(3), 5), 
+                     list.fingerList.fingerArray[5]);
+        
+        assertEquals(new Finger<>(null, 14),
+                     list.fingerList.fingerArray[6]);
+    }
+    
+    @Test
+    public void enlargeFingerArrayWithEmptyRangeExpansion() {
+        list.addAll(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
+        list.fingerList.setFingerIndices(0, 1, 2, 3);
+        list.fingerList.enlargeFingerArrayWithEmptyRange(13, 1, 2, 2);
+        
+        assertEquals(new Finger<>(new Node<>(0), 0), 
+                     list.fingerList.fingerArray[0]);
     }
     
     @Test
