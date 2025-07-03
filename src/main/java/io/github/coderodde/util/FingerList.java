@@ -296,9 +296,8 @@ final class FingerList<E> {
             }
             
             // Here, we have a next accommodating capacity!
-            
             Finger<E>[] nextFingerArray = new Finger[nextCapacity];
-            
+            System.out.println("FUCK YEAHHHH");
             // Shift the right part to the right:
             shiftFingerIndicesToRight(fingerRangeStartIndex,
                                       elementRangeLength);
@@ -323,15 +322,10 @@ final class FingerList<E> {
             shiftFingerIndicesToRight(fingerRangeStartIndex, 
                                       elementRangeLength);
             
-            int numberOfSuffixFingers = fingerArray.length
-                                      - size
-                                      - fingerRangeStartIndex
-                                      - fingerRangeLength;
-//            int numberOfSuffixFingers = Math.min(fingerArray.length 
-//                                                    - fingerRangeLength 
-//                                                    - fingerRangeStartIndex,
-//                                                 fingerRangeLength);
-            
+            int numberOfSuffixFingers = size
+                                      + 1
+                                      - fingerRangeStartIndex;
+
             // Make room for the finger range:
             System.arraycopy(fingerArray,
                              fingerRangeStartIndex,
@@ -675,26 +669,12 @@ final class FingerList<E> {
      */
     void insertFingerAndShiftOnceToRight(Finger<E> finger) {
         int beforeFingerIndex = getFingerIndexImpl(finger.index);
-        
+
         enlargeFingerArrayWithEmptyRange(size + 2,
                                          beforeFingerIndex, 
                                          1,
                                          1);
         
-//        enlargeFingerArrayIfNeeded(size + 2);
-
-//        System.arraycopy(
-//                fingerArray,
-//                beforeFingerIndex,
-//                fingerArray,
-//                beforeFingerIndex + 1,
-//                size + 1 - beforeFingerIndex);
-
-        ++size;
-
-        // Shift fingerArray[beforeFingerIndex + 1 ... size] one position to 
-        // the right (towards larger index values):
-        shiftFingerIndicesToRightOnce(beforeFingerIndex + 1);
         fingerArray[beforeFingerIndex] = finger;
     }
     

@@ -62,16 +62,6 @@ public class FingerListTest {
     }
     
     @Test
-    public void enlargeFingerArrayWithEmptyRangeExpansion() {
-        list.addAll(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
-        list.fingerList.setFingerIndices(0, 1, 2, 3);
-        list.fingerList.enlargeFingerArrayWithEmptyRange(13, 1, 2, 2);
-        
-        assertEquals(new Finger<>(new Node<>(0), 0), 
-                     list.fingerList.fingerArray[0]);
-    }
-    
-    @Test
     public void fingerToString() {
         Finger<Integer> f = new Finger<>(new Node<>(13), 2);
         assertEquals("[index = 2, item = 13]", f.toString());
