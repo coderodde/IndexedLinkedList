@@ -401,7 +401,6 @@ public class FingerListTest {
         list.clear();
         
         for (int i = 0; i < 100; ++i) {
-            System.out.println("iteration = " + i);
             list.add(i);
             list.checkInvarant();
         }

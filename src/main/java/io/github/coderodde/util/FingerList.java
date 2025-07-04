@@ -172,7 +172,6 @@ final class FingerList<E> {
                                          size, 
                                          1,
                                          1);
-        size++;
          
 //        enlargeFingerArrayIfNeeded(size + 1);
         fingerArray[size] = fingerArray[size - 1]; // TODO: Remove me?
@@ -290,7 +289,7 @@ final class FingerList<E> {
 //        System.out.println("requested = " + requestedCapacity);
         
         // + 1 for the end-of-finger-list sentinel:
-        if (requestedCapacity > fingerArray.length + fingerRangeLength) {
+        if (requestedCapacity >= fingerArray.length + fingerRangeLength) {
             // Compute the next accommodating capacity:
             int nextCapacity = 2 * fingerArray.length;
             
@@ -300,10 +299,6 @@ final class FingerList<E> {
             
             // Here, we have a next accommodating capacity!
             Finger<E>[] nextFingerArray = new Finger[nextCapacity];
-            System.out.println("FUCK YEAHHHH");
-            // Shift the right part to the right:
-            shiftFingerIndicesToRight(fingerRangeStartIndex,
-                                      elementRangeLength);
             
             // Copy the finger array prefix:
             System.arraycopy(fingerArray, 
@@ -312,14 +307,27 @@ final class FingerList<E> {
                              0,
                              fingerRangeStartIndex);
             
+            // Compute the number of fingers to shift to the right:
+            int numberOfFingersToShift = size
+                                       - fingerRangeStartIndex
+                                       + 1;
+            
             // Make room for the finger range:
             System.arraycopy(fingerArray, 
                              fingerRangeStartIndex,
                              nextFingerArray,
                              fingerRangeStartIndex + fingerRangeLength,
-                             fingerRangeLength + 2);
+                             numberOfFingersToShift);
             
+            // Deploy 'nextFingerArraqy':
             fingerArray = nextFingerArray;
+            
+            // Update the number of fingers in this finger list:
+            size += fingerRangeLength;
+            
+            // Update the indices of the suffix finger list:
+            shiftFingerIndicesToRight(fingerRangeStartIndex + fingerRangeLength,
+                                      elementRangeLength);
         } else {
             // Shift the right part to the right:
             shiftFingerIndicesToRight(fingerRangeStartIndex, 
@@ -335,6 +343,8 @@ final class FingerList<E> {
                              fingerArray,
                              fingerRangeStartIndex + fingerRangeLength,
                              numberOfSuffixFingers);
+            
+            size += fingerRangeLength;
         }
     }
     
