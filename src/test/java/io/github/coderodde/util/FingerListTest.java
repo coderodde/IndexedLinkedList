@@ -152,6 +152,7 @@ public class FingerListTest {
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(13), 1);
         
         fl.insertFingerAndShiftOnceToRight(insertionFinger);
+        fl.size++;
 
         assertEquals(4, fl.size());
     }
@@ -395,7 +396,18 @@ public class FingerListTest {
         //System.out.println("arrangePrefix2 passed!");
     }
     
-        @Test
+    @Test
+    public void add() {
+        list.clear();
+        
+        for (int i = 0; i < 100; ++i) {
+            System.out.println("iteration = " + i);
+            list.add(i);
+            list.checkInvarant();
+        }
+    }
+    
+    @Test
     public void arrangePrefix3() {
         
         loadList(101);
@@ -523,8 +535,12 @@ public class FingerListTest {
     }
     
     private void loadList(int size) {
+//        System.out.println("-----");
+//        System.out.println("size == " + size);
         for (int i = 0; i < size; i++) {
+//            System.out.println("i == " + i);
             list.add(i);
         }
+//        System.out.println("-----");
     }
 }

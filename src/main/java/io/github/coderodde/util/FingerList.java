@@ -286,6 +286,9 @@ final class FingerList<E> {
                                           int fingerRangeLength,
                                           int elementRangeLength) {
         
+//        System.out.println("size = " + list.size);
+//        System.out.println("requested = " + requestedCapacity);
+        
         // + 1 for the end-of-finger-list sentinel:
         if (requestedCapacity > fingerArray.length + fingerRangeLength) {
             // Compute the next accommodating capacity:
