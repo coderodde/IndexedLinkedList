@@ -1918,9 +1918,16 @@ public class IndexedLinkedList<E> implements Deque<E>,
     private void addFingersAfterSetAll(int collectionSize) {
         int numberOfNewFingers = getRecommendedNumberOfFingers();
         
-        fingerList.makeRoomAtIndex(0,
-                                   numberOfNewFingers,
-                                   collectionSize);
+        // Here, we never have 'numberOfNewFingers == 0' since we set a 
+        // non-empty collection that will require at least one finger!
+        fingerList.enlargeFingerArrayWithEmptyRange(numberOfNewFingers, 
+                                                    0, 
+                                                    numberOfNewFingers,
+                                                    collectionSize);
+        
+//        fingerList.makeRoomAtIndex(0,
+//                                   0,
+//                                   collectionSize);
         
         int distance = size / numberOfNewFingers;
         
