@@ -976,14 +976,39 @@ final class FingerList<E> {
         
         list.size -= removalRangeLength;
     }
-
+    
     /**
-     * Reserves a particular capacity.
+     * Returns a node that is {@code steps} hops away from {@code node] to the 
+     * left.
      * 
-     * @param requestedSize the requested size.
+     * @param node  the starting node.
+     * @param steps the number of hops to make.
+     * 
+     * @return the requested node.
      */
-    void reserve(int requestedSize) {
-        fingerArray = new Finger[requestedSize + 1];
+    static <E> Node<E> scrollToLeft(Node<E> node, int steps) {
+        for (int i = 0; i != steps; ++i) {
+            node = node.prev;
+        }
+        
+        return node;
+    }
+    
+    /**
+     * Returns a node that is {@code steps} hops away from {@code node] to the 
+     * right.
+     * 
+     * @param node  the starting node.
+     * @param steps the number of hops to make.
+     * 
+     * @return the requested node.
+     */
+    static <E> Node<E> scrollToRight(Node<E> node, int steps) {
+        for (int i = 0; i != steps; ++i) {
+            node = node.next;
+        }
+        
+        return node;
     }
         
     /**
@@ -1082,39 +1107,5 @@ final class FingerList<E> {
      */
     int size() {
         return size;
-    }
-    
-    /**
-     * Returns a node that is {@code steps} hops away from {@code node] to the 
-     * left.
-     * 
-     * @param node  the starting node.
-     * @param steps the number of hops to make.
-     * 
-     * @return the requested node.
-     */
-    private Node<E> scrollToLeft(Node<E> node, int steps) {
-        for (int i = 0; i != steps; ++i) {
-            node = node.prev;
-        }
-        
-        return node;
-    }
-    
-    /**
-     * Returns a node that is {@code steps} hops away from {@code node] to the 
-     * right.
-     * 
-     * @param node  the starting node.
-     * @param steps the number of hops to make.
-     * 
-     * @return the requested node.
-     */
-    private Node<E> scrollToRight(Node<E> node, int steps) {
-        for (int i = 0; i != steps; ++i) {
-            node = node.next;
-        }
-        
-        return node;
     }
 }

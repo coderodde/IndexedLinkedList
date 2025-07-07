@@ -3350,22 +3350,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
         Node<E> node = finger.node;
         
         if (steps < 0) {
-            steps = -steps;
-            
-            // Once here, we need to traverse to the left towards smaller 
-            // indices:
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
+            return FingerList.scrollToLeft(node, -steps);
         } else {
-            // Once here, we need to traverse to the right towards larger
-            // indices:
-            for (int i = 0; i < steps; i++) {
-                node = node.next;
-            }
+            return FingerList.scrollToRight(node, steps);
         }
-        
-        return node;
     }
     
     /**
@@ -3492,6 +3480,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
             s.writeObject(x.item);
         }
     }
+    
+    
     
     /**
      * This inner class implements a sublist view over the compassing list.
