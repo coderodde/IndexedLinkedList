@@ -57,7 +57,7 @@ import java.util.function.UnaryOperator;
  * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
- * @version 1.7.1 (Jul 1, 2025) - the Master thesis version)
+ * @version 1.7.2 (Jul 7, 2025) - the Master thesis version)
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the element type.
  */
@@ -169,7 +169,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else if (index == 0) {
             linkFirst(element);
         } else {
-            linkBefore(element, index, getNode(index));
+            linkBefore(element, 
+                       index, 
+                       getNode(index));
         }
     }
     
@@ -699,12 +701,10 @@ public class IndexedLinkedList<E> implements Deque<E>,
                          - fingerList.getFinger(i).index 
                          - fingerList.size();
             
-            value = Math.abs(value);
-            sum += value;
+            sum += Math.abs(value);
         }
         
-        sum /= size;
-        return Math.max(0.0, 1.0 - sum);
+        return Math.max(0.0, 1.0 - sum / size);
     }
     
     /**
@@ -1839,24 +1839,19 @@ public class IndexedLinkedList<E> implements Deque<E>,
         // The number of new fingers to add:
         int numberOfNewFingers =
                 getRecommendedNumberOfFingers() - fingerList.size();
+        
+        int startFingerIndex =
+                fingerList.getFingerIndexImpl(indexOfInsertedRangeHead);
 
         if (numberOfNewFingers == 0) {
-            // Get the finger index of the finger that is on the right of the
-            // 'indexOfInsertedRangeHead'th element and is the closest such
-            // finger:
-            int fingerIndex = 
-                    fingerList.getFingerIndexImpl(indexOfInsertedRangeHead);
-            
+            // TODO
             // Once here, nothing to do. Just add 'collectionSize' to all the 
             // indices of the affected fingers, starting from the 
             // 'fingerIndex'th finger in the finger list:
-            fingerList.shiftFingerIndicesToRight(fingerIndex, collectionSize);
+            fingerList.shiftFingerIndicesToRight(startFingerIndex, 
+                                                 collectionSize);
             return;
         }
-
-        // Get the starting finger index:
-        int startFingerIndex =
-                fingerList.getFingerIndexImpl(indexOfInsertedRangeHead);
         
         // Make room for 'numberOfNewFingers' fingers starting from 
         // 'startFingerIndex':
@@ -1924,11 +1919,6 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                                     0, 
                                                     numberOfNewFingers,
                                                     collectionSize);
-        
-//        fingerList.makeRoomAtIndex(0,
-//                                   0,
-//                                   collectionSize);
-        
         int distance = size / numberOfNewFingers;
         
         spreadFingers(head,
@@ -1959,7 +1949,9 @@ public class IndexedLinkedList<E> implements Deque<E>,
         size += sz;
         modCount++;
         
-        addFingersAfterAppendAll(oldLast.next, size - sz, sz);
+        addFingersAfterAppendAll(oldLast.next,
+                                 size - sz,
+                                 sz);
     }
     
     /**
@@ -3098,7 +3090,8 @@ public class IndexedLinkedList<E> implements Deque<E>,
         
         if (closestFinger.index == index) {
             // Make sure no finger is pointing to 'node':
-            moveFingerOutOfRemovalLocation(closestFinger, closestFingerIndex);
+            moveFingerOutOfRemovalLocation(closestFinger,
+                                           closestFingerIndex);
         } else {
             // Update the finger indices:
             fingerList.shiftFingerIndicesToLeftOnceAll(closestFingerIndex + 1);
@@ -3353,7 +3346,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param steps  the number of steps to rewind the {@code finger}.
      * @return the reached node.
      */
-    private Node<E> rewindFinger(Finger<E> finger, int steps) {
+    static <E> Node<E> rewindFinger(Finger<E> finger, int steps) {
         Node<E> node = finger.node;
         
         if (steps < 0) {

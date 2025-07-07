@@ -31,7 +31,7 @@ import java.util.Objects;
  * fingers.
  *
  * @param <E> the list node item type.
- * @version 1.7.0 (Jun 29, 2025)
+ * @version 1.7.2 (Jul 7, 2025)
  */
 final class FingerList<E> {
 
@@ -172,8 +172,6 @@ final class FingerList<E> {
                                          size, 
                                          1,
                                          1);
-         
-//        enlargeFingerArrayIfNeeded(size + 1);
         fingerArray[size - 1] = finger;
         fingerArray[size].index = list.size;
     }
@@ -223,8 +221,12 @@ final class FingerList<E> {
      * tests.
      */
     void clear() {
-        Arrays.fill(fingerArray, 0, size, null);
-        fingerArray = new Finger[INITIAL_CAPACITY];
+        Arrays.fill(fingerArray, 
+                    0, 
+                    size,
+                    null);
+        
+        fingerArray    = new Finger[INITIAL_CAPACITY];
         fingerArray[0] = new Finger<>(null, 0);
         size = 0;
     }
@@ -344,7 +346,8 @@ final class FingerList<E> {
      * {@code elementIndex}th element.
      */
     int getClosestFingerIndex(int elementIndex) {
-        return normalize(getFingerIndexImpl(elementIndex), elementIndex);
+        return normalize(getFingerIndexImpl(elementIndex), 
+                         elementIndex);
     }
 
     /**
@@ -390,20 +393,10 @@ final class FingerList<E> {
      */
     Node<E> getNodeNoFingersFix(int index) {
         Finger finger = fingerArray[getClosestFingerIndex(index)];
-        int steps = finger.index - index;
-        Node<E> node = finger.node;
+        int steps = index - finger.index;
         
-        if (steps > 0) {
-            for (int i = 0; i < steps; i++) {
-                node = node.prev;
-            }
-        } else {
-            for (int i = 0; i < -steps; i++) {
-                node = node.next;
-            }
-        }
-
-        return node;
+        return IndexedLinkedList.rewindFinger(finger, 
+                                              steps);
     }
     
     /**
@@ -460,21 +453,11 @@ final class FingerList<E> {
             int rightDistance = b.index - elementIndex;
 
             if (leftDistance < rightDistance) {
-                Node<E> node = a.node;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
+                return scrollToRight(a.node,
+                                     leftDistance);
             } else {
-                Node<E> node = b.node;
-                // TODO: Replace saveBIndex - elementIndex with rightDistance?
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
+                return scrollToLeft(b.node,
+                                    rightDistance);
             }
         } else {
             // Here, the desired element is between c and b:
@@ -482,21 +465,11 @@ final class FingerList<E> {
             int rightDistance = c.index - elementIndex;
 
             if (leftDistance < rightDistance) {
-                Node<E> node = b.node;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
+                return scrollToRight(b.node, 
+                                     leftDistance);
             } else {
-                Node<E> node = c.node;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
+                return scrollToLeft(c.node,
+                                    rightDistance);
             }
         }
     }
@@ -537,26 +510,16 @@ final class FingerList<E> {
         // Go get the proper node:
         if (elementIndex < nextAIndex) {
             // Here, the desired element is between the head of the list and
-            // the very first figner:
+            // the very first fi    nger:
             int leftDistance = elementIndex;
             int rightDistance = nextAIndex - elementIndex;
 
             if (leftDistance < rightDistance) {
-                Node<E> node = (Node<E>) list.head;
-
-                for (int i = 0; i != elementIndex; i++) {
-                    node = node.next;
-                }
-
-                return node;
+                return scrollToRight(list.head,
+                                     elementIndex);
             } else {
-                Node<E> node = aNode;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
+                return scrollToLeft(aNode, 
+                                    rightDistance);
             }
         } else {
             return aNode;
@@ -605,21 +568,11 @@ final class FingerList<E> {
             int rightDistance = nextBIndex - elementIndex;
 
             if (leftDistance < rightDistance) {
-                Node<E> node = a.node;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
+                return scrollToRight(a.node,
+                                     leftDistance);
             } else {
-                Node<E> node = b.node;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
+                return scrollToLeft(b.node,
+                                    rightDistance);
             }
         } else {
             // Here, the desired element node is between 'b' and the tail 
@@ -630,23 +583,13 @@ final class FingerList<E> {
             if (leftDistance < rightDistance) {
                 // Once here, rewind the node reference from bNode to the
                 // right:
-                Node<E> node = bNode;
-
-                for (int i = 0; i != leftDistance; i++) {
-                    node = node.next;
-                }
-
-                return node;
+                return scrollToRight(bNode, 
+                                     leftDistance);
             } else {
                 // Once here, rewind the node reference from tail to the 
                 // left:
-                Node<E> node = list.tail;
-
-                for (int i = 0; i != rightDistance; i++) {
-                    node = node.prev;
-                }
-
-                return node;
+                return scrollToLeft(list.tail,
+                                    rightDistance);
             }
         }
     }
@@ -1139,5 +1082,39 @@ final class FingerList<E> {
      */
     int size() {
         return size;
+    }
+    
+    /**
+     * Returns a node that is {@code steps} hops away from {@code node] to the 
+     * left.
+     * 
+     * @param node  the starting node.
+     * @param steps the number of hops to make.
+     * 
+     * @return the requested node.
+     */
+    private Node<E> scrollToLeft(Node<E> node, int steps) {
+        for (int i = 0; i != steps; ++i) {
+            node = node.prev;
+        }
+        
+        return node;
+    }
+    
+    /**
+     * Returns a node that is {@code steps} hops away from {@code node] to the 
+     * right.
+     * 
+     * @param node  the starting node.
+     * @param steps the number of hops to make.
+     * 
+     * @return the requested node.
+     */
+    private Node<E> scrollToRight(Node<E> node, int steps) {
+        for (int i = 0; i != steps; ++i) {
+            node = node.next;
+        }
+        
+        return node;
     }
 }
