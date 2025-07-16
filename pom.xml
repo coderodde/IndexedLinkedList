@@ -3,17 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fi.helsinki</groupId>
     <artifactId>IndexedLinkedList</artifactId>
-    <version>1.7.1</version>
+    <version>1.618033988</version>
     <packaging>jar</packaging>
 
     <name>IndexedLinkedList</name>
-    <description>An efficient, heuristic, indexeded linked-list for versatile usage for large data.</description>
+    <description>An efficient, heuristic, indexeded linked-list for versatile usage.</description>
     <url>https://github.com/coderodde/IndexedLinkedList</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>   
-        <maven.compiler.target>9</maven.compiler.target>
-        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
     </properties>
     
     <licenses>
@@ -28,7 +28,7 @@
             <name>Rodion Efremov</name>
             <email>rodion.efremov@helsinki.fi</email>
             <organization>University of Helsinki, Department of Computer Science</organization>
-            <organizationUrl>coderodde.github.io</organizationUrl>
+            <organizationUrl>github.com/coderodde</organizationUrl>
         </developer>
     </developers>
 
@@ -39,11 +39,28 @@
     </scm>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.12.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.7</version>
+        </dependency>
 
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>affinity</artifactId>
-            <version>3.23.3</version>
+            <version>3.27ea0</version>
         </dependency>
 
         <dependency>
@@ -65,13 +82,6 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
         </dependency>
-        
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.13</version>
-        </dependency>
-
     </dependencies>
     
     <distributionManagement>
@@ -86,26 +96,7 @@
     </distributionManagement>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
-                    <arguments>
-                        <argument>--all</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <!--
+        <plugins><!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -198,10 +189,11 @@
                 <version>3.6.3</version>
                 <configuration>
                     <show>private</show>
-                    <additionalOptions>
-                        <additionalOption>--allow-script-in-comments</additionalOption>
-                        <additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>
-                    </additionalOptions>
+                    <!--<additionalOptions>-->
+                        <!--<additionalOption>-private</additionalOption>-->
+                        <!--<additionalOption>-´allow-script-in-comments</additionalOption>-->
+                        <!--<additionalOption>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js&quot;&gt;&lt;/script&gt;&apos;</additionalOption>-->
+                    <!--</additionalOptions>-->
                     <excludePackageNames>com.github.coderodde.util.benchmark</excludePackageNames>
                 </configuration>
                 <executions>
@@ -269,13 +261,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
+                            <mainClass>
+                                com.github.coderodde.util.benchmark.LinkedListBenchmark2
+                            </mainClass>
                         </manifest>
                     </archive>
                 </configuration>
