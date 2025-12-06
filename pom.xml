@@ -102,7 +102,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -111,10 +111,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
-                    <arguments>
-                        <argument>--all</argument>
-                    </arguments>
+                    <mainClass>io.github.coderodde.util.benchmark.JMHBenchmark</mainClass>
                 </configuration>
             </plugin>
             <!--
@@ -287,7 +284,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>io.github.coderodde.util.benchmark.LinkedListBenchmarkRunner</mainClass>
+                            <mainClass>io.github.coderodde.util.benchmark.JMHBenchmark</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
