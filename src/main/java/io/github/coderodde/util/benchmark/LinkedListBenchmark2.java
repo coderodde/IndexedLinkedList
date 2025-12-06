@@ -153,50 +153,6 @@ public class LinkedListBenchmark2 {
         }  
     }
     
-//    private static void benchmarkBasicIteratorNext() {
-//        benchmarkBasicIteratorNext(false);
-//        benchmarkBasicIteratorNext(true);
-//    }
-//    
-//    private static void benchmarkBasicIteratorNext(boolean print) {
-//        List<Integer> list1 = new IndexedLinkedList<>();
-//        IndexedLinkedList<Integer> list2 = new IndexedLinkedList<>();
-//        
-//        for (int i = 0; i < 20_000_000; ++i) {
-//            list1.add(i);
-//            list2.add(i);
-//        }
-//        
-//        Iterator<Integer> it1 = list1.iterator();
-//        IndexedLinkedList.BasicIteratorV2 it2 = list2.basicIteratorResearch();
-//        
-//        long ta = System.currentTimeMillis();
-//        
-//        while (it1.hasNext()) {
-//            it1.next();
-//        }
-//        
-//        long tb = System.currentTimeMillis();
-//        long duration = tb - ta;
-//        
-//        if (print) {
-//            System.out.println("Simple iterator in " + duration + ".");
-//        }
-//        
-//        ta = System.currentTimeMillis();
-//        
-//        while (it2.hasNext()) {
-//            it2.next();
-//        }
-//        
-//        tb = System.currentTimeMillis();
-//        duration = tb - ta;
-//        
-//        if (print) {
-//            System.out.println("Research iterator in " + duration + ".");
-//        }
-//    }
-    
     public static void main(String[] args) {
         
         try (AffinityLock al = AffinityLock.acquireLock()) {
@@ -209,48 +165,14 @@ public class LinkedListBenchmark2 {
         }
     }
     
-    private static void deleteRange() {
-        System.out.println("deleteRange():");
-        final List<Object> indexedList = new IndexedLinkedList<>();
-        final List<Object> treeList    = new TreeList<>();
-        final Object obj = new Object();
-        final int N = 50_000_000;
-        
-        for (int i = 0; i < N; i++) {
-            indexedList.add(obj);
-        }
-        
-        System.out.println("Indexed list data loaded.");
-        
-        long start = System.currentTimeMillis();
-        indexedList.subList(100_000, N - 100_000).clear();
-        long end = System.currentTimeMillis();
-        
-        indexedList.clear();
-        System.gc();
-        
-        System.out.println("indexed list: " + (end - start) + " millis.");
-        
-        for (int i = 0; i < N; i++) {
-            treeList.add(obj);
-        }
-        
-        System.out.println("Tree list data loaded.");
-        
-        start = System.currentTimeMillis();
-        treeList.subList(100_000, N - 100_000).clear();
-        end = System.currentTimeMillis();
-        
-        System.out.println("tree list:    " + (end - start) + " millis.");
-        treeList.clear();
-        System.gc();
-    }
-    
     private static void warmup() {
         for (String methodName : METHOD_NAMES) {
             for (String listTypeName : LIST_TYPE_NAMES) {
                 for (int listSize : LIST_SIZES) {
-                    benchmark(methodName, listTypeName, listSize, false);
+                    benchmark(methodName,
+                              listTypeName, 
+                              listSize,
+                              false);
                 }
             }
         }

@@ -74,10 +74,10 @@ public class FingerListTest {
 
     @Test
     public void appendGetFinger() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(3)), 3));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(6)), 6));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(3)), 3));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(6)), 6));
         fl.fingerArray[4].index = 8;
         fl.fingerArray[4].node = new Node<>(Integer.valueOf(1000));
         
@@ -112,10 +112,10 @@ public class FingerListTest {
     
     @Test
     public void insertFingerAtFront() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(3)), 3));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(6)), 6));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(0)), 0));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(1)), 1));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(3)), 3));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(6)), 6));
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 0);
         
@@ -130,11 +130,11 @@ public class FingerListTest {
     @Test
     public void insertFingerAtTail() {
         fl.list.size = 1;
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 0));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(2)), 0));
         fl.list.size = 2;
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 1));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(4)), 1));
         fl.list.size = 3;
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 2));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(5)), 2));
         
         // Add end of finger list sentinel:
         fl.fingerArray[3] = new Finger<>(new Node<>(null), 10);
@@ -149,9 +149,9 @@ public class FingerListTest {
     
     @Test
     public void insertFingerInBetween1() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 4);
         
@@ -162,9 +162,9 @@ public class FingerListTest {
     
     @Test
     public void insertFingerInBetween2() {
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
-        fl.appendFinger(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(2)), 2));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(4)), 4));
+        fl.appendFingerImpl(new Finger<>(new Node<>(Integer.valueOf(5)), 5));
         
         Finger<Integer> insertionFinger = new Finger<>(new Node<>(null), 3);
         
@@ -505,15 +505,15 @@ public class FingerListTest {
         assertFalse(fingerList1.equals(new Object()));
         
         fingerList1.size = 0;
-        fingerList1.appendFinger(new Finger<>(new Node(1), 0));
-        fingerList1.appendFinger(new Finger<>(new Node(2), 1));
+        fingerList1.appendFingerImpl(new Finger<>(new Node(1), 0));
+        fingerList1.appendFingerImpl(new Finger<>(new Node(2), 1));
         
         fingerList2.size = 0;
-        fingerList2.appendFinger(new Finger<>(new Node(1), 0));
+        fingerList2.appendFingerImpl(new Finger<>(new Node(1), 0));
         
         assertFalse(fingerList1.equals(fingerList2));
         
-        fingerList2.appendFinger(new Finger<>(new Node(2), 1));
+        fingerList2.appendFingerImpl(new Finger<>(new Node(2), 1));
         
         assertTrue(fingerList1.equals(fingerList2));
         
@@ -524,13 +524,9 @@ public class FingerListTest {
     }
     
     private void loadList(int size) {
-//        System.out.println("-----");
-//        System.out.println("size == " + size);
         for (int i = 0; i < size; i++) {
-            System.out.println("i == " + i);
             list.add(i);
             list.checkInvarant();
         }
-//        System.out.println("-----");
     }
 }
