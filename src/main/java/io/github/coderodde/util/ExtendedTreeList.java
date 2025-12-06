@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import org.apache.commons.collections4.list.TreeList;
 
 /**
@@ -85,6 +86,37 @@ public class ExtendedTreeList<E> extends TreeList<E> {
         return new EnhancedSubList(this,
                                    fromIndex, 
                                    toIndex);
+    }
+    
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        
+        if (!getClass().equals(object.getClass())) {
+            return false;
+        }
+        
+        List<E> other = (List<E>) object;
+        
+        if (size() != other.size()) {
+            return false;
+        }
+        
+        Iterator<E> iter1 = iterator();
+        Iterator<E> iter2 = other.iterator();
+        
+        while (iter1.hasNext() && iter2.hasNext()) {
+            if (!Objects.equals(iter1.next(), iter2.next())) {
+                return false;
+            }
+        }
+        
+        if (iter1.hasNext() || iter2.hasNext()) {
+            throw new IllegalStateException("Problems with iteration");
+        }
+        
+        return true;
     }
     
     final class EnhancedSubList implements List<E> {
