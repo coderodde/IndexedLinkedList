@@ -20,6 +20,8 @@ import io.github.coderodde.util.IndexedLinkedList.BasicIterator;
 import io.github.coderodde.util.IndexedLinkedList.DescendingIterator;
 import io.github.coderodde.util.IndexedLinkedList.EnhancedIterator;
 import io.github.coderodde.util.IndexedLinkedList.EnhancedSubList;
+import io.github.coderodde.util.IndexedLinkedList.Finger;
+import io.github.coderodde.util.IndexedLinkedList.Node;
 import static io.github.coderodde.util.IndexedLinkedList.checkIndex;
 import java.io.File;
 import java.io.FileInputStream;

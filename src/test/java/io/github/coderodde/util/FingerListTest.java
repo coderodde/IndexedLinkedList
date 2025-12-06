@@ -16,6 +16,9 @@
  */
 package io.github.coderodde.util;
 
+import io.github.coderodde.util.IndexedLinkedList.Finger;
+import io.github.coderodde.util.IndexedLinkedList.FingerList;
+import io.github.coderodde.util.IndexedLinkedList.Node;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
