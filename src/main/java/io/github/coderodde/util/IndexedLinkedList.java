@@ -65,6 +65,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
                                              List<E>, 
                                              Cloneable, 
                                              java.io.Serializable {
+    /**
+     * The static inner class implements a node in a doubly-linked list.
+     * 
+     * @param <E> the element type stored in each {@code Node}.
+     */
     static final class Node<E> {
 
         /**
@@ -130,6 +135,11 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
 
+    /**
+     * This class implements the finger data structure.
+     * 
+     * @param <E> the element type stored in a node of a finger.
+     */
     static final class Finger<E> {
 
         /**
@@ -209,6 +219,12 @@ public class IndexedLinkedList<E> implements Deque<E>,
         }
     }
 
+    /**
+     * Implements the actual finger list index for faster access and 
+     * modification.
+     * 
+     * @param <E> the list element data type. 
+     */
     static final class FingerList<E> {
 
         /**
