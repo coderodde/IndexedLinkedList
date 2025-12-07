@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.github.coderodde.util;
 
 import io.github.coderodde.util.IndexedLinkedList.BasicIterator;
@@ -23,6 +7,7 @@ import io.github.coderodde.util.IndexedLinkedList.EnhancedSubList;
 import io.github.coderodde.util.IndexedLinkedList.Finger;
 import io.github.coderodde.util.IndexedLinkedList.Node;
 import static io.github.coderodde.util.IndexedLinkedList.checkIndex;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -49,23 +34,17 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IndexedLinkedListTest {
 
     private final IndexedLinkedList<Integer> list = new IndexedLinkedList<>();
     private final List<Integer> referenceList = new ArrayList<>();
     
-    @Before
+    @BeforeEach
     public void setUp() {
         list.clear();
         referenceList.clear();
@@ -73,20 +52,18 @@ public class IndexedLinkedListTest {
     
     @Test
     public void debugAddAtIndex() {
-        long seed = System.currentTimeMillis();
-        Random random = new Random(seed);
+        Random random = new Random(665L);
         
         list.add(0, 0);
         referenceList.add(0, 0);
         
         for (int i = 1; i < 100; ++i) {
             int index = random.nextInt(list.size());
+            referenceList.add(index, i);
             list.add(index, i);
             list.checkInvarant();
-            referenceList.add(index, i);
             assertEquals(referenceList, list);
         }
-        
     }
     
     @Test
@@ -97,98 +74,98 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onEmptyFingerListNonNullHead() {
         list.head = new Node<>(3);
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onEmptyFingerListNonNullTail() {
         list.tail = new Node<>(3);
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onEmptyFingerListNonEmptyList() {
         list.addAll(getIntegerList(13));
         list.fingerList.size = 0;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onNegativeFirstFingerNodeIndex() {
         list.addAll(getIntegerList(13));
         list.fingerList.getFinger(0).index = -1;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void onTooMissingSecondFinger() {
         list.addAll(getIntegerList(5));
         list.fingerList.setFingerIndices(0, 1, 2);
         list.fingerList.fingerArray[1] = null;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test 
     public void onTooMissingFirstFinger() {
         list.addAll(getIntegerList(5));
         list.fingerList.setFingerIndices(0, 1, 2);
         list.fingerList.fingerArray[0] = null;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void onInvalidListsize() {
         list.addAll(getIntegerList(5));
         list.size = 6;
         list.fingerList.getFinger(3).index = 6;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test 
     public void onBadRecommendation() {
         list.addAll(getIntegerList(5));
         list.size = 4;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onNullSentinel() {
         list.addAll(getIntegerList(16));
         list.fingerList.setFinger(4, null);
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onFingerListMismatch() {
         list.addAll(getIntegerList(16));
         list.fingerList.size = 5;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onWrongFingerListSize() {
         list.addAll(getIntegerList(16));
         list.fingerList.size = 5;
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onJunkFingers() {
         list.addAll(getIntegerList(16));
         list.fingerList.fingerArray[6] = new Finger<>(new Node<>(666), -13);
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void onNonContractedFingerArray() {
         list.addAll(getIntegerList(16));
         list.fingerList.fingerArray = 
                 Arrays.copyOf(list.fingerList.fingerArray, 100);
         
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
     @Test
@@ -531,7 +508,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void breakInvariant1() {
         list.add(11);
         list.add(12);
@@ -540,10 +517,10 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[0].index = 1;
         list.fingerList.fingerArray[1].index = 0;
         
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test 
     public void breakInvariant2() {
         list.add(11);
         list.add(12);
@@ -552,10 +529,10 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[list.fingerList.size()].index = 
                 list.fingerList.size() + 10;
         
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void breakInvariant3() {
         list.add(11);
         list.add(12);
@@ -564,20 +541,19 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[list.fingerList.size()].node = 
                 new Node<>(null);
         
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void breakInvariant4() {
         list.add(11);
         list.add(12);
         list.add(13);
         list.size = 2;
-        
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void breakInvariant5() {
         list.add(11);
         list.add(12);
@@ -587,7 +563,7 @@ public class IndexedLinkedListTest {
         list.fingerList.fingerArray[3] = new Finger<>(null, 3);
         list.fingerList.size = 3;
         
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class, () -> list.checkInvarant());
     }
     
     @Test
@@ -826,9 +802,9 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(2), list.get(0));
     }
     
-    @Test(expected = NoSuchElementException.class) 
+    @Test
     public void elementThrowsOnEmptyList() {
-        list.element();
+        assertThrows(NoSuchElementException.class, () -> list.element());
     }
     
     @Test 
@@ -1673,20 +1649,21 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(10, 7, 4), list);
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void noNextItemEnhancedSubList() {
         list.addAll(Arrays.asList(1, 2, 3, 4));
         List<Integer> subList = list.subList(0, 3);
         ListIterator<Integer> iter = subList.listIterator(3);
-        iter.next();
+        
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void noPreviousItemEnhancedSubList() {
         list.addAll(Arrays.asList(1, 2, 3, 4));
         List<Integer> subList = list.subList(0, 3);
         ListIterator<Integer> iter = subList.listIterator(0);
-        iter.previous();
+        assertThrows(NoSuchElementException.class, () -> iter.previous());
     }
     
     @Test
@@ -1696,18 +1673,21 @@ public class IndexedLinkedListTest {
         assertFalse(list.subList(0, 3).removeIf(predicate));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkInsertionIndexOnNegative() {
         list.addAll(Arrays.asList(1, 3, 5));
         EnhancedSubList sl = (EnhancedSubList) list.subList(0, 3);
-        sl.checkInsertionIndex(-1);
+        
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> sl.checkInsertionIndex(-1));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkInsertionIndexOnTooLarge() {
         list.addAll(Arrays.asList(1, 3, 5));
         EnhancedSubList sl = (EnhancedSubList) list.subList(0, 3);
-        sl.checkInsertionIndex(4);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> sl.checkInsertionIndex(-1));
     }
     
     @Test
@@ -1781,7 +1761,7 @@ public class IndexedLinkedListTest {
         assertEquals("[2, 22, 222]", list.subList(1, 4).toString());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void listIteratorSetAddThrows() {
         list.addAll(getIntegerList(10));
         ListIterator<Integer> listIterator = list.listIterator(3);
@@ -1789,32 +1769,37 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         listIterator.add(100);
         list.checkInvarant();
-        listIterator.set(-100);
-        list.checkInvarant();
+        assertThrows(IllegalStateException.class,
+                     () -> listIterator.set(-100));
+    
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void subListIteratorSetAddThrows() {
         list.addAll(getIntegerList(10));
         ListIterator<Integer> listIterator = list.subList(4, 9).listIterator(3);
         
         listIterator.add(100);
-        listIterator.set(-100);
+    
+        assertThrows(IllegalStateException.class,
+                     () -> listIterator.set(-100));
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void listIteratorRemoveWithouttNextPreviousThrows() {
         list.addAll(getIntegerList(5));
         ListIterator<Integer> iter = list.listIterator(1);
-        iter.remove();
+        assertThrows(IllegalStateException.class,
+                     () -> iter.remove());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void subListIteratorRemoveWithouttNextPreviousThrows() {
         list.addAll(getIntegerList(8));
         List<Integer> subList = list.subList(1, 6);
         ListIterator<Integer> iter = subList.listIterator(5);
-        iter.remove();
+        assertThrows(IllegalStateException.class,
+                     () -> iter.remove());
     }
     
     @Test
@@ -1892,7 +1877,7 @@ public class IndexedLinkedListTest {
         assertEquals(Arrays.asList(1, 2, 100, -100, 4, 5, -1000), subList);
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void listIteratorThrowsOnSetAfterRemove() {
         list.addAll(getIntegerList(8));
         ListIterator<Integer> iterator = list.listIterator(2);
@@ -1900,10 +1885,11 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         iterator.remove();
         list.checkInvarant();
-        iterator.set(1000);
+        assertThrows(IllegalStateException.class,
+                     () -> iterator.set(1000));
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void subListIteratorThrowsOnSetAfterRemove() {
         list.addAll(getIntegerList(8));
         List<Integer> subList = list.subList(1, 7);
@@ -1911,7 +1897,8 @@ public class IndexedLinkedListTest {
         ListIterator<Integer> iterator = subList.listIterator(2);
         iterator.previous();
         iterator.remove();
-        iterator.set(1000);
+        assertThrows(IllegalStateException.class,
+                     () -> iterator.set(1000));
     }
     
     @Test
@@ -2419,11 +2406,13 @@ public class IndexedLinkedListTest {
         }
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void listEqualsThrowsOnBadIterator() {
         DummyList dummyList = new DummyList();
         list.addAll(Arrays.asList(0, 0));
-        listsEqual(list, dummyList);
+        
+        assertThrows(IllegalStateException.class,
+                     () -> listsEqual(list, dummyList));
     }
     
     @Test
@@ -2499,22 +2488,25 @@ public class IndexedLinkedListTest {
         list.sort((c1,c2) -> { return -1; });
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void sublistRangeCheck1() {
         list.add(1);
-        list.subListRangeCheck(-1, 2, 5);
+        assertThrows(IndexOutOfBoundsException.class, 
+                     () -> list.subListRangeCheck(-1, 2, 5));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void sublistRangeCheck2() {
         list.add(1);
-        list.subListRangeCheck(0, 3, 2);
+        assertThrows(IndexOutOfBoundsException.class, 
+                     () -> list.subListRangeCheck(0, 3, 2));
     }
     
-    @Test(expected = IllegalArgumentException.class) 
+    @Test
     public void sublistRangeCheck3() {
         list.add(1);
-        list.subListRangeCheck(1, 0, 1);
+        assertThrows(IllegalArgumentException.class, 
+                     () -> list.subListRangeCheck(1, 0, 1));
     }
     
     @Test
@@ -2522,10 +2514,11 @@ public class IndexedLinkedListTest {
         list.batchRemove(new ArrayList<>(), true, 0, 1);
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void checkForComodification() {
         list.modCount = 123;
-        list.checkForComodification(122);
+        assertThrows(ConcurrentModificationException.class, 
+                     () -> list.checkForComodification(122));
     }
     
     @Test
@@ -2535,7 +2528,7 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void iteratorNextThrowsOnNoElements() {
         Iterator<Integer> iterator = 
                 new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
@@ -2547,9 +2540,10 @@ public class IndexedLinkedListTest {
             fail("Should not throw here.");
         }
         
-        iterator.next();
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
     }
-    @Test(expected = IllegalStateException.class)
+    
+    @Test
     public void iteratorNextThrowsOnRemove() {
         Iterator<Integer> iterator = 
                 new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
@@ -2562,16 +2556,17 @@ public class IndexedLinkedListTest {
             fail("Should not throw here.");
         }
         
-        iterator.remove();
+        assertThrows(IllegalStateException.class, () -> iterator.remove());
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void checkIteratorComodification() {
         BasicIterator iterator = (BasicIterator)
                 new IndexedLinkedList<>(Arrays.asList(2, 3)).iterator();
         
         iterator.expectedModCount = 1000;
-        iterator.checkForComodification();
+        assertThrows(ConcurrentModificationException.class,
+                     () -> iterator.checkForComodification());
     }
     
     @Test
@@ -2585,7 +2580,7 @@ public class IndexedLinkedListTest {
         list.addAll(0, new ArrayList<>());
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void listIteratorNext() {
         ListIterator<Integer> iterator = 
                 new IndexedLinkedList<>(Arrays.asList(1,2,3)).listIterator(1);
@@ -2597,10 +2592,10 @@ public class IndexedLinkedListTest {
             fail("Should not throw here.");
         }
         
-        iterator.next();
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void listIteratorPrev() {
         ListIterator<Integer> iterator = 
                 new IndexedLinkedList<>(Arrays.asList(1,2,3)).listIterator(1);
@@ -2611,7 +2606,7 @@ public class IndexedLinkedListTest {
             fail("Should not throw here.");
         }
         
-        iterator.previous();    
+        assertThrows(NoSuchElementException.class, () -> iterator.previous());
     }
     
     @Test
@@ -2619,40 +2614,45 @@ public class IndexedLinkedListTest {
         new IndexedLinkedList<>().iterator().forEachRemaining((a) -> {});
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkFromToOnNegativeFromIndex() {
-        list.checkFromTo(-1, 2);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> list.checkFromTo(-1, 2));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkFromToOnTooLargeToIndex() {
         list.add(1);
         list.add(3);
         
-        list.checkFromTo(0, 3);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> list.checkFromTo(0, 3));
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void checkFromToOnBackwardIndices() {
         list.add(1);
         list.add(3);
-        
-        list.checkFromTo(2, 1);
+        assertThrows(IllegalArgumentException.class,
+                     () -> list.checkFromTo(2, 1));
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void checkIndexOnNegativeSize() {
-        checkIndex(0, -1);
+        assertThrows(IllegalArgumentException.class,
+                     () -> checkIndex(0, -1));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkIndexOnNegativeIndex() {
-        checkIndex(-1, 1);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> checkIndex(-1, 1));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkIndexOnTooLargeIndex() {
-        checkIndex(2, 2);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> checkIndex(2, 2));
     }
     
     @Test
@@ -2662,52 +2662,58 @@ public class IndexedLinkedListTest {
         assertFalse(list.equals(referenceList));
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void noHasNext() {
-        list.iterator().next();
+        assertThrows(NoSuchElementException.class,
+                     () -> list.iterator().next());
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void noHasNextDescending() {
-        list.descendingIterator().next();
+        assertThrows(NoSuchElementException.class,
+                     () -> list.descendingIterator().next());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsOnDoubleRemove() {
         list.add(10);
         Iterator<Integer> it = list.iterator();
         it.next();
         it.remove();
-        it.remove();
+        assertThrows(IllegalStateException.class,
+                     () -> it.remove());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsOnDoubleRemoveDescending() {
         list.add(10);
         Iterator<Integer> it = list.descendingIterator();
         it.next();
         it.remove();
-        it.remove();
+        assertThrows(IllegalStateException.class,
+                     () -> it.remove());
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void throwOnConcurrency() {
         list.addAll(Arrays.asList(1, 2, 3));
         Iterator<Integer> it = list.iterator();
         
         it.next();
         list.add(13);
-        it.next();
+        assertThrows(ConcurrentModificationException.class,
+                     () -> it.next());
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void throwOnConcurrencyDescending() {
         list.addAll(Arrays.asList(1, 2, 3));
         Iterator<Integer> it = list.descendingIterator();
         
         it.next();
         list.add(13);
-        it.next();
+        assertThrows(ConcurrentModificationException.class,
+                     () -> it.next());
     }
     
     @Test
@@ -2805,9 +2811,10 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void removeFirstThrowsOnEmptyList() {
-        list.removeFirst();
+        assertThrows(NoSuchElementException.class,
+                     () -> list.removeFirst());
     }
     
     @Test
@@ -2865,7 +2872,7 @@ public class IndexedLinkedListTest {
         list.addAll(Arrays.asList(3, 2));
         BadList badList = new BadList();
         badList.addAll(Arrays.asList(3, 3));
-        Assert.assertNotEquals(badList, list);
+        assertNotEquals(badList, list);
     }
     
     @Test
@@ -2994,26 +3001,29 @@ public class IndexedLinkedListTest {
         }
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void checkPositionIndexThrowsOnNegativeIndex() {
-        list.add(-1, Integer.valueOf(0));
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> list.add(-1, Integer.valueOf(0)));
     }
     
-    @Test(expected = IndexOutOfBoundsException.class) 
+    @Test
     public void checkPositionIndxThrowsOnTooLargeIndex() {
         list.add(0);
-        
-        list.add(2, 1);
+        assertThrows(IndexOutOfBoundsException.class,
+                     () -> list.add(2, 1));
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void removeLastThrowsOnEmptyList() {
-        list.removeLast();
+        assertThrows(NoSuchElementException.class,
+                     () -> list.removeLast());
     }
     
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void getFirstThrowsOnEmptyList() {
-        list.getFirst();
+        assertThrows(NoSuchElementException.class,
+                     () -> list.getFirst());
     }
     
     @Test
@@ -3028,7 +3038,7 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(20), list.getFirst());
     }
       
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void basicIteratorNextThrowsOnNoNext() {
         list.add(1);
         
@@ -3040,10 +3050,10 @@ public class IndexedLinkedListTest {
             fail("Should not get here.");
         }
         
-        iter.next();
+        assertThrows(NoSuchElementException.class, () -> iter.next());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void basicIteratorThrowsOnDoubleRemove() {
         list.add(1);
         
@@ -3056,7 +3066,7 @@ public class IndexedLinkedListTest {
             fail("Should not get here.");
         }
         
-        iter.remove();
+        assertThrows(IllegalStateException.class, () -> iter.remove());
     }
     
     @Test
@@ -3094,7 +3104,7 @@ public class IndexedLinkedListTest {
         iter.next();
     }
     
-    @Test(expected = IllegalStateException.class) 
+    @Test
     public void enhancedIteratorThrowsOnSetAfterRemove() {
         list.addAll(Arrays.asList(1, 2, 3, 4));
         
@@ -3104,17 +3114,19 @@ public class IndexedLinkedListTest {
         list.checkInvarant();
         iter.remove();
         list.checkInvarant();
-        iter.set(10);
+        assertThrows(IllegalStateException.class,
+                     () -> iter.set(10));
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void basicIteratorForEachRemainingThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(1_000_000));
         
         BasicIterator iter = (BasicIterator) list.iterator();
         iter.expectedModCount = -1000;
         
-        iter.forEachRemaining((e) -> {});
+        assertThrows(ConcurrentModificationException.class,
+                     () -> iter.forEachRemaining((e) -> {}));
     }
     
     @Test
@@ -3133,16 +3145,17 @@ public class IndexedLinkedListTest {
         assertFalse(list.subList(0, 3).remove(null));
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void basicDescendingIteratorForEachRemainingThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(1_000_000));
         
         DescendingIterator iter = (DescendingIterator) list.descendingIterator();
         iter.expectedModCount = -1000;
-        iter.forEachRemaining((e) -> {});
+        assertThrows(ConcurrentModificationException.class,
+                     () -> iter.forEachRemaining((e) -> {}));
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void 
         enhancedIteratorForEachRemainingThrowsOnConcurrentModification() {
             
@@ -3150,18 +3163,19 @@ public class IndexedLinkedListTest {
         
         EnhancedIterator iter = (EnhancedIterator) list.listIterator();
         iter.expectedModCount = -1;
-        
-        iter.forEachRemaining((e) -> {});
+        assertThrows(ConcurrentModificationException.class,
+                     () -> iter.forEachRemaining((e) -> {}));
     }
         
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void spliteratorThrowsOnConcurrentModification() {
         list.addAll(getIntegerList(50_000));
         
         Spliterator<Integer> spliterator = list.spliterator();
         list.add(50_000);
         
-        spliterator.tryAdvance((e) -> {});
+        assertThrows(ConcurrentModificationException.class,
+                     () -> spliterator.tryAdvance((e) -> {}));
     }
     
     @Test
@@ -3216,19 +3230,21 @@ public class IndexedLinkedListTest {
         storageList.equals(Arrays.asList(2, 3, 4));
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void 
         spliteratorTryAdvanceThrowsNullPointerExceptionOnNullConsumer() {
-        list.spliterator().tryAdvance(null);
+        assertThrows(NullPointerException.class,
+                     () -> list.spliterator().tryAdvance(null));
     }
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void 
         spliteratorForEachRemainingThrowsNullPointerExceptionOnNullConsumer() {
-        list.spliterator().forEachRemaining(null);
+        assertThrows(NullPointerException.class,
+                     () -> list.spliterator().forEachRemaining(null));
     }
         
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void 
     spliteratorThrowsConcurrentModificationExceptionOnConcurrentModification() {
         list.addAll(Arrays.asList(1, 2, 3));
@@ -3236,11 +3252,11 @@ public class IndexedLinkedListTest {
         Spliterator<Integer> spliterator = list.spliterator();
         
         list.add(4);
-        spliterator.forEachRemaining((e) -> {});
-        list.forEach((e) -> {});
+        assertThrows(ConcurrentModificationException.class, 
+                     () -> spliterator.forEachRemaining((e) -> {}));
     }
     
-    @Test(expected = NoSuchElementException.class) 
+    @Test
     public void enhancedIteratorNextThrowsOnNoNext() {
         list.addAll(getIntegerList(20));
         
@@ -3252,10 +3268,11 @@ public class IndexedLinkedListTest {
             fail("Should not get here.");
         }
         
-        iter.next();
+        assertThrows(NoSuchElementException.class,
+                     () -> iter.next());
     }
     
-    @Test(expected = NoSuchElementException.class) 
+    @Test
     public void enhancedIteratorPrevioiusThrowsOnNoPrevious() {
         list.addAll(getIntegerList(20));
         
@@ -3267,10 +3284,11 @@ public class IndexedLinkedListTest {
             fail("Should not get here.");
         }
         
-        iter.previous();
+        assertThrows(NoSuchElementException.class,
+                     () -> iter.previous());
     }
     
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void enhancedIteratorThrowsOnDoubleRemove() {
         list.add(1);
         
@@ -3283,12 +3301,12 @@ public class IndexedLinkedListTest {
             fail("Should not get here.");
         }
         
-        iter.remove();
+        assertThrows(IllegalStateException.class,
+                     () -> iter.remove());
     }
     
-    @Test(expected = NoSuchElementException.class)
     public void getLastThrowsOnEmptyList() {
-        list.getLast();
+        assertThrows(NoSuchElementException.class, () -> list.getLast());
     }
     
     @Test
@@ -3373,27 +3391,27 @@ public class IndexedLinkedListTest {
         assertEquals(Integer.valueOf(1), list.get(1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void throwsOnAccessingEmptyList() {
-        list.get(0);
+        assertThrows(IndexOutOfBoundsException.class, () -> list.get(0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class) 
+    @Test
     public void throwsOnNegativeIndexInEmptyList() {
-        list.get(-1);
+        assertThrows(IndexOutOfBoundsException.class, () -> list.get(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class) 
+    @Test
     public void throwsOnNegativeIndexInNonEmptyList() {
         list.addFirst(10);
-        list.get(-1);
+        assertThrows(IndexOutOfBoundsException.class, () -> list.get(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class) 
+    @Test
     public void throwsOnTooLargeIndex() {
         list.addFirst(10);
         list.addLast(20);
-        list.get(2);
+        assertThrows(IndexOutOfBoundsException.class, () -> list.get(2));
     }
 
     @Test
@@ -3539,7 +3557,7 @@ public class IndexedLinkedListTest {
         assertTrue(listsEqual(list, referenceList));
     }
     
-    @Test(expected = ConcurrentModificationException.class)
+    @Test
     public void subListThrowsOnConcurrentModification() {
         List<Integer> l =
                 new IndexedLinkedList<>(
@@ -3549,7 +3567,9 @@ public class IndexedLinkedListTest {
         List<Integer> subList2 = subList1.subList(0, 2); // <2, 3>
         
         subList1.add(1, 10);
-        subList2.add(1, 11); // Must throw here.
+        
+        assertThrows(ConcurrentModificationException.class, 
+                     () -> subList2.add(1, 11)); // Must throw here.
     }
     
     @Test

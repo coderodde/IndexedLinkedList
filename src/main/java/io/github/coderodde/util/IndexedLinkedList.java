@@ -57,7 +57,7 @@ import java.util.function.UnaryOperator;
  * finger lis). 
  * 
  * @author Rodion "rodde" Efremov
- * @version 1.7.2 (Jul 7, 2025) - the Master thesis version)
+ * @version 1.7.3 (Dec 7, 2025)
  * @since 1.6 (Sep 1, 2021)
  * @param <E> the element type.
  */
@@ -1418,7 +1418,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
         } else {
             linkBefore(element, 
                        index, 
-                       getNode(index));
+                       fingerList.getNodeNoFingersFix(index));
         }   
     }
     
@@ -3955,7 +3955,7 @@ public class IndexedLinkedList<E> implements Deque<E>,
      * @param index the index of {@code e}.
      * @param succ  the node before which to link the {@code e}'s node.
      */
-        private void linkBefore(E e, int index, Node<E> succ) {
+    private void linkBefore(E e, int index, Node<E> succ) {
         Node<E> pred = succ.prev;   
         Node<E> newNode = new Node<>(e);
         
